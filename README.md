@@ -1,36 +1,88 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Traxium · Protótipo SaaS de Compliance Agrologística
 
-## Getting Started
+Protótipo navegável da plataforma Traxium para benchmarking e validação. Cobre o back-office web completo (gestores de transportadora) e preview do app mobile do motorista.
 
-First, run the development server:
+## Stack
+
+- **Next.js 16 (App Router)** com Turbopack
+- **TypeScript** estrito
+- **Tailwind CSS v4**
+- **shadcn/ui** (Radix UI primitives) — montado localmente
+- **Recharts** para gráficos
+- **Lucide React** para iconografia
+- **Geist Sans + Geist Mono** (fontes)
+
+## Rodando localmente
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Acesse [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Para começar pelo login: [http://localhost:3000/login](http://localhost:3000/login).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Roteiro sugerido para benchmarking
 
-## Learn More
+1. `/login` — tela de entrada com pitch da marca.
+2. `/` — Dashboard operacional. Banner de auditoria, KPIs, charts de conformidade, viagens em destaque, NCs abertas, risco EUDR.
+3. `/viagens` — Lista completa com filtros.
+4. `/viagens/v-002` — Detalhe de viagem **bloqueada** mostrando o sequenciamento T-3 e o motor de regras IDTF.
+5. `/viagens/v-001` — Detalhe de viagem em trânsito com rastreio.
+6. `/checklists` — Templates LCI, base IDTF e execuções recentes.
+7. `/bloqueios` — Não conformidades classificadas por severidade.
+8. `/frota` — Cavalos e carretas com certificação GMP+.
+9. `/motoristas` — Próprios, agregados, subcontratados. Letramento digital declarado.
+10. `/fazendas` — Polígonos EUDR, validação cruzada INPE/MapBiomas/CAR.
+11. `/lotes` — Lotes de exportação e pipeline DDS.
+12. `/traces` — Gateway TRACES NT (SOAP/WS-Security), logs, schemas, webhooks.
+13. `/auditoria` — Auditorias programadas e plano de preparação.
+14. `/conformidade` — Score consolidado, ranking de motoristas, recomendações.
+15. `/documentos` — Repositório de certificados, políticas, DDS.
+16. `/atividade` — Timeline de eventos do sistema.
+17. `/configuracoes` — Organização, equipe, integrações, API, faturamento.
+18. `/mobile` — **Preview interativo do app do motorista** com 6 telas navegáveis.
 
-To learn more about Next.js, take a look at the following resources:
+## Design system
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Consulte [DESIGN.md](./DESIGN.md) para a documentação completa de cores, tipografia, componentes, espaçamento, iconografia e padrões.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Paleta: verde-azulado `#1FA89F` + azul `#0E78B5` + branco. Sidebar escura `#1A2942`.
 
-## Deploy on Vercel
+## Estrutura do código
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+src/
+├── app/
+│   ├── (app)/              # Rotas autenticadas com shell (sidebar + topbar)
+│   │   ├── layout.tsx
+│   │   ├── page.tsx        # Dashboard
+│   │   └── [módulos]/
+│   └── (auth)/             # Rotas públicas
+│       └── login/
+├── components/
+│   ├── ui/                 # Primitivos shadcn-style
+│   ├── shell/              # Sidebar, Topbar, PageHeader, KPICard, StatusBadge
+│   └── logo.tsx
+└── lib/
+    ├── utils.ts            # cn(), formatters
+    └── mock-data.ts        # Dados de domínio (viagens, motoristas, etc)
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Decisões importantes do protótipo
+
+- Sem backend real. Todos os dados vêm de `src/lib/mock-data.ts` e podem ser editados livremente para gerar variações.
+- O multi-tenant é representado por um seletor no topbar; troca de tenant é local, não persistida.
+- Mapas usam SVG inline em vez de Leaflet/Mapbox para evitar dependência de tile servers no protótipo. A próxima iteração troca por mapa real.
+- App mobile é simulado em um phone frame dentro da rota `/mobile`. A entrega real é um app React Native ou PWA.
+- Toda a UI é client-side por simplicidade do protótipo.
+
+## Próximas evoluções planejadas
+
+1. Backend Supabase ou Postgres + Row Level Security para multi-tenant real
+2. Mapa Leaflet com tiles do MapBox e camadas vetoriais EUDR
+3. Mock real do gateway TRACES NT (SOAP fake server)
+4. App mobile React Native ou PWA com IndexedDB para offline
+5. Motor de regras T-3 como serviço separado (rules engine)
+6. Pesquisa com motoristas de Rondonópolis para validar a UX mobile
