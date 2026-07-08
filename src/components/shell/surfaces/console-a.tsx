@@ -6,6 +6,7 @@
 // usuários + métricas; cria tenant sandbox para test users (§6).
 
 import { useState } from "react";
+import { StatTile } from "@/components/kit/stat-tile";
 import {
   Building2,
   Receipt,
@@ -130,19 +131,6 @@ export function ConsoleA() {
   );
 }
 
-function KPI({ icon: Icon, label, value, hint }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string | number; hint?: string }) {
-  return (
-    <div className="rounded-xl border border-[hsl(200_18%_88%)] bg-white p-4">
-      <div className="flex items-center gap-2 text-[hsl(210_14%_42%)]">
-        <Icon className="size-4" />
-        <p className="text-[11px] font-semibold uppercase tracking-wide">{label}</p>
-      </div>
-      <p className="mt-2 text-[26px] font-bold tracking-tight num">{value}</p>
-      {hint && <p className="mt-0.5 text-[11px] text-[hsl(210_14%_48%)]">{hint}</p>}
-    </div>
-  );
-}
-
 function Metricas() {
   const sandbox = tenants.filter((t) => t.sandbox).length;
   return (
@@ -152,12 +140,12 @@ function Metricas() {
         <p className="text-[13px] text-[hsl(210_14%_42%)]">Visão cross-tenant · o Console cuida do cliente, não opera o dado dele.</p>
       </div>
       <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        <KPI icon={Building2} label="Tenants" value={tenants.length} hint={`${sandbox} sandbox`} />
-        <KPI icon={Truck} label="Viagens" value={viagens.length} hint="somadas na plataforma" />
-        <KPI icon={AlertOctagon} label="NCs abertas" value={naoConformidades.length} hint="todos os clientes" />
-        <KPI icon={Gavel} label="Exceções pendentes" value={excecoes.filter((e) => e.status === "pendente").length} />
-        <KPI icon={Boxes} label="Produtos IDTF" value={produtosIDTF.length} hint={`${produtosIDTF.filter((p) => p.statusClassificacao === "em_fila").length} em fila`} />
-        <KPI icon={Receipt} label="MRR estimado" value={`R$ ${(tenants.reduce((a, t) => a + (MRR[t.plano] ?? 0), 0) / 1000).toFixed(0)}k`} hint="recorrente/mês" />
+        <StatTile icon={Building2} label="Tenants" value={tenants.length} hint={`${sandbox} sandbox`} />
+        <StatTile icon={Truck} label="Viagens" value={viagens.length} hint="somadas na plataforma" />
+        <StatTile icon={AlertOctagon} label="NCs abertas" value={naoConformidades.length} hint="todos os clientes" />
+        <StatTile icon={Gavel} label="Exceções pendentes" value={excecoes.filter((e) => e.status === "pendente").length} />
+        <StatTile icon={Boxes} label="Produtos IDTF" value={produtosIDTF.length} hint={`${produtosIDTF.filter((p) => p.statusClassificacao === "em_fila").length} em fila`} />
+        <StatTile icon={Receipt} label="MRR estimado" value={`R$ ${(tenants.reduce((a, t) => a + (MRR[t.plano] ?? 0), 0) / 1000).toFixed(0)}k`} hint="recorrente/mês" />
       </div>
     </>
   );
@@ -274,9 +262,9 @@ function IDTFGlobal({ onPublicar }: { onPublicar: () => void }) {
         A Traxium cura a base oficial do GMP+ FSA e publica versões para todos os tenants. Um produto novo classificado aqui vira regra em todo cliente.
       </p>
       <div className="grid gap-3 sm:grid-cols-3">
-        <KPI icon={Boxes} label="Produtos na base" value={produtosIDTF.length} />
-        <KPI icon={ShieldCheck} label="Classificados" value={classificados} />
-        <KPI icon={AlertOctagon} label="Em fila (curadoria)" value={emFila} />
+        <StatTile icon={Boxes} label="Produtos na base" value={produtosIDTF.length} />
+        <StatTile icon={ShieldCheck} label="Classificados" value={classificados} />
+        <StatTile icon={AlertOctagon} label="Em fila (curadoria)" value={emFila} />
       </div>
     </>
   );

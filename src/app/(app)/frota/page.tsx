@@ -26,6 +26,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatusBadge, RegimeBadge, CompartimentoStatusBadge } from "@/components/shell/status-badge";
+import { StatTile } from "@/components/kit/stat-tile";
 import {
   cavalos,
   implementos,
@@ -34,7 +35,7 @@ import {
   findSubcontratado,
 } from "@/lib/domain/model";
 import { statusCompartimento } from "@/lib/domain/rules-engine";
-import { formatDate, cn } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 
 export default function FrotaPage() {
   const { version } = useSession();
@@ -97,10 +98,10 @@ export default function FrotaPage() {
       />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <MetricCard icon={<Truck />} label="Cavalos" value={cavalos.length} hint="não carregam T-3" />
-        <MetricCard icon={<Container />} label="Implementos" value={implementos.length} />
-        <MetricCard icon={<Boxes />} label="Compartimentos" value={compartimentos.length} variant="brand" />
-        <MetricCard icon={<ShieldAlert />} label="Compart. bloqueados" value={bloqueados} variant="danger" />
+        <StatTile icon={Truck} label="Cavalos" value={cavalos.length} hint="não carregam T-3" />
+        <StatTile icon={Container} label="Implementos" value={implementos.length} />
+        <StatTile icon={Boxes} label="Compartimentos" value={compartimentos.length} tone="brand" />
+        <StatTile icon={ShieldAlert} label="Compart. bloqueados" value={bloqueados} tone="danger" />
       </div>
 
       <Tabs defaultValue="compartimentos">
@@ -112,7 +113,7 @@ export default function FrotaPage() {
 
         <div className="mt-4">
           <div className="relative max-w-md mb-3">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[hsl(210_14%_42%)]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-fg-muted" />
             <Input
               placeholder="Buscar placa, compartimento ou modelo…"
               value={search}
@@ -146,9 +147,9 @@ export default function FrotaPage() {
                             <Link href={`/frota/compartimento/${c.id}`} className="block">
                               <p className="text-[13px] font-semibold hover:underline">
                                 <span className="font-mono">{imp?.placa}</span>
-                                <span className="text-[hsl(210_14%_42%)] font-normal"> · {c.identificador}</span>
+                                <span className="text-fg-muted font-normal"> · {c.identificador}</span>
                               </p>
-                              <p className="text-[10px] text-[hsl(210_12%_58%)]">
+                              <p className="text-[10px] text-fg-soft">
                                 {imp?.tipo} · {c.capacidadeT} t · {c.material}
                               </p>
                             </Link>
@@ -157,12 +158,12 @@ export default function FrotaPage() {
                             {st.ultimaCarga ? (
                               <>
                                 <p className="text-[12px]">{st.ultimaCarga.nomeCanonico}</p>
-                                <p className="text-[10px] text-[hsl(210_12%_58%)] num">
+                                <p className="text-[10px] text-fg-soft num">
                                   {st.ultimaCargaData && formatDate(st.ultimaCargaData)}
                                 </p>
                               </>
                             ) : (
-                              <span className="text-[12px] text-[hsl(210_12%_58%)]">—</span>
+                              <span className="text-[12px] text-fg-soft">—</span>
                             )}
                           </TableCell>
                           <TableCell>
@@ -175,7 +176,7 @@ export default function FrotaPage() {
                             {st.ultimaLimpeza ? (
                               <div className="flex items-center gap-1.5">
                                 <RegimeBadge regime={st.ultimaLimpeza.regime} size="sm" />
-                                <span className="text-[10px] text-[hsl(210_12%_58%)] num">
+                                <span className="text-[10px] text-fg-soft num">
                                   {formatDate(st.ultimaLimpeza.data)}
                                 </span>
                               </div>
@@ -185,7 +186,7 @@ export default function FrotaPage() {
                           </TableCell>
                           <TableCell>
                             <Link href={`/frota/compartimento/${c.id}`}>
-                              <ChevronRight className="size-4 text-[hsl(210_12%_70%)]" />
+                              <ChevronRight className="size-4 text-fg-soft" />
                             </Link>
                           </TableCell>
                         </TableRow>
@@ -195,7 +196,7 @@ export default function FrotaPage() {
                 </Table>
               </CardContent>
             </Card>
-            <p className="mt-2 flex items-center gap-1.5 text-[11px] text-[hsl(210_14%_42%)]">
+            <p className="mt-2 flex items-center gap-1.5 text-[11px] text-fg-muted">
               <Info className="size-3.5" /> O T-3 pertence ao compartimento e sobrevive à troca de cavalo entre viagens.
             </p>
           </TabsContent>
@@ -229,13 +230,13 @@ export default function FrotaPage() {
                           <TableCell className="num text-[13px]">{i.nCompartimentos}</TableCell>
                           <TableCell>
                             <p className="text-[12px]">{i.proprietario}</p>
-                            {sub && <p className="text-[10px] text-[hsl(210_12%_58%)]">{sub.razaoSocial}</p>}
+                            {sub && <p className="text-[10px] text-fg-soft">{sub.razaoSocial}</p>}
                           </TableCell>
-                          <TableCell className="text-[11px] text-[hsl(210_14%_42%)]">{i.certGMP.escopo}</TableCell>
+                          <TableCell className="text-[11px] text-fg-muted">{i.certGMP.escopo}</TableCell>
                           <TableCell>
                             <StatusBadge status={i.certGMP.status} size="sm" />
                             <div className="flex items-center gap-2 mt-0.5">
-                              <span className="text-[10px] text-[hsl(210_12%_58%)]">vence {formatDate(i.certGMP.validade)}</span>
+                              <span className="text-[10px] text-fg-soft">vence {formatDate(i.certGMP.validade)}</span>
                               <button
                                 onClick={() => setRenovarTarget({ kind: "implemento", id: i.id, placa: i.placa, validadeAtual: i.certGMP.validade })}
                                 className="text-[10px] font-semibold text-[hsl(176_84%_25%)] hover:underline"
@@ -287,7 +288,7 @@ export default function FrotaPage() {
                             <Badge variant="destructive" className="text-[10px]">Pendente</Badge>
                           )}
                         </TableCell>
-                        <TableCell className="text-[11px] text-[hsl(210_12%_58%)]">
+                        <TableCell className="text-[11px] text-fg-soft">
                           não aplicável — não toca a carga
                         </TableCell>
                       </TableRow>
@@ -302,41 +303,5 @@ export default function FrotaPage() {
 
       <RenovarCertificacaoModal open={!!renovarTarget} onOpenChange={(o) => { if (!o) setRenovarTarget(null); }} target={renovarTarget} />
     </div>
-  );
-}
-
-function MetricCard({
-  icon,
-  label,
-  value,
-  variant,
-  hint,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: number;
-  variant?: "brand" | "danger";
-  hint?: string;
-}) {
-  return (
-    <Card className="p-4">
-      <div className="flex items-center gap-3">
-        <div
-          className={cn(
-            "size-10 rounded-lg flex items-center justify-center shrink-0",
-            variant === "danger" && "bg-[hsl(0_72%_95%)] text-[hsl(0_72%_40%)]",
-            variant === "brand" && "bg-[hsl(174_64%_94%)] text-[hsl(180_80%_18%)]",
-            !variant && "bg-[hsl(200_18%_94%)] text-[hsl(210_14%_42%)]"
-          )}
-        >
-          {icon}
-        </div>
-        <div className="min-w-0">
-          <p className="text-[11px] uppercase tracking-wider text-[hsl(215_16%_47%)] font-semibold">{label}</p>
-          <p className="text-2xl font-bold tabular-nums leading-none mt-0.5">{value}</p>
-          {hint && <p className="text-[10px] text-[hsl(210_12%_58%)] mt-0.5">{hint}</p>}
-        </div>
-      </div>
-    </Card>
   );
 }

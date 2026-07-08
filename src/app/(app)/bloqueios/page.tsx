@@ -29,6 +29,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { StatusBadge } from "@/components/shell/status-badge";
+import { StatTile } from "@/components/kit/stat-tile";
 import { naoConformidades, type NaoConformidade } from "@/lib/mock-data";
 import { ReportarNCModal } from "@/components/modals/reportar-nc-modal";
 import { useSession } from "@/lib/store/session";
@@ -101,37 +102,37 @@ export default function BloqueiosPage() {
         <StatTile
           label="Críticas ativas"
           value={counts.criticas}
-          icon={<ShieldAlert className="size-5" />}
+          icon={ShieldAlert}
           tone="danger"
-          sub="bloqueando operações"
+          hint="bloqueando operações"
         />
         <StatTile
           label="Abertas"
           value={counts.abertas}
-          icon={<AlertOctagon className="size-5" />}
+          icon={AlertOctagon}
           tone="warning"
-          sub="sem responsável"
+          hint="sem responsável"
         />
         <StatTile
           label="Em tratamento"
           value={counts.tratamento}
-          icon={<Clock className="size-5" />}
-          tone="info"
-          sub="prazo médio: 3d"
+          icon={Clock}
+          tone="brand"
+          hint="prazo médio: 3d"
         />
         <StatTile
           label="Resolvidas (7d)"
           value={counts.resolvidas}
-          icon={<CheckCheck className="size-5" />}
+          icon={CheckCheck}
           tone="success"
-          sub="ciclo médio: 1.4d"
+          hint="ciclo médio: 1.4d"
         />
       </div>
 
       <Tabs value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
         <TabsList>
           <TabsTrigger value="todas">
-            Todas <span className="ml-1.5 text-[hsl(210_12%_58%)] num">({naoConformidades.length})</span>
+            Todas <span className="ml-1.5 text-fg-soft num">({naoConformidades.length})</span>
           </TabsTrigger>
           <TabsTrigger value="abertas">
             Abertas <span className="ml-1.5 text-[hsl(0_70%_38%)] font-bold num">({counts.abertas})</span>
@@ -148,7 +149,7 @@ export default function BloqueiosPage() {
           <Card>
             <CardHeader className="flex flex-row items-center gap-2 pb-3 flex-wrap">
               <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-[hsl(210_14%_42%)]" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-fg-muted" />
                 <Input
                   placeholder="Buscar código, motorista, viagem…"
                   value={busca}
@@ -158,7 +159,7 @@ export default function BloqueiosPage() {
               </div>
               <Select value={sev} onValueChange={setSev}>
                 <SelectTrigger className="h-9 w-[150px]">
-                  <Filter className="size-4 text-[hsl(210_14%_42%)]" />
+                  <Filter className="size-4 text-fg-muted" />
                   <SelectValue placeholder="Severidade" />
                 </SelectTrigger>
                 <SelectContent>
@@ -170,7 +171,7 @@ export default function BloqueiosPage() {
               </Select>
               <Select value={cat} onValueChange={setCat}>
                 <SelectTrigger className="h-9 w-[180px]">
-                  <Filter className="size-4 text-[hsl(210_14%_42%)]" />
+                  <Filter className="size-4 text-fg-muted" />
                   <SelectValue placeholder="Categoria" />
                 </SelectTrigger>
                 <SelectContent>
@@ -187,7 +188,7 @@ export default function BloqueiosPage() {
                     "group rounded-lg border p-4 hover:shadow-brand-md transition-all cursor-pointer",
                     nc.severidade === "Crítica" && "border-[hsl(0_72%_80%)] bg-gradient-to-r from-[hsl(0_72%_98%)] to-white",
                     nc.severidade === "Maior" && "border-[hsl(28_92%_80%)] bg-gradient-to-r from-[hsl(36_95%_98%)] to-white",
-                    nc.severidade === "Menor" && "border-[hsl(200_18%_92%)]"
+                    nc.severidade === "Menor" && "border-border-soft"
                   )}
                 >
                   <div className="flex items-start gap-4">
@@ -217,40 +218,40 @@ export default function BloqueiosPage() {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-1">
-                        <span className="font-mono text-[12px] font-bold text-[hsl(195_30%_8%)]">{nc.codigo}</span>
+                        <span className="font-mono text-[12px] font-bold text-fg">{nc.codigo}</span>
                         <Badge variant="outline" className="text-[10px]">
                           {nc.categoria}
                         </Badge>
                         <StatusBadge status={nc.status} size="sm" />
                       </div>
-                      <p className="text-[13px] font-medium leading-snug text-[hsl(195_30%_8%)]">{nc.descricao}</p>
-                      <div className="flex items-center gap-x-4 gap-y-1 mt-3 text-[11px] text-[hsl(210_14%_42%)] flex-wrap">
+                      <p className="text-[13px] font-medium leading-snug text-fg">{nc.descricao}</p>
+                      <div className="flex items-center gap-x-4 gap-y-1 mt-3 text-[11px] text-fg-muted flex-wrap">
                         {nc.viagem && (
                           <span>
-                            <span className="text-[hsl(210_12%_58%)]">Viagem:</span>{" "}
+                            <span className="text-fg-soft">Viagem:</span>{" "}
                             <span className="font-mono font-semibold">{nc.viagem}</span>
                           </span>
                         )}
                         {nc.motorista && (
                           <span>
-                            <span className="text-[hsl(210_12%_58%)]">Motorista:</span>{" "}
+                            <span className="text-fg-soft">Motorista:</span>{" "}
                             <span className="font-semibold">{nc.motorista}</span>
                           </span>
                         )}
                         {nc.veiculo && (
                           <span>
-                            <span className="text-[hsl(210_12%_58%)]">Veículo:</span>{" "}
+                            <span className="text-fg-soft">Veículo:</span>{" "}
                             <span className="font-mono font-semibold">{nc.veiculo}</span>
                           </span>
                         )}
                         {nc.responsavel && (
                           <span>
-                            <span className="text-[hsl(210_12%_58%)]">Responsável:</span>{" "}
+                            <span className="text-fg-soft">Responsável:</span>{" "}
                             <span className="font-semibold">{nc.responsavel}</span>
                           </span>
                         )}
                       </div>
-                      <p className="text-[10px] text-[hsl(210_12%_58%)] uppercase tracking-wider font-semibold mt-2">
+                      <p className="text-[10px] text-fg-soft uppercase tracking-wider font-semibold mt-2">
                         Aberta em {formatDateTime(nc.abertaEm)}
                         {nc.capa && (
                           <span className={cn("ml-2", nc.capa.eficaciaVerificada ? "text-[hsl(142_71%_28%)]" : "text-[hsl(24_88%_32%)]")}>
@@ -278,9 +279,12 @@ export default function BloqueiosPage() {
                 </div>
               ))}
               {!filtered.length && (
-                <p className="text-center text-[13px] text-[hsl(210_14%_42%)] py-8">
-                  Nenhuma não conformidade para os filtros atuais.
-                </p>
+                <div className="flex flex-col items-center gap-2 py-12 text-center">
+                  <CheckCheck className="size-8 text-fg-soft" />
+                  <p className="text-[13px] text-fg-muted">
+                    Nenhuma não conformidade para os filtros atuais.
+                  </p>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -311,9 +315,9 @@ function CapaPanel({
     prazo !== (capa.prazo?.slice(0, 10) ?? "") || eficacia !== capa.eficaciaVerificada;
 
   return (
-    <div className="mt-3 rounded-lg border border-[hsl(200_18%_92%)] bg-[hsl(200_18%_98%)] p-3.5 space-y-3">
+    <div className="mt-3 rounded-lg border border-border-soft bg-bg p-3.5 space-y-3">
       <div className="flex items-center gap-2">
-        <span className="text-[10px] uppercase tracking-[0.12em] font-bold text-[hsl(210_14%_42%)]">
+        <span className="text-[10px] uppercase tracking-[0.12em] font-bold text-fg-muted">
           CAPA · Correção e ação corretiva (editável)
         </span>
         <label className={cn(
@@ -331,17 +335,17 @@ function CapaPanel({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
         <div>
-          <Label className="text-[10px] uppercase tracking-[0.1em] font-semibold text-[hsl(210_14%_42%)] flex items-center gap-1"><ShieldCheck className="size-3" /> Responsável</Label>
+          <Label className="text-[10px] uppercase tracking-[0.1em] font-semibold text-fg-muted flex items-center gap-1"><ShieldCheck className="size-3" /> Responsável</Label>
           <Input value={responsavelAcao} onChange={(e) => setResponsavel(e.target.value)} className="h-8 mt-1" placeholder="Ex.: Gerência de Compliance" />
         </div>
         <div>
-          <Label className="text-[10px] uppercase tracking-[0.1em] font-semibold text-[hsl(210_14%_42%)] flex items-center gap-1"><CalendarClock className="size-3" /> Prazo</Label>
+          <Label className="text-[10px] uppercase tracking-[0.1em] font-semibold text-fg-muted flex items-center gap-1"><CalendarClock className="size-3" /> Prazo</Label>
           <Input type="date" value={prazo} onChange={(e) => setPrazo(e.target.value)} className="h-8 mt-1" />
         </div>
       </div>
 
       <div className="flex items-center justify-between pt-1">
-        <span className="text-[10px] text-[hsl(210_12%_58%)]">Correção imediata não basta — auditor cobra causa raiz + ação + eficácia.</span>
+        <span className="text-[10px] text-fg-soft">Correção imediata não basta — auditor cobra causa raiz + ação + eficácia.</span>
         <Button
           variant={dirty ? "gradient" : "outline"}
           size="sm"
@@ -370,45 +374,10 @@ function CapaField({
     <div className="flex items-start gap-2.5">
       <span className={cn("size-6 rounded-md flex items-center justify-center text-white shrink-0 mt-0.5", c)}>{icon}</span>
       <div className="min-w-0 flex-1">
-        <p className="text-[10px] uppercase tracking-[0.1em] font-semibold text-[hsl(210_14%_42%)] mb-1">{titulo}</p>
+        <p className="text-[10px] uppercase tracking-[0.1em] font-semibold text-fg-muted mb-1">{titulo}</p>
         <Input value={value} onChange={(e) => onChange(e.target.value)} className="h-8" placeholder={placeholder} />
       </div>
     </div>
   );
 }
 
-function StatTile({
-  label,
-  value,
-  icon,
-  tone,
-  sub,
-}: {
-  label: string;
-  value: number;
-  icon: React.ReactNode;
-  tone: "danger" | "warning" | "info" | "success";
-  sub: string;
-}) {
-  const colors = {
-    danger: { bg: "bg-gradient-to-br from-[hsl(0_72%_94%)] to-[hsl(0_72%_98%)]", icon: "bg-[hsl(0_78%_50%)] text-white", text: "text-[hsl(0_70%_28%)]" },
-    warning: { bg: "bg-gradient-to-br from-[hsl(36_95%_94%)] to-[hsl(36_95%_98%)]", icon: "bg-[hsl(28_92%_48%)] text-white", text: "text-[hsl(24_88%_28%)]" },
-    info: { bg: "bg-gradient-to-br from-[hsl(174_64%_94%)] to-[hsl(174_64%_98%)]", icon: "bg-[hsl(176_84%_25%)] text-white", text: "text-[hsl(180_80%_18%)]" },
-    success: { bg: "bg-gradient-to-br from-[hsl(142_65%_94%)] to-[hsl(142_65%_98%)]", icon: "bg-[hsl(142_71%_36%)] text-white", text: "text-[hsl(142_71%_22%)]" },
-  };
-  const c = colors[tone];
-  return (
-    <Card className={cn("p-4", c.bg)}>
-      <div className="flex items-start gap-3">
-        <div className={cn("size-10 rounded-lg flex items-center justify-center shadow-brand-sm shrink-0", c.icon)}>
-          {icon}
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className={cn("text-[10px] uppercase tracking-[0.12em] font-bold", c.text)}>{label}</p>
-          <p className={cn("text-[28px] font-bold num tracking-tight leading-none mt-0.5", c.text)}>{value}</p>
-          <p className="text-[10px] text-[hsl(210_14%_42%)] mt-1">{sub}</p>
-        </div>
-      </div>
-    </Card>
-  );
-}

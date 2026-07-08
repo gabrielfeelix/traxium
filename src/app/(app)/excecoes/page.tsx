@@ -120,8 +120,8 @@ export default function ExcecoesPage() {
                 {m.icon}
               </div>
               <div>
-                <p className="text-[12px] font-semibold text-[hsl(195_30%_8%)]">{m.nivel}</p>
-                <p className="text-[11px] text-[hsl(210_14%_42%)] mt-0.5 leading-relaxed">{m.casos}</p>
+                <p className="text-[12px] font-semibold text-fg">{m.nivel}</p>
+                <p className="text-[11px] text-fg-muted mt-0.5 leading-relaxed">{m.casos}</p>
               </div>
             </div>
           ))}
@@ -130,7 +130,7 @@ export default function ExcecoesPage() {
 
       {/* Fila de pendências */}
       <div>
-        <h2 className="text-[13px] font-semibold text-[hsl(195_30%_8%)] mb-2 flex items-center gap-2">
+        <h2 className="text-[13px] font-semibold text-fg mb-2 flex items-center gap-2">
           <Clock className="size-4 text-[hsl(28_92%_48%)]" /> Pendentes de decisão
           <Badge variant="warning" className="num">{pendentes.length}</Badge>
         </h2>
@@ -139,7 +139,12 @@ export default function ExcecoesPage() {
             <ExcecaoCard key={e.id} e={e} papel={papel} onDecidir={decidir} />
           ))}
           {!pendentes.length && (
-            <Card><CardContent className="p-6 text-center text-[13px] text-[hsl(210_14%_42%)]">Nenhuma exceção pendente.</CardContent></Card>
+            <Card>
+              <CardContent className="p-8 flex flex-col items-center gap-2 text-center">
+                <CheckCircle2 className="size-8 text-fg-soft" />
+                <p className="text-[13px] text-fg-muted">Nenhuma exceção pendente.</p>
+              </CardContent>
+            </Card>
           )}
         </div>
       </div>
@@ -147,7 +152,7 @@ export default function ExcecoesPage() {
       {/* Decididas */}
       {decididas.length > 0 && (
         <div>
-          <h2 className="text-[13px] font-semibold text-[hsl(195_30%_8%)] mb-2">Histórico de decisões</h2>
+          <h2 className="text-[13px] font-semibold text-fg mb-2">Histórico de decisões</h2>
           <div className="space-y-3">
             {decididas.map((e) => (
               <ExcecaoCard key={e.id} e={e} papel={papel} onDecidir={decidir} />
@@ -174,10 +179,10 @@ function ExcecaoCard({ e, papel, onDecidir }: { e: Excecao; papel: Papel; onDeci
               <Badge variant="outline" className="text-[9px]">{e.regra}</Badge>
               <StatusTag status={e.status} />
             </div>
-            <p className="text-[13px] text-[hsl(195_30%_8%)]">{e.motivoBloqueio}</p>
+            <p className="text-[13px] text-fg">{e.motivoBloqueio}</p>
 
             <div className="flex items-center gap-2 mt-2 flex-wrap">
-              <span className="text-[10px] uppercase tracking-wide font-semibold text-[hsl(210_14%_42%)]">Nível exigido:</span>
+              <span className="text-[10px] uppercase tracking-wide font-semibold text-fg-muted">Nível exigido:</span>
               <span
                 className={cn(
                   "text-[10px] font-bold rounded px-1.5 py-0.5",
@@ -188,14 +193,14 @@ function ExcecaoCard({ e, papel, onDecidir }: { e: Excecao; papel: Papel; onDeci
               </span>
             </div>
 
-            <p className="text-[11px] text-[hsl(210_14%_42%)] mt-1.5">
+            <p className="text-[11px] text-fg-muted mt-1.5">
               Solicitado por {e.solicitante} · {formatDateTime(e.solicitadoEm)}
             </p>
 
             {e.evidencias.length > 0 && (
               <div className="flex items-center gap-2 mt-2 flex-wrap">
                 {e.evidencias.map((ev) => (
-                  <span key={ev} className="inline-flex items-center gap-1 text-[10px] text-[hsl(210_14%_42%)] bg-[hsl(200_18%_96%)] rounded px-1.5 py-0.5">
+                  <span key={ev} className="inline-flex items-center gap-1 text-[10px] text-fg-muted bg-bg rounded px-1.5 py-0.5">
                     <Paperclip className="size-2.5" /> {ev}
                   </span>
                 ))}
@@ -209,7 +214,7 @@ function ExcecaoCard({ e, papel, onDecidir }: { e: Excecao; papel: Papel; onDeci
             )}
 
             {e.status !== "pendente" && e.aprovador && (
-              <p className="text-[11px] text-[hsl(210_14%_42%)] mt-2">
+              <p className="text-[11px] text-fg-muted mt-2">
                 {e.status === "aprovada" ? "Aprovada" : "Negada"} por {e.aprovador} · {e.decididoEm && formatDateTime(e.decididoEm)}
               </p>
             )}
@@ -226,7 +231,7 @@ function ExcecaoCard({ e, papel, onDecidir }: { e: Excecao; papel: Papel; onDeci
                 </Button>
               </div>
             ) : (
-              <div className="shrink-0 max-w-[170px] text-[10px] text-[hsl(210_14%_42%)] flex items-start gap-1.5 bg-[hsl(200_18%_97%)] rounded-md p-2">
+              <div className="shrink-0 max-w-[170px] text-[10px] text-fg-muted flex items-start gap-1.5 bg-bg rounded-md p-2">
                 <Lock className="size-3.5 mt-0.5 shrink-0" />
                 <span>Requer <strong>{NIVEL_LABEL[e.nivelRequerido]}</strong>. Seu papel não decide esta exceção.</span>
               </div>

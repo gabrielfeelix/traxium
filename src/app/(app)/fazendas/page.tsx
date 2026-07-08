@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatusBadge, RiscoBadge } from "@/components/shell/status-badge";
+import { StatTile } from "@/components/kit/stat-tile";
 import { FazendaMap } from "@/components/map/fazenda-map-dynamic";
 import { fazendas } from "@/lib/mock-data";
 import { NovaFazendaModal } from "@/components/modals/nova-fazenda-modal";
@@ -76,9 +77,9 @@ export default function FazendasPage() {
 
       {/* Resumo agregado */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
-        <StatCard label="Fazendas" value={fazendas.length} subtle={`em ${new Set(fazendas.map((f) => f.cidade)).size} municípios`} />
-        <StatCard label="Área total" value={`${(areaTotal / 1000).toFixed(1)}k`} subtle="hectares" />
-        <StatCard label="Preservação" value={`${Math.round((preservacao / areaTotal) * 100)}%`} subtle="da área total" tone="success" />
+        <StatTile label="Fazendas" value={fazendas.length} hint={`em ${new Set(fazendas.map((f) => f.cidade)).size} municípios`} />
+        <StatTile label="Área total" value={`${(areaTotal / 1000).toFixed(1)}k`} hint="hectares" />
+        <StatTile label="Preservação" value={`${Math.round((preservacao / areaTotal) * 100)}%`} hint="da área total" tone="success" />
         <div className="lg:col-span-4 grid grid-cols-4 gap-2">
           <RiskCard label="Baixo" value={riscoCounts.baixo} color="hsl(142 71% 36%)" />
           <RiskCard label="Médio" value={riscoCounts.medio} color="hsl(36 95% 50%)" />
@@ -99,7 +100,7 @@ export default function FazendasPage() {
                   "text-[10px] font-semibold uppercase tracking-wider px-2 py-1 rounded-md border transition-colors",
                   showAll
                     ? "border-[hsl(176_84%_25%)] bg-[hsl(174_64%_94%)] text-[hsl(176_84%_25%)]"
-                    : "border-[hsl(200_18%_88%)] text-[hsl(210_14%_42%)] hover:border-[hsl(176_60%_55%)]"
+                    : "border-border text-fg-muted hover:border-[hsl(176_60%_55%)]"
                 )}
               >
                 <Layers className="size-3 inline mr-1" />
@@ -107,7 +108,7 @@ export default function FazendasPage() {
               </button>
             </div>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-[hsl(210_14%_42%)]" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-fg-muted" />
               <Input
                 placeholder="Buscar fazenda…"
                 value={search}
@@ -134,7 +135,7 @@ export default function FazendasPage() {
                     "w-full text-left p-3 rounded-lg border transition-all relative overflow-hidden",
                     selected.id === f.id
                       ? "border-[hsl(176_84%_45%)] bg-[hsl(174_64%_97%)] shadow-brand-sm"
-                      : "border-[hsl(200_18%_92%)] hover:border-[hsl(176_60%_70%)] hover:bg-[hsl(174_64%_99%)]"
+                      : "border-border-soft hover:border-[hsl(176_60%_70%)] hover:bg-[hsl(174_64%_99%)]"
                   )}
                 >
                   {selected.id === f.id && (
@@ -149,14 +150,14 @@ export default function FazendasPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
-                        <p className="text-[13px] font-semibold text-[hsl(195_30%_8%)] truncate">{f.nome}</p>
+                        <p className="text-[13px] font-semibold text-fg truncate">{f.nome}</p>
                         <RiscoBadge risco={f.scoreRiscoEUDR} />
                       </div>
-                      <p className="text-[11px] text-[hsl(210_14%_42%)] mt-0.5">
+                      <p className="text-[11px] text-fg-muted mt-0.5">
                         {f.cidade}/{f.uf} · <span className="num">{formatNumber(f.areaTotalHa)}</span> ha
                       </p>
                       <div className="flex items-center gap-1.5 mt-1.5">
-                        <span className="text-[10px] font-mono text-[hsl(210_14%_42%)] tracking-tight">
+                        <span className="text-[10px] font-mono text-fg-muted tracking-tight">
                           {f.car.split("-").slice(-1)[0].slice(0, 8)}…
                         </span>
                         <StatusBadge status={f.status} size="sm" />
@@ -178,10 +179,10 @@ export default function FazendasPage() {
         {/* Mapa */}
         <div className="lg:col-span-8 flex flex-col gap-3">
           <Card className="overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-3 border-b border-[hsl(200_18%_92%)]">
+            <div className="flex items-center justify-between px-5 py-3 border-b border-border-soft">
               <div>
                 <h3 className="text-[15px] font-semibold tracking-tight">{selected.nome}</h3>
-                <p className="text-[12px] text-[hsl(210_14%_42%)]">
+                <p className="text-[12px] text-fg-muted">
                   {selected.produtor} · {selected.cidade}/{selected.uf} · Centroide <span className="font-mono text-[11px]">{selected.centroide.lat.toFixed(4)}, {selected.centroide.lng.toFixed(4)}</span>
                 </p>
               </div>
@@ -195,7 +196,7 @@ export default function FazendasPage() {
               </div>
             </div>
             <FazendaMap fazenda={selected} fazendas={fazendas} showAllPolygons={showAll} height={460} />
-            <div className="grid grid-cols-3 gap-0 border-t border-[hsl(200_18%_92%)]">
+            <div className="grid grid-cols-3 gap-0 border-t border-border-soft">
               <AreaStat label="Área total" value={`${formatNumber(selected.areaTotalHa)} ha`} />
               <AreaStat label="Produtiva" value={`${formatNumber(selected.areaProdutivaHa)} ha`} accent="warning" />
               <AreaStat label="Preservação" value={`${formatNumber(selected.areaPreservacaoHa)} ha`} accent="success" border={false} />
@@ -240,13 +241,13 @@ export default function FazendasPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-[13px] text-[hsl(200_25%_25%)] leading-relaxed mb-4">
+                <p className="text-[13px] text-fg leading-relaxed mb-4">
                   {selected.desmatamentoPos2020
                     ? "INPE PRODES e MapBiomas Alerta indicam supressão de vegetação nativa em parcela aproximada de 18 ha após a data-corte da EUDR. Recomenda-se vistoria documental e análise multispectral antes de incluir esta fazenda em qualquer DDS."
                     : "Polígono validado contra todas as fontes obrigatórias da EUDR e auxiliares brasileiras. Nenhuma sobreposição com alertas de desmatamento, embargos IBAMA ou áreas indígenas/quilombolas."}
                 </p>
 
-                <p className="text-[10px] uppercase tracking-[0.12em] text-[hsl(210_14%_42%)] font-semibold mb-2">
+                <p className="text-[10px] uppercase tracking-[0.12em] text-fg-muted font-semibold mb-2">
                   Fontes consultadas
                 </p>
                 <div className="space-y-1.5">
@@ -258,11 +259,11 @@ export default function FazendasPage() {
                     { name: "FUNAI · Terras indígenas", desc: "Sobreposição com TIs homologadas", on: true },
                     { name: "INCRA · Quilombolas", desc: "Sobreposição com territórios reconhecidos", on: true },
                   ].map((src, i) => (
-                    <div key={i} className="flex items-center gap-2.5 p-2 rounded-md border border-[hsl(200_18%_94%)] bg-white">
+                    <div key={i} className="flex items-center gap-2.5 p-2 rounded-md border border-border-soft bg-white">
                       <Satellite className="size-3.5 text-[hsl(176_84%_25%)] shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="text-[12px] font-medium">{src.name}</p>
-                        <p className="text-[10px] text-[hsl(210_14%_42%)]">{src.desc}</p>
+                        <p className="text-[10px] text-fg-muted">{src.desc}</p>
                       </div>
                       <Badge variant="success" className="text-[9px]">Sincronizado</Badge>
                     </div>
@@ -287,7 +288,7 @@ export default function FazendasPage() {
                 ].map((m, i) => (
                   <div key={i}>
                     <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-[11px] text-[hsl(210_14%_42%)]">{m.d}</span>
+                      <span className="text-[11px] text-fg-muted">{m.d}</span>
                       <span
                         className={cn(
                           "text-[12px] font-bold num",
@@ -297,7 +298,7 @@ export default function FazendasPage() {
                         {m.s}
                       </span>
                     </div>
-                    <div className="h-1.5 rounded-full bg-[hsl(200_18%_94%)] overflow-hidden">
+                    <div className="h-1.5 rounded-full bg-bg overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all"
                         style={{
@@ -345,18 +346,18 @@ export default function FazendasPage() {
             </CardHeader>
             <CardContent className="space-y-2">
               {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="flex items-center gap-3 p-3 rounded-lg border border-[hsl(200_18%_92%)]">
+                <div key={i} className="flex items-center gap-3 p-3 rounded-lg border border-border-soft">
                   <div className="size-9 rounded-md bg-gradient-to-br from-[hsl(176_84%_30%)] to-[hsl(200_92%_28%)] text-white flex items-center justify-center">
                     <MapPin className="size-4" />
                   </div>
                   <div className="flex-1">
                     <p className="text-[13px] font-semibold font-mono">LOT-2026-014{i}</p>
-                    <p className="text-[11px] text-[hsl(210_14%_42%)]">
+                    <p className="text-[11px] text-fg-muted">
                       Soja em grão · {(1800 - i * 120).toLocaleString("pt-BR")}t · destino UE
                     </p>
                   </div>
                   <Badge variant="success" className="text-[10px]">DDS aprovado</Badge>
-                  <p className="text-[11px] text-[hsl(210_14%_42%)] num">há {i * 7}d</p>
+                  <p className="text-[11px] text-fg-muted num">há {i * 7}d</p>
                 </div>
               ))}
             </CardContent>
@@ -388,27 +389,18 @@ export default function FazendasPage() {
                   </div>
                 </div>
               ) : (
-                <p className="text-center text-[13px] text-[hsl(210_14%_42%)] py-12">
-                  Nenhum alerta de monitoramento nos últimos 90 dias.
-                </p>
+                <div className="flex flex-col items-center justify-center gap-2 py-12 text-center">
+                  <ShieldCheck className="size-8 text-fg-soft" />
+                  <p className="text-[13px] text-fg-muted">
+                    Nenhum alerta de monitoramento nos últimos 90 dias.
+                  </p>
+                </div>
               )}
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
     </div>
-  );
-}
-
-function StatCard({ label, value, subtle, tone }: { label: string; value: string | number; subtle?: string; tone?: "success" }) {
-  return (
-    <Card className="p-3.5">
-      <p className="text-[10px] uppercase tracking-[0.1em] text-[hsl(210_14%_42%)] font-semibold">{label}</p>
-      <p className={cn("text-xl font-bold num tracking-tight mt-1", tone === "success" && "text-[hsl(142_71%_24%)]")}>
-        {value}
-      </p>
-      {subtle && <p className="text-[10px] text-[hsl(210_12%_58%)] mt-0.5">{subtle}</p>}
-    </Card>
   );
 }
 
@@ -431,8 +423,8 @@ function RiskCard({ label, value, color }: { label: string; value: number; color
 
 function AreaStat({ label, value, accent, border = true }: { label: string; value: string; accent?: "success" | "warning"; border?: boolean }) {
   return (
-    <div className={cn("p-4 text-center", border && "border-r border-[hsl(200_18%_92%)]")}>
-      <p className="text-[10px] uppercase tracking-[0.12em] font-semibold text-[hsl(210_14%_42%)]">{label}</p>
+    <div className={cn("p-4 text-center", border && "border-r border-border-soft")}>
+      <p className="text-[10px] uppercase tracking-[0.12em] font-semibold text-fg-muted">{label}</p>
       <p
         className={cn(
           "text-base font-bold num tracking-tight mt-1",
@@ -449,8 +441,8 @@ function AreaStat({ label, value, accent, border = true }: { label: string; valu
 function DataField({ label, value, mono }: { label: string; value: string | React.ReactNode; mono?: boolean }) {
   return (
     <div>
-      <p className="text-[10px] uppercase tracking-[0.1em] text-[hsl(210_14%_42%)] font-semibold mb-1">{label}</p>
-      <div className={cn("text-[13px] font-medium text-[hsl(195_30%_8%)]", mono && "font-mono text-[12px] break-all")}>
+      <p className="text-[10px] uppercase tracking-[0.1em] text-fg-muted font-semibold mb-1">{label}</p>
+      <div className={cn("text-[13px] font-medium text-fg", mono && "font-mono text-[12px] break-all")}>
         {value}
       </div>
     </div>

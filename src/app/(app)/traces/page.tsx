@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { StatTile } from "@/components/kit/stat-tile";
 import { traceNTLogs } from "@/lib/mock-data";
 import { useToast } from "@/components/ui/toast";
 import { cn, formatDateTime } from "@/lib/utils";
@@ -30,7 +31,7 @@ export default function TracesPage() {
         description="Integração M2M com o portal da Comissão Europeia para submissão automática de Declarações de Devida Diligência (DDS). Protocolo SOAP com WS-Security."
         actions={
           <>
-            <Button variant="outline" size="sm" onClick={() => toast("Re-sincronizando com TRACES NT", { type: "info", desc: "Fila de mensagens SOAP reprocessada." })}>
+            <Button variant="outline" size="sm" onClick={() => toast("Re-sincronizar com TRACES NT", { type: "info", desc: "Reprocessamento da fila SOAP — em breve." })}>
               <RefreshCw className="size-4" /> Re-sincronizar
             </Button>
             <Button variant="gradient" size="sm" onClick={() => toast("Conexão OK", { desc: "Handshake WS-Security bem-sucedido." })}>
@@ -58,10 +59,10 @@ export default function TracesPage() {
             </div>
           </CardHeader>
           <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <KPIBlock label="Latência" value="312ms" />
-            <KPIBlock label="Sucesso 24h" value="98.4%" />
-            <KPIBlock label="DDS hoje" value="14" />
-            <KPIBlock label="Próx. sync" value="2 min" />
+            <StatTile label="Latência" value="312ms" />
+            <StatTile label="Sucesso 24h" value="98.4%" />
+            <StatTile label="DDS hoje" value="14" />
+            <StatTile label="Próx. sync" value="2 min" />
           </CardContent>
         </Card>
 
@@ -107,9 +108,9 @@ export default function TracesPage() {
               {traceNTLogs.map((log, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-3 p-2 rounded-md hover:bg-[hsl(174_64%_98%)] border border-[hsl(215_20%_94%)]"
+                  className="flex items-center gap-3 p-2 rounded-md hover:bg-[hsl(174_64%_98%)] border border-border-soft"
                 >
-                  <span className="text-[hsl(215_16%_47%)] tabular-nums shrink-0">{formatDateTime(log.ts)}</span>
+                  <span className="text-fg-muted tabular-nums shrink-0">{formatDateTime(log.ts)}</span>
                   <Badge
                     variant={log.direcao === "out" ? "secondary" : "default"}
                     className="text-[9px] font-mono"
@@ -117,7 +118,7 @@ export default function TracesPage() {
                     {log.direcao === "out" ? "→ OUT" : "← IN"}
                   </Badge>
                   <span className="flex-1 truncate">{log.evento}</span>
-                  <span className="text-[hsl(215_16%_47%)] truncate max-w-[200px]">{log.payload}</span>
+                  <span className="text-fg-muted truncate max-w-[200px]">{log.payload}</span>
                   <Badge
                     variant={
                       log.status === "Approved"
@@ -179,7 +180,7 @@ export default function TracesPage() {
               ].map((s) => (
                 <div
                   key={s}
-                  className="flex items-center gap-3 p-3 rounded-md border border-[hsl(215_20%_92%)] hover:bg-[hsl(174_64%_98%)]"
+                  className="flex items-center gap-3 p-3 rounded-md border border-border-soft hover:bg-[hsl(174_64%_98%)]"
                 >
                   <Code2 className="size-4 text-[hsl(174_72%_35%)]" />
                   <span className="text-sm font-mono flex-1">{s}</span>
@@ -207,11 +208,11 @@ export default function TracesPage() {
                 { ev: "dds.expired", desc: "DDS expirada — recriar declaração", on: true },
                 { ev: "system.maintenance", desc: "TRACES NT em manutenção programada", on: false },
               ].map((w, i) => (
-                <div key={i} className="flex items-center gap-3 p-3 rounded-md border border-[hsl(215_20%_92%)]">
+                <div key={i} className="flex items-center gap-3 p-3 rounded-md border border-border-soft">
                   <Send className="size-4 text-[hsl(174_72%_35%)]" />
                   <div className="flex-1">
                     <p className="text-sm font-mono font-semibold">{w.ev}</p>
-                    <p className="text-[11px] text-[hsl(215_16%_47%)]">{w.desc}</p>
+                    <p className="text-[11px] text-fg-muted">{w.desc}</p>
                   </div>
                   <Switch defaultChecked={w.on} />
                 </div>
@@ -224,19 +225,10 @@ export default function TracesPage() {
   );
 }
 
-function KPIBlock({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-lg border border-[hsl(215_20%_92%)] bg-white/60 p-3">
-      <p className="text-[10px] uppercase tracking-wider text-[hsl(215_16%_47%)] font-semibold">{label}</p>
-      <p className="text-xl font-bold tabular-nums mt-0.5">{value}</p>
-    </div>
-  );
-}
-
 function KV({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <span className="text-[hsl(215_16%_47%)]">{label}</span>
+      <span className="text-fg-muted">{label}</span>
       <span className="font-semibold text-right truncate">{value}</span>
     </div>
   );
@@ -244,8 +236,8 @@ function KV({ label, value }: { label: string; value: string }) {
 
 function ConfigRow({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
-    <div className="flex items-center justify-between gap-2 py-1.5 border-b border-[hsl(215_20%_94%)]">
-      <span className="text-xs text-[hsl(215_16%_47%)]">{label}</span>
+    <div className="flex items-center justify-between gap-2 py-1.5 border-b border-border-soft">
+      <span className="text-xs text-fg-muted">{label}</span>
       <span className={cn("text-xs font-medium text-right truncate max-w-[280px]", mono && "font-mono")}>{value}</span>
     </div>
   );

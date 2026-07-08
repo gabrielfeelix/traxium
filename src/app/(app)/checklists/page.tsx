@@ -76,6 +76,17 @@ export default function ChecklistsPage() {
   const [cond, setCond] = useState<Record<string, Estado>>({});
   const [fotos, setFotos] = useState<Record<string, number>>({});
   const [assinatura, setAssinatura] = useState(false);
+  const [modeloBusca, setModeloBusca] = useState("");
+
+  const modelosFiltrados = modelos.filter((m) => {
+    const q = modeloBusca.trim().toLowerCase();
+    return (
+      !q ||
+      m.titulo.toLowerCase().includes(q) ||
+      m.tipo.toLowerCase().includes(q) ||
+      (m.fonteNormativa?.toLowerCase().includes(q) ?? false)
+    );
+  });
 
   const st = statusCompartimento(comp);
   const imp = findImplemento(findCompartimento(comp)?.implementoId ?? "");
@@ -123,11 +134,6 @@ export default function ChecklistsPage() {
       <PageHeader
         title="Inspeção LCI"
         description="Loading Compartment Inspection pré-carregamento. Separa o mínimo obrigatório para liberar (condições visuais, fotos por ângulo, assinatura) da evidência complementar. Cada inspeção gera um registro imutável vinculado ao compartimento — e à viagem quando feita em contexto de despacho."
-        actions={
-          <Button variant="outline" size="sm" onClick={() => toast("Modelos de checklist", { type: "info", desc: "Veja a aba Modelos." })}>
-            <Copy className="size-4" /> Modelos
-          </Button>
-        }
       />
 
       <Tabs defaultValue="nova">
@@ -190,7 +196,7 @@ export default function ChecklistsPage() {
                 </CardHeader>
                 <CardContent className="space-y-2">
                   {CONDICOES.map((c) => (
-                    <div key={c.id} className="flex items-center gap-3 p-2.5 rounded-lg border border-[hsl(200_18%_92%)]">
+                    <div key={c.id} className="flex items-center gap-3 p-2.5 rounded-lg border border-border-soft">
                       <p className="flex-1 text-[13px] font-medium">{c.label}</p>
                       <TriState value={cond[c.id]} onChange={(v) => setCond((s) => ({ ...s, [c.id]: v }))} />
                     </div>
@@ -214,12 +220,12 @@ export default function ChecklistsPage() {
                           onClick={() => setFotos((s) => ({ ...s, [a.id]: (s[a.id] ?? 0) + 1 }))}
                           className={cn(
                             "rounded-lg border p-2.5 text-left transition-all",
-                            n >= 1 ? "border-[hsl(142_60%_75%)] bg-[hsl(142_65%_98%)]" : "border-dashed border-[hsl(200_18%_82%)] hover:border-[hsl(176_60%_60%)]"
+                            n >= 1 ? "border-[hsl(142_60%_75%)] bg-[hsl(142_65%_98%)]" : "border-dashed border-border hover:border-[hsl(176_60%_60%)]"
                           )}
                         >
                           <div className="flex items-center justify-between">
-                            {n >= 1 ? <CheckCircle2 className="size-4 text-[hsl(142_71%_36%)]" /> : <Camera className="size-4 text-[hsl(210_14%_42%)]" />}
-                            <span className="text-[10px] num text-[hsl(210_14%_42%)]">{n}</span>
+                            {n >= 1 ? <CheckCircle2 className="size-4 text-[hsl(142_71%_36%)]" /> : <Camera className="size-4 text-fg-muted" />}
+                            <span className="text-[10px] num text-fg-muted">{n}</span>
                           </div>
                           <p className="text-[11px] font-medium mt-1 leading-tight">{a.label}</p>
                         </button>
@@ -243,7 +249,7 @@ export default function ChecklistsPage() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <Input placeholder="Observações do inspetor…" className="h-9" />
-                  <div className="flex items-center justify-between p-2.5 rounded-lg border border-[hsl(200_18%_92%)]">
+                  <div className="flex items-center justify-between p-2.5 rounded-lg border border-border-soft">
                     <Label htmlFor="assin" className="text-[13px] cursor-pointer flex items-center gap-2">
                       <PenLine className="size-4 text-[hsl(176_84%_25%)]" /> Assinatura digital do inspetor
                     </Label>
@@ -279,7 +285,7 @@ export default function ChecklistsPage() {
                     {resultado === "pendente" && "Complete o mínimo obrigatório"}
                   </Button>
 
-                  <p className="text-[10px] text-[hsl(210_14%_42%)] leading-relaxed">
+                  <p className="text-[10px] text-fg-muted leading-relaxed">
                     O registro vincula-se ao compartimento (e à viagem, se selecionada), com geo, timestamp e hash. Fica imutável após envio; correção só por retificação.
                   </p>
                 </CardContent>
@@ -324,7 +330,7 @@ export default function ChecklistsPage() {
                         <p className="text-[13px] font-medium">
                           <span className="font-mono">{im?.placa}</span> · {c?.identificador}
                         </p>
-                        <p className="text-[11px] text-[hsl(210_14%_42%)]">
+                        <p className="text-[11px] text-fg-muted">
                           {i.inspetor} · <span className="num">{i.itensOk}/{i.itensTotal}</span> itens · {formatDateTime(i.dataHora)}
                           {i.offline && <span className="text-[hsl(38_90%_28%)]"> · offline</span>}
                         </p>
@@ -348,13 +354,18 @@ export default function ChecklistsPage() {
         <TabsContent value="modelos" className="mt-4 space-y-4">
           <div className="flex items-center gap-3">
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[hsl(215_16%_47%)]" />
-              <Input placeholder="Buscar modelo…" className="pl-9 h-9" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-fg-muted" />
+              <Input
+                placeholder="Buscar modelo…"
+                value={modeloBusca}
+                onChange={(e) => setModeloBusca(e.target.value)}
+                className="pl-9 h-9"
+              />
             </div>
             <Button variant="gradient" size="sm" onClick={() => setModeloOpen(true)}><Plus className="size-4" /> Novo modelo</Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {modelos.map((ck) => (
+            {modelosFiltrados.map((ck) => (
               <Card key={ck.id} className="hover:shadow-md transition-shadow">
                 <CardHeader>
                   <div className="flex items-start justify-between gap-3">
@@ -367,11 +378,11 @@ export default function ChecklistsPage() {
                   <CardDescription>{ck.tipo}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center justify-between text-xs text-[hsl(215_16%_47%)] mb-3">
+                  <div className="flex items-center justify-between text-xs text-fg-muted mb-3">
                     <span>{ck.itens} itens · {ck.obrigatorio ? "Obrigatório" : "Opcional"}</span>
                     <span>{ck.fonteNormativa}</span>
                   </div>
-                  <p className="text-[10px] text-[hsl(215_16%_60%)] mb-3">Última revisão: {formatDate(ck.ultimaRevisao)}</p>
+                  <p className="text-[10px] text-fg-soft mb-3">Última revisão: {formatDate(ck.ultimaRevisao)}</p>
                   <div className="flex items-center gap-1">
                     <Button variant="outline" size="sm" className="flex-1 h-8" onClick={() => toast("Edição de modelo", { type: "info", desc: "Editor de modelos — em breve." })}><FileEdit className="size-3.5" /> Editar</Button>
                     <Button
@@ -398,6 +409,12 @@ export default function ChecklistsPage() {
                 </CardContent>
               </Card>
             ))}
+            {modelosFiltrados.length === 0 && (
+              <div className="col-span-full flex flex-col items-center gap-2 py-12 text-center">
+                <ClipboardCheck className="size-8 text-fg-soft" />
+                <p className="text-[13px] text-fg-muted">Nenhum modelo encontrado.</p>
+              </div>
+            )}
           </div>
         </TabsContent>
       </Tabs>
@@ -423,7 +440,7 @@ function TriState({ value, onChange }: { value: Estado; onChange: (v: Estado) =>
         onClick={() => onChange(value === "ok" ? undefined : "ok")}
         className={cn(
           "size-8 rounded-md flex items-center justify-center border transition-all",
-          value === "ok" ? "bg-[hsl(142_71%_36%)] text-white border-[hsl(142_71%_36%)]" : "border-[hsl(200_18%_82%)] text-[hsl(142_71%_36%)] hover:bg-[hsl(142_65%_96%)]"
+          value === "ok" ? "bg-[hsl(142_71%_36%)] text-white border-[hsl(142_71%_36%)]" : "border-border text-[hsl(142_71%_36%)] hover:bg-[hsl(142_65%_96%)]"
         )}
         aria-label="Conforme"
       >
@@ -433,7 +450,7 @@ function TriState({ value, onChange }: { value: Estado; onChange: (v: Estado) =>
         onClick={() => onChange(value === "nc" ? undefined : "nc")}
         className={cn(
           "size-8 rounded-md flex items-center justify-center border transition-all",
-          value === "nc" ? "bg-[hsl(0_78%_50%)] text-white border-[hsl(0_78%_50%)]" : "border-[hsl(200_18%_82%)] text-[hsl(0_78%_50%)] hover:bg-[hsl(0_72%_97%)]"
+          value === "nc" ? "bg-[hsl(0_78%_50%)] text-white border-[hsl(0_78%_50%)]" : "border-border text-[hsl(0_78%_50%)] hover:bg-[hsl(0_72%_97%)]"
         )}
         aria-label="Não conforme"
       >
@@ -447,14 +464,14 @@ function ResultadoBadge({ resultado }: { resultado: "aprovado" | "reprovado" | "
   const cfg = {
     aprovado: { bg: "bg-[hsl(142_65%_96%)]", ring: "border-[hsl(142_60%_75%)]", text: "text-[hsl(142_71%_24%)]", label: "Pronto para aprovar", icon: <CheckCircle2 className="size-6" /> },
     reprovado: { bg: "bg-[hsl(0_72%_97%)]", ring: "border-[hsl(0_72%_82%)]", text: "text-[hsl(0_70%_38%)]", label: "Reprovado", icon: <XCircle className="size-6" /> },
-    pendente: { bg: "bg-[hsl(200_18%_97%)]", ring: "border-[hsl(200_18%_88%)]", text: "text-[hsl(210_14%_42%)]", label: "Pendente", icon: <Clock className="size-6" /> },
+    pendente: { bg: "bg-bg", ring: "border-border", text: "text-fg-muted", label: "Pendente", icon: <Clock className="size-6" /> },
   }[resultado];
   return (
     <div className={cn("rounded-xl border p-4 flex items-center gap-3", cfg.bg, cfg.ring)}>
       <span className={cfg.text}>{cfg.icon}</span>
       <div>
         <p className={cn("text-[15px] font-bold", cfg.text)}>{cfg.label}</p>
-        <p className="text-[11px] text-[hsl(210_14%_42%)]">resultado calculado ao vivo</p>
+        <p className="text-[11px] text-fg-muted">resultado calculado ao vivo</p>
       </div>
     </div>
   );
@@ -463,9 +480,9 @@ function ResultadoBadge({ resultado }: { resultado: "aprovado" | "reprovado" | "
 function Linha({ ok, label, detalhe }: { ok: boolean; label: string; detalhe: string }) {
   return (
     <div className="flex items-center gap-2">
-      {ok ? <CheckCircle2 className="size-3.5 text-[hsl(142_71%_36%)] shrink-0" /> : <Clock className="size-3.5 text-[hsl(210_14%_42%)] shrink-0" />}
-      <span className="text-[hsl(210_14%_42%)]">{label}:</span>
-      <span className="font-medium text-[hsl(195_30%_8%)] ml-auto">{detalhe}</span>
+      {ok ? <CheckCircle2 className="size-3.5 text-[hsl(142_71%_36%)] shrink-0" /> : <Clock className="size-3.5 text-fg-muted shrink-0" />}
+      <span className="text-fg-muted">{label}:</span>
+      <span className="font-medium text-fg ml-auto">{detalhe}</span>
     </div>
   );
 }

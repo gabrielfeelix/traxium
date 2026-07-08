@@ -194,7 +194,7 @@ export default function LimpezasPage() {
                           "flex-1 h-9 rounded-md text-[13px] font-bold border transition-all",
                           regime === r
                             ? "bg-[hsl(176_84%_25%)] text-white border-[hsl(176_84%_25%)] shadow-brand-sm"
-                            : "bg-white text-[hsl(210_14%_42%)] border-[hsl(200_18%_88%)] hover:border-[hsl(176_60%_60%)]"
+                            : "bg-white text-fg-muted border-border hover:border-[hsl(176_60%_60%)]"
                         )}
                       >
                         {r}
@@ -206,21 +206,21 @@ export default function LimpezasPage() {
 
               {/* Status atual do compartimento — feedback antes→depois no próprio lugar da ação */}
               <div className="flex items-center gap-2 flex-wrap text-[12px]">
-                <span className="text-[hsl(210_14%_42%)]">Status agora:</span>
+                <span className="text-fg-muted">Status agora:</span>
                 <span
                   className={cn(
                     "text-[11px] font-bold rounded px-1.5 py-0.5",
                     st.status === "apto" && "bg-[hsl(142_65%_93%)] text-[hsl(142_71%_24%)]",
                     st.status === "bloqueado" && "bg-[hsl(0_72%_94%)] text-[hsl(0_70%_38%)]",
                     st.status === "requer_limpeza" && "bg-[hsl(36_95%_92%)] text-[hsl(24_88%_32%)]",
-                    st.status === "sem_historico" && "bg-[hsl(200_18%_94%)] text-[hsl(210_14%_42%)]"
+                    st.status === "sem_historico" && "bg-bg text-fg-muted"
                   )}
                 >
                   {st.label}
                 </span>
                 {regimeExigido && (
                   <>
-                    <span className="text-[hsl(210_14%_42%)]">· exige</span>
+                    <span className="text-fg-muted">· exige</span>
                     <RegimeBadge regime={regimeExigido} size="sm" />
                   </>
                 )}
@@ -297,8 +297,8 @@ export default function LimpezasPage() {
               {(["A", "B", "C", "D"] as Regime[]).map((r) => (
                 <div key={r} className="flex items-center gap-2 text-[12px]">
                   <RegimeBadge regime={r} size="sm" />
-                  <span className="text-[hsl(210_14%_42%)] flex-1">{REGIMES[r].desc}</span>
-                  <span className="num font-semibold text-[hsl(195_30%_8%)]">{REGIMES[r].campos.length}</span>
+                  <span className="text-fg-muted flex-1">{REGIMES[r].desc}</span>
+                  <span className="num font-semibold text-fg">{REGIMES[r].campos.length}</span>
                 </div>
               ))}
             </CardContent>
@@ -313,16 +313,16 @@ export default function LimpezasPage() {
                 const c = compartimentos.find((x) => x.id === e.compartimentoId);
                 const imp = c ? findImplemento(c.implementoId) : undefined;
                 return (
-                  <div key={e.id} className="rounded-lg border border-[hsl(200_18%_92%)] p-2.5">
+                  <div key={e.id} className="rounded-lg border border-border-soft p-2.5">
                     <div className="flex items-center gap-2 mb-1">
                       <RegimeBadge regime={e.regime} size="sm" />
                       <span className="text-[12px] font-medium truncate">{e.metodo}</span>
-                      <span className="ml-auto text-[10px] font-mono text-[hsl(210_12%_58%)] num">{formatDate(e.data)}</span>
+                      <span className="ml-auto text-[10px] font-mono text-fg-soft num">{formatDate(e.data)}</span>
                     </div>
-                    <p className="text-[10px] text-[hsl(210_14%_42%)]">
+                    <p className="text-[10px] text-fg-muted">
                       <span className="font-mono">{imp?.placa}</span> · {c?.identificador} · {e.executor}
                     </p>
-                    <div className="flex items-center gap-2 mt-1 text-[10px] text-[hsl(210_12%_58%)]">
+                    <div className="flex items-center gap-2 mt-1 text-[10px] text-fg-soft">
                       <span className="inline-flex items-center gap-0.5"><Camera className="size-2.5" /> {e.fotos}</span>
                       {e.produtoQuimico && <span className="inline-flex items-center gap-0.5"><FlaskConical className="size-2.5" /> {e.produtoQuimico}</span>}
                       {e.comprovanteEstacao && <span className="inline-flex items-center gap-0.5"><CheckCircle2 className="size-2.5 text-[hsl(142_71%_40%)]" /> estação</span>}
@@ -354,7 +354,7 @@ function CampoInput({
       {campo.tipo === "toggle" ? (
         <div className={cn(
           "flex items-center justify-between rounded-md border px-3 h-9",
-          ok ? "border-[hsl(142_60%_75%)] bg-[hsl(142_65%_98%)]" : "border-[hsl(200_18%_88%)]"
+          ok ? "border-[hsl(142_60%_75%)] bg-[hsl(142_65%_98%)]" : "border-border"
         )}>
           <Label className="text-[12px] cursor-pointer">{campo.label}</Label>
           <Switch checked={valor === true} onCheckedChange={(v) => onChange(v)} />
@@ -380,9 +380,9 @@ function CampoInput({
             <Button type="button" variant="outline" size="sm" className="h-9" onClick={() => onChange(((valor as number) ?? 0) + 1)}>
               <Camera className="size-4" /> Capturar
             </Button>
-            <span className="text-[12px] num text-[hsl(210_14%_42%)]">{(valor as number) ?? 0} foto(s)</span>
+            <span className="text-[12px] num text-fg-muted">{(valor as number) ?? 0} foto(s)</span>
           </div>
-          {campo.hint && <p className="text-[10px] text-[hsl(210_12%_58%)] mt-0.5">{campo.hint}</p>}
+          {campo.hint && <p className="text-[10px] text-fg-soft mt-0.5">{campo.hint}</p>}
         </>
       ) : (
         <>

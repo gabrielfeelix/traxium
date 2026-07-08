@@ -70,7 +70,7 @@ export function PlanoPreparacaoModal({ trigger }: { trigger?: React.ReactNode })
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-[13px] font-medium">{p.item}</p>
-                <p className="text-[11px] text-[hsl(215_16%_47%)] mt-0.5">Responsável: {p.resp}</p>
+                <p className="text-[11px] text-fg-muted mt-0.5">Responsável: {p.resp}</p>
               </div>
             </div>
           ))}

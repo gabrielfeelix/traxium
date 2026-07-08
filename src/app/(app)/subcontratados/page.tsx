@@ -20,6 +20,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { StatTile } from "@/components/kit/stat-tile";
 import { subcontratados, nivelVencimento, type Subcontratado } from "@/lib/domain/model";
 import { QualificarSubcontratadoModal } from "@/components/modals/qualificar-subcontratado-modal";
 import { useSession } from "@/lib/store/session";
@@ -73,14 +74,14 @@ export default function SubcontratadosPage() {
       />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Metric icon={<Building2 />} label="Cadastrados" value={subcontratados.length} />
-        <Metric icon={<ShieldCheck />} label="Escopo válido" value={subcontratados.length - vencidos} variant="success" />
-        <Metric icon={<AlertTriangle />} label="A vencer (≤60d)" value={aVencer} variant="warning" />
-        <Metric icon={<ShieldAlert />} label="Vencidos / bloqueados" value={vencidos} variant="danger" />
+        <StatTile icon={Building2} label="Cadastrados" value={subcontratados.length} />
+        <StatTile icon={ShieldCheck} label="Escopo válido" value={subcontratados.length - vencidos} tone="success" />
+        <StatTile icon={AlertTriangle} label="A vencer (≤60d)" value={aVencer} tone="warning" />
+        <StatTile icon={ShieldAlert} label="Vencidos / bloqueados" value={vencidos} tone="danger" />
       </div>
 
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[hsl(210_14%_42%)]" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-fg-muted" />
         <Input
           placeholder="Buscar razão social ou CNPJ…"
           value={search}
@@ -112,7 +113,7 @@ function SubcontratadoCard({ s }: { s: Subcontratado }) {
             </div>
             <div className="min-w-0">
               <CardTitle className="truncate">{s.razaoSocial}</CardTitle>
-              <p className="text-[11px] text-[hsl(210_14%_42%)] font-mono">{s.cnpj}</p>
+              <p className="text-[11px] text-fg-muted font-mono">{s.cnpj}</p>
             </div>
           </div>
           {bloqueado ? (
@@ -125,7 +126,7 @@ function SubcontratadoCard({ s }: { s: Subcontratado }) {
       <CardContent className="space-y-3">
         {/* Escopo GMP+ */}
         <div>
-          <p className="text-[10px] uppercase tracking-[0.1em] text-[hsl(210_14%_42%)] font-semibold mb-1.5">Escopo GMP+</p>
+          <p className="text-[10px] uppercase tracking-[0.1em] text-fg-muted font-semibold mb-1.5">Escopo GMP+</p>
           <div className="flex flex-wrap gap-1.5">
             {s.certGMP.escopo.map((e) => (
               <Badge key={e} variant="secondary" className="text-[9px]">{e}</Badge>
@@ -134,12 +135,12 @@ function SubcontratadoCard({ s }: { s: Subcontratado }) {
         </div>
 
         {/* Certificado + validade com alerta */}
-        <div className="rounded-lg border border-[hsl(200_18%_92%)] p-2.5">
+        <div className="rounded-lg border border-border-soft p-2.5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-[10px] uppercase tracking-[0.1em] text-[hsl(210_14%_42%)] font-semibold">Certificado</p>
+              <p className="text-[10px] uppercase tracking-[0.1em] text-fg-muted font-semibold">Certificado</p>
               <p className="text-[12px] font-mono">{s.certGMP.numero}</p>
-              <p className="text-[10px] text-[hsl(210_12%_58%)]">{s.certGMP.certificadora}</p>
+              <p className="text-[10px] text-fg-soft">{s.certGMP.certificadora}</p>
             </div>
             <VencimentoBadge nivel={venc.nivel} dias={venc.dias} validade={s.certGMP.validade} />
           </div>
@@ -148,24 +149,24 @@ function SubcontratadoCard({ s }: { s: Subcontratado }) {
         {/* Status base pública + site */}
         <div className="grid grid-cols-2 gap-2 text-[11px]">
           <div className="flex items-center gap-1.5">
-            <Globe className="size-3.5 text-[hsl(210_14%_42%)]" />
-            <span className="text-[hsl(210_14%_42%)]">Base pública:</span>
+            <Globe className="size-3.5 text-fg-muted" />
+            <span className="text-fg-muted">Base pública:</span>
             <span className={cn("font-semibold", s.certGMP.statusBasePublica === "Ativo" ? "text-[hsl(142_71%_28%)]" : "text-[hsl(0_70%_45%)]")}>
               {s.certGMP.statusBasePublica}
             </span>
           </div>
-          <div className="text-[hsl(210_14%_42%)] truncate">Sites: {s.certGMP.sitesCobertos.join(", ")}</div>
+          <div className="text-fg-muted truncate">Sites: {s.certGMP.sitesCobertos.join(", ")}</div>
         </div>
 
         {/* Autorizados */}
-        <div className="flex items-center gap-4 text-[11px] text-[hsl(210_14%_42%)]">
+        <div className="flex items-center gap-4 text-[11px] text-fg-muted">
           <span className="inline-flex items-center gap-1"><Truck className="size-3.5" /> {s.veiculosAutorizados.length} veículos</span>
           <span className="inline-flex items-center gap-1"><IdCard className="size-3.5" /> {s.motoristasAutorizados.length} motoristas</span>
         </div>
 
         {/* Treinamento */}
         <div>
-          <p className="text-[10px] uppercase tracking-[0.1em] text-[hsl(210_14%_42%)] font-semibold mb-1.5 flex items-center gap-1">
+          <p className="text-[10px] uppercase tracking-[0.1em] text-fg-muted font-semibold mb-1.5 flex items-center gap-1">
             <GraduationCap className="size-3" /> Treinamento
           </p>
           <div className="flex flex-wrap gap-3 text-[11px]">
@@ -213,7 +214,7 @@ function VencimentoBadge({
       <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold", map.bg, map.text)}>
         {map.label}
       </span>
-      <p className="text-[10px] text-[hsl(210_12%_58%)] mt-1 num">{formatDate(validade)}</p>
+      <p className="text-[10px] text-fg-soft mt-1 num">{formatDate(validade)}</p>
     </div>
   );
 }
@@ -224,39 +225,5 @@ function TreinoItem({ ok, label }: { ok: boolean; label: string }) {
       {ok ? <CheckCircle2 className="size-3.5" /> : <XCircle className="size-3.5" />}
       {label}
     </span>
-  );
-}
-
-function Metric({
-  icon,
-  label,
-  value,
-  variant,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: number;
-  variant?: "success" | "warning" | "danger";
-}) {
-  return (
-    <Card className="p-4">
-      <div className="flex items-center gap-3">
-        <div
-          className={cn(
-            "size-10 rounded-lg flex items-center justify-center shrink-0",
-            variant === "success" && "bg-[hsl(142_71%_95%)] text-[hsl(142_71%_28%)]",
-            variant === "warning" && "bg-[hsl(28_92%_92%)] text-[hsl(24_88%_32%)]",
-            variant === "danger" && "bg-[hsl(0_72%_95%)] text-[hsl(0_72%_40%)]",
-            !variant && "bg-[hsl(174_64%_96%)] text-[hsl(176_84%_25%)]"
-          )}
-        >
-          {icon}
-        </div>
-        <div>
-          <p className="text-[11px] uppercase tracking-wider text-[hsl(215_16%_47%)] font-semibold">{label}</p>
-          <p className="text-2xl font-bold tabular-nums leading-none mt-0.5">{value}</p>
-        </div>
-      </div>
-    </Card>
   );
 }

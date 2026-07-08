@@ -35,6 +35,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { StatusBadge, RegimeBadge } from "@/components/shell/status-badge";
+import { StatTile } from "@/components/kit/stat-tile";
 import { viagens, filialDaViagem, pertenceAFilial } from "@/lib/mock-data";
 import { formatDateTime, cn } from "@/lib/utils";
 
@@ -94,17 +95,17 @@ export default function ViagensPage() {
 
       {/* Stats line */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatLine icon={<Truck className="size-5" />} label="Total ativas" value={counts.total} sub="últimos 7 dias" />
-        <StatLine icon={<MapPin className="size-5" />} label="Em trânsito" value={counts.transito} sub="84 entre 7 estados" tone="info" />
-        <StatLine icon={<AlertTriangle className="size-5" />} label="Bloqueadas" value={counts.bloqueada} sub="ação requerida" tone="danger" />
-        <StatLine icon={<Calendar className="size-5" />} label="Concluídas (7d)" value={counts.concluida} sub="100% conformidade" tone="success" />
+        <StatTile icon={Truck} label="Total ativas" value={counts.total} hint="últimos 7 dias" />
+        <StatTile icon={MapPin} label="Em trânsito" value={counts.transito} hint="84 entre 7 estados" tone="brand" />
+        <StatTile icon={AlertTriangle} label="Bloqueadas" value={counts.bloqueada} hint="ação requerida" tone="danger" />
+        <StatTile icon={Calendar} label="Concluídas (7d)" value={counts.concluida} hint="100% conformidade" tone="success" />
       </div>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-3 flex-wrap pb-3">
           <div className="flex items-center gap-2 flex-1 min-w-[240px]">
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-[hsl(210_14%_42%)]" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-fg-muted" />
               <Input
                 placeholder="Buscar por código, motorista, produto…"
                 value={search}
@@ -128,7 +129,7 @@ export default function ViagensPage() {
             </Select>
             <Select value={regimeFilter} onValueChange={setRegimeFilter}>
               <SelectTrigger className="w-36 h-9">
-                <Filter className="size-4 text-[hsl(210_14%_42%)]" />
+                <Filter className="size-4 text-fg-muted" />
                 <SelectValue placeholder="Regime" />
               </SelectTrigger>
               <SelectContent>
@@ -141,12 +142,12 @@ export default function ViagensPage() {
             </Select>
           </div>
           <div className="flex items-center gap-2">
-            <div className="inline-flex rounded-md border border-[hsl(200_18%_88%)] bg-white p-0.5">
+            <div className="inline-flex rounded-md border border-border bg-white p-0.5">
               <button
                 onClick={() => setView("tabela")}
                 className={cn(
                   "px-2.5 py-1 text-[11px] font-semibold rounded-[5px] transition-colors",
-                  view === "tabela" ? "bg-[hsl(176_84%_25%)] text-white" : "text-[hsl(210_14%_42%)] hover:bg-[hsl(200_18%_96%)]"
+                  view === "tabela" ? "bg-[hsl(176_84%_25%)] text-white" : "text-fg-muted hover:bg-bg"
                 )}
               >
                 Tabela
@@ -155,7 +156,7 @@ export default function ViagensPage() {
                 onClick={() => setView("cards")}
                 className={cn(
                   "px-2.5 py-1 text-[11px] font-semibold rounded-[5px] transition-colors",
-                  view === "cards" ? "bg-[hsl(176_84%_25%)] text-white" : "text-[hsl(210_14%_42%)] hover:bg-[hsl(200_18%_96%)]"
+                  view === "cards" ? "bg-[hsl(176_84%_25%)] text-white" : "text-fg-muted hover:bg-bg"
                 )}
               >
                 <Layers3 className="size-3 inline mr-1" /> Cards
@@ -188,22 +189,22 @@ export default function ViagensPage() {
                         <p className="font-mono text-[12px] font-semibold text-[hsl(180_80%_18%)] hover:underline">
                           {v.codigo}
                         </p>
-                        <p className="text-[10px] text-[hsl(210_12%_58%)] mt-0.5 font-mono">
+                        <p className="text-[10px] text-fg-soft mt-0.5 font-mono">
                           {v.cavalo} · {v.carreta}
                         </p>
                       </Link>
                     </TableCell>
                     <TableCell>
                       <p className="text-[13px] font-medium">{v.motorista}</p>
-                      <p className="text-[10px] text-[hsl(210_12%_58%)] font-mono">{v.motoristaCpf}</p>
+                      <p className="text-[10px] text-fg-soft font-mono">{v.motoristaCpf}</p>
                     </TableCell>
                     <TableCell>
                       <p className="text-[12px] truncate max-w-[200px]">{v.origem.split("·")[0].trim()}</p>
-                      <p className="text-[10px] text-[hsl(210_12%_58%)] truncate max-w-[200px]">→ {v.destino.split("·")[0].trim()}</p>
+                      <p className="text-[10px] text-fg-soft truncate max-w-[200px]">→ {v.destino.split("·")[0].trim()}</p>
                     </TableCell>
                     <TableCell>
                       <p className="text-[12px]">{v.produto}</p>
-                      <p className="text-[10px] text-[hsl(210_12%_58%)] num">{v.km} km</p>
+                      <p className="text-[10px] text-fg-soft num">{v.km} km</p>
                     </TableCell>
                     <TableCell>
                       <RegimeBadge regime={v.regimeLimpeza} size="sm" />
@@ -213,7 +214,7 @@ export default function ViagensPage() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="inline-flex items-center gap-1.5">
-                        <div className="w-12 h-1 rounded-full bg-[hsl(200_18%_94%)] overflow-hidden">
+                        <div className="w-12 h-1 rounded-full bg-bg overflow-hidden">
                           <div
                             className="h-full rounded-full"
                             style={{
@@ -241,7 +242,7 @@ export default function ViagensPage() {
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell className="text-right text-[11px] text-[hsl(210_14%_42%)] num whitespace-nowrap">
+                    <TableCell className="text-right text-[11px] text-fg-muted num whitespace-nowrap">
                       {formatDateTime(v.iniciadaEm)}
                     </TableCell>
                     <TableCell>
@@ -291,13 +292,13 @@ export default function ViagensPage() {
                     "block rounded-lg border p-4 transition-all hover:shadow-brand-md",
                     v.status === "Bloqueada"
                       ? "border-[hsl(0_72%_80%)] bg-[hsl(0_72%_98%)]"
-                      : "border-[hsl(200_18%_92%)] hover:border-[hsl(176_60%_60%)]"
+                      : "border-border-soft hover:border-[hsl(176_60%_60%)]"
                   )}
                 >
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <div>
                       <p className="font-mono text-[12px] font-semibold text-[hsl(180_80%_18%)]">{v.codigo}</p>
-                      <p className="text-[10px] text-[hsl(210_12%_58%)] mt-0.5 font-mono">
+                      <p className="text-[10px] text-fg-soft mt-0.5 font-mono">
                         {v.cavalo} · {v.carreta}
                       </p>
                     </div>
@@ -307,12 +308,12 @@ export default function ViagensPage() {
                     </div>
                   </div>
                   <p className="text-[14px] font-semibold mb-1">{v.motorista}</p>
-                  <p className="text-[12px] text-[hsl(210_14%_42%)] mb-1">{v.produto} · <span className="num">{v.km} km</span></p>
-                  <p className="text-[11px] text-[hsl(210_12%_58%)] truncate">
+                  <p className="text-[12px] text-fg-muted mb-1">{v.produto} · <span className="num">{v.km} km</span></p>
+                  <p className="text-[11px] text-fg-soft truncate">
                     {v.origem.split("·")[0].trim()} → {v.destino.split("·")[0].trim()}
                   </p>
-                  <div className="mt-3 pt-3 border-t border-[hsl(200_18%_94%)] flex items-center justify-between">
-                    <span className="text-[11px] text-[hsl(210_14%_42%)] num">{formatDateTime(v.iniciadaEm)}</span>
+                  <div className="mt-3 pt-3 border-t border-border-soft flex items-center justify-between">
+                    <span className="text-[11px] text-fg-muted num">{formatDateTime(v.iniciadaEm)}</span>
                     <span
                       className={cn(
                         "text-[14px] font-bold num",
@@ -333,44 +334,5 @@ export default function ViagensPage() {
         </CardContent>
       </Card>
     </div>
-  );
-}
-
-function StatLine({
-  icon,
-  label,
-  value,
-  sub,
-  tone,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: number;
-  sub: string;
-  tone?: "info" | "danger" | "success";
-}) {
-  return (
-    <Card className="p-3.5">
-      <div className="flex items-center gap-3">
-        <div
-          className={cn(
-            "size-10 rounded-lg flex items-center justify-center shrink-0",
-            tone === "danger" && "bg-[hsl(0_72%_94%)] text-[hsl(0_70%_38%)]",
-            tone === "success" && "bg-[hsl(142_65%_93%)] text-[hsl(142_71%_24%)]",
-            tone === "info" && "bg-[hsl(174_64%_94%)] text-[hsl(180_80%_18%)]",
-            !tone && "bg-[hsl(200_18%_94%)] text-[hsl(210_14%_42%)]"
-          )}
-        >
-          {icon}
-        </div>
-        <div className="min-w-0">
-          <p className="text-[10px] uppercase tracking-[0.12em] text-[hsl(210_14%_42%)] font-semibold">{label}</p>
-          <div className="flex items-baseline gap-2">
-            <p className="text-[22px] font-bold num tracking-tight leading-none">{value}</p>
-          </div>
-          <p className="text-[10px] text-[hsl(210_12%_58%)] mt-0.5">{sub}</p>
-        </div>
-      </div>
-    </Card>
   );
 }

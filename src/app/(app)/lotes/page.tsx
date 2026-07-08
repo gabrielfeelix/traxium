@@ -49,7 +49,7 @@ export default function LotesPage() {
         description="Lotes de exportação para a União Europeia. Cada lote agrega cargas de fazendas verificadas e gera uma Declaração de Devida Diligência transmitida via gateway TRACES NT (SOAP/WS-Security)."
         actions={
           <>
-            <Button variant="outline" size="sm" onClick={() => toast("Modelos DDS", { type: "info", desc: "Biblioteca de modelos por país destino." })}>
+            <Button variant="outline" size="sm" onClick={() => toast("Modelos DDS", { type: "info", desc: "Biblioteca de modelos por país destino — em breve." })}>
               <FileText className="size-4" /> Modelos DDS
             </Button>
             <NovoLoteModal />
@@ -82,18 +82,18 @@ export default function LotesPage() {
               { label: "Aprovada UE", desc: "Aceita pela autoridade", count: counts.aprovados },
             ].map((step, i, arr) => (
               <div key={i} className="flex items-center gap-1 flex-1 min-w-[180px]">
-                <div className="flex-1 rounded-xl bg-white border border-[hsl(200_18%_92%)] p-3 text-center relative overflow-hidden shadow-brand-sm">
+                <div className="flex-1 rounded-xl bg-white border border-border-soft p-3 text-center relative overflow-hidden shadow-brand-sm">
                   <div className="absolute -top-2 -right-2 size-12 rounded-full bg-gradient-to-br from-[hsl(174_64%_94%)] to-transparent" />
                   <div className="relative size-9 rounded-lg bg-gradient-to-br from-[hsl(176_84%_25%)] to-[hsl(200_92%_28%)] text-white font-bold text-[13px] mx-auto flex items-center justify-center mb-2 shadow-brand-sm num">
                     {i + 1}
                   </div>
-                  <p className="relative text-[11px] font-bold text-[hsl(195_30%_8%)] leading-tight">{step.label}</p>
-                  <p className="relative text-[10px] text-[hsl(210_14%_42%)] mt-0.5 leading-tight">{step.desc}</p>
+                  <p className="relative text-[11px] font-bold text-fg leading-tight">{step.label}</p>
+                  <p className="relative text-[10px] text-fg-muted mt-0.5 leading-tight">{step.desc}</p>
                   <p className="relative text-[22px] font-bold text-traxium-grad text-[hsl(176_84%_25%)] mt-2 num leading-none">
                     {step.count}
                   </p>
                 </div>
-                {i < arr.length - 1 && <ArrowRight className="size-4 text-[hsl(210_12%_70%)] shrink-0" />}
+                {i < arr.length - 1 && <ArrowRight className="size-4 text-fg-soft shrink-0" />}
               </div>
             ))}
           </div>
@@ -103,7 +103,7 @@ export default function LotesPage() {
       <Card>
         <CardHeader className="flex flex-row items-center gap-2 pb-3 flex-wrap">
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-[hsl(210_14%_42%)]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-fg-muted" />
             <Input
               placeholder="Buscar lote ou destinatário…"
               value={search}
@@ -136,29 +136,29 @@ export default function LotesPage() {
                   </TableCell>
                   <TableCell>
                     <p className="text-[12px]">{l.produto}</p>
-                    <p className="text-[10px] text-[hsl(210_12%_58%)] font-mono">HS {l.hsCode}</p>
+                    <p className="text-[10px] text-fg-soft font-mono">HS {l.hsCode}</p>
                   </TableCell>
                   <TableCell className="text-right">
                     <p className="text-[13px] font-bold num">{formatNumber(l.toneladas)}</p>
-                    <p className="text-[10px] text-[hsl(210_12%_58%)]">toneladas</p>
+                    <p className="text-[10px] text-fg-soft">toneladas</p>
                   </TableCell>
                   <TableCell>
                     <p className="text-[12px]">{l.fazendas.length} fazenda{l.fazendas.length > 1 ? "s" : ""}</p>
-                    <p className="text-[10px] text-[hsl(210_12%_58%)] truncate max-w-[180px]">
+                    <p className="text-[10px] text-fg-soft truncate max-w-[180px]">
                       {l.fazendas.map((f) => f.nome).join(" · ")}
                     </p>
                   </TableCell>
                   <TableCell>
                     <p className="text-[12px] font-medium">{l.destinatarioFinal}</p>
-                    <p className="text-[10px] text-[hsl(210_12%_58%)]">{l.paisDestino}</p>
+                    <p className="text-[10px] text-fg-soft">{l.paisDestino}</p>
                   </TableCell>
                   <TableCell>
                     <StatusBadge status={l.statusDDS} size="sm" />
                   </TableCell>
-                  <TableCell className="font-mono text-[10px] text-[hsl(210_14%_42%)]">
+                  <TableCell className="font-mono text-[10px] text-fg-muted">
                     {l.numeroDDS || "—"}
                   </TableCell>
-                  <TableCell className="text-[11px] text-[hsl(210_14%_42%)] num whitespace-nowrap">
+                  <TableCell className="text-[11px] text-fg-muted num whitespace-nowrap">
                     {l.dataEnvio ? formatDateTime(l.dataEnvio) : "—"}
                   </TableCell>
                   <TableCell>

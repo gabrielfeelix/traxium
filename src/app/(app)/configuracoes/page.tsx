@@ -133,14 +133,14 @@ export default function ConfiguracoesPage() {
                   {equipe.map((u, i) => (
                     <div
                       key={i}
-                      className="flex items-center gap-3 p-3 rounded-lg border border-[hsl(215_20%_92%)] hover:bg-[hsl(174_64%_98%)]"
+                      className="flex items-center gap-3 p-3 rounded-lg border border-border-soft hover:bg-[hsl(174_64%_98%)]"
                     >
                       <Avatar>
                         <AvatarFallback>{u.nome.split(" ").slice(0, 2).map((n) => n[0]).join("")}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
                         <p className="text-sm font-semibold">{u.nome}</p>
-                        <p className="text-[11px] text-[hsl(215_16%_47%)]">{u.email}</p>
+                        <p className="text-[11px] text-fg-muted">{u.email}</p>
                       </div>
                       <Badge variant={u.papel === "Owner" ? "default" : "outline"} className="text-[10px]">
                         {u.papel}
@@ -177,20 +177,20 @@ export default function ConfiguracoesPage() {
                       className="flex items-center justify-between p-3 rounded-md hover:bg-[hsl(174_64%_98%)]"
                     >
                       <div className="flex items-center gap-3">
-                        <Mail className="size-4 text-[hsl(215_16%_47%)]" />
+                        <Mail className="size-4 text-fg-muted" />
                         <span className="text-sm">{n}</span>
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="flex items-center gap-1.5">
-                          <span className="text-[10px] uppercase tracking-wider text-[hsl(215_16%_47%)]">E-mail</span>
+                          <span className="text-[10px] uppercase tracking-wider text-fg-muted">E-mail</span>
                           <Switch defaultChecked={i % 2 === 0} />
                         </div>
                         <div className="flex items-center gap-1.5">
-                          <span className="text-[10px] uppercase tracking-wider text-[hsl(215_16%_47%)]">Push</span>
+                          <span className="text-[10px] uppercase tracking-wider text-fg-muted">Push</span>
                           <Switch defaultChecked />
                         </div>
                         <div className="flex items-center gap-1.5">
-                          <span className="text-[10px] uppercase tracking-wider text-[hsl(215_16%_47%)]">Slack</span>
+                          <span className="text-[10px] uppercase tracking-wider text-fg-muted">Slack</span>
                           <Switch defaultChecked={i < 3} />
                         </div>
                       </div>
@@ -236,10 +236,10 @@ export default function ConfiguracoesPage() {
                     { nome: "Microsoft Teams", desc: "Notificações em canal", on: false },
                     { nome: "Power BI", desc: "Conector OData para BI", on: false },
                   ].map((s, i) => (
-                    <div key={i} className="flex items-center justify-between gap-2 p-3 rounded-lg border border-[hsl(215_20%_92%)]">
+                    <div key={i} className="flex items-center justify-between gap-2 p-3 rounded-lg border border-border-soft">
                       <div>
                         <p className="text-sm font-semibold">{s.nome}</p>
-                        <p className="text-[11px] text-[hsl(215_16%_47%)]">{s.desc}</p>
+                        <p className="text-[11px] text-fg-muted">{s.desc}</p>
                       </div>
                       <Switch defaultChecked={s.on} />
                     </div>
@@ -260,13 +260,13 @@ export default function ConfiguracoesPage() {
                     { nome: "Power BI Connector", token: "trx_live_•••••••••••f29c", criadoEm: "02/04/2026" },
                     { nome: "Webhook ERP", token: "trx_live_•••••••••••2d11", criadoEm: "18/05/2026" },
                   ].map((t, i) => (
-                    <div key={i} className="flex items-center gap-3 p-3 rounded-lg border border-[hsl(215_20%_92%)]">
+                    <div key={i} className="flex items-center gap-3 p-3 rounded-lg border border-border-soft">
                       <KeyRound className="size-4 text-[hsl(174_72%_35%)]" />
                       <div className="flex-1">
                         <p className="text-sm font-semibold">{t.nome}</p>
-                        <p className="text-[11px] font-mono text-[hsl(215_16%_47%)]">{t.token}</p>
+                        <p className="text-[11px] font-mono text-fg-muted">{t.token}</p>
                       </div>
-                      <span className="text-[11px] text-[hsl(215_16%_47%)]">criado em {t.criadoEm}</span>
+                      <span className="text-[11px] text-fg-muted">criado em {t.criadoEm}</span>
                       <Button variant="outline" size="sm" onClick={() => toast("Token revogado", { type: "error" })}>Revogar</Button>
                     </div>
                   ))}
@@ -291,7 +291,7 @@ export default function ConfiguracoesPage() {
                         <p className="text-3xl font-bold mt-2 tabular-nums">
                           R$ 28.400<span className="text-base font-normal">/mês</span>
                         </p>
-                        <p className="text-xs text-[hsl(215_16%_47%)] mt-1">+ R$ 0,42 por viagem acima de 6.000</p>
+                        <p className="text-xs text-fg-muted mt-1">+ R$ 0,42 por viagem acima de 6.000</p>
                       </div>
                       <Button variant="outline" size="sm">Mudar plano</Button>
                     </div>
@@ -304,10 +304,10 @@ export default function ConfiguracoesPage() {
                     <FaturaStat label="API calls" value="284k" />
                   </div>
                   <Separator />
-                  <p className="text-xs font-semibold uppercase tracking-wider text-[hsl(215_16%_47%)]">Faturas recentes</p>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-fg-muted">Faturas recentes</p>
                   <div className="space-y-2">
                     {["Maio 2026", "Abril 2026", "Março 2026"].map((m, i) => (
-                      <div key={i} className="flex items-center justify-between p-3 rounded-md border border-[hsl(215_20%_92%)]">
+                      <div key={i} className="flex items-center justify-between p-3 rounded-md border border-border-soft">
                         <p className="text-sm font-medium">{m}</p>
                         <span className="text-sm font-bold tabular-nums">R$ 28.400,00</span>
                         <Badge variant="success" className="text-[10px]">Pago</Badge>
@@ -338,8 +338,8 @@ function SwitchRow({ label, defaultChecked }: { label: string; defaultChecked?: 
 
 function FaturaStat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md border border-[hsl(215_20%_92%)] p-3">
-      <p className="text-[10px] uppercase tracking-wider text-[hsl(215_16%_47%)] font-semibold">{label}</p>
+    <div className="rounded-md border border-border-soft p-3">
+      <p className="text-[10px] uppercase tracking-wider text-fg-muted font-semibold">{label}</p>
       <p className="text-lg font-bold tabular-nums mt-1">{value}</p>
     </div>
   );

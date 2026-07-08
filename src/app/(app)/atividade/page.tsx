@@ -106,7 +106,7 @@ export default function AtividadePage() {
         </CardHeader>
         <CardContent>
           <div className="relative space-y-5">
-            <div className="absolute left-[15px] top-2 bottom-2 w-px bg-[hsl(215_20%_92%)]" />
+            <div className="absolute left-[15px] top-2 bottom-2 w-px bg-border-soft" />
             {filtrados.map((a) => {
               const Icon =
                 a.severidade === "danger"
@@ -137,8 +137,8 @@ export default function AtividadePage() {
                           {tipoLabel[a.tipo]}
                         </Badge>
                       </div>
-                      <p className="text-xs text-[hsl(215_16%_47%)] mt-1">{a.descricao}</p>
-                      <p className="text-[11px] text-[hsl(215_16%_60%)] mt-1.5">
+                      <p className="text-xs text-fg-muted mt-1">{a.descricao}</p>
+                      <p className="text-[11px] text-fg-soft mt-1.5">
                         <span className="font-medium">{a.ator}</span> · {formatDateTime(a.quando)}
                       </p>
                     </div>
@@ -147,7 +147,10 @@ export default function AtividadePage() {
               );
             })}
             {!filtrados.length && (
-              <p className="text-center text-[13px] text-[hsl(210_14%_42%)] py-8">Nenhum evento para os filtros atuais.</p>
+              <div className="pl-12 py-10 flex flex-col items-center text-center gap-2">
+                <Info className="size-6 text-fg-soft" />
+                <p className="text-[13px] text-fg-muted">Nenhum evento para os filtros atuais.</p>
+              </div>
             )}
           </div>
         </CardContent>
@@ -155,19 +158,19 @@ export default function AtividadePage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <Card className="p-4">
-          <p className="text-[11px] uppercase tracking-wider text-[hsl(215_16%_47%)] font-semibold">Eventos listados</p>
+          <p className="text-[11px] uppercase tracking-wider text-fg-muted font-semibold">Eventos listados</p>
           <p className="text-3xl font-bold tabular-nums mt-2">{filtrados.length}</p>
-          <p className="text-[11px] text-[hsl(215_16%_47%)] mt-1">no filtro atual</p>
+          <p className="text-[11px] text-fg-muted mt-1">no filtro atual</p>
         </Card>
         <Card className="p-4">
-          <p className="text-[11px] uppercase tracking-wider text-[hsl(215_16%_47%)] font-semibold">Eventos críticos</p>
+          <p className="text-[11px] uppercase tracking-wider text-fg-muted font-semibold">Eventos críticos</p>
           <p className="text-3xl font-bold tabular-nums text-[hsl(0_72%_40%)] mt-2">{filtrados.filter((a) => a.severidade === "danger").length}</p>
-          <p className="text-[11px] text-[hsl(215_16%_47%)] mt-1">no filtro atual</p>
+          <p className="text-[11px] text-fg-muted mt-1">no filtro atual</p>
         </Card>
         <Card className="p-4">
-          <p className="text-[11px] uppercase tracking-wider text-[hsl(215_16%_47%)] font-semibold">Tempo médio de resposta</p>
+          <p className="text-[11px] uppercase tracking-wider text-fg-muted font-semibold">Tempo médio de resposta</p>
           <p className="text-3xl font-bold tabular-nums mt-2">4m 22s</p>
-          <p className="text-[11px] text-[hsl(215_16%_47%)] mt-1">da detecção à ação · simulado</p>
+          <p className="text-[11px] text-fg-muted mt-1">da detecção à ação · simulado</p>
         </Card>
       </div>
     </div>

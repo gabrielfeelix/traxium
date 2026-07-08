@@ -22,6 +22,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatusBadge } from "@/components/shell/status-badge";
+import { StatTile } from "@/components/kit/stat-tile";
 import { motoristas } from "@/lib/mock-data";
 import { useToast } from "@/components/ui/toast";
 import { downloadCSV } from "@/lib/export";
@@ -79,10 +80,10 @@ export default function MotoristasPage() {
       />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <SmallStat icon={<Users />} label="Total" value={motoristas.length} />
-        <SmallStat icon={<CheckCircle2 />} label="Ativos" value={motoristas.filter((m) => m.status === "Ativo" || m.status === "Em viagem").length} variant="success" />
-        <SmallStat icon={<AlertCircle />} label="Bloqueados" value={motoristas.filter((m) => m.status === "Bloqueado").length} variant="danger" />
-        <SmallStat icon={<TrendingUp />} label="Conf. média" value={`${(motoristas.reduce((acc, m) => acc + m.conformidadeMedia, 0) / motoristas.length).toFixed(1)}%`} />
+        <StatTile icon={Users} label="Total" value={motoristas.length} />
+        <StatTile icon={CheckCircle2} label="Ativos" value={motoristas.filter((m) => m.status === "Ativo" || m.status === "Em viagem").length} tone="success" />
+        <StatTile icon={AlertCircle} label="Bloqueados" value={motoristas.filter((m) => m.status === "Bloqueado").length} tone="danger" />
+        <StatTile icon={TrendingUp} label="Conf. média" value={`${(motoristas.reduce((acc, m) => acc + m.conformidadeMedia, 0) / motoristas.length).toFixed(1)}%`} />
       </div>
 
       <Tabs defaultValue="todos">
@@ -97,7 +98,7 @@ export default function MotoristasPage() {
           <Card>
             <CardHeader className="flex flex-row items-center gap-2">
               <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[hsl(215_16%_47%)]" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-fg-muted" />
                 <Input placeholder="Buscar motorista…" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 h-9" />
               </div>
             </CardHeader>
@@ -129,7 +130,7 @@ export default function MotoristasPage() {
                             </Avatar>
                             <div>
                               <p className="text-sm font-semibold">{m.nome}</p>
-                              <p className="text-[10px] text-[hsl(215_16%_60%)] font-mono">{m.cpf}</p>
+                              <p className="text-[10px] text-fg-soft font-mono">{m.cpf}</p>
                             </div>
                           </div>
                         </TableCell>
@@ -140,7 +141,7 @@ export default function MotoristasPage() {
                         </TableCell>
                         <TableCell>
                           <p className="text-xs font-mono">Cat. {m.cnh.categoria}</p>
-                          <p className="text-[10px] text-[hsl(215_16%_60%)]">vence {formatDate(m.cnh.vencimento)}</p>
+                          <p className="text-[10px] text-fg-soft">vence {formatDate(m.cnh.vencimento)}</p>
                         </TableCell>
                         <TableCell>
                           {vencidas > 0 ? (
@@ -237,39 +238,16 @@ function SubList({ motoristas, initials }: { motoristas: typeof import("@/lib/mo
       </CardHeader>
       <CardContent className="space-y-2">
         {motoristas.map((m) => (
-          <div key={m.id} className="flex items-center gap-3 p-3 rounded-lg border border-[hsl(215_20%_92%)] hover:bg-[hsl(174_64%_98%)]">
+          <div key={m.id} className="flex items-center gap-3 p-3 rounded-lg border border-border-soft hover:bg-[hsl(174_64%_98%)]">
             <Avatar><AvatarFallback>{initials(m.nome)}</AvatarFallback></Avatar>
             <div className="flex-1">
               <p className="text-sm font-medium">{m.nome}</p>
-              <p className="text-[11px] text-[hsl(215_16%_47%)]">{m.cidade}/{m.uf} · {m.totalViagens} viagens · {m.conformidadeMedia.toFixed(1)}% conformidade</p>
+              <p className="text-[11px] text-fg-muted">{m.cidade}/{m.uf} · {m.totalViagens} viagens · {m.conformidadeMedia.toFixed(1)}% conformidade</p>
             </div>
             <StatusBadge status={m.status} size="sm" />
           </div>
         ))}
       </CardContent>
-    </Card>
-  );
-}
-
-function SmallStat({ icon, label, value, variant }: { icon: React.ReactNode; label: string; value: number | string; variant?: "success" | "danger" }) {
-  return (
-    <Card className="p-4">
-      <div className="flex items-center gap-3">
-        <div
-          className={cn(
-            "size-10 rounded-lg flex items-center justify-center",
-            variant === "success" && "bg-[hsl(142_71%_95%)] text-[hsl(142_71%_28%)]",
-            variant === "danger" && "bg-[hsl(0_72%_95%)] text-[hsl(0_72%_40%)]",
-            !variant && "bg-[hsl(174_64%_96%)] text-[hsl(174_72%_25%)]"
-          )}
-        >
-          {icon}
-        </div>
-        <div>
-          <p className="text-[11px] uppercase tracking-wider text-[hsl(215_16%_47%)] font-semibold">{label}</p>
-          <p className="text-2xl font-bold tabular-nums">{value}</p>
-        </div>
-      </div>
     </Card>
   );
 }

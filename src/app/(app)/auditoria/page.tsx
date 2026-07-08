@@ -55,7 +55,7 @@ export default function AuditoriaPage() {
                   <Badge variant="warning" className="text-[10px]">23 dias</Badge>
                   <h2 className="text-lg font-bold">Próxima auditoria: {programada.tipo}</h2>
                 </div>
-                <p className="text-sm text-[hsl(215_28%_25%)]">
+                <p className="text-sm text-fg">
                   Programada para {formatDate(programada.data)} · Auditor: {programada.auditor} · {programada.organismo}
                 </p>
                 <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -125,7 +125,7 @@ export default function AuditoriaPage() {
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium">{p.item}</p>
-                    <p className="text-[11px] text-[hsl(215_16%_47%)] mt-0.5">Responsável: {p.resp}</p>
+                    <p className="text-[11px] text-fg-muted mt-0.5">Responsável: {p.resp}</p>
                   </div>
                   <Badge variant={p.ok ? "success" : "warning"} className="text-[10px]">
                     {p.ok ? "Concluído" : "Pendente"}
@@ -154,7 +154,7 @@ function AuditoriaCard({ a }: { a: typeof import("@/lib/mock-data").auditorias[n
               <p className="text-base font-bold">{a.tipo}</p>
               <StatusBadge status={a.status.split("—")[1]?.trim() || a.status} size="sm" />
             </div>
-            <div className="flex items-center gap-4 text-xs text-[hsl(215_16%_47%)] flex-wrap">
+            <div className="flex items-center gap-4 text-xs text-fg-muted flex-wrap">
               <span className="flex items-center gap-1.5">
                 <Calendar className="size-3.5" /> {formatDate(a.data)}
               </span>
@@ -181,15 +181,15 @@ function AuditoriaCard({ a }: { a: typeof import("@/lib/mock-data").auditorias[n
 function ChecklistStat({ label, complete, total }: { label: string; complete: number; total: number }) {
   const pct = Math.round((complete / total) * 100);
   return (
-    <div className="rounded-lg bg-white border border-[hsl(215_20%_92%)] p-3">
+    <div className="rounded-lg bg-white border border-border-soft p-3">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-[11px] uppercase tracking-wider text-[hsl(215_16%_47%)] font-semibold">{label}</span>
+        <span className="text-[11px] uppercase tracking-wider text-fg-muted font-semibold">{label}</span>
         <span className="text-xs font-bold tabular-nums">
           {complete}/{total}
         </span>
       </div>
       <Progress value={pct} className="h-1.5" />
-      <p className="text-[10px] text-[hsl(215_16%_47%)] mt-1">{pct}% concluído</p>
+      <p className="text-[10px] text-fg-muted mt-1">{pct}% concluído</p>
     </div>
   );
 }
