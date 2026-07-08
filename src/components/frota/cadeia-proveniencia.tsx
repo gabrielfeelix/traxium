@@ -5,8 +5,6 @@ import {
   Truck,
   Droplets,
   ClipboardCheck,
-  ChevronRight,
-  ChevronDown,
   Ban,
   CheckCircle2,
   AlertTriangle,
@@ -14,6 +12,7 @@ import {
 } from "lucide-react";
 import { cn, formatDate } from "@/lib/utils";
 import { REGIME_META, RegimeDisc } from "@/components/kit/regime";
+import { ChainConn, ChainNode } from "@/components/kit/causal-chain";
 import type { Regime } from "@/lib/domain/model";
 
 /**
@@ -77,7 +76,7 @@ export function CadeiaProveniencia({
         <>
           <div className="flex flex-col lg:flex-row lg:items-stretch gap-2 lg:gap-0">
             {/* 1 · Carga determinante */}
-            <Node
+            <ChainNode
               etapa="Carga anterior"
               tone={carga.bloqueiaFeed ? "border-danger-500/40 ring-1 ring-danger-500/20" : undefined}
             >
@@ -101,12 +100,12 @@ export function CadeiaProveniencia({
                   )}
                 </div>
               </div>
-            </Node>
+            </ChainNode>
 
-            <Conn label="IDTF exige" broken={broken(1)} />
+            <ChainConn label="IDTF exige" broken={broken(1)} />
 
             {/* 2 · Regime exigido */}
-            <Node etapa="Regime mínimo">
+            <ChainNode etapa="Regime mínimo">
               {regimeExigido ? (
                 <div className="flex items-center gap-2">
                   <RegimeDisc regime={regimeExigido} className="size-9 text-[15px]" />
@@ -118,12 +117,12 @@ export function CadeiaProveniencia({
               ) : (
                 <p className="text-[12px] text-fg-muted">—</p>
               )}
-            </Node>
+            </ChainNode>
 
-            <Conn gate={limpezaSatisfaz ? "ok" : "fail"} broken={broken(2)} />
+            <ChainConn gate={limpezaSatisfaz ? "ok" : "fail"} broken={broken(2)} />
 
             {/* 3 · Limpeza aplicada */}
-            <Node etapa="Limpeza aplicada" tone={!limpeza || !limpezaSatisfaz ? "border-danger-500/40" : undefined}>
+            <ChainNode etapa="Limpeza aplicada" tone={!limpeza || !limpezaSatisfaz ? "border-danger-500/40" : undefined}>
               {limpeza ? (
                 <div className="flex items-center gap-2">
                   <RegimeDisc regime={limpeza.regime} className="size-9 text-[15px]" />
@@ -137,12 +136,12 @@ export function CadeiaProveniencia({
                   <Droplets className="size-3.5" /> não evidenciada
                 </span>
               )}
-            </Node>
+            </ChainNode>
 
-            <Conn label="inspeção" broken={broken(3)} />
+            <ChainConn label="inspeção" broken={broken(3)} />
 
             {/* 4 · Inspeção LCI */}
-            <Node etapa="Inspeção LCI">
+            <ChainNode etapa="Inspeção LCI">
               {inspecao ? (
                 <div className="flex items-center gap-2">
                   <span
@@ -167,53 +166,22 @@ export function CadeiaProveniencia({
               ) : (
                 <p className="text-[12px] text-fg-muted">Sem inspeção</p>
               )}
-            </Node>
+            </ChainNode>
 
-            <Conn broken={broken(4)} />
+            <ChainConn broken={broken(4)} />
 
             {/* 5 · Veredito */}
-            <Node etapa="Veredito" tone={V.box}>
+            <ChainNode etapa="Veredito" tone={V.box}>
               <div className="flex items-center gap-2">
                 <VerdictIcon className={cn("size-5 shrink-0", V.fg)} />
                 <p className={cn("text-[14px] font-bold leading-tight", V.fg)}>{label}</p>
               </div>
-            </Node>
+            </ChainNode>
           </div>
 
           <p className="mt-4 text-[12px] text-fg-muted leading-relaxed border-t border-border-soft pt-3">{motivo}</p>
         </>
       )}
     </section>
-  );
-}
-
-function Node({ etapa, tone, children }: { etapa: string; tone?: string; children: React.ReactNode }) {
-  return (
-    <div className={cn("flex-1 lg:min-w-0 rounded-lg border bg-bg-elev p-3", tone ?? "border-border-soft")}>
-      <p className="text-[9px] uppercase tracking-[0.12em] font-semibold text-fg-soft mb-2">{etapa}</p>
-      {children}
-    </div>
-  );
-}
-
-function Conn({ label, gate, broken }: { label?: string; gate?: "ok" | "fail"; broken?: boolean }) {
-  return (
-    <div className="flex lg:flex-col items-center justify-center gap-1 shrink-0 lg:w-16 py-1 lg:py-0">
-      {gate ? (
-        <span
-          className={cn(
-            "inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[9px] font-bold whitespace-nowrap",
-            gate === "ok" ? "bg-regime-a-bg text-regime-a-fg" : "bg-danger-50 text-danger-700"
-          )}
-        >
-          {gate === "ok" ? <CheckCircle2 className="size-2.5" /> : <XCircle className="size-2.5" />}
-          {gate === "ok" ? "satisfaz" : "falha"}
-        </span>
-      ) : label ? (
-        <span className="text-[8px] uppercase tracking-[0.1em] text-fg-soft whitespace-nowrap">{label}</span>
-      ) : null}
-      <ChevronRight className={cn("hidden lg:block size-4", broken ? "text-danger-500" : "text-fg-soft")} />
-      <ChevronDown className={cn("lg:hidden size-4", broken ? "text-danger-500" : "text-fg-soft")} />
-    </div>
   );
 }
