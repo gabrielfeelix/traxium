@@ -76,10 +76,10 @@ export function StatusBadge({ status, size = "md", className }: StatusBadgeProps
 }
 
 const regimeConfig = {
-  A: { label: "A · Seco", bg: "bg-[hsl(142_65%_93%)]", text: "text-[hsl(142_71%_24%)]", dot: "hsl(142 71% 36%)" },
-  B: { label: "B · Água", bg: "bg-[hsl(48_95%_90%)]", text: "text-[hsl(38_90%_28%)]", dot: "hsl(48 95% 50%)" },
-  C: { label: "C · Detergente", bg: "bg-[hsl(28_92%_92%)]", text: "text-[hsl(24_88%_32%)]", dot: "hsl(28 92% 48%)" },
-  D: { label: "D · Desinfecção", bg: "bg-[hsl(0_72%_94%)]", text: "text-[hsl(0_70%_38%)]", dot: "hsl(0 78% 50%)" },
+  A: { label: "A · Seco", bg: "bg-regime-a-bg", text: "text-regime-a-fg", dot: "var(--color-regime-a)" },
+  B: { label: "B · Água", bg: "bg-regime-b-bg", text: "text-regime-b-fg", dot: "var(--color-regime-b)" },
+  C: { label: "C · Detergente", bg: "bg-regime-c-bg", text: "text-regime-c-fg", dot: "var(--color-regime-c)" },
+  D: { label: "D · Desinfecção", bg: "bg-regime-d-bg", text: "text-regime-d-fg", dot: "var(--color-regime-d)" },
 };
 
 export function RegimeBadge({ regime, size = "md" }: { regime: "A" | "B" | "C" | "D"; size?: "sm" | "md" }) {

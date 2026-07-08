@@ -28,6 +28,20 @@
   --color-danger-500:  hsl(0 78% 50%);
   --color-danger-700:  hsl(0 70% 38%);
 
+  /* Regimes de limpeza (sequenciamento IDTF) — escada de severidade A→D */
+  --color-regime-a:    hsl(142 71% 36%);
+  --color-regime-a-bg: hsl(142 65% 93%);
+  --color-regime-a-fg: hsl(142 71% 24%);
+  --color-regime-b:    hsl(48 95% 50%);
+  --color-regime-b-bg: hsl(48 95% 90%);
+  --color-regime-b-fg: hsl(38 90% 28%);
+  --color-regime-c:    hsl(28 92% 48%);
+  --color-regime-c-bg: hsl(28 92% 92%);
+  --color-regime-c-fg: hsl(24 88% 32%);
+  --color-regime-d:    hsl(0 78% 50%);
+  --color-regime-d-bg: hsl(0 72% 94%);
+  --color-regime-d-fg: hsl(0 70% 38%);
+
   /* Surface */
   --color-bg:         hsl(180 14% 97%);
   --color-bg-elev:    hsl(0 0% 100%);
