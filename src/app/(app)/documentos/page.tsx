@@ -1,36 +1,65 @@
 "use client";
 
 import { useState } from "react";
-import { FileText, Search, Upload, Download, Folder, Filter, MoreHorizontal, Calendar, Check } from "lucide-react";
+import {
+  FileText,
+  Search,
+  Upload,
+  Download,
+  Folder,
+  MoreHorizontal,
+  Check,
+  X,
+  Award,
+  Scale,
+  ClipboardList,
+  Globe,
+  ShieldCheck,
+  GraduationCap,
+  BarChart3,
+  type LucideIcon,
+} from "lucide-react";
 import { PageHeader } from "@/components/shell/page-header";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { documentos, type Documento } from "@/lib/mock-data";
 import { useToast } from "@/components/ui/toast";
-import { downloadCSV } from "@/lib/export";
-import { formatDate } from "@/lib/utils";
+import { formatDate, cn } from "@/lib/utils";
 import { EnviarDocumentoModal } from "@/components/modals/enviar-documento-modal";
+
+type Tipo = Documento["tipo"];
+type Aba = "todos" | "vigentes" | "arquivados";
+
+// Ícones da biblioteca do sistema (lucide, DESIGN §9) — nada de emoji decorativo (§10).
+const tipoIcon: Record<Tipo, LucideIcon> = {
+  Certificado: Award,
+  Política: Scale,
+  Procedimento: ClipboardList,
+  DDS: Globe,
+  Auditoria: ShieldCheck,
+  Treinamento: GraduationCap,
+  Relatório: BarChart3,
+};
+const TIPOS = Object.keys(tipoIcon) as Tipo[];
 
 export default function DocumentosPage() {
   const { toast } = useToast();
   const [search, setSearch] = useState("");
   const [docs, setDocs] = useState<Documento[]>(documentos);
+  const [tipoFiltro, setTipoFiltro] = useState<Tipo | null>(null);
+  const [aba, setAba] = useState<Aba>("todos");
   const [enviarOpen, setEnviarOpen] = useState(false);
-  const filtered = docs.filter((d) => d.nome.toLowerCase().includes(search.toLowerCase()));
 
-  const tipoIcon: Record<string, string> = {
-    Certificado: "🏆",
-    Política: "📋",
-    Procedimento: "📑",
-    DDS: "🌍",
-    Auditoria: "🔍",
-    Treinamento: "🎓",
-    Relatório: "📊",
-  };
+  const visible = docs.filter((d) => {
+    const mq = d.nome.toLowerCase().includes(search.toLowerCase());
+    const mt = !tipoFiltro || d.tipo === tipoFiltro;
+    const ms = aba === "todos" ? true : aba === "vigentes" ? d.vigente : !d.vigente;
+    return mq && mt && ms;
+  });
 
   return (
     <div className="space-y-6">
@@ -49,73 +78,113 @@ export default function DocumentosPage() {
         }
       />
 
+      {/* Tira de tipos — filtro real (clique alterna), ícone de sistema em chip de marca */}
       <div className="grid grid-cols-2 lg:grid-cols-7 gap-2">
-        {Object.keys(tipoIcon).map((tipo) => {
+        {TIPOS.map((tipo) => {
+          const Icon = tipoIcon[tipo];
           const count = docs.filter((d) => d.tipo === tipo).length;
+          const isSel = tipoFiltro === tipo;
           return (
-            <Card key={tipo} className="p-3 hover:shadow-md transition-shadow cursor-pointer text-center">
-              <div className="text-2xl">{tipoIcon[tipo]}</div>
-              <p className="text-[11px] font-semibold mt-1">{tipo}</p>
-              <p className="text-[10px] text-[hsl(215_16%_47%)] tabular-nums">{count}</p>
-            </Card>
+            <button
+              key={tipo}
+              type="button"
+              onClick={() => setTipoFiltro(isSel ? null : tipo)}
+              aria-pressed={isSel}
+              className={cn(
+                "rounded-xl border bg-bg-elev p-3 flex flex-col items-center text-center gap-1.5 transition-all hover:shadow-brand-md",
+                isSel ? "border-transparent ring-2 ring-brand-500" : "border-border-soft"
+              )}
+            >
+              <span
+                className={cn(
+                  "size-9 rounded-lg flex items-center justify-center transition-colors",
+                  isSel ? "bg-brand-500 text-white" : "bg-brand-50 text-brand-700"
+                )}
+              >
+                <Icon className="size-4" />
+              </span>
+              <span className="text-[11px] font-semibold text-fg leading-tight">{tipo}</span>
+              <span className="num text-[10px] text-fg-muted">{count}</span>
+            </button>
           );
         })}
       </div>
 
-      <Tabs defaultValue="todos">
+      <Tabs value={aba} onValueChange={(v) => setAba(v as Aba)}>
         <TabsList>
           <TabsTrigger value="todos">Todos</TabsTrigger>
           <TabsTrigger value="vigentes">Vigentes</TabsTrigger>
           <TabsTrigger value="arquivados">Arquivados</TabsTrigger>
         </TabsList>
+      </Tabs>
 
-        <TabsContent value="todos" className="mt-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center gap-2 flex-wrap">
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[hsl(215_16%_47%)]" />
-                <Input placeholder="Buscar documento…" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 h-9" />
-              </div>
-              <Button variant="outline" size="sm" onClick={() => toast("Filtro por tipo", { type: "info" })}>
-                <Filter className="size-4" /> Tipo
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => toast("Filtro por período", { type: "info" })}>
-                <Calendar className="size-4" /> Período
-              </Button>
-            </CardHeader>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nome</TableHead>
-                    <TableHead>Tipo</TableHead>
-                    <TableHead>Tamanho</TableHead>
-                    <TableHead>Autor</TableHead>
-                    <TableHead>Atualizado em</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filtered.map((d) => (
+      <Card>
+        <CardHeader className="flex flex-row items-center gap-2 flex-wrap">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-fg-muted" />
+            <Input placeholder="Buscar documento…" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 h-9" />
+          </div>
+          {tipoFiltro && (
+            <button
+              type="button"
+              onClick={() => setTipoFiltro(null)}
+              className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 text-brand-700 text-[11px] font-semibold px-2.5 py-1 hover:bg-brand-100 transition-colors"
+            >
+              {tipoFiltro}
+              <X className="size-3" />
+            </button>
+          )}
+          <span className="ml-auto num text-[11px] text-fg-muted">{visible.length} documento{visible.length === 1 ? "" : "s"}</span>
+        </CardHeader>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Nome</TableHead>
+                <TableHead>Tipo</TableHead>
+                <TableHead>Tamanho</TableHead>
+                <TableHead>Autor</TableHead>
+                <TableHead>Atualizado em</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {visible.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-10 text-[12px] text-fg-muted">
+                    Nenhum documento
+                    {tipoFiltro ? ` do tipo ${tipoFiltro}` : ""}
+                    {aba !== "todos" ? ` ${aba}` : ""}
+                    {search ? ` para “${search}”` : ""}.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                visible.map((d) => {
+                  const Icon = tipoIcon[d.tipo];
+                  return (
                     <TableRow key={d.id}>
                       <TableCell>
                         <div className="flex items-center gap-2.5">
-                          <FileText className="size-4 text-[hsl(174_72%_35%)]" />
-                          <p className="text-sm font-medium">{d.nome}</p>
+                          <span className="size-7 rounded-md bg-brand-50 text-brand-700 flex items-center justify-center shrink-0">
+                            <Icon className="size-3.5" />
+                          </span>
+                          <p className="text-[13px] font-medium text-fg">{d.nome}</p>
                         </div>
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline" className="text-[10px]">{d.tipo}</Badge>
                       </TableCell>
-                      <TableCell className="text-xs text-[hsl(215_16%_47%)] tabular-nums">{d.tamanho}</TableCell>
-                      <TableCell className="text-xs">{d.autor}</TableCell>
-                      <TableCell className="text-xs text-[hsl(215_16%_47%)] tabular-nums">{formatDate(d.atualizadoEm)}</TableCell>
+                      <TableCell className="text-[11px] text-fg-muted num">{d.tamanho}</TableCell>
+                      <TableCell className="text-[12px] text-fg">{d.autor}</TableCell>
+                      <TableCell className="text-[11px] text-fg-muted num">{formatDate(d.atualizadoEm)}</TableCell>
                       <TableCell>
-                        {d.vigente && (
+                        {d.vigente ? (
                           <Badge variant="success" className="text-[10px]">
                             <Check className="size-2.5" /> Vigente
                           </Badge>
+                        ) : (
+                          <Badge variant="muted" className="text-[10px]">Arquivado</Badge>
                         )}
                       </TableCell>
                       <TableCell>
@@ -129,29 +198,13 @@ export default function DocumentosPage() {
                         </div>
                       </TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="vigentes">
-          <Card>
-            <CardContent className="pt-6 text-center text-sm text-[hsl(215_16%_47%)]">
-              {filtered.filter((d) => d.vigente).length} documentos vigentes no momento.
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="arquivados">
-          <Card>
-            <CardContent className="pt-6 text-center text-sm text-[hsl(215_16%_47%)]">
-              Nenhum documento arquivado.
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+                  );
+                })
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
       <EnviarDocumentoModal
         open={enviarOpen}
