@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { CompartimentoStatusBadge, RegimeBadge, StatusBadge } from "@/components/shell/status-badge";
+import { CadeiaProveniencia } from "@/components/frota/cadeia-proveniencia";
 import {
   findCompartimento,
   findImplemento,
@@ -49,6 +50,21 @@ export default function CompartimentoDetailPage({ params }: { params: Promise<{ 
   const t3 = getT3(comp.id);
   const limpezas = limpezasDoCompartimento(comp.id);
   const inspecoes = inspecoesDoCompartimento(comp.id);
+
+  // Peças da cadeia de proveniência (derivadas do motor de regras — fonte única)
+  const cargaDet = t3[0];
+  const carga = cargaDet
+    ? {
+        nome: cargaDet.produto?.nomeCanonico ?? cargaDet.load.produtoId,
+        idtfCode: cargaDet.produto?.idtfCode,
+        data: cargaDet.load.data,
+        cavalo: cargaDet.load.cavaloPlaca,
+        bloqueiaFeed: !!cargaDet.produto?.bloqueiaFeed,
+      }
+    : null;
+  const ultimaInspecao = [...inspecoes].sort(
+    (a, b) => new Date(b.dataHora).getTime() - new Date(a.dataHora).getTime()
+  )[0];
 
   return (
     <div className="space-y-5">
@@ -96,40 +112,17 @@ export default function CompartimentoDetailPage({ params }: { params: Promise<{ 
         </div>
       </div>
 
-      {/* Status atual — sinal principal */}
-      <div
-        className={cn(
-          "rounded-xl border p-4 flex items-start gap-3 relative overflow-hidden",
-          st.status === "apto" && "border-[hsl(142_60%_75%)] bg-[hsl(142_65%_98%)]",
-          st.status === "bloqueado" && "border-[hsl(0_72%_75%)] bg-[hsl(0_72%_98%)]",
-          st.status === "requer_limpeza" && "border-[hsl(28_92%_75%)] bg-[hsl(36_95%_98%)]",
-          st.status === "sem_historico" && "border-[hsl(200_18%_85%)] bg-[hsl(200_18%_98%)]"
-        )}
-      >
-        <div
-          className={cn(
-            "size-10 rounded-lg flex items-center justify-center shrink-0 text-white shadow-md",
-            st.status === "apto" && "bg-[hsl(142_71%_36%)]",
-            st.status === "bloqueado" && "bg-[hsl(0_78%_50%)]",
-            st.status === "requer_limpeza" && "bg-[hsl(28_92%_48%)]",
-            st.status === "sem_historico" && "bg-[hsl(210_14%_55%)]"
-          )}
-        >
-          {st.status === "apto" ? <CheckCircle2 className="size-5" /> : <AlertTriangle className="size-5" />}
-        </div>
-        <div className="flex-1">
-          <div className="flex items-center gap-2 flex-wrap">
-            <p className="text-[14px] font-semibold text-[hsl(195_30%_8%)]">Situação para próximo carregamento de feed</p>
-            <CompartimentoStatusBadge status={st.status} size="sm" />
-            {st.regimeExigido && (
-              <span className="text-[11px] text-[hsl(210_14%_42%)]">
-                regime mínimo <RegimeBadge regime={st.regimeExigido} size="sm" />
-              </span>
-            )}
-          </div>
-          <p className="text-[12px] text-[hsl(210_14%_42%)] mt-1 leading-relaxed">{st.motivo}</p>
-        </div>
-      </div>
+      {/* Momento-assinatura — cadeia de proveniência conecta carga→regime→limpeza→inspeção→veredito */}
+      <CadeiaProveniencia
+        carga={carga}
+        regimeExigido={st.regimeExigido}
+        limpeza={st.ultimaLimpeza ? { regime: st.ultimaLimpeza.regime, metodo: st.ultimaLimpeza.metodo, data: st.ultimaLimpeza.data } : null}
+        limpezaSatisfaz={st.status === "apto"}
+        inspecao={ultimaInspecao ? { resultado: ultimaInspecao.resultado, itensOk: ultimaInspecao.itensOk, itensTotal: ultimaInspecao.itensTotal } : null}
+        status={st.status}
+        label={st.label}
+        motivo={st.motivo}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 space-y-4">
