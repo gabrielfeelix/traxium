@@ -23,6 +23,8 @@ import { PageHeader } from "@/components/shell/page-header";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -35,7 +37,7 @@ import { downloadCSV } from "@/lib/export";
 import { cn, formatDate, formatDateTime } from "@/lib/utils";
 
 export default function BloqueiosPage() {
-  const { version } = useSession();
+  const { version, updateNCCapa } = useSession();
   const { toast } = useToast();
   const [filter, setFilter] = useState<"todas" | "abertas" | "tratamento" | "resolvidas">("todas");
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -270,7 +272,9 @@ export default function BloqueiosPage() {
                     </div>
                   </div>
 
-                  {expanded === nc.id && nc.capa && <CapaPanel capa={nc.capa} />}
+                  {expanded === nc.id && nc.capa && (
+                    <CapaPanel nc={nc} onUpdate={(patch) => { updateNCCapa(nc.id, patch); toast("CAPA atualizada", { desc: nc.codigo }); }} />
+                  )}
                 </div>
               ))}
               {!filtered.length && (
@@ -286,55 +290,88 @@ export default function BloqueiosPage() {
   );
 }
 
-function CapaPanel({ capa }: { capa: NonNullable<NaoConformidade["capa"]> }) {
+function CapaPanel({
+  nc,
+  onUpdate,
+}: {
+  nc: NaoConformidade;
+  onUpdate: (patch: Partial<NonNullable<NaoConformidade["capa"]>>) => void;
+}) {
+  const capa = nc.capa!;
+  const [acaoImediata, setAcaoImediata] = useState(capa.acaoImediata);
+  const [causaRaiz, setCausaRaiz] = useState(capa.causaRaiz);
+  const [acaoCorretiva, setAcaoCorretiva] = useState(capa.acaoCorretiva);
+  const [responsavelAcao, setResponsavel] = useState(capa.responsavelAcao);
+  const [prazo, setPrazo] = useState(capa.prazo && capa.prazo.length >= 10 ? capa.prazo.slice(0, 10) : "");
+  const [eficacia, setEficacia] = useState(capa.eficaciaVerificada);
+
+  const dirty =
+    acaoImediata !== capa.acaoImediata || causaRaiz !== capa.causaRaiz ||
+    acaoCorretiva !== capa.acaoCorretiva || responsavelAcao !== capa.responsavelAcao ||
+    prazo !== (capa.prazo?.slice(0, 10) ?? "") || eficacia !== capa.eficaciaVerificada;
+
   return (
-    <div className="mt-3 rounded-lg border border-[hsl(200_18%_92%)] bg-[hsl(200_18%_98%)] p-3.5 space-y-2.5">
+    <div className="mt-3 rounded-lg border border-[hsl(200_18%_92%)] bg-[hsl(200_18%_98%)] p-3.5 space-y-3">
       <div className="flex items-center gap-2">
         <span className="text-[10px] uppercase tracking-[0.12em] font-bold text-[hsl(210_14%_42%)]">
-          CAPA · Correção e ação corretiva
+          CAPA · Correção e ação corretiva (editável)
         </span>
-        <span
-          className={cn(
-            "ml-auto text-[10px] font-bold rounded px-1.5 py-0.5",
-            capa.eficaciaVerificada ? "bg-[hsl(142_65%_93%)] text-[hsl(142_71%_24%)]" : "bg-[hsl(28_92%_92%)] text-[hsl(24_88%_32%)]"
-          )}
-        >
-          {capa.eficaciaVerificada ? "Eficácia verificada" : "Eficácia pendente"}
-        </span>
+        <label className={cn(
+          "ml-auto text-[10px] font-bold rounded px-1.5 py-0.5 flex items-center gap-1.5 cursor-pointer",
+          eficacia ? "bg-[hsl(142_65%_93%)] text-[hsl(142_71%_24%)]" : "bg-[hsl(28_92%_92%)] text-[hsl(24_88%_32%)]"
+        )}>
+          {eficacia ? "Eficácia verificada" : "Eficácia pendente"}
+          <Switch checked={eficacia} onCheckedChange={setEficacia} />
+        </label>
       </div>
-      <CapaStep icon={<Zap className="size-3.5" />} tone="amber" titulo="Ação imediata (contenção)" texto={capa.acaoImediata} />
-      <CapaStep icon={<GitBranch className="size-3.5" />} tone="red" titulo="Causa raiz" texto={capa.causaRaiz} />
-      <CapaStep icon={<Wrench className="size-3.5" />} tone="teal" titulo="Ação corretiva" texto={capa.acaoCorretiva} />
-      <div className="flex items-center gap-4 text-[11px] text-[hsl(210_14%_42%)] pt-2 border-t border-[hsl(200_18%_92%)]">
-        <span className="inline-flex items-center gap-1"><ShieldCheck className="size-3.5" /> {capa.responsavelAcao}</span>
-        <span className="inline-flex items-center gap-1"><CalendarClock className="size-3.5" /> prazo {formatDate(capa.prazo)}</span>
+
+      <CapaField icon={<Zap className="size-3.5" />} tone="amber" titulo="Ação imediata (contenção)" value={acaoImediata} onChange={setAcaoImediata} />
+      <CapaField icon={<GitBranch className="size-3.5" />} tone="red" titulo="Causa raiz" value={causaRaiz} onChange={setCausaRaiz} placeholder="Por que aconteceu? (5 porquês)" />
+      <CapaField icon={<Wrench className="size-3.5" />} tone="teal" titulo="Ação corretiva" value={acaoCorretiva} onChange={setAcaoCorretiva} placeholder="O que evita a reincidência?" />
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+        <div>
+          <Label className="text-[10px] uppercase tracking-[0.1em] font-semibold text-[hsl(210_14%_42%)] flex items-center gap-1"><ShieldCheck className="size-3" /> Responsável</Label>
+          <Input value={responsavelAcao} onChange={(e) => setResponsavel(e.target.value)} className="h-8 mt-1" placeholder="Ex.: Gerência de Compliance" />
+        </div>
+        <div>
+          <Label className="text-[10px] uppercase tracking-[0.1em] font-semibold text-[hsl(210_14%_42%)] flex items-center gap-1"><CalendarClock className="size-3" /> Prazo</Label>
+          <Input type="date" value={prazo} onChange={(e) => setPrazo(e.target.value)} className="h-8 mt-1" />
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between pt-1">
+        <span className="text-[10px] text-[hsl(210_12%_58%)]">Correção imediata não basta — auditor cobra causa raiz + ação + eficácia.</span>
+        <Button
+          variant={dirty ? "gradient" : "outline"}
+          size="sm"
+          disabled={!dirty}
+          onClick={() => onUpdate({ acaoImediata, causaRaiz, acaoCorretiva, responsavelAcao, prazo, eficaciaVerificada: eficacia })}
+        >
+          Salvar CAPA
+        </Button>
       </div>
     </div>
   );
 }
 
-function CapaStep({
-  icon,
-  tone,
-  titulo,
-  texto,
+function CapaField({
+  icon, tone, titulo, value, onChange, placeholder,
 }: {
   icon: React.ReactNode;
   tone: "amber" | "red" | "teal";
   titulo: string;
-  texto: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
 }) {
-  const c = {
-    amber: "bg-[hsl(28_92%_48%)]",
-    red: "bg-[hsl(0_78%_50%)]",
-    teal: "bg-[hsl(176_84%_25%)]",
-  }[tone];
+  const c = { amber: "bg-[hsl(28_92%_48%)]", red: "bg-[hsl(0_78%_50%)]", teal: "bg-[hsl(176_84%_25%)]" }[tone];
   return (
     <div className="flex items-start gap-2.5">
-      <span className={cn("size-6 rounded-md flex items-center justify-center text-white shrink-0", c)}>{icon}</span>
-      <div className="min-w-0">
-        <p className="text-[10px] uppercase tracking-[0.1em] font-semibold text-[hsl(210_14%_42%)]">{titulo}</p>
-        <p className="text-[12px] text-[hsl(195_30%_8%)] leading-snug">{texto}</p>
+      <span className={cn("size-6 rounded-md flex items-center justify-center text-white shrink-0 mt-0.5", c)}>{icon}</span>
+      <div className="min-w-0 flex-1">
+        <p className="text-[10px] uppercase tracking-[0.1em] font-semibold text-[hsl(210_14%_42%)] mb-1">{titulo}</p>
+        <Input value={value} onChange={(e) => onChange(e.target.value)} className="h-8" placeholder={placeholder} />
       </div>
     </div>
   );

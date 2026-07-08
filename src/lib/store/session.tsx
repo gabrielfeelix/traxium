@@ -8,6 +8,7 @@
 // Recarregar a página reseta (módulos são re-avaliados). É o comportamento esperado num protótipo.
 
 import { createContext, useContext, useState, useCallback } from "react";
+import { avaliarCarregamento } from "@/lib/domain/rules-engine";
 import {
   viagens,
   naoConformidades,
@@ -32,8 +33,10 @@ import {
   inspectionEvents,
   loadHistory,
   excecoes,
+  retificacoes,
   compartimentoPorViagem,
   produtoAtualPorViagem,
+  findImplemento,
   VERSAO_BASE_IDTF,
   HOJE,
   PAPEL_LABEL,
@@ -119,6 +122,13 @@ export type NovaAuditoriaInput = {
 
 export type NovaExcecaoInput = Omit<Excecao, "id" | "status" | "aprovador" | "decididoEm">;
 
+export type TrocaVeiculoInput = {
+  cavaloPlaca?: string;
+  implementoId?: string;
+  compartimentoId?: string;
+  motivo: string;
+};
+
 type SessionCtx = {
   version: number;
   /** Papel do usuário atual (RBAC-lite do protótipo). */
@@ -126,6 +136,7 @@ type SessionCtx = {
   setPapel: (p: Papel) => void;
   addViagem: (i: NovaViagemInput) => string;
   addNaoConformidade: (nc: Omit<NaoConformidade, "id">) => string;
+  updateNCCapa: (ncId: string, patch: Partial<NonNullable<NaoConformidade["capa"]>>) => void;
   addCavalo: (c: Omit<Cavalo, "id">) => string;
   addImplemento: (i: NovoImplementoInput) => string;
   addCompartimento: (c: Omit<Compartimento, "id">) => string;
@@ -137,6 +148,10 @@ type SessionCtx = {
   addCleaningEvent: (c: Omit<CleaningEvent, "id">) => string;
   addInspectionEvent: (i: Omit<InspectionEvent, "id">) => string;
   updateViagemStatus: (viagemId: string, status: Viagem["status"]) => void;
+  /** Troca veículo/compartimento de uma viagem. Cavalo NÃO altera o T-3 (é do
+   *  compartimento); trocar implemento/compartimento re-roda o motor. Cada campo
+   *  travado alterado gera uma retificação (imutabilidade, pergunta 20). */
+  trocarVeiculo: (viagemId: string, changes: TrocaVeiculoInput) => void;
   addExcecao: (i: NovaExcecaoInput) => string;
   /** Decide uma exceção. Retorna false se o papel atual não pode aprovar (gate de autoridade). */
   decidirExcecao: (id: string, status: "aprovada" | "negada") => boolean;
@@ -196,6 +211,17 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     naoConformidades.unshift({ ...nc, id });
     bump();
     return id;
+  }, [bump]);
+
+  const updateNCCapa = useCallback<SessionCtx["updateNCCapa"]>((ncId, patch) => {
+    const nc = naoConformidades.find((x) => x.id === ncId);
+    if (!nc) return;
+    const base = nc.capa ?? {
+      acaoImediata: "", causaRaiz: "", acaoCorretiva: "",
+      responsavelAcao: nc.responsavel ?? "", prazo: "", eficaciaVerificada: false,
+    };
+    nc.capa = { ...base, ...patch };
+    bump();
   }, [bump]);
 
   const addCavalo = useCallback<SessionCtx["addCavalo"]>((c) => {
@@ -275,6 +301,36 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     const v = viagens.find((x) => x.id === viagemId);
     if (v) { v.status = status; bump(); }
   }, [bump]);
+
+  const trocarVeiculo = useCallback<SessionCtx["trocarVeiculo"]>((viagemId, changes) => {
+    const v = viagens.find((x) => x.id === viagemId);
+    if (!v) return;
+    const resp = PAPEL_LABEL[papel];
+    const stamp = `${HOJE}T10:00:00`;
+    const retif = (campo: string, orig: string, novo: string) => {
+      if (orig === novo) return;
+      retificacoes.unshift({
+        id: nextId("ret"), entidade: "viagem", entidadeId: viagemId, campo,
+        valorOriginal: orig, valorNovo: novo, motivo: changes.motivo, responsavel: resp, dataHora: stamp,
+      });
+    };
+    // Trocar o CAVALO não toca o T-3 — o histórico é do compartimento, não do cavalo.
+    if (changes.cavaloPlaca) retif("cavalo", v.cavalo, changes.cavaloPlaca), (v.cavalo = changes.cavaloPlaca);
+    if (changes.implementoId) {
+      const imp = findImplemento(changes.implementoId);
+      if (imp) { retif("carreta", v.carreta, imp.placa); v.carreta = imp.placa; }
+    }
+    if (changes.compartimentoId && changes.compartimentoId !== compartimentoPorViagem[viagemId]) {
+      retif("compartimento", compartimentoPorViagem[viagemId] ?? "—", changes.compartimentoId);
+      compartimentoPorViagem[viagemId] = changes.compartimentoId;
+      // Trocar implemento/compartimento RE-RODA o motor: pode virar Bloqueada ou liberar.
+      const d = avaliarCarregamento(viagemId);
+      v.status = d.tier === "BLOQUEIO" ? "Bloqueada" : v.status === "Bloqueada" ? "Agendada" : v.status;
+      v.alertas = d.tier === "BLOQUEIO" ? 1 : 0;
+      v.regimeLimpeza = (d.regimeAplicado ?? d.regimeExigido ?? v.regimeLimpeza) as Viagem["regimeLimpeza"];
+    }
+    bump();
+  }, [papel, bump]);
 
   const addExcecao = useCallback<SessionCtx["addExcecao"]>((i) => {
     const id = nextId("exc");
@@ -414,6 +470,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     setPapel,
     addViagem,
     addNaoConformidade,
+    updateNCCapa,
     addCavalo,
     addImplemento,
     addCompartimento,
@@ -422,6 +479,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     addCleaningEvent,
     addInspectionEvent,
     updateViagemStatus,
+    trocarVeiculo,
     addExcecao,
     decidirExcecao,
     addLote,

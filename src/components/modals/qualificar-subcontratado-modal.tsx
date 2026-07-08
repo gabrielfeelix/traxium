@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { type Subcontratado, nivelVencimento } from "@/lib/domain/model";
+import { type Subcontratado, nivelVencimento, podeExecutar } from "@/lib/domain/model";
 import { useSession } from "@/lib/store/session";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
@@ -18,8 +18,9 @@ import { cn } from "@/lib/utils";
 type Escopo = "Road Transport of Feed" | "Affreightment of Road Transport";
 
 export function QualificarSubcontratadoModal() {
-  const { addSubcontratado } = useSession();
+  const { addSubcontratado, papel } = useSession();
   const { toast } = useToast();
+  const bloqueado = !podeExecutar(papel, "qualificarSubcontratado");
   const [open, setOpen] = useState(false);
 
   const [cnpj, setCnpj] = useState("");
@@ -73,7 +74,9 @@ export function QualificarSubcontratadoModal() {
   return (
     <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) reset(); }}>
       <DialogTrigger asChild>
-        <Button variant="gradient" size="sm"><Plus className="size-4" /> Qualificar subcontratado</Button>
+        <Button variant="gradient" size="sm" disabled={bloqueado} title={bloqueado ? "Seu papel não qualifica subcontratados" : undefined}>
+          <Plus className="size-4" /> Qualificar subcontratado
+        </Button>
       </DialogTrigger>
       <DialogContent className="max-h-[85vh] overflow-y-auto">
         <DialogHeader>

@@ -11,14 +11,15 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RegimeBadge } from "@/components/shell/status-badge";
-import { type ProdutoIDTF, type Regime } from "@/lib/domain/model";
+import { type ProdutoIDTF, type Regime, podeExecutar } from "@/lib/domain/model";
 import { useSession } from "@/lib/store/session";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 
 export function NovoProdutoModal() {
-  const { addProdutoIDTF } = useSession();
+  const { addProdutoIDTF, papel } = useSession();
   const { toast } = useToast();
+  const bloqueado = !podeExecutar(papel, "classificarIDTF");
   const [open, setOpen] = useState(false);
   const [nome, setNome] = useState("");
   const [alias, setAlias] = useState("");
@@ -42,7 +43,9 @@ export function NovoProdutoModal() {
   return (
     <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) reset(); }}>
       <DialogTrigger asChild>
-        <Button variant="gradient" size="sm"><Plus className="size-4" /> Novo produto</Button>
+        <Button variant="gradient" size="sm" disabled={bloqueado} title={bloqueado ? "Só a qualidade (gestor) adiciona produtos" : undefined}>
+          <Plus className="size-4" /> Novo produto
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

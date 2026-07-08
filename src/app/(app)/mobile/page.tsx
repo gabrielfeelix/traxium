@@ -27,19 +27,60 @@ import {
 import { PageHeader } from "@/components/shell/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 
 type Screen = "login" | "home" | "viagem" | "checklist" | "foto" | "bloqueio" | "sync";
 
+const CHECK_ITENS = [
+  "Compartimento varrido e seco",
+  "Sem resíduos visíveis (>1cm)",
+  "Lavagem com água sob pressão",
+  "Aplicação de detergente neutro",
+  "Enxágue completo",
+  "Foto pré-carregamento",
+  "Assinatura digital",
+];
+
+const ANGULO_LABELS = [
+  "Visão geral interna",
+  "Cantos e frestas",
+  "Teto / lona / tampa",
+  "Piso / fundo",
+  "Descarga / bica / porta",
+  "Identificação externa (placa)",
+];
+
 export default function MobilePreviewPage() {
+  const { toast } = useToast();
   const [screen, setScreen] = useState<Screen>("home");
   const [online, setOnline] = useState(false);
+  // Estado operável do fluxo do motorista (checklist clicável, fotos capturadas, fila de sync).
+  const [check, setCheck] = useState<boolean[]>([true, true, true, false, false, false, false]);
+  const [fotos, setFotos] = useState(0);
+  const [synced, setSynced] = useState(false);
+
+  const capturarFoto = () =>
+    setFotos((f) => {
+      const n = Math.min(6, f + 1);
+      if (n >= 6) setCheck((c) => c.map((v, i) => (i === 5 ? true : v))); // marca "Foto pré-carregamento"
+      return n;
+    });
+
+  const sincronizar = () => {
+    if (!online || synced) return;
+    setSynced(true);
+    toast("Sincronizado com sucesso", { desc: "Itens enviados ao servidor e travados para edição." });
+  };
+
+  // Ao ficar offline de novo, a fila volta a "pendente".
+  const toggleOnline = () => setOnline((o) => { if (o) setSynced(false); return !o; });
 
   return (
     <div className="space-y-5">
       <PageHeader
         title="Preview · App do motorista"
-        description="Simulação interativa do app mobile offline-first. Interface otimizada para motoristas e tractionairs subcontratados com baixo letramento digital, uso em condições adversas e operação sem internet."
+        description="Simulação interativa do app mobile offline-first. Interface otimizada para motoristas próprios, agregados e subcontratados com baixo letramento digital, uso em condições adversas e operação sem internet."
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -76,12 +117,12 @@ export default function MobilePreviewPage() {
                 </div>
 
                 <div className="h-full pt-[44px]">
-                  {screen === "home" && <HomeScreen onSelect={setScreen} online={online} />}
+                  {screen === "home" && <HomeScreen onSelect={setScreen} online={online} synced={synced} check={check} />}
                   {screen === "viagem" && <ViagemScreen onBack={() => setScreen("home")} onChecklist={() => setScreen("checklist")} />}
-                  {screen === "checklist" && <ChecklistScreen onBack={() => setScreen("viagem")} onFoto={() => setScreen("foto")} />}
-                  {screen === "foto" && <FotoScreen onBack={() => setScreen("checklist")} />}
+                  {screen === "checklist" && <ChecklistScreen check={check} setCheck={setCheck} onBack={() => setScreen("viagem")} onFoto={() => setScreen("foto")} />}
+                  {screen === "foto" && <FotoScreen fotos={fotos} onCapturar={capturarFoto} onBack={() => setScreen("checklist")} />}
                   {screen === "bloqueio" && <BloqueioScreen onBack={() => setScreen("home")} />}
-                  {screen === "sync" && <SyncScreen online={online} onBack={() => setScreen("home")} />}
+                  {screen === "sync" && <SyncScreen online={online} synced={synced} check={check} fotos={fotos} onSync={sincronizar} onBack={() => setScreen("home")} />}
                   {screen === "login" && <LoginScreen onLogin={() => setScreen("home")} />}
                 </div>
               </div>
@@ -106,7 +147,7 @@ export default function MobilePreviewPage() {
               <ScreenButton active={screen === "sync"} onClick={() => setScreen("sync")} icon={<RefreshCw className="size-4" />} label="Fila de sincronização" />
 
               <button
-                onClick={() => setOnline((o) => !o)}
+                onClick={toggleOnline}
                 className={cn(
                   "mt-1 w-full flex items-center gap-2 p-2.5 rounded-md text-[13px] font-semibold border transition-colors",
                   online
@@ -227,7 +268,8 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
   );
 }
 
-function HomeScreen({ onSelect, online }: { onSelect: (s: Screen) => void; online: boolean }) {
+function HomeScreen({ onSelect, online, synced, check }: { onSelect: (s: Screen) => void; online: boolean; synced: boolean; check: boolean[] }) {
+  const pendentes = check.filter((v) => !v).length;
   return (
     <div className="h-full overflow-y-auto bg-[hsl(180_14%_97%)]">
       {/* Header */}
@@ -263,17 +305,19 @@ function HomeScreen({ onSelect, online }: { onSelect: (s: Screen) => void; onlin
               : "border-[hsl(28_92%_80%)] bg-[hsl(36_95%_97%)]"
           )}
         >
-          {online ? (
+          {synced ? (
+            <CheckCircle2 className="size-4 text-[hsl(142_71%_28%)] shrink-0" />
+          ) : online ? (
             <RefreshCw className="size-4 text-[hsl(142_71%_28%)] shrink-0" />
           ) : (
             <CloudOff className="size-4 text-[hsl(24_88%_32%)] shrink-0" />
           )}
           <div className="flex-1 min-w-0">
             <p className={cn("text-[12px] font-bold", online ? "text-[hsl(142_71%_24%)]" : "text-[hsl(24_88%_32%)]")}>
-              {online ? "Sincronizando pendências…" : "Sem sinal · 3 itens salvos no aparelho"}
+              {synced ? "Tudo sincronizado" : online ? "Toque para sincronizar pendências" : `Sem sinal · ${pendentes} item(ns) salvo(s) no aparelho`}
             </p>
             <p className="text-[10px] text-[hsl(210_14%_42%)]">
-              {online ? "Enviando fotos e checklists ao servidor" : "Tudo salvo localmente. Envia quando a rede voltar."}
+              {synced ? "Enviado ao servidor e travado para edição." : online ? "Fotos e checklists prontos para enviar." : "Tudo salvo localmente. Envia quando a rede voltar."}
             </p>
           </div>
           <ChevronRight className="size-4 text-[hsl(210_12%_70%)]" />
@@ -398,16 +442,10 @@ function InfoRow({ label, value, sub, mono }: { label: string; value: string; su
   );
 }
 
-function ChecklistScreen({ onBack, onFoto }: { onBack: () => void; onFoto: () => void }) {
-  const items = [
-    { ok: true, t: "Compartimento varrido e seco" },
-    { ok: true, t: "Sem resíduos visíveis (>1cm)" },
-    { ok: true, t: "Lavagem com água sob pressão" },
-    { ok: false, t: "Aplicação de detergente neutro" },
-    { ok: false, t: "Enxágue completo" },
-    { ok: false, t: "Foto pré-carregamento" },
-    { ok: false, t: "Assinatura digital" },
-  ];
+function ChecklistScreen({ check, setCheck, onBack, onFoto }: { check: boolean[]; setCheck: (f: (c: boolean[]) => boolean[]) => void; onBack: () => void; onFoto: () => void }) {
+  const feitos = check.filter(Boolean).length;
+  const pct = Math.round((feitos / CHECK_ITENS.length) * 100);
+  const toggle = (i: number) => setCheck((c) => c.map((v, idx) => (idx === i ? !v : v)));
   return (
     <div className="h-full overflow-y-auto bg-white">
       <div className="bg-gradient-to-br from-[hsl(180_80%_18%)] to-[hsl(200_92%_24%)] text-white p-5 relative">
@@ -418,45 +456,51 @@ function ChecklistScreen({ onBack, onFoto }: { onBack: () => void; onFoto: () =>
         <h2 className="text-[18px] font-bold mt-1">Checklist de limpeza</h2>
         <div className="flex items-center gap-3 mt-3">
           <div className="flex-1 h-2 bg-white/15 rounded-full overflow-hidden">
-            <div className="h-full bg-white shadow-md" style={{ width: "43%" }} />
+            <div className="h-full bg-white shadow-md transition-all" style={{ width: `${pct}%` }} />
           </div>
-          <span className="text-[12px] font-bold num">3 / 7</span>
+          <span className="text-[12px] font-bold num">{feitos} / {CHECK_ITENS.length}</span>
         </div>
       </div>
       <div className="p-3 space-y-2">
-        {items.map((item, i) => (
-          <div
-            key={i}
-            className={cn(
-              "flex items-center gap-3 p-3 rounded-xl border-2 transition-all",
-              item.ok ? "border-[hsl(142_60%_75%)] bg-[hsl(142_65%_97%)]" : "border-[hsl(200_18%_88%)] bg-white"
-            )}
-          >
-            <div
+        {CHECK_ITENS.map((t, i) => {
+          const ok = check[i];
+          const isFoto = i === 5;
+          return (
+            <button
+              key={i}
+              onClick={() => (isFoto ? onFoto() : toggle(i))}
               className={cn(
-                "size-8 rounded-full flex items-center justify-center shrink-0",
-                item.ok
-                  ? "bg-[hsl(142_71%_36%)] text-white shadow-md"
-                  : "bg-[hsl(200_18%_94%)] border-2 border-[hsl(200_18%_75%)]"
+                "w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all text-left active:scale-[0.99]",
+                ok ? "border-[hsl(142_60%_75%)] bg-[hsl(142_65%_97%)]" : "border-[hsl(200_18%_88%)] bg-white"
               )}
             >
-              {item.ok && <CheckCircle2 className="size-4" />}
-            </div>
-            <p className={cn("text-[13px] font-medium flex-1", item.ok && "text-[hsl(142_71%_24%)]")}>{item.t}</p>
-          </div>
-        ))}
+              <div
+                className={cn(
+                  "size-8 rounded-full flex items-center justify-center shrink-0",
+                  ok ? "bg-[hsl(142_71%_36%)] text-white shadow-md" : "bg-[hsl(200_18%_94%)] border-2 border-[hsl(200_18%_75%)]"
+                )}
+              >
+                {ok ? <CheckCircle2 className="size-4" /> : isFoto ? <Camera className="size-4 text-[hsl(210_14%_42%)]" /> : null}
+              </div>
+              <p className={cn("text-[13px] font-medium flex-1", ok && "text-[hsl(142_71%_24%)]")}>{t}</p>
+              {isFoto && !ok && <span className="text-[10px] font-bold text-[hsl(28_92%_45%)] uppercase">tirar</span>}
+            </button>
+          );
+        })}
         <button
           onClick={onFoto}
           className="w-full mt-2 bg-gradient-to-r from-[hsl(176_84%_25%)] to-[hsl(200_92%_28%)] text-white font-bold py-3.5 rounded-xl text-[13px] flex items-center justify-center gap-2 shadow-brand-md active:scale-[0.98] transition-transform"
         >
-          <Camera className="size-4" /> Próximo passo
+          <Camera className="size-4" /> Câmera com GPS
         </button>
       </div>
     </div>
   );
 }
 
-function FotoScreen({ onBack }: { onBack: () => void }) {
+function FotoScreen({ fotos, onCapturar, onBack }: { fotos: number; onCapturar: () => void; onBack: () => void }) {
+  const completo = fotos >= 6;
+  const anguloAtual = Math.min(fotos + 1, 6);
   return (
     <div className="h-full bg-black flex flex-col">
       <div className="absolute top-[44px] left-0 right-0 z-10 p-4 flex items-center justify-between text-white">
@@ -466,7 +510,7 @@ function FotoScreen({ onBack }: { onBack: () => void }) {
         >
           <ArrowLeft className="size-4" />
         </button>
-        <p className="text-[13px] font-bold">Foto · Compartimento limpo</p>
+        <p className="text-[13px] font-bold">Foto · <span className="num">{fotos}/6</span> capturadas</p>
         <div className="size-9" />
       </div>
 
@@ -486,9 +530,11 @@ function FotoScreen({ onBack }: { onBack: () => void }) {
         </div>
 
         {/* Ângulo obrigatório */}
-        <div className="absolute top-[70px] left-4 right-4 flex items-center gap-2 bg-[hsl(28_92%_48%)]/90 backdrop-blur-md rounded-lg px-3 py-2 text-white">
-          <Camera className="size-3.5 shrink-0" />
-          <p className="text-[11px] font-semibold flex-1">Foto 6/6 · Identificação externa (placa do compartimento)</p>
+        <div className={cn("absolute top-[70px] left-4 right-4 flex items-center gap-2 backdrop-blur-md rounded-lg px-3 py-2 text-white", completo ? "bg-[hsl(142_71%_36%)]/90" : "bg-[hsl(28_92%_48%)]/90")}>
+          {completo ? <CheckCircle2 className="size-3.5 shrink-0" /> : <Camera className="size-3.5 shrink-0" />}
+          <p className="text-[11px] font-semibold flex-1">
+            {completo ? "6/6 ângulos capturados · pronto" : `Foto ${anguloAtual}/6 · ${ANGULO_LABELS[anguloAtual - 1]}`}
+          </p>
         </div>
 
         <div className="absolute top-[124px] left-4 right-4 bg-black/60 backdrop-blur-md rounded-lg p-3 text-white border border-white/[0.08] space-y-1.5">
@@ -512,16 +558,33 @@ function FotoScreen({ onBack }: { onBack: () => void }) {
         </div>
       </div>
 
-      <div className="p-6 pb-10 bg-black flex items-center justify-around">
-        <div className="size-12 rounded-full bg-white/[0.06] flex flex-col items-center justify-center text-white/40 border border-white/10">
-          <ImageOff className="size-5" />
-        </div>
-        <button className="size-20 rounded-full border-4 border-white flex items-center justify-center shadow-2xl">
-          <div className="size-14 rounded-full bg-white" />
-        </button>
-        <button className="size-12 rounded-full bg-white/10 flex items-center justify-center text-white border border-white/10">
-          <Camera className="size-5" />
-        </button>
+      <div className="p-6 pb-10 bg-black">
+        {completo ? (
+          <button
+            onClick={onBack}
+            className="w-full bg-gradient-to-r from-[hsl(176_84%_25%)] to-[hsl(200_92%_28%)] text-white font-bold py-4 rounded-2xl text-[14px] flex items-center justify-center gap-2 shadow-2xl active:scale-[0.98] transition-transform"
+          >
+            <CheckCircle2 className="size-5" /> Concluir · 6 fotos
+          </button>
+        ) : (
+          <div className="flex items-center justify-around">
+            <div className="size-12 rounded-full bg-white/[0.06] flex flex-col items-center justify-center text-white/40 border border-white/10">
+              <ImageOff className="size-5" />
+            </div>
+            <button
+              onClick={onCapturar}
+              className="size-20 rounded-full border-4 border-white flex items-center justify-center shadow-2xl active:scale-95 transition-transform"
+            >
+              <div className="size-14 rounded-full bg-white" />
+            </button>
+            <button
+              onClick={onCapturar}
+              className="size-12 rounded-full bg-white/10 flex items-center justify-center text-white border border-white/10 active:scale-95 transition-transform"
+            >
+              <Camera className="size-5" />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -584,12 +647,13 @@ function BloqueioScreen({ onBack }: { onBack: () => void }) {
 
 type EstadoSync = "sincronizado" | "sincronizando" | "salvo" | "divergente";
 
-function SyncScreen({ online, onBack }: { online: boolean; onBack: () => void }) {
+function SyncScreen({ online, synced, check, fotos, onSync, onBack }: { online: boolean; synced: boolean; check: boolean[]; fotos: number; onSync: () => void; onBack: () => void }) {
+  const feitos = check.filter(Boolean).length;
   const itens: { t: string; sub: string; estado: EstadoSync }[] = [
-    { t: "Checklist LCI · TX-08471", sub: "14 itens · assinado", estado: online ? "sincronizado" : "salvo" },
-    { t: "Fotos do compartimento (6)", sub: "geo + hash SHA-256", estado: online ? "sincronizando" : "salvo" },
-    { t: "Limpeza Regime C", sub: "detergente · tempo de ação", estado: "salvo" },
-    { t: "Assinatura do motorista", sub: "carimbo local 09:44", estado: online ? "sincronizado" : "salvo" },
+    { t: "Checklist LCI · TX-08471", sub: `${feitos}/${check.length} itens${feitos === check.length ? " · assinado" : ""}`, estado: synced ? "sincronizado" : "salvo" },
+    { t: `Fotos do compartimento (${fotos})`, sub: "geo + hash SHA-256", estado: synced ? "sincronizado" : "salvo" },
+    { t: "Limpeza Regime C", sub: "detergente · tempo de ação", estado: synced ? "sincronizado" : "salvo" },
+    { t: "Assinatura do motorista", sub: "carimbo local 09:44", estado: synced ? "sincronizado" : "salvo" },
     { t: "Inspeção LCI · TX-08469", sub: "horário do aparelho difere do servidor", estado: "divergente" },
   ];
   const salvos = itens.filter((i) => i.estado === "salvo").length;
@@ -636,15 +700,18 @@ function SyncScreen({ online, onBack }: { online: boolean; onBack: () => void })
           </p>
         </div>
         <button
-          disabled={!online}
+          disabled={!online || synced}
+          onClick={onSync}
           className={cn(
             "w-full font-bold py-3.5 rounded-xl text-[13px] flex items-center justify-center gap-2 transition-all",
-            online
+            synced
+              ? "bg-[hsl(142_65%_94%)] text-[hsl(142_71%_24%)] border border-[hsl(142_60%_75%)]"
+              : online
               ? "bg-gradient-to-r from-[hsl(176_84%_25%)] to-[hsl(200_92%_28%)] text-white shadow-brand-md active:scale-[0.98]"
               : "bg-[hsl(200_18%_92%)] text-[hsl(210_12%_58%)]"
           )}
         >
-          <RefreshCw className="size-4" /> {online ? "Sincronizar agora" : "Aguardando rede…"}
+          {synced ? <><CheckCircle2 className="size-4" /> Sincronizado</> : <><RefreshCw className="size-4" /> {online ? "Sincronizar agora" : "Aguardando rede…"}</>}
         </button>
       </div>
     </div>

@@ -10,14 +10,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { RegimeBadge } from "@/components/shell/status-badge";
-import { type ProdutoIDTF, type Regime } from "@/lib/domain/model";
+import { type ProdutoIDTF, type Regime, podeExecutar } from "@/lib/domain/model";
 import { useSession } from "@/lib/store/session";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 
 export function ClassificarIDTFModal({ produto }: { produto: ProdutoIDTF }) {
-  const { classificarProduto } = useSession();
+  const { classificarProduto, papel } = useSession();
   const { toast } = useToast();
+  const bloqueado = !podeExecutar(papel, "classificarIDTF");
   const [open, setOpen] = useState(false);
   const [regime, setRegime] = useState<Regime>(produto.regimeAntesDeFeed);
   const [bloqueia, setBloqueia] = useState(produto.bloqueiaFeed);
@@ -32,7 +33,7 @@ export function ClassificarIDTFModal({ produto }: { produto: ProdutoIDTF }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">Classificar</Button>
+        <Button variant="outline" size="sm" disabled={bloqueado} title={bloqueado ? "Só a qualidade (gestor) classifica produtos" : undefined}>Classificar</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

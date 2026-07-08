@@ -41,8 +41,14 @@ export function ReportarNCModal() {
       abertaEm: "2026-07-08T10:00:00", status: "Aberta",
       responsavel: resp || undefined,
       viagem: viagem || undefined, veiculo: veiculo || undefined, motorista: motorista || undefined,
+      // Nasce com CAPA em branco (contenção → causa raiz → ação corretiva → eficácia)
+      // para tratamento em /bloqueios — correção imediata não basta (pergunta 23).
+      capa: {
+        acaoImediata: "", causaRaiz: "", acaoCorretiva: "",
+        responsavelAcao: resp || "", prazo: "", eficaciaVerificada: false,
+      },
     });
-    toast(`NC ${codigo} registrada`, { type: sev === "Crítica" ? "error" : "info", desc: sev === "Crítica" ? "Crítica — pode exigir exceção." : "Aberta para tratamento (CAPA)." });
+    toast(`NC ${codigo} registrada`, { type: sev === "Crítica" ? "error" : "info", desc: sev === "Crítica" ? "Crítica — abra o CAPA e trate a causa raiz." : "Aberta para tratamento (CAPA)." });
     setOpen(false); reset();
   }
 

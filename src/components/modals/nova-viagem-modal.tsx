@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { RegimeBadge } from "@/components/shell/status-badge";
 import {
-  produtosIDTF, cavalos, implementos, compartimentos, findImplemento, HOJE,
+  produtosIDTF, cavalos, implementos, compartimentos, findImplemento, HOJE, podeExecutar,
 } from "@/lib/domain/model";
 import { getT3, avaliarNovoCarregamento, type Tier } from "@/lib/domain/rules-engine";
 import { motoristas, viagens } from "@/lib/mock-data";
@@ -28,8 +28,9 @@ const tierStyle: Record<Tier, { bg: string; ring: string; text: string; icon: Re
 };
 
 export function NovaViagemModal() {
-  const { addViagem, addExcecao } = useSession();
+  const { addViagem, addExcecao, papel } = useSession();
   const { toast } = useToast();
+  const bloqueado = !podeExecutar(papel, "criarViagem");
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(1);
 
@@ -103,7 +104,9 @@ export function NovaViagemModal() {
   return (
     <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) reset(); }}>
       <DialogTrigger asChild>
-        <Button variant="gradient" size="sm"><Plus className="size-4" /> Nova viagem</Button>
+        <Button variant="gradient" size="sm" disabled={bloqueado} title={bloqueado ? "Seu papel não cria viagens (despachante/gestor)" : undefined}>
+          <Plus className="size-4" /> Nova viagem
+        </Button>
       </DialogTrigger>
       <DialogContent className="max-w-xl">
         <DialogHeader>

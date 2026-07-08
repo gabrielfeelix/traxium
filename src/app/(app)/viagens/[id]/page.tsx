@@ -34,6 +34,7 @@ import {
   compartimentoPorViagem,
   findCompartimento,
   findImplemento,
+  retificacoesDe,
 } from "@/lib/domain/model";
 import {
   avaliarCarregamento,
@@ -44,6 +45,7 @@ import {
 import { useSession } from "@/lib/store/session";
 import { useToast } from "@/components/ui/toast";
 import { ContatarMotoristaModal } from "@/components/modals/contatar-motorista-modal";
+import { TrocarVeiculoModal } from "@/components/modals/trocar-veiculo-modal";
 import { printPDF } from "@/lib/export";
 import { formatDate, formatDateTime, cn } from "@/lib/utils";
 import { notFound } from "next/navigation";
@@ -63,6 +65,7 @@ export default function ViagemDetailPage({ params }: { params: Promise<{ id: str
   const t3 = getT3(compId);
   const cavalosT3 = cavalosDistintosNoT3(compId);
   const blocked = decisao.tier === "BLOQUEIO";
+  const retifs = retificacoesDe("viagem", viagem.id);
 
   const checklist = [
     { item: "Inspeção visual do compartimento", status: "ok", quando: "08:14" },
@@ -99,6 +102,7 @@ export default function ViagemDetailPage({ params }: { params: Promise<{ id: str
         </div>
         <div className="flex items-center gap-2">
           <ContatarMotoristaModal nome={viagem.motorista} />
+          <TrocarVeiculoModal viagem={viagem} />
           <Button variant="outline" size="sm" onClick={() => { printPDF(); toast("Gerando guia", { type: "info", desc: "Use 'Salvar como PDF'." }); }}>
             <Download className="size-4" /> Guia
           </Button>
@@ -150,6 +154,31 @@ export default function ViagemDetailPage({ params }: { params: Promise<{ id: str
             </div>
           </div>
         </div>
+      )}
+
+      {retifs.length > 0 && (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-[13px] flex items-center gap-2">
+              <Clock className="size-3.5 text-[hsl(176_84%_25%)]" /> Trilha de retificações
+            </CardTitle>
+            <CardDescription>Correções preservando o valor original — o passado não é apagado (imutabilidade).</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {retifs.map((r) => (
+              <div key={r.id} className="text-[12px] rounded-md border border-[hsl(200_18%_92%)] p-2.5">
+                <p>
+                  <span className="font-semibold capitalize">{r.campo}</span>:{" "}
+                  <span className="line-through text-[hsl(210_12%_58%)]">{r.valorOriginal}</span>{" → "}
+                  <span className="font-medium text-[hsl(176_84%_25%)]">{r.valorNovo}</span>
+                </p>
+                <p className="text-[10px] text-[hsl(210_14%_42%)] mt-0.5">
+                  {r.motivo} · {r.responsavel} · {formatDateTime(r.dataHora)}
+                </p>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

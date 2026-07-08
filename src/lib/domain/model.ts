@@ -683,6 +683,33 @@ export const compartimentoPorViagem: Record<string, string> = {
   "v-006": "comp-006",
 };
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Retificação — imutabilidade (pergunta 20). Depois de enviado/sincronizado, um
+// campo travado não é sobrescrito: a correção é um EVENTO NOVO que preserva o
+// valor original, com motivo, responsável e data/hora. Nunca apagar o passado.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type Retificacao = {
+  id: string;
+  entidade: "viagem" | "compartimento" | "limpeza" | "inspecao";
+  entidadeId: string;
+  campo: string;
+  valorOriginal: string;
+  valorNovo: string;
+  motivo: string;
+  responsavel: string;
+  dataHora: string;
+};
+
+export const retificacoes: Retificacao[] = [];
+
+/** Retificações de uma entidade (mais recentes primeiro). */
+export function retificacoesDe(entidade: Retificacao["entidade"], entidadeId: string): Retificacao[] {
+  return retificacoes
+    .filter((r) => r.entidade === entidade && r.entidadeId === entidadeId)
+    .sort((a, b) => new Date(b.dataHora).getTime() - new Date(a.dataHora).getTime());
+}
+
 /** Produto atual de cada viagem, resolvido para o IDTF canônico. */
 export const produtoAtualPorViagem: Record<string, string> = {
   "v-001": "p-soja",
