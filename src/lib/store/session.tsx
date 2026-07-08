@@ -41,6 +41,8 @@ import {
   HOJE,
   PAPEL_LABEL,
   podeAprovarExcecao,
+  deriveSurface,
+  PERFIL_POR_ID,
   type Cavalo,
   type Implemento,
   type Compartimento,
@@ -51,6 +53,9 @@ import {
   type ProdutoIDTF,
   type Papel,
   type Excecao,
+  type AccountType,
+  type Surface,
+  type PerfilDemoId,
 } from "@/lib/domain/model";
 
 let seq = 5000;
@@ -129,11 +134,31 @@ export type TrocaVeiculoInput = {
   motivo: string;
 };
 
+export type Impersonation = { tenantId: string; tenantName: string } | null;
+
 type SessionCtx = {
   version: number;
-  /** Papel do usuário atual (RBAC-lite do protótipo). */
+  /** Papel do usuário atual (RBAC-lite do protótipo — eixo 2). */
   papel: Papel;
   setPapel: (p: Papel) => void;
+  // ── Eixo 1 (accountType) — entra POR CIMA do papel. Decide a superfície. ──
+  /** Tipo de conta (eixo 1). Decide em qual superfície o usuário entra. */
+  accountType: AccountType;
+  setAccountType: (t: AccountType) => void;
+  /** Superfície ativa, derivada de (accountType, papel) — ou B durante impersonation. */
+  surface: Surface;
+  /** Modo apresentação: destrava todas as abas da superfície B (chave-mestra de demo). */
+  isMaster: boolean;
+  /** Perfil-demo atualmente aplicado (para marcar o item ativo no seletor). */
+  perfilId: PerfilDemoId;
+  /** "Entrar como…" — aplica um perfil-demo do §2 (seta accountType+papel+master, limpa impersonation). */
+  aplicarPerfil: (id: PerfilDemoId) => void;
+  /** Admin operando como um tenant (§4). Null = não está impersonando. */
+  impersonating: Impersonation;
+  /** Console → "Entrar como [tenant]": cai na superfície B com banner fixo. */
+  impersonar: (tenantId: string, tenantName: string) => void;
+  /** Encerra a impersonation e volta ao Console. */
+  sairImpersonation: () => void;
   addViagem: (i: NovaViagemInput) => string;
   addNaoConformidade: (nc: Omit<NaoConformidade, "id">) => string;
   updateNCCapa: (ncId: string, patch: Partial<NonNullable<NaoConformidade["capa"]>>) => void;
@@ -175,6 +200,38 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [version, setVersion] = useState(0);
   const bump = useCallback(() => setVersion((v) => v + 1), []);
   const [papel, setPapel] = useState<Papel>("gestor");
+
+  // ── Eixo 1 — accountType + superfície + impersonation ───────────────────────
+  const [accountType, setAccountType] = useState<AccountType>("tenant_user");
+  const [isMaster, setIsMaster] = useState(false);
+  const [perfilId, setPerfilId] = useState<PerfilDemoId>("gestor");
+  const [impersonating, setImpersonating] = useState<Impersonation>(null);
+
+  const aplicarPerfil = useCallback((id: PerfilDemoId) => {
+    const p = PERFIL_POR_ID[id];
+    if (!p) return;
+    setPerfilId(id);
+    setAccountType(p.accountType);
+    setPapel(p.papel);
+    setIsMaster(!!p.isMaster);
+    setImpersonating(null);
+    bump();
+  }, [bump]);
+
+  const impersonar = useCallback((tenantId: string, tenantName: string) => {
+    // Admin opera como o tenant na superfície B (papel gestor = nav larga), banner fixo (§4).
+    setImpersonating({ tenantId, tenantName });
+    setPapel("gestor");
+    bump();
+  }, [bump]);
+
+  const sairImpersonation = useCallback(() => {
+    setImpersonating(null);
+    bump();
+  }, [bump]);
+
+  // Impersonation força a superfície B; senão deriva de (accountType, papel).
+  const surface: Surface = impersonating ? "B" : deriveSurface(accountType, papel);
 
   const addViagem = useCallback<SessionCtx["addViagem"]>((i) => {
     const id = nextId("v");
@@ -468,6 +525,15 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     version,
     papel,
     setPapel,
+    accountType,
+    setAccountType,
+    surface,
+    isMaster,
+    perfilId,
+    aplicarPerfil,
+    impersonating,
+    impersonar,
+    sairImpersonation,
     addViagem,
     addNaoConformidade,
     updateNCCapa,

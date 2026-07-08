@@ -584,7 +584,8 @@ export type Papel =
   | "motorista"
   | "inspetor"
   | "diretoria_rt"
-  | "admin_subcontratados";
+  | "admin_subcontratados"
+  | "auditor_interno";
 
 export const PAPEL_LABEL: Record<Papel, string> = {
   gestor: "Gestor GMP+/Qualidade",
@@ -593,7 +594,13 @@ export const PAPEL_LABEL: Record<Papel, string> = {
   inspetor: "Inspetor de pátio",
   diretoria_rt: "Diretoria + Resp. Técnico",
   admin_subcontratados: "Admin de subcontratados",
+  auditor_interno: "Auditor interno",
 };
+
+// Papéis de CAMPO roteiam para o App (superfície C); os demais são de ESCRITÓRIO
+// (superfície B). É o que decide o eixo 2 dentro de um tenant_user.
+export const PAPEIS_CAMPO: Papel[] = ["motorista", "inspetor"];
+export const isPapelCampo = (p: Papel): boolean => p === "motorista" || p === "inspetor";
 
 /** Quem pode aprovar uma exceção do nível exigido. Motorista/inspetor/despachante NUNCA. */
 export function podeAprovarExcecao(papel: Papel, nivel: NivelAutoridade): boolean {
@@ -625,6 +632,164 @@ export function podeExecutar(
       return false;
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EIXO 1 — accountType (decide a SUPERFÍCIE). Entra POR CIMA do `papel` (eixo 2).
+// Regra (PLANO-PERFIS §0/§9): login resolve accountType → escolhe superfície;
+// dentro de tenant_user o `papel` de campo (motorista/inspetor) desvia p/ o App (C).
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type AccountType = "traxium_admin" | "tenant_user" | "subcontractor_admin" | "auditor";
+
+/** A·Console · B·Back-office · C·App de campo · D·Portal subcontratado · E·Visão auditor. */
+export type Surface = "A" | "B" | "C" | "D" | "E";
+
+export function deriveSurface(accountType: AccountType, papel: Papel): Surface {
+  switch (accountType) {
+    case "traxium_admin":
+      return "A";
+    case "subcontractor_admin":
+      return "D";
+    case "auditor":
+      return "E";
+    case "tenant_user":
+      return isPapelCampo(papel) ? "C" : "B";
+  }
+}
+
+export const SURFACE_LABEL: Record<Surface, string> = {
+  A: "Console Traxium",
+  B: "Back-office",
+  C: "App de campo",
+  D: "Portal do subcontratado",
+  E: "Visão do auditor",
+};
+
+// Catálogo de logins do protótipo (§2). "Entrar como…" seleciona um destes:
+// seta (accountType, papel) e roteia para a superfície derivada. `master` é a
+// chave-mestra de demonstração (ortogonal — destrava todas as abas da superfície B).
+export type PerfilDemoId =
+  | "master"
+  | "traxium_admin"
+  | "gestor"
+  | "despachante"
+  | "diretoria"
+  | "admin_sub"
+  | "auditor_interno"
+  | "motorista"
+  | "inspetor"
+  | "subcontratado"
+  | "auditor_externo";
+
+export type PerfilDemo = {
+  id: PerfilDemoId;
+  label: string;
+  pessoa: string; // persona do §2 (contexto de demo)
+  descricao: string;
+  accountType: AccountType;
+  papel: Papel; // para superfícies não-tenant é indiferente; guardamos um default coerente
+  isMaster?: boolean;
+  fase2?: boolean; // D/E são prévia rotulada no MVP
+};
+
+export const PERFIS_DEMO: PerfilDemo[] = [
+  {
+    id: "master",
+    label: "Apresentação — Master",
+    pessoa: "Chave-mestra de palco",
+    descricao: "Todas as abas de todas as superfícies. Não é papel de produção.",
+    accountType: "tenant_user",
+    papel: "gestor",
+    isMaster: true,
+  },
+  {
+    id: "traxium_admin",
+    label: "Traxium Admin",
+    pessoa: "Console",
+    descricao: "Tenants, faturamento, IDTF global, impersonation. Não opera o cliente.",
+    accountType: "traxium_admin",
+    papel: "gestor",
+  },
+  {
+    id: "gestor",
+    label: "Gestor GMP+/Qualidade",
+    pessoa: "Thiago",
+    descricao: "Dono da conformidade — nav mais larga do tenant.",
+    accountType: "tenant_user",
+    papel: "gestor",
+  },
+  {
+    id: "despachante",
+    label: "Despachante/Tráfego",
+    pessoa: "Jéssica",
+    descricao: "Dono da viagem. Não aprova exceção nem classifica IDTF.",
+    accountType: "tenant_user",
+    papel: "despachante",
+  },
+  {
+    id: "diretoria",
+    label: "Diretoria + Resp. Técnico",
+    pessoa: "Roberto",
+    descricao: "Nav enxuta. Foco em exceção nível 2 + painel executivo.",
+    accountType: "tenant_user",
+    papel: "diretoria_rt",
+  },
+  {
+    id: "admin_sub",
+    label: "Admin de Subcontratados",
+    pessoa: "Fernanda",
+    descricao: "Nav focada em subcontratados e certificados a vencer.",
+    accountType: "tenant_user",
+    papel: "admin_subcontratados",
+  },
+  {
+    id: "auditor_interno",
+    label: "Auditor interno",
+    pessoa: "Patrícia",
+    descricao: "Somente leitura + abrir NC. Investigação contínua.",
+    accountType: "tenant_user",
+    papel: "auditor_interno",
+  },
+  {
+    id: "motorista",
+    label: "Motorista",
+    pessoa: "Valdir / Cleiton / Wesley",
+    descricao: "Só o App. Sem sidebar, sem back-office.",
+    accountType: "tenant_user",
+    papel: "motorista",
+  },
+  {
+    id: "inspetor",
+    label: "Inspetor de pátio",
+    pessoa: "Marcão",
+    descricao: "App/tablet focado em inspeção LCI.",
+    accountType: "tenant_user",
+    papel: "inspetor",
+  },
+  {
+    id: "subcontratado",
+    label: "Subcontratado (Portal)",
+    pessoa: "Souza Transportes",
+    descricao: "Portal tenant-lite, escopado só à própria empresa.",
+    accountType: "subcontractor_admin",
+    papel: "gestor",
+    fase2: true,
+  },
+  {
+    id: "auditor_externo",
+    label: "Auditor externo",
+    pessoa: "Organismo certificador",
+    descricao: "Somente leitura, amostra liberada. Prévia de Fase 2.",
+    accountType: "auditor",
+    papel: "gestor",
+    fase2: true,
+  },
+];
+
+export const PERFIL_POR_ID: Record<PerfilDemoId, PerfilDemo> = PERFIS_DEMO.reduce(
+  (acc, p) => ((acc[p.id] = p), acc),
+  {} as Record<PerfilDemoId, PerfilDemo>
+);
 
 export const excecoes: Excecao[] = [
   {
