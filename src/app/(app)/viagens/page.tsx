@@ -35,18 +35,21 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { StatusBadge, RegimeBadge } from "@/components/shell/status-badge";
-import { viagens } from "@/lib/mock-data";
+import { viagens, filialDaViagem, pertenceAFilial } from "@/lib/mock-data";
 import { formatDateTime, cn } from "@/lib/utils";
 
 export default function ViagensPage() {
-  const { version } = useSession();
+  const { version, filialId } = useSession();
   const { toast } = useToast();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("todos");
   const [regimeFilter, setRegimeFilter] = useState<string>("todos");
   const [view, setView] = useState<"tabela" | "cards">("tabela");
 
-  const filtered = viagens.filter((v) => {
+  // Re-escopo por filial (§5) — a lista e os contadores mudam com a filial ativa.
+  const escopadas = viagens.filter((v) => pertenceAFilial(filialId, filialDaViagem(v)));
+
+  const filtered = escopadas.filter((v) => {
     const matchSearch =
       v.codigo.toLowerCase().includes(search.toLowerCase()) ||
       v.motorista.toLowerCase().includes(search.toLowerCase()) ||
@@ -57,10 +60,10 @@ export default function ViagensPage() {
   });
 
   const counts = {
-    total: viagens.length,
-    transito: viagens.filter((v) => v.status === "Em trânsito").length,
-    bloqueada: viagens.filter((v) => v.status === "Bloqueada").length,
-    concluida: viagens.filter((v) => v.status === "Concluída").length,
+    total: escopadas.length,
+    transito: escopadas.filter((v) => v.status === "Em trânsito").length,
+    bloqueada: escopadas.filter((v) => v.status === "Bloqueada").length,
+    concluida: escopadas.filter((v) => v.status === "Concluída").length,
   };
 
   return (

@@ -39,6 +39,8 @@ import {
   fazendas,
   naoConformidades,
   auditorias,
+  filialDaViagem,
+  pertenceAFilial,
 } from "@/lib/mock-data";
 import {
   AreaChart,
@@ -72,11 +74,13 @@ import {
 const PERIODOS = ["Últimos 7 dias", "Últimos 30 dias", "Últimos 90 dias", "Tudo"];
 
 export default function DashboardPage() {
-  const { version } = useSession();
+  const { version, filialId } = useSession();
   const { toast } = useToast();
   const [periodo, setPeriodo] = useState("Últimos 30 dias");
   const proximaAuditoria = auditorias.find((a) => a.status === "Programada");
-  const viagensRecentes = viagens.slice(0, 5);
+  // Re-escopo por filial (§5) — KPIs de viagem e a lista recente seguem a filial ativa.
+  const viagensEscopadas = viagens.filter((v) => pertenceAFilial(filialId, filialDaViagem(v)));
+  const viagensRecentes = viagensEscopadas.slice(0, 5);
   const fazendasRisco = fazendas.filter((f) => f.scoreRiscoEUDR !== "Baixo");
   const ncCriticas = naoConformidades.filter(
     (nc) => nc.status === "Aberta" || nc.status === "Em tratamento"
@@ -84,10 +88,10 @@ export default function DashboardPage() {
 
   // KPIs derivados do estado real (movem quando algo é criado). Deltas/sparklines
   // seguem como tendência ilustrativa; os valores-âncora são honestos.
-  const viagensAtivas = viagens.filter((v) => v.status !== "Concluída").length;
-  const bloqueadas = viagens.filter((v) => v.status === "Bloqueada").length;
-  const confMedia = viagens.length
-    ? Math.round((viagens.reduce((a, v) => a + v.conformidade, 0) / viagens.length) * 10) / 10
+  const viagensAtivas = viagensEscopadas.filter((v) => v.status !== "Concluída").length;
+  const bloqueadas = viagensEscopadas.filter((v) => v.status === "Bloqueada").length;
+  const confMedia = viagensEscopadas.length
+    ? Math.round((viagensEscopadas.reduce((a, v) => a + v.conformidade, 0) / viagensEscopadas.length) * 10) / 10
     : 0;
   const diasAudit = proximaAuditoria ? diasEntre(HOJE, proximaAuditoria.data) : 0;
 

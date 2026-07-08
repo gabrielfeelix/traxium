@@ -30,7 +30,7 @@ import { TraxiumLogo } from "@/components/logo";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/lib/store/session";
 import { produtosIDTF, subcontratados, excecoes, nivelVencimento, type Papel } from "@/lib/domain/model";
-import { viagens, naoConformidades, lotes } from "@/lib/mock-data";
+import { viagens, naoConformidades, lotes, filialDaViagem, pertenceAFilial } from "@/lib/mock-data";
 
 type Acesso = "full" | "read";
 // Visibilidade por papel de escritório, derivada da matriz §3. Papel ausente = oculto.
@@ -98,7 +98,7 @@ const navigation: NavGroup[] = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { version, papel, isMaster } = useSession();
+  const { version, papel, isMaster, filialId } = useSession();
 
   // Modo de acesso do papel atual a um item (Master vê tudo). undefined = oculto.
   const acessoDe = (item: NavItem): Acesso | undefined =>
@@ -110,7 +110,7 @@ export function Sidebar() {
   const badgeFor = (href: string): number => {
     switch (href) {
       case "/viagens":
-        return viagens.length;
+        return viagens.filter((v) => pertenceAFilial(filialId, filialDaViagem(v))).length;
       case "/idtf":
         return produtosIDTF.filter((p) => p.statusClassificacao === "em_fila").length;
       case "/bloqueios":

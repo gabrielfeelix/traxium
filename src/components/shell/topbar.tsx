@@ -2,17 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Bell, ChevronDown, LogOut, Settings, User, HelpCircle, Sparkles, Plus, UserCog } from "lucide-react";
+import { Bell, ChevronDown, LogOut, Settings, User, HelpCircle, Sparkles, Building2, Check, UserCog } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
-import { tenants, notificacoes, type Tenant } from "@/lib/mock-data";
+import { notificacoes, filiais, findFilial, FILIAL_TODAS } from "@/lib/mock-data";
 import { CommandPalette } from "@/components/shell/command-palette";
 import { PerfilModal, PreferenciasModal, AjudaModal, CopilotModal } from "@/components/shell/header-modals";
-import { AdicionarTransportadoraModal } from "@/components/modals/adicionar-transportadora-modal";
 import { useToast } from "@/components/ui/toast";
 import { useSession } from "@/lib/store/session";
 import { PERFIL_POR_ID } from "@/lib/domain/model";
@@ -22,10 +20,7 @@ import { cn } from "@/lib/utils";
 export function Topbar() {
   const router = useRouter();
   const { toast } = useToast();
-  const { perfilId } = useSession();
-  const [tenantList, setTenantList] = useState<Tenant[]>(tenants);
-  const [activeTenant, setActiveTenant] = useState(tenants[0]);
-  const [addTransp, setAddTransp] = useState(false);
+  const { perfilId, filialId, setFilial, impersonating } = useSession();
   const [unread, setUnread] = useState(notificacoes.filter((n) => !n.lida).length);
   const [perfil, setPerfil] = useState(false);
   const [prefs, setPrefs] = useState(false);
@@ -41,42 +36,53 @@ export function Topbar() {
   }, []);
 
   const initials = (name: string) => name.split(" ").slice(0, 2).map((n) => n[0]).join("").toUpperCase();
+  const tenantNome = impersonating?.tenantName ?? "Bom Frete Transportes";
+  const filialAtiva = filialId === FILIAL_TODAS ? "Todas as filiais" : findFilial(filialId)?.nome ?? "Filial";
 
   return (
     <header className="sticky top-0 z-30 h-[60px] border-b border-[hsl(200_18%_90%)] bg-[hsl(0_0%_100%_/_0.78)] backdrop-blur-xl">
       <div className="flex h-full items-center gap-3 px-5">
-        {/* Tenant switcher */}
+        {/* Filial switcher — troca de FILIAL dentro do tenant (§5), NÃO de transportadora.
+            Selecionar re-escopa o dado (viagens, KPIs), não só o rótulo. */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="group flex items-center gap-2.5 rounded-lg border border-[hsl(200_18%_90%)] bg-white px-2.5 py-1.5 hover:border-[hsl(176_60%_50%)] hover:shadow-brand-sm transition-all">
               <div className="size-7 rounded-md bg-gradient-to-br from-[hsl(176_84%_30%)] to-[hsl(200_92%_28%)] flex items-center justify-center text-white font-bold text-[10px] shadow-sm">
-                {initials(activeTenant.name)}
+                {initials(tenantNome)}
               </div>
               <div className="text-left">
-                <p className="text-[9px] uppercase tracking-[0.12em] text-[hsl(210_14%_42%)] font-semibold leading-none">Operando como</p>
-                <p className="text-[13px] font-semibold leading-tight mt-0.5">{activeTenant.name}</p>
+                <p className="text-[9px] uppercase tracking-[0.12em] text-[hsl(210_14%_42%)] font-semibold leading-none">Filial ativa</p>
+                <p className="text-[13px] font-semibold leading-tight mt-0.5">{filialAtiva}</p>
               </div>
               <ChevronDown className="size-3.5 text-[hsl(210_14%_42%)] group-hover:text-[hsl(176_84%_25%)]" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-80">
-            <DropdownMenuLabel>Tenants disponíveis</DropdownMenuLabel>
-            {tenantList.map((t) => (
-              <DropdownMenuItem key={t.id} onClick={() => { setActiveTenant(t); toast(`Operando como ${t.name}`); }} className="flex items-center gap-3 py-2.5">
-                <div className="size-9 rounded-md bg-gradient-to-br from-[hsl(176_84%_30%)] to-[hsl(200_92%_28%)] flex items-center justify-center text-white font-bold text-xs shrink-0">{initials(t.name)}</div>
+            <DropdownMenuLabel className="flex items-center gap-1.5">
+              <Building2 className="size-3.5 text-[hsl(210_14%_42%)]" /> {tenantNome} · filiais
+            </DropdownMenuLabel>
+            <DropdownMenuItem
+              onClick={() => { setFilial(FILIAL_TODAS); toast("Filial: Todas", { type: "info", desc: "Visão matriz consolidada." }); }}
+              className={cn("flex items-center gap-2.5 py-2.5", filialId === FILIAL_TODAS && "bg-[hsl(174_64%_96%)]")}
+            >
+              <Check className={cn("size-4", filialId === FILIAL_TODAS ? "opacity-100 text-[hsl(176_84%_25%)]" : "opacity-0")} />
+              <span className="font-semibold text-[13px]">Todas as filiais</span>
+              <span className="ml-auto text-[10px] uppercase tracking-wider text-[hsl(210_14%_45%)]">matriz</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            {filiais.map((f) => (
+              <DropdownMenuItem
+                key={f.id}
+                onClick={() => { setFilial(f.id); toast(`Filial: ${f.nome}`, { type: "info", desc: "Dados re-escopados para esta filial." }); }}
+                className={cn("flex items-center gap-2.5 py-2.5", filialId === f.id && "bg-[hsl(174_64%_96%)]")}
+              >
+                <Check className={cn("size-4", filialId === f.id ? "opacity-100 text-[hsl(176_84%_25%)]" : "opacity-0")} />
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-semibold text-[13px] truncate">{t.name}</span>
-                    <Badge variant="outline" className="text-[9px] py-0 px-1.5 h-4">{t.plano}</Badge>
-                  </div>
-                  <p className="text-[11px] text-[hsl(210_14%_42%)] mt-0.5">{t.cidade}/{t.uf} · {t.caminhoes} caminhões · {t.motoristas} motoristas</p>
+                  <p className="font-semibold text-[13px] truncate">{f.nome}</p>
+                  <p className="text-[11px] text-[hsl(210_14%_42%)]">{f.cidade}/{f.uf}</p>
                 </div>
               </DropdownMenuItem>
             ))}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => setAddTransp(true)} className="text-[hsl(176_84%_25%)] font-medium">
-              <Plus className="size-3.5" /> Adicionar nova transportadora
-            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -169,19 +175,6 @@ export function Topbar() {
       <PreferenciasModal open={prefs} onOpenChange={setPrefs} />
       <AjudaModal open={ajuda} onOpenChange={setAjuda} />
       <CopilotModal open={copilot} onOpenChange={setCopilot} />
-      <AdicionarTransportadoraModal
-        open={addTransp}
-        onOpenChange={setAddTransp}
-        onAdd={(t) => {
-          const novo: Tenant = {
-            id: `t-${tenantList.length}`, name: t.name, cnpj: t.cnpj,
-            cidade: t.cidade || "—", uf: t.uf || "—", plano: t.plano,
-            certificacaoGMP: false, certificacaoEUDR: false, motoristas: 0, caminhoes: 0,
-          };
-          setTenantList((cur) => [...cur, novo]);
-          setActiveTenant(novo);
-        }}
-      />
     </header>
   );
 }

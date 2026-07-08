@@ -55,6 +55,35 @@ export const tenants: Tenant[] = [
   },
 ];
 
+// ── Filial (dentro do tenant · PLANO-PERFIS §5) ──────────────────────────────
+// O switcher do header troca de FILIAL (controle interno), não de transportadora
+// (isso é ação do Console A). Trocar de filial RE-ESCOPA o dado, não só o rótulo.
+export type Filial = { id: string; nome: string; cidade: string; uf: string; tenantId: string };
+
+/** Sentinela "Todas as filiais" — visão matriz consolidada (sem escopo). */
+export const FILIAL_TODAS = "todas";
+
+export const filiais: Filial[] = [
+  { id: "fil-matriz", nome: "Matriz Rondonópolis", cidade: "Rondonópolis", uf: "MT", tenantId: "bom-frete" },
+  { id: "fil-sorriso", nome: "Filial Sorriso", cidade: "Sorriso", uf: "MT", tenantId: "bom-frete" },
+  { id: "fil-maringa", nome: "Filial Maringá", cidade: "Maringá", uf: "PR", tenantId: "bom-frete" },
+];
+
+export const findFilial = (id: string): Filial | undefined => filiais.find((f) => f.id === id);
+
+/** Filial responsável por uma viagem — determinístico, sem editar o mock, por região
+ *  da origem: PR → Maringá; origem em Sorriso → Filial Sorriso; demais MT → Matriz. */
+export function filialDaViagem(v: { id: string; origem: string }): string {
+  if (/\/PR\b/.test(v.origem)) return "fil-maringa";
+  if (/Sorriso/i.test(v.origem)) return "fil-sorriso";
+  return "fil-matriz";
+}
+
+/** True se a entidade pertence à filial ativa (ou se a visão é "Todas"). */
+export function pertenceAFilial(filialAtiva: string, filialEntidade: string): boolean {
+  return filialAtiva === FILIAL_TODAS || filialAtiva === filialEntidade;
+}
+
 export type KPIData = {
   label: string;
   value: string | number;

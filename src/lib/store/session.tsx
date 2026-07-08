@@ -17,6 +17,7 @@ import {
   motoristas,
   auditorias,
   tenants,
+  FILIAL_TODAS,
   type Viagem,
   type NaoConformidade,
   type Lote,
@@ -163,6 +164,10 @@ type SessionCtx = {
   sairImpersonation: () => void;
   /** Console → cria um tenant de demonstração (flag sandbox) para test users (§6). */
   addTenant: (input: { name: string; plano?: Tenant["plano"] }) => string;
+  // ── Filial (dentro do tenant · §5) — re-escopa o dado, não só o rótulo. ──
+  /** Filial ativa (id) ou FILIAL_TODAS para a visão matriz consolidada. */
+  filialId: string;
+  setFilial: (id: string) => void;
   addViagem: (i: NovaViagemInput) => string;
   addNaoConformidade: (nc: Omit<NaoConformidade, "id">) => string;
   updateNCCapa: (ncId: string, patch: Partial<NonNullable<NaoConformidade["capa"]>>) => void;
@@ -210,6 +215,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [isMaster, setIsMaster] = useState(false);
   const [perfilId, setPerfilId] = useState<PerfilDemoId>("gestor");
   const [impersonating, setImpersonating] = useState<Impersonation>(null);
+  const [filialId, setFilial] = useState<string>(FILIAL_TODAS);
 
   const aplicarPerfil = useCallback((id: PerfilDemoId) => {
     const p = PERFIL_POR_ID[id];
@@ -219,6 +225,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     setPapel(p.papel);
     setIsMaster(!!p.isMaster);
     setImpersonating(null);
+    setFilial(FILIAL_TODAS); // novo contexto → visão matriz
     bump();
   }, [bump]);
 
@@ -226,6 +233,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     // Admin opera como o tenant na superfície B (papel gestor = nav larga), banner fixo (§4).
     setImpersonating({ tenantId, tenantName });
     setPapel("gestor");
+    setFilial(FILIAL_TODAS); // troca de tenant re-escopa filial
     bump();
   }, [bump]);
 
@@ -558,6 +566,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     impersonar,
     sairImpersonation,
     addTenant,
+    filialId,
+    setFilial,
     addViagem,
     addNaoConformidade,
     updateNCCapa,
