@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, type PointerEvent as ReactPointerEvent } from "react";
 import {
   Smartphone,
   Truck,
@@ -26,6 +26,8 @@ import {
   Navigation,
   Droplets,
   Clock,
+  PenLine,
+  Eraser,
 } from "lucide-react";
 import { PageHeader } from "@/components/shell/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -33,7 +35,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 
-type Screen = "login" | "home" | "viagem" | "checklist" | "foto" | "bloqueio" | "sync" | "lavagem";
+type Screen = "login" | "home" | "viagem" | "checklist" | "foto" | "assinatura" | "bloqueio" | "sync" | "lavagem";
 
 const CHECK_ITENS = [
   "Compartimento varrido e seco",
@@ -122,8 +124,9 @@ export default function MobilePreviewPage() {
                 <div className="h-full pt-[44px]">
                   {screen === "home" && <HomeScreen onSelect={setScreen} online={online} synced={synced} check={check} />}
                   {screen === "viagem" && <ViagemScreen onBack={() => setScreen("home")} onChecklist={() => setScreen("checklist")} />}
-                  {screen === "checklist" && <ChecklistScreen check={check} setCheck={setCheck} onBack={() => setScreen("viagem")} onFoto={() => setScreen("foto")} onEnviar={() => setScreen("sync")} />}
+                  {screen === "checklist" && <ChecklistScreen check={check} setCheck={setCheck} onBack={() => setScreen("viagem")} onFoto={() => setScreen("foto")} onAssinar={() => setScreen("assinatura")} onEnviar={() => setScreen("sync")} />}
                   {screen === "foto" && <FotoScreen fotos={fotos} onCapturar={capturarFoto} onBack={() => setScreen("checklist")} />}
+                  {screen === "assinatura" && <AssinaturaScreen onConfirm={() => { setCheck((c) => c.map((v, i) => (i === 6 ? true : v))); setScreen("checklist"); }} onBack={() => setScreen("checklist")} />}
                   {screen === "bloqueio" && <BloqueioScreen onBack={() => setScreen("home")} onLavagem={() => setScreen("lavagem")} />}
                   {screen === "lavagem" && <LavagemScreen onBack={() => setScreen("bloqueio")} />}
                   {screen === "sync" && <SyncScreen online={online} synced={synced} check={check} fotos={fotos} onSync={sincronizar} onBack={() => setScreen("home")} />}
@@ -446,9 +449,11 @@ function InfoRow({ label, value, sub, mono }: { label: string; value: string; su
   );
 }
 
-function ChecklistScreen({ check, setCheck, onBack, onFoto, onEnviar }: { check: boolean[]; setCheck: (f: (c: boolean[]) => boolean[]) => void; onBack: () => void; onFoto: () => void; onEnviar: () => void }) {
+function ChecklistScreen({ check, setCheck, onBack, onFoto, onAssinar, onEnviar }: { check: boolean[]; setCheck: (f: (c: boolean[]) => boolean[]) => void; onBack: () => void; onFoto: () => void; onAssinar: () => void; onEnviar: () => void }) {
   const feitos = check.filter(Boolean).length;
   const completo = feitos === CHECK_ITENS.length;
+  const fotoFeita = check[5];
+  const assinaturaFeita = check[6];
   const pct = Math.round((feitos / CHECK_ITENS.length) * 100);
   const toggle = (i: number) => setCheck((c) => c.map((v, idx) => (idx === i ? !v : v)));
   return (
@@ -470,10 +475,11 @@ function ChecklistScreen({ check, setCheck, onBack, onFoto, onEnviar }: { check:
         {CHECK_ITENS.map((t, i) => {
           const ok = check[i];
           const isFoto = i === 5;
+          const isAssinatura = i === 6;
           return (
             <button
               key={i}
-              onClick={() => (isFoto ? onFoto() : toggle(i))}
+              onClick={() => (isFoto ? onFoto() : isAssinatura ? onAssinar() : toggle(i))}
               className={cn(
                 "w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all text-left active:scale-[0.99]",
                 ok ? "border-[hsl(142_60%_75%)] bg-[hsl(142_65%_97%)]" : "border-[hsl(200_18%_88%)] bg-white"
@@ -485,10 +491,12 @@ function ChecklistScreen({ check, setCheck, onBack, onFoto, onEnviar }: { check:
                   ok ? "bg-[hsl(142_71%_36%)] text-white shadow-md" : "bg-[hsl(200_18%_94%)] border-2 border-[hsl(200_18%_75%)]"
                 )}
               >
-                {ok ? <CheckCircle2 className="size-4" /> : isFoto ? <Camera className="size-4 text-[hsl(210_14%_42%)]" /> : null}
+                {ok ? <CheckCircle2 className="size-4" /> : isFoto ? <Camera className="size-4 text-[hsl(210_14%_42%)]" /> : isAssinatura ? <PenLine className="size-4 text-[hsl(210_14%_42%)]" /> : null}
               </div>
               <p className={cn("text-[13px] font-medium flex-1", ok && "text-[hsl(142_71%_24%)]")}>{t}</p>
-              {isFoto && !ok && <span className="text-[10px] font-bold text-[hsl(28_92%_45%)] uppercase">tirar</span>}
+              {(isFoto || isAssinatura) && !ok && (
+                <span className="text-[10px] font-bold text-[hsl(28_92%_45%)] uppercase">{isFoto ? "tirar" : "assinar"}</span>
+              )}
             </button>
           );
         })}
@@ -499,12 +507,26 @@ function ChecklistScreen({ check, setCheck, onBack, onFoto, onEnviar }: { check:
           >
             <CheckCircle2 className="size-4" /> Enviar inspeção
           </button>
-        ) : (
+        ) : !fotoFeita ? (
           <button
             onClick={onFoto}
             className="w-full mt-2 bg-gradient-to-r from-[hsl(176_84%_25%)] to-[hsl(200_92%_28%)] text-white font-bold py-3.5 rounded-xl text-[13px] flex items-center justify-center gap-2 shadow-brand-md active:scale-[0.98] transition-transform"
           >
             <Camera className="size-4" /> Câmera com GPS
+          </button>
+        ) : !assinaturaFeita ? (
+          <button
+            onClick={onAssinar}
+            className="w-full mt-2 bg-gradient-to-r from-[hsl(176_84%_25%)] to-[hsl(200_92%_28%)] text-white font-bold py-3.5 rounded-xl text-[13px] flex items-center justify-center gap-2 shadow-brand-md active:scale-[0.98] transition-transform"
+          >
+            <PenLine className="size-4" /> Assinar com o dedo
+          </button>
+        ) : (
+          <button
+            disabled
+            className="w-full mt-2 bg-[hsl(200_18%_92%)] text-[hsl(210_12%_58%)] font-bold py-3.5 rounded-xl text-[13px] flex items-center justify-center gap-2"
+          >
+            Marque os itens restantes
           </button>
         )}
       </div>
@@ -599,6 +621,119 @@ function FotoScreen({ fotos, onCapturar, onBack }: { fotos: number; onCapturar: 
             </button>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+function AssinaturaScreen({ onConfirm, onBack }: { onConfirm: () => void; onBack: () => void }) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const drawing = useRef(false);
+  const last = useRef<{ x: number; y: number } | null>(null);
+  const [temTraco, setTemTraco] = useState(false);
+
+  const posOf = (e: ReactPointerEvent<HTMLCanvasElement>) => {
+    const c = canvasRef.current!;
+    const r = c.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * (c.width / r.width), y: (e.clientY - r.top) * (c.height / r.height) };
+  };
+  const start = (e: ReactPointerEvent<HTMLCanvasElement>) => {
+    drawing.current = true;
+    last.current = posOf(e);
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+  };
+  const move = (e: ReactPointerEvent<HTMLCanvasElement>) => {
+    if (!drawing.current) return;
+    const g = canvasRef.current?.getContext("2d");
+    if (!g || !last.current) return;
+    const p = posOf(e);
+    g.strokeStyle = "#0b3d44";
+    g.lineWidth = 2.5;
+    g.lineCap = "round";
+    g.lineJoin = "round";
+    g.beginPath();
+    g.moveTo(last.current.x, last.current.y);
+    g.lineTo(p.x, p.y);
+    g.stroke();
+    last.current = p;
+    if (!temTraco) setTemTraco(true);
+  };
+  const end = () => { drawing.current = false; last.current = null; };
+  const limpar = () => {
+    const c = canvasRef.current;
+    const g = c?.getContext("2d");
+    if (c && g) g.clearRect(0, 0, c.width, c.height);
+    setTemTraco(false);
+  };
+
+  return (
+    <div className="h-full bg-white flex flex-col">
+      <div className="bg-gradient-to-br from-[hsl(180_80%_18%)] to-[hsl(200_92%_24%)] text-white p-5 relative">
+        <button onClick={onBack} className="text-white/80 mb-2 flex items-center gap-1 text-[12px] font-semibold">
+          <ArrowLeft className="size-4" /> Voltar
+        </button>
+        <div className="flex items-center gap-2">
+          <PenLine className="size-5" />
+          <h2 className="text-[18px] font-bold">Assinatura do motorista</h2>
+        </div>
+        <p className="text-[12px] text-white/80 mt-1">Declaro que inspecionei o compartimento e as informações são verdadeiras.</p>
+      </div>
+
+      <div className="p-4 flex-1 flex flex-col">
+        <p className="text-[11px] uppercase tracking-[0.14em] font-bold text-[hsl(210_14%_42%)] mb-2">Assine com o dedo</p>
+        <div className="relative flex-1 min-h-[200px] rounded-2xl border-2 border-dashed border-[hsl(176_60%_70%)] bg-[hsl(174_64%_98%)] overflow-hidden">
+          <canvas
+            ref={canvasRef}
+            width={320}
+            height={220}
+            onPointerDown={start}
+            onPointerMove={move}
+            onPointerUp={end}
+            onPointerLeave={end}
+            className="absolute inset-0 w-full h-full"
+            style={{ touchAction: "none" }}
+          />
+          {!temTraco && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <PenLine className="size-7 text-[hsl(176_60%_70%)]" />
+              <p className="text-[13px] text-[hsl(176_60%_55%)] font-medium mt-1">Deslize o dedo para assinar</p>
+            </div>
+          )}
+          {/* linha de assinatura */}
+          <div className="absolute bottom-8 left-6 right-6 border-b-2 border-[hsl(176_60%_78%)] pointer-events-none" />
+          <span className="absolute bottom-3 left-6 text-[10px] text-[hsl(176_60%_55%)] font-mono pointer-events-none num">Edivaldo Souza · 09:44</span>
+        </div>
+
+        <div className="flex flex-wrap gap-2 mt-3">
+          <span className="inline-flex items-center gap-1 text-[10px] text-[hsl(180_80%_18%)] bg-[hsl(174_64%_94%)] rounded px-1.5 py-0.5 font-medium"><MapPin className="size-3" /> Geo capturada</span>
+          <span className="inline-flex items-center gap-1 text-[10px] text-[hsl(180_80%_18%)] bg-[hsl(174_64%_94%)] rounded px-1.5 py-0.5 font-medium"><Hash className="size-3" /> Hash + timestamp</span>
+          <span className="inline-flex items-center gap-1 text-[10px] text-[hsl(180_80%_18%)] bg-[hsl(174_64%_94%)] rounded px-1.5 py-0.5 font-medium"><Lock className="size-3" /> Imutável após envio</span>
+        </div>
+
+        <div className="flex gap-2 mt-3">
+          <button
+            onClick={limpar}
+            disabled={!temTraco}
+            className={cn(
+              "px-4 py-3.5 rounded-xl text-[13px] font-bold flex items-center justify-center gap-1.5 border-2",
+              temTraco ? "border-[hsl(200_18%_85%)] text-[hsl(195_30%_8%)]" : "border-[hsl(200_18%_92%)] text-[hsl(210_12%_70%)]"
+            )}
+          >
+            <Eraser className="size-4" /> Limpar
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={!temTraco}
+            className={cn(
+              "flex-1 py-3.5 rounded-xl text-[13px] font-bold flex items-center justify-center gap-2 transition-all",
+              temTraco
+                ? "bg-gradient-to-r from-[hsl(142_71%_32%)] to-[hsl(160_71%_30%)] text-white shadow-brand-md active:scale-[0.98]"
+                : "bg-[hsl(200_18%_92%)] text-[hsl(210_12%_58%)]"
+            )}
+          >
+            <CheckCircle2 className="size-4" /> Confirmar assinatura
+          </button>
+        </div>
       </div>
     </div>
   );
