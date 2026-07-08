@@ -8,9 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { PerfilSwitcherLogin } from "@/components/shell/perfil-switcher";
+import { useSession } from "@/lib/store/session";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { aplicarPerfil } = useSession();
   return (
     <div className="min-h-screen flex bg-[hsl(180_14%_97%)]">
       {/* Left side */}
@@ -58,8 +61,8 @@ export default function LoginPage() {
       </div>
 
       {/* Right side */}
-      <div className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-sm">
+      <div className="flex-1 flex items-center justify-center p-6 overflow-y-auto">
+        <div className="w-full max-w-md py-6">
           <div className="lg:hidden mb-8 text-center">
             <TraxiumLogo />
           </div>
@@ -69,6 +72,7 @@ export default function LoginPage() {
           <form
             onSubmit={(e) => {
               e.preventDefault();
+              aplicarPerfil("gestor");
               router.push("/");
             }}
             className="mt-8 space-y-4"
@@ -99,23 +103,28 @@ export default function LoginPage() {
               </Label>
             </div>
             <Button type="submit" variant="gradient" size="lg" className="w-full mt-2">
-              Entrar
+              Entrar como Gestor
               <ArrowRight className="size-4" />
             </Button>
-            <div className="relative my-5">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-[hsl(200_18%_92%)]" />
-              </div>
-              <div className="relative flex justify-center">
-                <span className="bg-[hsl(180_14%_97%)] px-3 text-[10px] uppercase tracking-[0.14em] text-[hsl(210_14%_42%)] font-semibold">
-                  ou
-                </span>
-              </div>
-            </div>
-            <Button variant="outline" size="lg" className="w-full">
-              Entrar com Microsoft Entra
-            </Button>
           </form>
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-[hsl(200_18%_92%)]" />
+            </div>
+            <div className="relative flex justify-center">
+              <span className="bg-[hsl(180_14%_97%)] px-3 text-[10px] uppercase tracking-[0.14em] text-[hsl(210_14%_42%)] font-semibold">
+                ou entre como (demonstração)
+              </span>
+            </div>
+          </div>
+
+          <p className="mb-4 text-[12px] leading-relaxed text-[hsl(210_14%_42%)]">
+            O sistema <strong className="text-[hsl(195_30%_20%)]">muda inteiramente</strong> conforme quem entra.
+            Escolha um perfil — o Traxium roteia para a superfície certa (Console, Back-office, App de campo, Portal ou Visão do auditor).
+          </p>
+
+          <PerfilSwitcherLogin />
 
           <p className="text-[12px] text-[hsl(210_14%_42%)] mt-8 text-center">
             Quer testar o Traxium?{" "}

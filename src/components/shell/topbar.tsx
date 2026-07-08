@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Bell, ChevronDown, LogOut, Settings, User, HelpCircle, Sparkles, Plus, UserCog, Check } from "lucide-react";
+import { Bell, ChevronDown, LogOut, Settings, User, HelpCircle, Sparkles, Plus, UserCog } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -15,15 +15,14 @@ import { PerfilModal, PreferenciasModal, AjudaModal, CopilotModal } from "@/comp
 import { AdicionarTransportadoraModal } from "@/components/modals/adicionar-transportadora-modal";
 import { useToast } from "@/components/ui/toast";
 import { useSession } from "@/lib/store/session";
-import { PAPEL_LABEL, type Papel } from "@/lib/domain/model";
+import { PERFIL_POR_ID } from "@/lib/domain/model";
+import { PerfilSwitcherMenuItems } from "@/components/shell/perfil-switcher";
 import { cn } from "@/lib/utils";
-
-const PAPEIS = Object.keys(PAPEL_LABEL) as Papel[];
 
 export function Topbar() {
   const router = useRouter();
   const { toast } = useToast();
-  const { papel, setPapel } = useSession();
+  const { perfilId } = useSession();
   const [tenantList, setTenantList] = useState<Tenant[]>(tenants);
   const [activeTenant, setActiveTenant] = useState(tenants[0]);
   const [addTransp, setAddTransp] = useState(false);
@@ -145,29 +144,20 @@ export function Topbar() {
                 </Avatar>
                 <div className="text-left hidden lg:block">
                   <p className="text-[12px] font-semibold leading-tight">Gabriel Felix</p>
-                  <p className="text-[10px] text-[hsl(210_14%_42%)] leading-tight">{PAPEL_LABEL[papel]}</p>
+                  <p className="text-[10px] text-[hsl(210_14%_42%)] leading-tight">{PERFIL_POR_ID[perfilId].label}</p>
                 </div>
                 <ChevronDown className="size-3 text-[hsl(210_14%_42%)]" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-64">
+            <DropdownMenuContent align="end" className="w-72 max-h-[80vh] overflow-y-auto">
               <DropdownMenuLabel>Minha conta</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => setPerfil(true)}><User className="size-4" /> Perfil</DropdownMenuItem>
               <DropdownMenuItem onClick={() => setPrefs(true)}><Settings className="size-4" /> Preferências</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuLabel className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-[hsl(210_14%_42%)]">
-                <UserCog className="size-3" /> Papel (simulação RBAC)
+                <UserCog className="size-3" /> Entrar como… (muda a superfície ao vivo)
               </DropdownMenuLabel>
-              {PAPEIS.map((p) => (
-                <DropdownMenuItem
-                  key={p}
-                  onClick={() => { setPapel(p); toast(`Papel: ${PAPEL_LABEL[p]}`, { type: "info", desc: "Ações permitidas ajustadas ao papel." }); }}
-                  className={cn(papel === p && "bg-[hsl(174_64%_96%)]")}
-                >
-                  <Check className={cn("size-4", papel === p ? "opacity-100 text-[hsl(176_84%_25%)]" : "opacity-0")} />
-                  {PAPEL_LABEL[p]}
-                </DropdownMenuItem>
-              ))}
+              <PerfilSwitcherMenuItems />
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => router.push("/login")} className="text-[hsl(0_70%_38%)]"><LogOut className="size-4" /> Sair</DropdownMenuItem>
             </DropdownMenuContent>
