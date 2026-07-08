@@ -1000,7 +1000,10 @@ export function MotoristaFlow() {
   const toggleOnline = () => setOnline((o) => { if (o) setSynced(false); return !o; });
 
   return (
-    <div className="mx-auto flex min-h-[100dvh] w-full max-w-[440px] flex-col bg-white shadow-2xl">
+    // h-full ocupa a altura DEFINIDA que o AppCampo dá (não min-h) — assim o `h-full`
+    // interno das telas (ex.: FotoScreen) resolve e não colapsa. O screen-area é
+    // `relative` para os overlays `absolute` das telas ancorarem aqui (como no frame).
+    <div className="mx-auto flex h-full w-full max-w-[440px] flex-col bg-white shadow-2xl">
       {/* Barra de status (não é o phone frame — é o topo do app real) */}
       <div className="flex h-[38px] shrink-0 items-center justify-between px-6 pt-1.5 text-[11px] font-semibold">
         <span className="num flex items-center gap-1">
@@ -1018,7 +1021,7 @@ export function MotoristaFlow() {
         </button>
       </div>
 
-      <div className="min-h-0 flex-1">
+      <div className="relative min-h-0 flex-1 overflow-hidden">
         {screen === "home" && <HomeScreen onSelect={setScreen} online={online} synced={synced} check={check} />}
         {screen === "viagem" && <ViagemScreen onBack={() => setScreen("home")} onChecklist={() => setScreen("checklist")} />}
         {screen === "checklist" && <ChecklistScreen check={check} setCheck={setCheck} onBack={() => setScreen("viagem")} onFoto={() => setScreen("foto")} onAssinar={() => setScreen("assinatura")} onEnviar={() => setScreen("sync")} />}

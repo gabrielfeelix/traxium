@@ -15,15 +15,16 @@ export function AppCampo() {
   const { papel } = useSession();
   const inspetor = papel === "inspetor";
   return (
-    <div className="min-h-[100dvh] bg-[hsl(202_45%_9%)]">
+    // h-[100dvh] (altura DEFINIDA, não min-h) para o `h-full` das telas resolver.
+    <div className="flex h-[100dvh] flex-col overflow-hidden bg-[hsl(202_45%_9%)]">
       {/* Faixa de demo (num app real não existe) — deixa você "virar" outro perfil e voltar. */}
-      <div className="mx-auto flex h-11 max-w-[440px] items-center justify-between px-3">
+      <div className="mx-auto flex h-11 w-full max-w-[440px] shrink-0 items-center justify-between px-3">
         <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">
           Traxium · App de campo
         </span>
         <SurfacePerfilMenu tone="dark" />
       </div>
-      {inspetor ? <InspetorFlow /> : <MotoristaFlow />}
+      <div className="min-h-0 flex-1">{inspetor ? <InspetorFlow /> : <MotoristaFlow />}</div>
     </div>
   );
 }

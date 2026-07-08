@@ -115,7 +115,7 @@ export function InspetorFlow() {
   };
 
   return (
-    <div className="mx-auto flex min-h-[100dvh] w-full max-w-[440px] flex-col bg-[hsl(180_14%_97%)] shadow-2xl">
+    <div className="mx-auto flex h-full w-full max-w-[440px] flex-col bg-[hsl(180_14%_97%)] shadow-2xl">
       {/* Barra de status */}
       <div className="flex h-[38px] shrink-0 items-center justify-between px-6 pt-1.5 text-[11px] font-semibold">
         <span className="num flex items-center gap-1">09:42</span>
