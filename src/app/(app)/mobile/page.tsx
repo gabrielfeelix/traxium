@@ -12,21 +12,28 @@ import {
   Signal,
   Battery,
   Wifi,
+  WifiOff,
   ArrowLeft,
   AlertTriangle,
   Phone,
-  Sparkles,
   Hand,
+  RefreshCw,
+  CloudOff,
+  Cloud,
+  Hash,
+  ImageOff,
+  Lock,
 } from "lucide-react";
 import { PageHeader } from "@/components/shell/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
-type Screen = "login" | "home" | "viagem" | "checklist" | "foto" | "bloqueio";
+type Screen = "login" | "home" | "viagem" | "checklist" | "foto" | "bloqueio" | "sync";
 
 export default function MobilePreviewPage() {
   const [screen, setScreen] = useState<Screen>("home");
+  const [online, setOnline] = useState(false);
 
   return (
     <div className="space-y-5">
@@ -57,20 +64,24 @@ export default function MobilePreviewPage() {
               <div className="w-full h-full rounded-[32px] overflow-hidden bg-white relative">
                 {/* Status bar */}
                 <div className="absolute top-0 left-0 right-0 h-[44px] flex items-center justify-between px-7 pt-3 text-[11px] font-semibold z-10">
-                  <span className="num">09:42</span>
+                  <span className="num flex items-center gap-1">
+                    09:42
+                    {!online && <span className="text-[9px] font-bold text-[hsl(28_92%_48%)] uppercase tracking-wide">offline</span>}
+                  </span>
                   <div className="flex items-center gap-1">
                     <Signal className="size-3" />
-                    <Wifi className="size-3" />
+                    {online ? <Wifi className="size-3" /> : <WifiOff className="size-3 text-[hsl(28_92%_48%)]" />}
                     <Battery className="size-3.5" />
                   </div>
                 </div>
 
                 <div className="h-full pt-[44px]">
-                  {screen === "home" && <HomeScreen onSelect={setScreen} />}
+                  {screen === "home" && <HomeScreen onSelect={setScreen} online={online} />}
                   {screen === "viagem" && <ViagemScreen onBack={() => setScreen("home")} onChecklist={() => setScreen("checklist")} />}
                   {screen === "checklist" && <ChecklistScreen onBack={() => setScreen("viagem")} onFoto={() => setScreen("foto")} />}
                   {screen === "foto" && <FotoScreen onBack={() => setScreen("checklist")} />}
                   {screen === "bloqueio" && <BloqueioScreen onBack={() => setScreen("home")} />}
+                  {screen === "sync" && <SyncScreen online={online} onBack={() => setScreen("home")} />}
                   {screen === "login" && <LoginScreen onLogin={() => setScreen("home")} />}
                 </div>
               </div>
@@ -92,6 +103,20 @@ export default function MobilePreviewPage() {
               <ScreenButton active={screen === "checklist"} onClick={() => setScreen("checklist")} icon={<CheckCircle2 className="size-4" />} label="Checklist LCI" />
               <ScreenButton active={screen === "foto"} onClick={() => setScreen("foto")} icon={<Camera className="size-4" />} label="Captura de foto com GPS" />
               <ScreenButton active={screen === "bloqueio"} onClick={() => setScreen("bloqueio")} icon={<AlertTriangle className="size-4" />} label="Bloqueio com instruções" />
+              <ScreenButton active={screen === "sync"} onClick={() => setScreen("sync")} icon={<RefreshCw className="size-4" />} label="Fila de sincronização" />
+
+              <button
+                onClick={() => setOnline((o) => !o)}
+                className={cn(
+                  "mt-1 w-full flex items-center gap-2 p-2.5 rounded-md text-[13px] font-semibold border transition-colors",
+                  online
+                    ? "border-[hsl(142_60%_75%)] bg-[hsl(142_65%_97%)] text-[hsl(142_71%_24%)]"
+                    : "border-[hsl(28_92%_80%)] bg-[hsl(36_95%_97%)] text-[hsl(24_88%_32%)]"
+                )}
+              >
+                {online ? <Cloud className="size-4" /> : <CloudOff className="size-4" />}
+                <span className="flex-1 text-left">{online ? "Conectado — simular perda de sinal" : "Offline — simular volta do sinal"}</span>
+              </button>
             </CardContent>
           </Card>
 
@@ -202,7 +227,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
   );
 }
 
-function HomeScreen({ onSelect }: { onSelect: (s: Screen) => void }) {
+function HomeScreen({ onSelect, online }: { onSelect: (s: Screen) => void; online: boolean }) {
   return (
     <div className="h-full overflow-y-auto bg-[hsl(180_14%_97%)]">
       {/* Header */}
@@ -228,6 +253,32 @@ function HomeScreen({ onSelect }: { onSelect: (s: Screen) => void }) {
       </div>
 
       <div className="p-4 -mt-4 relative z-10 space-y-4">
+        {/* Banner de sincronização */}
+        <button
+          onClick={() => onSelect("sync")}
+          className={cn(
+            "w-full flex items-center gap-2.5 rounded-xl border p-3 text-left",
+            online
+              ? "border-[hsl(142_60%_75%)] bg-[hsl(142_65%_97%)]"
+              : "border-[hsl(28_92%_80%)] bg-[hsl(36_95%_97%)]"
+          )}
+        >
+          {online ? (
+            <RefreshCw className="size-4 text-[hsl(142_71%_28%)] shrink-0" />
+          ) : (
+            <CloudOff className="size-4 text-[hsl(24_88%_32%)] shrink-0" />
+          )}
+          <div className="flex-1 min-w-0">
+            <p className={cn("text-[12px] font-bold", online ? "text-[hsl(142_71%_24%)]" : "text-[hsl(24_88%_32%)]")}>
+              {online ? "Sincronizando pendências…" : "Sem sinal · 3 itens salvos no aparelho"}
+            </p>
+            <p className="text-[10px] text-[hsl(210_14%_42%)]">
+              {online ? "Enviando fotos e checklists ao servidor" : "Tudo salvo localmente. Envia quando a rede voltar."}
+            </p>
+          </div>
+          <ChevronRight className="size-4 text-[hsl(210_12%_70%)]" />
+        </button>
+
         {/* Active trip */}
         <div className="bg-white rounded-2xl shadow-brand-md border-2 border-[hsl(176_60%_70%)] p-4 relative overflow-hidden">
           <div className="absolute -right-4 -top-4 size-20 rounded-full bg-gradient-to-br from-[hsl(174_64%_94%)] to-transparent" />
@@ -434,22 +485,37 @@ function FotoScreen({ onBack }: { onBack: () => void }) {
           </div>
         </div>
 
-        <div className="absolute top-[100px] left-4 right-4 bg-black/60 backdrop-blur-md rounded-lg p-3 text-white border border-white/[0.08]">
+        {/* Ângulo obrigatório */}
+        <div className="absolute top-[70px] left-4 right-4 flex items-center gap-2 bg-[hsl(28_92%_48%)]/90 backdrop-blur-md rounded-lg px-3 py-2 text-white">
+          <Camera className="size-3.5 shrink-0" />
+          <p className="text-[11px] font-semibold flex-1">Foto 6/6 · Identificação externa (placa do compartimento)</p>
+        </div>
+
+        <div className="absolute top-[124px] left-4 right-4 bg-black/60 backdrop-blur-md rounded-lg p-3 text-white border border-white/[0.08] space-y-1.5">
           <div className="flex items-center gap-2">
             <MapPin className="size-3.5 text-[hsl(176_84%_55%)] animate-pulse" />
             <p className="text-[10px] font-mono num">-12.5447, -55.7211 · ±3m</p>
             <span className="ml-auto text-[10px] font-mono num">09:42:18</span>
           </div>
-          <p className="text-[10px] text-white/70 mt-1 leading-tight">
-            GPS bloqueado · Anti-fraude ativo · Watermark automático
-          </p>
+          <div className="flex items-center gap-1.5 text-[10px] text-white/80">
+            <Hash className="size-3 text-[hsl(176_84%_55%)]" />
+            <span className="font-mono truncate">sha256: 9f2a…c71b</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-[10px] text-[hsl(28_92%_75%)]">
+            <ImageOff className="size-3" />
+            <span>Galeria bloqueada · captura só pela câmera do app</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-[10px] text-white/70">
+            <Lock className="size-3 text-[hsl(176_84%_55%)]" />
+            <span>Watermark + carimbo local · imutável após envio</span>
+          </div>
         </div>
       </div>
 
       <div className="p-6 pb-10 bg-black flex items-center justify-around">
-        <button className="size-12 rounded-full bg-white/10 flex items-center justify-center text-white border border-white/10">
-          <Sparkles className="size-5" />
-        </button>
+        <div className="size-12 rounded-full bg-white/[0.06] flex flex-col items-center justify-center text-white/40 border border-white/10">
+          <ImageOff className="size-5" />
+        </div>
         <button className="size-20 rounded-full border-4 border-white flex items-center justify-center shadow-2xl">
           <div className="size-14 rounded-full bg-white" />
         </button>
@@ -512,6 +578,94 @@ function BloqueioScreen({ onBack }: { onBack: () => void }) {
           <Phone className="size-4" /> Falar com despachante
         </button>
       </div>
+    </div>
+  );
+}
+
+type EstadoSync = "sincronizado" | "sincronizando" | "salvo" | "divergente";
+
+function SyncScreen({ online, onBack }: { online: boolean; onBack: () => void }) {
+  const itens: { t: string; sub: string; estado: EstadoSync }[] = [
+    { t: "Checklist LCI · TX-08471", sub: "14 itens · assinado", estado: online ? "sincronizado" : "salvo" },
+    { t: "Fotos do compartimento (6)", sub: "geo + hash SHA-256", estado: online ? "sincronizando" : "salvo" },
+    { t: "Limpeza Regime C", sub: "detergente · tempo de ação", estado: "salvo" },
+    { t: "Assinatura do motorista", sub: "carimbo local 09:44", estado: online ? "sincronizado" : "salvo" },
+    { t: "Inspeção LCI · TX-08469", sub: "horário do aparelho difere do servidor", estado: "divergente" },
+  ];
+  const salvos = itens.filter((i) => i.estado === "salvo").length;
+  const divergentes = itens.filter((i) => i.estado === "divergente").length;
+
+  return (
+    <div className="h-full bg-white flex flex-col overflow-y-auto">
+      <div className="bg-gradient-to-br from-[hsl(180_80%_18%)] to-[hsl(200_92%_24%)] text-white p-5 relative">
+        <button onClick={onBack} className="text-white/80 mb-2 flex items-center gap-1 text-[12px] font-semibold">
+          <ArrowLeft className="size-4" /> Voltar
+        </button>
+        <div className="flex items-center gap-2">
+          {online ? <Cloud className="size-5" /> : <CloudOff className="size-5 text-[hsl(28_92%_65%)]" />}
+          <h2 className="text-[18px] font-bold">Sincronização</h2>
+        </div>
+        <p className="text-[12px] text-white/80 mt-1">
+          {online ? "Conectado — enviando pendências ao servidor" : "Sem sinal — tudo salvo no aparelho"}
+        </p>
+      </div>
+
+      {/* Resumo */}
+      <div className="p-4 grid grid-cols-2 gap-2">
+        <div className="rounded-xl border border-[hsl(28_92%_82%)] bg-[hsl(36_95%_98%)] p-3">
+          <p className="text-[22px] font-bold num text-[hsl(24_88%_32%)] leading-none">{salvos}</p>
+          <p className="text-[10px] text-[hsl(24_88%_32%)] font-semibold uppercase tracking-wide mt-1">salvos no aparelho</p>
+        </div>
+        <div className="rounded-xl border border-[hsl(0_72%_85%)] bg-[hsl(0_72%_98%)] p-3">
+          <p className="text-[22px] font-bold num text-[hsl(0_70%_42%)] leading-none">{divergentes}</p>
+          <p className="text-[10px] text-[hsl(0_70%_42%)] font-semibold uppercase tracking-wide mt-1">divergência</p>
+        </div>
+      </div>
+
+      <div className="px-4 pb-2 space-y-2">
+        {itens.map((i, idx) => (
+          <SyncItem key={idx} {...i} />
+        ))}
+      </div>
+
+      <div className="p-4 mt-auto space-y-2">
+        <div className="rounded-lg bg-[hsl(200_18%_96%)] p-2.5 flex items-start gap-2">
+          <Lock className="size-3.5 text-[hsl(210_14%_42%)] shrink-0 mt-0.5" />
+          <p className="text-[10px] text-[hsl(210_14%_42%)] leading-relaxed">
+            Itens sincronizados ficam <strong>bloqueados para edição</strong>. Correção só por retificação registrada.
+          </p>
+        </div>
+        <button
+          disabled={!online}
+          className={cn(
+            "w-full font-bold py-3.5 rounded-xl text-[13px] flex items-center justify-center gap-2 transition-all",
+            online
+              ? "bg-gradient-to-r from-[hsl(176_84%_25%)] to-[hsl(200_92%_28%)] text-white shadow-brand-md active:scale-[0.98]"
+              : "bg-[hsl(200_18%_92%)] text-[hsl(210_12%_58%)]"
+          )}
+        >
+          <RefreshCw className="size-4" /> {online ? "Sincronizar agora" : "Aguardando rede…"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function SyncItem({ t, sub, estado }: { t: string; sub: string; estado: EstadoSync }) {
+  const cfg = {
+    sincronizado: { bg: "border-[hsl(142_60%_78%)] bg-[hsl(142_65%_98%)]", chip: "bg-[hsl(142_71%_36%)]", label: "Sincronizado", icon: <CheckCircle2 className="size-3.5" /> },
+    sincronizando: { bg: "border-[hsl(176_60%_78%)] bg-[hsl(174_64%_98%)]", chip: "bg-[hsl(176_84%_28%)]", label: "Sincronizando", icon: <RefreshCw className="size-3.5 animate-spin" /> },
+    salvo: { bg: "border-[hsl(28_92%_82%)] bg-[hsl(36_95%_98%)]", chip: "bg-[hsl(28_92%_48%)]", label: "Salvo no aparelho", icon: <CloudOff className="size-3.5" /> },
+    divergente: { bg: "border-[hsl(0_72%_85%)] bg-[hsl(0_72%_98%)]", chip: "bg-[hsl(0_78%_50%)]", label: "Divergente", icon: <AlertTriangle className="size-3.5" /> },
+  }[estado];
+  return (
+    <div className={cn("flex items-center gap-3 p-3 rounded-xl border", cfg.bg)}>
+      <div className={cn("size-8 rounded-full flex items-center justify-center text-white shrink-0", cfg.chip)}>{cfg.icon}</div>
+      <div className="flex-1 min-w-0">
+        <p className="text-[13px] font-semibold truncate">{t}</p>
+        <p className="text-[10px] text-[hsl(210_14%_42%)] truncate">{sub}</p>
+      </div>
+      <span className="text-[9px] font-bold uppercase tracking-wide text-[hsl(210_14%_42%)] shrink-0">{cfg.label}</span>
     </div>
   );
 }

@@ -18,9 +18,11 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { traceNTLogs } from "@/lib/mock-data";
+import { useToast } from "@/components/ui/toast";
 import { cn, formatDateTime } from "@/lib/utils";
 
 export default function TracesPage() {
+  const { toast } = useToast();
   return (
     <div className="space-y-6">
       <PageHeader
@@ -28,10 +30,10 @@ export default function TracesPage() {
         description="Integração M2M com o portal da Comissão Europeia para submissão automática de Declarações de Devida Diligência (DDS). Protocolo SOAP com WS-Security."
         actions={
           <>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={() => toast("Re-sincronizando com TRACES NT", { type: "info", desc: "Fila de mensagens SOAP reprocessada." })}>
               <RefreshCw className="size-4" /> Re-sincronizar
             </Button>
-            <Button variant="gradient" size="sm">
+            <Button variant="gradient" size="sm" onClick={() => toast("Conexão OK", { desc: "Handshake WS-Security bem-sucedido." })}>
               <Globe2 className="size-4" /> Testar conexão
             </Button>
           </>

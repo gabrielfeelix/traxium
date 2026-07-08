@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import {
-  Plus,
   Search,
   Send,
   Eye,
@@ -12,7 +11,6 @@ import {
   FileText,
   CheckCircle2,
   AlertCircle,
-  Package,
 } from "lucide-react";
 import { PageHeader } from "@/components/shell/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -22,9 +20,14 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { StatusBadge } from "@/components/shell/status-badge";
 import { lotes } from "@/lib/mock-data";
+import { NovoLoteModal } from "@/components/modals/novo-lote-modal";
+import { useSession } from "@/lib/store/session";
+import { useToast } from "@/components/ui/toast";
 import { formatDateTime, formatNumber, cn } from "@/lib/utils";
 
 export default function LotesPage() {
+  const { updateLoteStatus, version } = useSession();
+  const { toast } = useToast();
   const [search, setSearch] = useState("");
   const filtered = lotes.filter(
     (l) =>
@@ -40,18 +43,16 @@ export default function LotesPage() {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5" data-v={version}>
       <PageHeader
         title="Lotes EUDR e Declarações DDS"
         description="Lotes de exportação para a União Europeia. Cada lote agrega cargas de fazendas verificadas e gera uma Declaração de Devida Diligência transmitida via gateway TRACES NT (SOAP/WS-Security)."
         actions={
           <>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={() => toast("Modelos DDS", { type: "info", desc: "Biblioteca de modelos por país destino." })}>
               <FileText className="size-4" /> Modelos DDS
             </Button>
-            <Button variant="gradient" size="sm">
-              <Plus className="size-4" /> Novo lote
-            </Button>
+            <NovoLoteModal />
           </>
         }
       />
@@ -163,16 +164,16 @@ export default function LotesPage() {
                   <TableCell>
                     <div className="flex items-center gap-1">
                       {l.statusDDS === "Rascunho" && (
-                        <Button variant="gradient" size="sm">
+                        <Button variant="gradient" size="sm" onClick={() => { updateLoteStatus(l.id, "Pronto para envio"); toast(`${l.codigo} validado`, { desc: "DDS pronta para envio ao TRACES." }); }}>
                           <Sparkles className="size-3.5" /> Validar
                         </Button>
                       )}
                       {l.statusDDS === "Pronto para envio" && (
-                        <Button variant="gradient" size="sm">
+                        <Button variant="gradient" size="sm" onClick={() => { updateLoteStatus(l.id, "Enviado TRACES"); toast(`${l.codigo} enviado ao TRACES NT`, { desc: "Aguardando validação da autoridade UE." }); }}>
                           <Send className="size-3.5" /> Enviar
                         </Button>
                       )}
-                      <Button variant="ghost" size="icon-sm">
+                      <Button variant="ghost" size="icon-sm" onClick={() => toast(l.codigo, { type: "info", desc: `${l.fazendas.length} origem(ns) · ${l.destinatarioFinal}` })}>
                         <Eye className="size-3.5" />
                       </Button>
                     </div>

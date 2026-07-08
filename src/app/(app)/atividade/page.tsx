@@ -1,13 +1,17 @@
 "use client";
 
-import { Activity, Filter, Download, AlertTriangle, CheckCircle2, Info, AlertCircle } from "lucide-react";
+import { useState } from "react";
+import { Filter, Download, AlertTriangle, CheckCircle2, Info, AlertCircle } from "lucide-react";
 import { PageHeader } from "@/components/shell/page-header";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { atividades } from "@/lib/mock-data";
-import { cn, formatDateTime, relativeTime } from "@/lib/utils";
+import { useToast } from "@/components/ui/toast";
+import { downloadCSV } from "@/lib/export";
+import { cn, formatDateTime } from "@/lib/utils";
 
 const tipoLabel: Record<string, string> = {
   viagem: "Viagem",
@@ -18,11 +22,29 @@ const tipoLabel: Record<string, string> = {
   fazenda: "Fazenda EUDR",
 };
 
+// Base fixa (determinística) — evita Date.now() em render → sem hydration mismatch.
+const BASE_TS = new Date("2026-07-08T09:00:00").getTime();
+const extended = [
+  ...atividades,
+  ...atividades.map((a, i) => ({ ...a, id: `${a.id}-2`, quando: new Date(BASE_TS - (i + 7) * 86400000).toISOString() })),
+];
+
 export default function AtividadePage() {
-  const extended = [
-    ...atividades,
-    ...atividades.map((a, i) => ({ ...a, id: `${a.id}-2`, quando: new Date(Date.now() - (i + 7) * 86400000).toISOString() })),
-  ];
+  const { toast } = useToast();
+  const [busca, setBusca] = useState("");
+  const [tipo, setTipo] = useState("todos");
+  const [sev, setSev] = useState("todas");
+  const [periodo, setPeriodo] = useState("todos");
+
+  const filtrados = extended.filter((a) => {
+    const q = busca.trim().toLowerCase();
+    const buscaOk = !q || [a.titulo, a.descricao, a.ator].some((v) => v.toLowerCase().includes(q));
+    const tipoOk = tipo === "todos" || a.tipo === tipo;
+    const sevOk = sev === "todas" || a.severidade === sev;
+    const dias = Math.floor((BASE_TS - new Date(a.quando).getTime()) / 86400000);
+    const periodoOk = periodo === "todos" || dias <= Number(periodo);
+    return buscaOk && tipoOk && sevOk && periodoOk;
+  });
 
   return (
     <div className="space-y-6">
@@ -30,7 +52,18 @@ export default function AtividadePage() {
         title="Linha do tempo de atividade"
         description="Auditoria completa de eventos do sistema. Cada ação é registrada com timestamp, ator e payload para fins de rastreabilidade e auditoria GMP+."
         actions={
-          <Button variant="outline" size="sm">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              downloadCSV(
+                "traxium-atividade",
+                ["Evento", "Tipo", "Descrição", "Ator", "Severidade", "Quando"],
+                filtrados.map((a) => [a.titulo, tipoLabel[a.tipo] ?? a.tipo, a.descricao, a.ator, a.severidade ?? "info", formatDateTime(a.quando)])
+              );
+              toast("CSV exportado", { desc: `${filtrados.length} evento(s).` });
+            }}
+          >
             <Download className="size-4" /> Exportar
           </Button>
         }
@@ -38,21 +71,43 @@ export default function AtividadePage() {
 
       <Card>
         <CardHeader className="flex flex-row items-center gap-2 flex-wrap">
-          <Input placeholder="Buscar evento, ator, código…" className="max-w-md h-9" />
-          <Button variant="outline" size="sm">
-            <Filter className="size-4" /> Tipo de evento
-          </Button>
-          <Button variant="outline" size="sm">
-            <Filter className="size-4" /> Severidade
-          </Button>
-          <Button variant="outline" size="sm">
-            <Filter className="size-4" /> Período
-          </Button>
+          <Input
+            placeholder="Buscar evento, ator, código…"
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            className="max-w-md h-9"
+          />
+          <Select value={tipo} onValueChange={setTipo}>
+            <SelectTrigger className="h-9 w-[170px]"><Filter className="size-4 text-[hsl(210_14%_42%)]" /><SelectValue placeholder="Tipo" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todo tipo</SelectItem>
+              {Object.entries(tipoLabel).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Select value={sev} onValueChange={setSev}>
+            <SelectTrigger className="h-9 w-[150px]"><Filter className="size-4 text-[hsl(210_14%_42%)]" /><SelectValue placeholder="Severidade" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todas">Toda severidade</SelectItem>
+              <SelectItem value="danger">Crítico</SelectItem>
+              <SelectItem value="warning">Atenção</SelectItem>
+              <SelectItem value="success">Sucesso</SelectItem>
+              <SelectItem value="info">Info</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={periodo} onValueChange={setPeriodo}>
+            <SelectTrigger className="h-9 w-[140px]"><Filter className="size-4 text-[hsl(210_14%_42%)]" /><SelectValue placeholder="Período" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todo período</SelectItem>
+              <SelectItem value="7">Últimos 7 dias</SelectItem>
+              <SelectItem value="30">Últimos 30 dias</SelectItem>
+              <SelectItem value="90">Últimos 90 dias</SelectItem>
+            </SelectContent>
+          </Select>
         </CardHeader>
         <CardContent>
           <div className="relative space-y-5">
             <div className="absolute left-[15px] top-2 bottom-2 w-px bg-[hsl(215_20%_92%)]" />
-            {extended.map((a) => {
+            {filtrados.map((a) => {
               const Icon =
                 a.severidade === "danger"
                   ? AlertTriangle
@@ -84,32 +139,35 @@ export default function AtividadePage() {
                       </div>
                       <p className="text-xs text-[hsl(215_16%_47%)] mt-1">{a.descricao}</p>
                       <p className="text-[11px] text-[hsl(215_16%_60%)] mt-1.5">
-                        <span className="font-medium">{a.ator}</span> · {formatDateTime(a.quando)} · {relativeTime(a.quando)}
+                        <span className="font-medium">{a.ator}</span> · {formatDateTime(a.quando)}
                       </p>
                     </div>
                   </div>
                 </div>
               );
             })}
+            {!filtrados.length && (
+              <p className="text-center text-[13px] text-[hsl(210_14%_42%)] py-8">Nenhum evento para os filtros atuais.</p>
+            )}
           </div>
         </CardContent>
       </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <Card className="p-4">
-          <p className="text-[11px] uppercase tracking-wider text-[hsl(215_16%_47%)] font-semibold">Eventos hoje</p>
-          <p className="text-3xl font-bold tabular-nums mt-2">1,247</p>
-          <p className="text-[11px] text-[hsl(142_71%_30%)] mt-1">+12% vs ontem</p>
+          <p className="text-[11px] uppercase tracking-wider text-[hsl(215_16%_47%)] font-semibold">Eventos listados</p>
+          <p className="text-3xl font-bold tabular-nums mt-2">{filtrados.length}</p>
+          <p className="text-[11px] text-[hsl(215_16%_47%)] mt-1">no filtro atual</p>
         </Card>
         <Card className="p-4">
-          <p className="text-[11px] uppercase tracking-wider text-[hsl(215_16%_47%)] font-semibold">Eventos críticos (24h)</p>
-          <p className="text-3xl font-bold tabular-nums text-[hsl(0_72%_40%)] mt-2">3</p>
-          <p className="text-[11px] text-[hsl(215_16%_47%)] mt-1">Todos tratados ou em tratamento</p>
+          <p className="text-[11px] uppercase tracking-wider text-[hsl(215_16%_47%)] font-semibold">Eventos críticos</p>
+          <p className="text-3xl font-bold tabular-nums text-[hsl(0_72%_40%)] mt-2">{filtrados.filter((a) => a.severidade === "danger").length}</p>
+          <p className="text-[11px] text-[hsl(215_16%_47%)] mt-1">no filtro atual</p>
         </Card>
         <Card className="p-4">
           <p className="text-[11px] uppercase tracking-wider text-[hsl(215_16%_47%)] font-semibold">Tempo médio de resposta</p>
           <p className="text-3xl font-bold tabular-nums mt-2">4m 22s</p>
-          <p className="text-[11px] text-[hsl(215_16%_47%)] mt-1">Da detecção à ação</p>
+          <p className="text-[11px] text-[hsl(215_16%_47%)] mt-1">da detecção à ação · simulado</p>
         </Card>
       </div>
     </div>

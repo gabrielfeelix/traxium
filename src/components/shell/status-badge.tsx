@@ -120,3 +120,34 @@ export function RiscoBadge({ risco }: { risco: "Baixo" | "Médio" | "Alto" | "Cr
     </span>
   );
 }
+
+const compStatusConfig = {
+  apto: { label: "Apto", bg: "bg-[hsl(142_65%_93%)]", text: "text-[hsl(142_71%_24%)]", icon: CheckCircle2 },
+  bloqueado: { label: "Bloqueado", bg: "bg-[hsl(0_72%_94%)]", text: "text-[hsl(0_70%_38%)]", icon: ShieldAlert },
+  requer_limpeza: { label: "Requer limpeza", bg: "bg-[hsl(28_92%_92%)]", text: "text-[hsl(24_88%_32%)]", icon: AlertTriangle },
+  sem_historico: { label: "Sem histórico", bg: "bg-[hsl(200_18%_94%)]", text: "text-[hsl(210_14%_42%)]", icon: Clock },
+} as const;
+
+export function CompartimentoStatusBadge({
+  status,
+  size = "md",
+}: {
+  status: "apto" | "bloqueado" | "requer_limpeza" | "sem_historico";
+  size?: "sm" | "md";
+}) {
+  const c = compStatusConfig[status];
+  const Icon = c.icon;
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 rounded-full font-semibold whitespace-nowrap leading-none",
+        c.bg,
+        c.text,
+        size === "sm" ? "text-[10px] px-1.5 py-0.5" : "text-[11px] px-2 py-0.5"
+      )}
+    >
+      <Icon className={size === "sm" ? "size-2.5" : "size-3"} />
+      {c.label}
+    </span>
+  );
+}

@@ -17,7 +17,6 @@ import {
   Clock,
   Sparkles,
   Download,
-  Phone,
   Navigation,
   Zap,
 } from "lucide-react";
@@ -31,15 +30,39 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { StatusBadge, RegimeBadge } from "@/components/shell/status-badge";
 import { viagens } from "@/lib/mock-data";
+import {
+  compartimentoPorViagem,
+  findCompartimento,
+  findImplemento,
+} from "@/lib/domain/model";
+import {
+  avaliarCarregamento,
+  getT3,
+  cavalosDistintosNoT3,
+  type Tier,
+} from "@/lib/domain/rules-engine";
+import { useSession } from "@/lib/store/session";
+import { useToast } from "@/components/ui/toast";
+import { ContatarMotoristaModal } from "@/components/modals/contatar-motorista-modal";
+import { printPDF } from "@/lib/export";
 import { formatDate, formatDateTime, cn } from "@/lib/utils";
 import { notFound } from "next/navigation";
 
 export default function ViagemDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const { touch, version } = useSession();
+  const { toast } = useToast();
   const viagem = viagens.find((v) => v.id === id);
   if (!viagem) return notFound();
 
-  const blocked = viagem.status === "Bloqueada";
+  // Fase 0: decisão e T-3 vêm do COMPARTIMENTO, não da viagem.
+  const compId = compartimentoPorViagem[viagem.id] ?? "";
+  const compartimento = findCompartimento(compId);
+  const implemento = compartimento ? findImplemento(compartimento.implementoId) : undefined;
+  const decisao = avaliarCarregamento(viagem.id);
+  const t3 = getT3(compId);
+  const cavalosT3 = cavalosDistintosNoT3(compId);
+  const blocked = decisao.tier === "BLOQUEIO";
 
   const checklist = [
     { item: "Inspeção visual do compartimento", status: "ok", quando: "08:14" },
@@ -52,7 +75,7 @@ export default function ViagemDetailPage({ params }: { params: Promise<{ id: str
   ];
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5" data-v={version}>
       <Link
         href="/viagens"
         className="inline-flex items-center gap-1.5 text-[12px] text-[hsl(210_14%_42%)] hover:text-[hsl(176_84%_25%)] transition-colors"
@@ -75,13 +98,22 @@ export default function ViagemDetailPage({ params }: { params: Promise<{ id: str
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            <Phone className="size-4" /> Contatar motorista
-          </Button>
-          <Button variant="outline" size="sm">
+          <ContatarMotoristaModal nome={viagem.motorista} />
+          <Button variant="outline" size="sm" onClick={() => { printPDF(); toast("Gerando guia", { type: "info", desc: "Use 'Salvar como PDF'." }); }}>
             <Download className="size-4" /> Guia
           </Button>
-          <Button variant="gradient" size="sm">
+          <Button
+            variant="gradient"
+            size="sm"
+            onClick={() => {
+              const d = avaliarCarregamento(viagem.id);
+              toast(`Motor: ${d.tier}`, {
+                type: d.tier === "BLOQUEIO" ? "error" : d.tier === "ALERTA" ? "info" : "success",
+                desc: d.regra,
+              });
+              touch();
+            }}
+          >
             <Sparkles className="size-4" /> Re-validar regras
           </Button>
         </div>
@@ -94,22 +126,26 @@ export default function ViagemDetailPage({ params }: { params: Promise<{ id: str
             <AlertTriangle className="size-5 text-white" />
           </div>
           <div className="relative flex-1">
-            <p className="text-[14px] font-semibold text-[hsl(0_70%_28%)]">Carga bloqueada pelo motor de regras</p>
-            <p className="text-[12px] text-[hsl(0_70%_38%)] mt-1 leading-relaxed">
-              A última carga registrada para o compartimento <span className="font-mono font-semibold">{viagem.carreta}</span> foi{" "}
-              <strong>{viagem.cargasAnteriores[0].produto}</strong> em {formatDate(viagem.cargasAnteriores[0].data)}. A
-              IDTF determina regime <strong>D (Desinfecção)</strong> antes do carregamento atual ({viagem.produto}).
-              Limpeza correspondente não foi evidenciada.
+            <div className="flex items-center gap-2 flex-wrap">
+              <p className="text-[14px] font-semibold text-[hsl(0_70%_28%)]">Carga bloqueada pelo motor de regras</p>
+              <span className="text-[10px] font-mono font-semibold text-[hsl(0_70%_38%)] bg-[hsl(0_72%_94%)] rounded px-1.5 py-0.5">
+                {decisao.regra}
+              </span>
+            </div>
+            <p className="text-[12px] text-[hsl(0_70%_38%)] mt-1 leading-relaxed">{decisao.mensagem}</p>
+            <p className="text-[11px] text-[hsl(0_70%_38%)] mt-1.5">
+              <strong>Ação:</strong> {decisao.acaoSugerida}{" "}
+              <span className="text-[hsl(0_60%_50%)]">· base {decisao.versaoBaseIDTF}</span>
             </p>
             <div className="flex items-center gap-2 mt-3">
-              <Button variant="destructive" size="sm">
+              <Button variant="destructive" size="sm" onClick={() => toast("Carga mantida bloqueada", { type: "error", desc: "Registro na trilha de auditoria." })}>
                 Bloquear definitivamente
               </Button>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" onClick={() => toast("Evidência solicitada ao motorista", { desc: "Notificação enviada ao app." })}>
                 Solicitar evidência ao motorista
               </Button>
-              <Button variant="ghost" size="sm">
-                Liberar sob exceção (requer aprovação)
+              <Button asChild variant="ghost" size="sm">
+                <Link href="/excecoes">Liberar sob exceção (requer aprovação)</Link>
               </Button>
             </div>
           </div>
@@ -182,40 +218,70 @@ export default function ViagemDetailPage({ params }: { params: Promise<{ id: str
             <TabsContent value="sequenciamento">
               <Card>
                 <CardHeader>
-                  <CardTitle>Histórico T-3 do compartimento {viagem.carreta}</CardTitle>
+                  <CardTitle>
+                    Histórico T-3 · <span className="font-mono">{implemento?.placa ?? viagem.carreta}</span>
+                    {compartimento && <span className="text-[hsl(210_14%_42%)] font-normal"> · {compartimento.identificador}</span>}
+                  </CardTitle>
                   <CardDescription>
-                    A última carga determina o regime de limpeza para o próximo carregamento, conforme tabela IDTF do GMP+ FSA.
+                    O histórico pertence ao <strong>compartimento</strong>, não à viagem nem ao cavalo. A última carga
+                    determina o regime mínimo de limpeza pela IDTF ({decisao.versaoBaseIDTF}).
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
+                  {/* Prova: o T-3 segue o compartimento mesmo trocando de cavalo */}
+                  {cavalosT3.length > 1 && (
+                    <div className="mb-4 rounded-lg border border-[hsl(176_60%_78%)] bg-[hsl(174_64%_97%)] p-3 flex items-start gap-2.5">
+                      <ContainerIcon className="size-4 text-[hsl(180_80%_18%)] shrink-0 mt-0.5" />
+                      <p className="text-[12px] text-[hsl(180_80%_18%)] leading-relaxed">
+                        As 3 últimas cargas deste compartimento foram puxadas por{" "}
+                        <strong className="num">{cavalosT3.length}</strong> cavalos diferentes
+                        (<span className="font-mono">{cavalosT3.join(", ")}</span>). Trocar o cavalo{" "}
+                        <strong>não</strong> altera o T-3 — o histórico acompanha a carreta.
+                      </p>
+                    </div>
+                  )}
+
                   <div className="relative pb-4 pl-2">
                     <div className="absolute left-[28px] top-2 bottom-2 w-0.5 bg-gradient-to-b from-[hsl(200_18%_88%)] via-[hsl(176_60%_70%)] to-[hsl(176_84%_25%)]" />
 
-                    {viagem.cargasAnteriores.map((carga, i) => (
-                      <div key={i} className="relative pl-16 pb-5">
+                    {t3.map((entry) => (
+                      <div key={entry.load.id} className="relative pl-16 pb-5">
                         <div
                           className={cn(
                             "absolute left-0 top-0 size-12 rounded-xl border-[3px] border-white flex items-center justify-center font-bold text-[11px] shadow-brand-sm",
-                            i === 0
+                            entry.determinante
                               ? "bg-gradient-to-br from-[hsl(176_84%_28%)] to-[hsl(200_92%_28%)] text-white"
                               : "bg-[hsl(200_18%_94%)] text-[hsl(210_14%_42%)]"
                           )}
                         >
-                          T-{i + 1}
+                          T-{entry.ordem}
                         </div>
                         <div className="bg-white rounded-lg border border-[hsl(200_18%_92%)] p-3">
                           <div className="flex items-center gap-2 flex-wrap mb-1.5">
-                            <span className="font-semibold text-[14px]">{carga.produto}</span>
-                            <RegimeBadge regime={carga.regime as "A" | "B" | "C" | "D"} size="sm" />
-                            {i === 0 && (
+                            <span className="font-semibold text-[14px]">{entry.produto?.nomeCanonico ?? entry.load.produtoId}</span>
+                            {entry.produto?.bloqueiaFeed && (
+                              <Badge variant="destructive" className="text-[9px]">Carga proibida</Badge>
+                            )}
+                            {entry.determinante && (
                               <Badge variant="default" className="text-[9px]">
                                 <Zap className="size-2.5" /> Determinante
                               </Badge>
                             )}
                           </div>
-                          <p className="text-[11px] text-[hsl(210_14%_42%)]">
-                            Carregada em {formatDate(carga.data)}
-                          </p>
+                          <div className="flex items-center gap-3 flex-wrap text-[11px] text-[hsl(210_14%_42%)]">
+                            <span>Carregada em {formatDate(entry.load.data)}</span>
+                            <span className="inline-flex items-center gap-1">
+                              <Truck className="size-3" /> puxado por <span className="font-mono">{entry.load.cavaloPlaca}</span>
+                            </span>
+                          </div>
+                          {entry.determinante && entry.produto && (
+                            <div className="mt-2 flex items-center gap-1.5">
+                              <span className="text-[10px] uppercase tracking-wide font-semibold text-[hsl(210_14%_42%)]">
+                                Exige limpeza mín.
+                              </span>
+                              <RegimeBadge regime={entry.produto.regimeAntesDeFeed} size="sm" />
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -228,31 +294,51 @@ export default function ViagemDetailPage({ params }: { params: Promise<{ id: str
                       <div className="bg-gradient-to-br from-[hsl(174_64%_97%)] to-[hsl(200_60%_97%)] rounded-lg border border-[hsl(176_60%_70%)] p-3">
                         <div className="flex items-center gap-2 flex-wrap mb-1.5">
                           <span className="font-semibold text-[14px]">{viagem.produto}</span>
-                          <RegimeBadge regime={viagem.regimeLimpeza} size="sm" />
-                          <Badge variant="secondary" className="text-[9px]">
-                            Atual
-                          </Badge>
+                          {decisao.regimeExigido && <RegimeBadge regime={decisao.regimeExigido} size="sm" />}
+                          <Badge variant="secondary" className="text-[9px]">Atual</Badge>
                         </div>
                         <p className="text-[11px] text-[hsl(180_80%_18%)]">
-                          Regime <strong>{viagem.regimeLimpeza}</strong> exigido por cruzamento IDTF com a última carga.
+                          {decisao.regimeExigido
+                            ? <>Regime <strong>{decisao.regimeExigido}</strong> exigido por cruzamento IDTF com a última carga.</>
+                            : "Regime a definir após validação do T-3."}
                         </p>
                       </div>
                     </div>
                   </div>
 
                   <Separator className="my-3" />
+
+                  {/* Decisão do motor de regras — tier real */}
                   <div className="rounded-lg bg-[hsl(195_30%_8%)] text-white p-4 relative overflow-hidden">
                     <div className="absolute top-0 right-0 size-32 rounded-full bg-gradient-to-br from-[hsl(176_84%_45%_/_0.15)] to-transparent blur-2xl" />
                     <div className="relative flex items-start gap-3">
                       <Sparkles className="size-5 text-[hsl(176_84%_55%)] shrink-0 mt-0.5" />
-                      <div>
-                        <p className="text-[12px] font-bold text-white uppercase tracking-wider mb-1">
-                          Decisão do motor de regras
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 flex-wrap mb-1.5">
+                          <p className="text-[12px] font-bold text-white uppercase tracking-wider">
+                            Decisão do motor de regras
+                          </p>
+                          <TierChip tier={decisao.tier} />
+                          <span className="text-[10px] font-mono text-white/50">{decisao.regra}</span>
+                        </div>
+                        <p className="text-[13px] text-white/85 leading-relaxed">{decisao.mensagem}</p>
+                        <p className="text-[11px] text-white/60 mt-2">
+                          <strong className="text-white/80">Ação:</strong> {decisao.acaoSugerida}{" "}
+                          · base <span className="font-mono">{decisao.versaoBaseIDTF}</span>
                         </p>
-                        <p className="text-[13px] text-white/85 leading-relaxed">
-                          Regime <strong className="text-[hsl(176_84%_65%)]">{viagem.regimeLimpeza}</strong> aplicado automaticamente.
-                          Checklist correspondente foi atribuído ao motorista no app mobile com captura fotográfica e geolocalização.
-                        </p>
+                        <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                          {decisao.checagens.map((c) => (
+                            <div key={c.nome} className="flex items-center gap-2 text-[11px]">
+                              {c.ok ? (
+                                <CheckCircle2 className="size-3.5 text-[hsl(142_71%_55%)] shrink-0" />
+                              ) : (
+                                <AlertTriangle className="size-3.5 text-[hsl(0_78%_62%)] shrink-0" />
+                              )}
+                              <span className="text-white/70">{c.nome}:</span>
+                              <span className="text-white/90 truncate">{c.detalhe}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -455,6 +541,7 @@ export default function ViagemDetailPage({ params }: { params: Promise<{ id: str
               ].map((doc, i) => (
                 <button
                   key={i}
+                  onClick={() => toast(`Baixando ${doc.nome}`, { desc: doc.tipo })}
                   className="w-full flex items-center gap-2 p-2 rounded-md hover:bg-[hsl(174_64%_97%)] transition-colors text-left"
                 >
                   <FileText className="size-3.5 text-[hsl(176_84%_25%)] shrink-0" />
@@ -541,6 +628,19 @@ function ScoreLine({ label, value }: { label: string; value: number }) {
         />
       </div>
     </div>
+  );
+}
+
+function TierChip({ tier }: { tier: Tier }) {
+  const style: Record<Tier, string> = {
+    BLOQUEIO: "bg-[hsl(0_78%_50%)] text-white",
+    ALERTA: "bg-[hsl(28_92%_48%)] text-white",
+    LIBERADO: "bg-[hsl(142_71%_40%)] text-white",
+  };
+  return (
+    <span className={cn("text-[9px] font-bold uppercase tracking-wider rounded px-1.5 py-0.5", style[tier])}>
+      {tier}
+    </span>
   );
 }
 

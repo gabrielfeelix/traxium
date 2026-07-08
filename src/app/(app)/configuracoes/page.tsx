@@ -21,8 +21,23 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/components/ui/toast";
+import { useState } from "react";
+import { ConvidarUsuarioModal, type Convidado } from "@/components/modals/convidar-usuario-modal";
+
+const EQUIPE_INICIAL: Convidado[] = [
+  { nome: "Leonardo Felix", email: "leonardo@bomfrete.com.br", papel: "Owner" },
+  { nome: "Beto Souza", email: "beto@bomfrete.com.br", papel: "Admin" },
+  { nome: "Rafael · RD Insight", email: "rafael@rdinsight.com.br", papel: "Compliance" },
+  { nome: "Gabriel Felix", email: "gabriel@traxium.com.br", papel: "UX · Admin" },
+  { nome: "Matheus Bruno", email: "matheus@traxium.com.br", papel: "Engenharia" },
+  { nome: "Helena Marques", email: "helena@auditoria-gmp.com.br", papel: "Auditor (acesso limitado)" },
+];
 
 export default function ConfiguracoesPage() {
+  const { toast } = useToast();
+  const [convidarOpen, setConvidarOpen] = useState(false);
+  const [equipe, setEquipe] = useState<Convidado[]>(EQUIPE_INICIAL);
   return (
     <div className="space-y-6">
       <PageHeader
@@ -97,7 +112,7 @@ export default function ConfiguracoesPage() {
                   <Separator />
                   <div className="flex justify-end gap-2">
                     <Button variant="outline">Cancelar</Button>
-                    <Button variant="gradient">Salvar alterações</Button>
+                    <Button variant="gradient" onClick={() => toast("Configurações salvas")}>Salvar alterações</Button>
                   </div>
                 </CardContent>
               </Card>
@@ -110,19 +125,12 @@ export default function ConfiguracoesPage() {
                     <CardTitle>Equipe e permissões</CardTitle>
                     <CardDescription>Usuários internos e papéis no sistema</CardDescription>
                   </div>
-                  <Button variant="gradient" size="sm">
+                  <Button variant="gradient" size="sm" onClick={() => setConvidarOpen(true)}>
                     <Plus className="size-4" /> Convidar usuário
                   </Button>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  {[
-                    { nome: "Leonardo Felix", email: "leonardo@bomfrete.com.br", papel: "Owner" },
-                    { nome: "Beto Souza", email: "beto@bomfrete.com.br", papel: "Admin" },
-                    { nome: "Rafael · RD Insight", email: "rafael@rdinsight.com.br", papel: "Compliance" },
-                    { nome: "Gabriel Felix", email: "gabriel@traxium.com.br", papel: "UX · Admin" },
-                    { nome: "Matheus Bruno", email: "matheus@traxium.com.br", papel: "Engenharia" },
-                    { nome: "Helena Marques", email: "helena@auditoria-gmp.com.br", papel: "Auditor (acesso limitado)" },
-                  ].map((u, i) => (
+                  {equipe.map((u, i) => (
                     <div
                       key={i}
                       className="flex items-center gap-3 p-3 rounded-lg border border-[hsl(215_20%_92%)] hover:bg-[hsl(174_64%_98%)]"
@@ -259,10 +267,10 @@ export default function ConfiguracoesPage() {
                         <p className="text-[11px] font-mono text-[hsl(215_16%_47%)]">{t.token}</p>
                       </div>
                       <span className="text-[11px] text-[hsl(215_16%_47%)]">criado em {t.criadoEm}</span>
-                      <Button variant="outline" size="sm">Revogar</Button>
+                      <Button variant="outline" size="sm" onClick={() => toast("Token revogado", { type: "error" })}>Revogar</Button>
                     </div>
                   ))}
-                  <Button variant="gradient" size="sm" className="mt-2">
+                  <Button variant="gradient" size="sm" className="mt-2" onClick={() => toast("Novo token gerado", { desc: "trx_sk_" + "•".repeat(24) })}>
                     <Plus className="size-4" /> Gerar novo token
                   </Button>
                 </CardContent>
@@ -303,7 +311,7 @@ export default function ConfiguracoesPage() {
                         <p className="text-sm font-medium">{m}</p>
                         <span className="text-sm font-bold tabular-nums">R$ 28.400,00</span>
                         <Badge variant="success" className="text-[10px]">Pago</Badge>
-                        <Button variant="ghost" size="sm">Baixar fatura</Button>
+                        <Button variant="ghost" size="sm" onClick={() => toast("Baixando fatura", { desc: "PDF gerado." })}>Baixar fatura</Button>
                       </div>
                     ))}
                   </div>
@@ -313,6 +321,8 @@ export default function ConfiguracoesPage() {
           </div>
         </div>
       </Tabs>
+
+      <ConvidarUsuarioModal open={convidarOpen} onOpenChange={setConvidarOpen} onInvite={(u) => setEquipe((e) => [u, ...e])} />
     </div>
   );
 }

@@ -19,6 +19,7 @@ import {
   PackageCheck,
   TrendingUp,
   Zap,
+  ChevronDown,
 } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -54,9 +55,26 @@ import {
   RadialBar,
   PolarAngleAxis,
 } from "recharts";
-import { formatDateTime, relativeTime, cn } from "@/lib/utils";
+import { formatDateTime, cn } from "@/lib/utils";
+import { HOJE, diasEntre } from "@/lib/domain/model";
+import { useState } from "react";
+import { NovaViagemModal } from "@/components/modals/nova-viagem-modal";
+import { ProgramarAuditoriaModal } from "@/components/modals/programar-auditoria-modal";
+import { useSession } from "@/lib/store/session";
+import { useToast } from "@/components/ui/toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+const PERIODOS = ["Últimos 7 dias", "Últimos 30 dias", "Últimos 90 dias", "Tudo"];
 
 export default function DashboardPage() {
+  const { version } = useSession();
+  const { toast } = useToast();
+  const [periodo, setPeriodo] = useState("Últimos 30 dias");
   const proximaAuditoria = auditorias.find((a) => a.status === "Programada");
   const viagensRecentes = viagens.slice(0, 5);
   const fazendasRisco = fazendas.filter((f) => f.scoreRiscoEUDR !== "Baixo");
@@ -64,8 +82,17 @@ export default function DashboardPage() {
     (nc) => nc.status === "Aberta" || nc.status === "Em tratamento"
   );
 
+  // KPIs derivados do estado real (movem quando algo é criado). Deltas/sparklines
+  // seguem como tendência ilustrativa; os valores-âncora são honestos.
+  const viagensAtivas = viagens.filter((v) => v.status !== "Concluída").length;
+  const bloqueadas = viagens.filter((v) => v.status === "Bloqueada").length;
+  const confMedia = viagens.length
+    ? Math.round((viagens.reduce((a, v) => a + v.conformidade, 0) / viagens.length) * 10) / 10
+    : 0;
+  const diasAudit = proximaAuditoria ? diasEntre(HOJE, proximaAuditoria.data) : 0;
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-5" data-v={version}>
       <PageHeader
         title="Dashboard operacional"
         description="Visão consolidada das viagens em andamento, compliance GMP+ FSA, risco EUDR e integração ativa com o TRACES NT da Comissão Europeia."
@@ -77,12 +104,35 @@ export default function DashboardPage() {
         }
         actions={
           <>
-            <Button variant="outline" size="sm">
-              <Calendar className="size-4" /> Últimos 30 dias
-            </Button>
-            <Button variant="gradient" size="sm">
-              <Plus className="size-4" /> Nova viagem
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Calendar className="size-4" /> {periodo}
+                  <ChevronDown className="size-3.5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {PERIODOS.map((p) => (
+                  <DropdownMenuItem
+                    key={p}
+                    onSelect={() => {
+                      setPeriodo(p);
+                      toast(`Período: ${p}`, { type: "info", desc: "Recorte de período (dados do protótipo não recalculam)." });
+                    }}
+                  >
+                    {p}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <ProgramarAuditoriaModal
+              trigger={
+                <Button variant="outline" size="sm">
+                  <ShieldCheck className="size-4" /> Programar auditoria
+                </Button>
+              }
+            />
+            <NovaViagemModal />
           </>
         }
       />
@@ -96,14 +146,14 @@ export default function DashboardPage() {
           </div>
           <div className="relative flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <Badge variant="warning" className="text-[10px]">D-23</Badge>
+              <Badge variant="warning" className="text-[10px]">{diasAudit >= 0 ? `D-${diasAudit}` : "Atrasada"}</Badge>
               <p className="text-[14px] font-semibold text-[hsl(195_30%_8%)]">
                 Auditoria {proximaAuditoria.tipo} programada para {formatDateTime(proximaAuditoria.data).split(",")[0]}
               </p>
             </div>
             <p className="text-[12px] text-[hsl(200_25%_25%)]">
-              <span className="font-medium">{proximaAuditoria.auditor}</span> · {proximaAuditoria.organismo} · Conformidade atual{" "}
-              <span className="font-bold text-[hsl(176_84%_25%)] num">97.8%</span> · 12 itens preparatórios pendentes
+              <span className="font-medium">{proximaAuditoria.auditor}</span> · {proximaAuditoria.organismo} · Conformidade média{" "}
+              <span className="font-bold text-[hsl(176_84%_25%)] num">{confMedia}%</span> · 12 itens preparatórios pendentes
             </p>
           </div>
           <Button variant="outline" size="sm" asChild className="relative shrink-0">
@@ -116,9 +166,9 @@ export default function DashboardPage() {
 
       {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <KPICard {...dashboardKPIs[0]} icon={<Truck className="size-4" />} sparkline={[42, 38, 51, 47, 58, 62, 68, 64, 71, 78, 82, 84]} />
-        <KPICard {...dashboardKPIs[1]} icon={<ShieldCheck className="size-4" />} variant="success" sparkline={[88, 89, 90, 91, 91, 92, 94, 94, 95, 96, 97, 97.8]} />
-        <KPICard {...dashboardKPIs[2]} icon={<AlertOctagon className="size-4" />} variant="danger" sparkline={[14, 18, 12, 16, 11, 14, 9, 12, 8, 11, 9, 7]} />
+        <KPICard {...dashboardKPIs[0]} value={viagensAtivas} icon={<Truck className="size-4" />} sparkline={[42, 38, 51, 47, 58, 62, 68, 64, 71, 78, 82, 84]} />
+        <KPICard {...dashboardKPIs[1]} value={`${confMedia}%`} icon={<ShieldCheck className="size-4" />} variant="success" sparkline={[88, 89, 90, 91, 91, 92, 94, 94, 95, 96, 97, 97.8]} />
+        <KPICard {...dashboardKPIs[2]} value={bloqueadas} icon={<AlertOctagon className="size-4" />} variant="danger" sparkline={[14, 18, 12, 16, 11, 14, 9, 12, 8, 11, 9, 7]} />
         <KPICard {...dashboardKPIs[3]} icon={<Trees className="size-4" />} sparkline={[45, 48, 52, 55, 58, 62, 68, 72, 76, 80, 84, 88]} />
       </div>
 
@@ -328,7 +378,7 @@ export default function DashboardPage() {
                   <p className="text-[12px] font-semibold leading-snug">{a.titulo}</p>
                   <p className="text-[11px] text-[hsl(210_14%_42%)] mt-0.5 leading-snug">{a.descricao}</p>
                   <p className="text-[10px] text-[hsl(210_12%_58%)] mt-1 uppercase tracking-wider font-semibold">
-                    {relativeTime(a.quando)} · {a.ator}
+                    {formatDateTime(a.quando)} · {a.ator}
                   </p>
                 </div>
               ))}
@@ -474,7 +524,7 @@ export default function DashboardPage() {
                     </div>
                     <p className="text-[11px] mt-1 line-clamp-2 leading-snug">{nc.descricao}</p>
                     <p className="text-[9px] text-[hsl(210_12%_58%)] mt-1.5 uppercase tracking-wider font-semibold">
-                      {relativeTime(nc.abertaEm)}
+                      {formatDateTime(nc.abertaEm)}
                     </p>
                   </div>
                 </div>

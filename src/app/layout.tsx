@@ -27,6 +27,9 @@ export default function RootLayout({
     <html
       lang="pt-BR"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      // Extensões de browser (ex.: garimpo-ext) injetam atributos em <html> antes
+      // do React hidratar. Suprime o warning de mismatch só nesse nível.
+      suppressHydrationWarning
     >
       <body className="min-h-full">{children}</body>
     </html>

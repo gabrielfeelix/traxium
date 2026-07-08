@@ -2,14 +2,12 @@
 
 import {
   ShieldCheck,
-  Plus,
   Download,
   Calendar,
   FileText,
   Users,
   CheckCircle2,
   AlertOctagon,
-  ClipboardCheck,
 } from "lucide-react";
 import { PageHeader } from "@/components/shell/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -19,23 +17,27 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatusBadge } from "@/components/shell/status-badge";
 import { auditorias } from "@/lib/mock-data";
+import { useToast } from "@/components/ui/toast";
 import { cn, formatDate } from "@/lib/utils";
+import { useSession } from "@/lib/store/session";
+import { ProgramarAuditoriaModal } from "@/components/modals/programar-auditoria-modal";
+import { PlanoPreparacaoModal } from "@/components/modals/plano-preparacao-modal";
 
 export default function AuditoriaPage() {
+  const { toast } = useToast();
+  const { version } = useSession();
   const programada = auditorias.find((a) => a.status === "Programada");
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-v={version}>
       <PageHeader
         title="Auditoria"
         description="Auditorias GMP+ FSA, EUDR, internas e de clientes compradores. Programe, prepare e arquive cada ciclo de verificação."
         actions={
           <>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={() => toast("Histórico de auditorias", { type: "info", desc: `${auditorias.length} ciclos registrados.` })}>
               <Download className="size-4" /> Histórico
             </Button>
-            <Button variant="gradient" size="sm">
-              <Plus className="size-4" /> Programar auditoria
-            </Button>
+            <ProgramarAuditoriaModal />
           </>
         }
       />
@@ -62,9 +64,7 @@ export default function AuditoriaPage() {
                   <ChecklistStat label="Itens preparatórios" complete={28} total={42} />
                 </div>
               </div>
-              <Button variant="gradient" size="sm">
-                <ClipboardCheck className="size-4" /> Plano de preparação
-              </Button>
+              <PlanoPreparacaoModal />
             </div>
           </CardContent>
         </Card>
@@ -141,6 +141,7 @@ export default function AuditoriaPage() {
 }
 
 function AuditoriaCard({ a }: { a: typeof import("@/lib/mock-data").auditorias[number] }) {
+  const { toast } = useToast();
   return (
     <Card>
       <CardContent className="pt-6">
@@ -167,7 +168,7 @@ function AuditoriaCard({ a }: { a: typeof import("@/lib/mock-data").auditorias[n
             </div>
           </div>
           {a.documento && (
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={() => toast(`Baixando ${a.documento}`, { desc: "Relatório de auditoria." })}>
               <FileText className="size-3.5" /> Relatório
             </Button>
           )}

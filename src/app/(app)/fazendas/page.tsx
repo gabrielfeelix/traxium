@@ -3,15 +3,12 @@
 import { useState } from "react";
 import {
   Trees,
-  Plus,
   Search,
-  Upload,
   Download,
   ShieldCheck,
   AlertTriangle,
   Satellite,
   ExternalLink,
-  Globe,
   MapPin,
   Layers,
   Filter,
@@ -25,9 +22,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatusBadge, RiscoBadge } from "@/components/shell/status-badge";
 import { FazendaMap } from "@/components/map/fazenda-map-dynamic";
 import { fazendas } from "@/lib/mock-data";
+import { NovaFazendaModal } from "@/components/modals/nova-fazenda-modal";
+import { useSession } from "@/lib/store/session";
+import { useToast } from "@/components/ui/toast";
+import { downloadCSV } from "@/lib/export";
 import { cn, formatDate, formatNumber } from "@/lib/utils";
 
 export default function FazendasPage() {
+  const { version } = useSession();
+  const { toast } = useToast();
   const [selected, setSelected] = useState(fazendas[0]);
   const [search, setSearch] = useState("");
   const [showAll, setShowAll] = useState(false);
@@ -45,21 +48,28 @@ export default function FazendasPage() {
   const preservacao = fazendas.reduce((acc, f) => acc + f.areaPreservacaoHa, 0);
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5" data-v={version}>
       <PageHeader
         title="Fazendas e polígonos EUDR"
         description="Polígonos geoespaciais cadastrados. Validação cruzada automática com INPE TerraBrasilis, MapBiomas Alerta e CAR estadual para detectar supressão pós-31/12/2020."
         actions={
           <>
-            <Button variant="outline" size="sm">
-              <Upload className="size-4" /> GeoJSON
-            </Button>
-            <Button variant="outline" size="sm">
+            <NovaFazendaModal trigger="geojson" />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                downloadCSV(
+                  "traxium-fazendas",
+                  ["Nome", "Produtor", "CAR", "Município", "UF", "Área (ha)", "Risco EUDR", "Status"],
+                  fazendas.map((f) => [f.nome, f.produtor, f.car, f.cidade, f.uf, f.areaTotalHa, f.scoreRiscoEUDR, f.status])
+                );
+                toast("CSV exportado", { desc: `${fazendas.length} fazendas.` });
+              }}
+            >
               <Download className="size-4" /> Exportar
             </Button>
-            <Button variant="gradient" size="sm">
-              <Plus className="size-4" /> Cadastrar fazenda
-            </Button>
+            <NovaFazendaModal />
           </>
         }
       />
@@ -371,7 +381,7 @@ export default function FazendasPage() {
                       <p className="text-[12px] text-[hsl(0_70%_38%)] mt-1">
                         Detecção de supressão de vegetação nativa de aproximadamente 18.4 ha no quadrante NE do polígono. Imagem Sentinel-2 de 12/05/2026.
                       </p>
-                      <Button variant="outline" size="sm" className="mt-3">
+                      <Button variant="outline" size="sm" className="mt-3" onClick={() => window.open("https://plataforma.brasil.mapbiomas.org/alertas", "_blank", "noopener")}>
                         <ExternalLink className="size-3.5" /> Ver no MapBiomas
                       </Button>
                     </div>

@@ -9,12 +9,18 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { documentos } from "@/lib/mock-data";
+import { documentos, type Documento } from "@/lib/mock-data";
+import { useToast } from "@/components/ui/toast";
+import { downloadCSV } from "@/lib/export";
 import { formatDate } from "@/lib/utils";
+import { EnviarDocumentoModal } from "@/components/modals/enviar-documento-modal";
 
 export default function DocumentosPage() {
+  const { toast } = useToast();
   const [search, setSearch] = useState("");
-  const filtered = documentos.filter((d) => d.nome.toLowerCase().includes(search.toLowerCase()));
+  const [docs, setDocs] = useState<Documento[]>(documentos);
+  const [enviarOpen, setEnviarOpen] = useState(false);
+  const filtered = docs.filter((d) => d.nome.toLowerCase().includes(search.toLowerCase()));
 
   const tipoIcon: Record<string, string> = {
     Certificado: "🏆",
@@ -33,10 +39,10 @@ export default function DocumentosPage() {
         description="Repositório central de certificados, políticas, procedimentos, DDS, relatórios de auditoria e materiais de treinamento."
         actions={
           <>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={() => toast("Pastas", { type: "info", desc: "Organização por tipo de documento." })}>
               <Folder className="size-4" /> Pastas
             </Button>
-            <Button variant="gradient" size="sm">
+            <Button variant="gradient" size="sm" onClick={() => setEnviarOpen(true)}>
               <Upload className="size-4" /> Enviar documento
             </Button>
           </>
@@ -45,7 +51,7 @@ export default function DocumentosPage() {
 
       <div className="grid grid-cols-2 lg:grid-cols-7 gap-2">
         {Object.keys(tipoIcon).map((tipo) => {
-          const count = documentos.filter((d) => d.tipo === tipo).length;
+          const count = docs.filter((d) => d.tipo === tipo).length;
           return (
             <Card key={tipo} className="p-3 hover:shadow-md transition-shadow cursor-pointer text-center">
               <div className="text-2xl">{tipoIcon[tipo]}</div>
@@ -70,10 +76,10 @@ export default function DocumentosPage() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[hsl(215_16%_47%)]" />
                 <Input placeholder="Buscar documento…" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 h-9" />
               </div>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" onClick={() => toast("Filtro por tipo", { type: "info" })}>
                 <Filter className="size-4" /> Tipo
               </Button>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" onClick={() => toast("Filtro por período", { type: "info" })}>
                 <Calendar className="size-4" /> Período
               </Button>
             </CardHeader>
@@ -114,10 +120,10 @@ export default function DocumentosPage() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
-                          <Button variant="ghost" size="icon-sm">
+                          <Button variant="ghost" size="icon-sm" onClick={() => toast(`Baixando ${d.nome}`, { desc: `${d.tipo} · ${d.tamanho}` })}>
                             <Download className="size-4" />
                           </Button>
-                          <Button variant="ghost" size="icon-sm">
+                          <Button variant="ghost" size="icon-sm" onClick={() => toast(d.nome, { type: "info", desc: `Autor: ${d.autor}` })}>
                             <MoreHorizontal className="size-4" />
                           </Button>
                         </div>
@@ -146,6 +152,17 @@ export default function DocumentosPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <EnviarDocumentoModal
+        open={enviarOpen}
+        onOpenChange={setEnviarOpen}
+        onUpload={(nd) =>
+          setDocs((cur) => [
+            { id: `doc-new-${cur.length}`, nome: nd.nome, tipo: nd.tipo, tamanho: nd.tamanho, atualizadoEm: "2026-07-08", autor: "Gabriel Felix", vigente: true },
+            ...cur,
+          ])
+        }
+      />
     </div>
   );
 }

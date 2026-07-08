@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   Truck,
-  Plus,
   Filter,
   Download,
   MoreHorizontal,
@@ -16,6 +15,11 @@ import {
   Sparkles,
   Layers3,
 } from "lucide-react";
+import { NovaViagemModal } from "@/components/modals/nova-viagem-modal";
+import { useSession } from "@/lib/store/session";
+import { useToast } from "@/components/ui/toast";
+import { downloadCSV, printPDF } from "@/lib/export";
+import { avaliarCarregamento } from "@/lib/domain/rules-engine";
 import { PageHeader } from "@/components/shell/page-header";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -35,8 +39,11 @@ import { viagens } from "@/lib/mock-data";
 import { formatDateTime, cn } from "@/lib/utils";
 
 export default function ViagensPage() {
+  const { version } = useSession();
+  const { toast } = useToast();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("todos");
+  const [regimeFilter, setRegimeFilter] = useState<string>("todos");
   const [view, setView] = useState<"tabela" | "cards">("tabela");
 
   const filtered = viagens.filter((v) => {
@@ -45,7 +52,8 @@ export default function ViagensPage() {
       v.motorista.toLowerCase().includes(search.toLowerCase()) ||
       v.produto.toLowerCase().includes(search.toLowerCase());
     const matchStatus = statusFilter === "todos" || v.status === statusFilter;
-    return matchSearch && matchStatus;
+    const matchRegime = regimeFilter === "todos" || v.regimeLimpeza === regimeFilter;
+    return matchSearch && matchStatus && matchRegime;
   });
 
   const counts = {
@@ -56,18 +64,27 @@ export default function ViagensPage() {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5" data-v={version}>
       <PageHeader
         title="Viagens"
         description="Operações de transporte criadas no sistema. O motor de regras valida T-3, regime de limpeza, certificações e documentação antes de liberar cada carregamento."
         actions={
           <>
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                downloadCSV(
+                  "traxium-viagens",
+                  ["Código", "Motorista", "Cavalo", "Carreta", "Produto", "Origem", "Destino", "Status", "Conformidade %"],
+                  filtered.map((v) => [v.codigo, v.motorista, v.cavalo, v.carreta, v.produto, v.origem, v.destino, v.status, v.conformidade])
+                );
+                toast("CSV exportado", { desc: `${filtered.length} viagem(ns).` });
+              }}
+            >
               <Download className="size-4" /> Exportar
             </Button>
-            <Button variant="gradient" size="sm">
-              <Plus className="size-4" /> Nova viagem
-            </Button>
+            <NovaViagemModal />
           </>
         }
       />
@@ -106,9 +123,19 @@ export default function ViagensPage() {
                 <SelectItem value="Bloqueada">Bloqueada</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant="outline" size="sm">
-              <Filter className="size-4" /> Mais filtros
-            </Button>
+            <Select value={regimeFilter} onValueChange={setRegimeFilter}>
+              <SelectTrigger className="w-36 h-9">
+                <Filter className="size-4 text-[hsl(210_14%_42%)]" />
+                <SelectValue placeholder="Regime" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todo regime</SelectItem>
+                <SelectItem value="A">Regime A</SelectItem>
+                <SelectItem value="B">Regime B</SelectItem>
+                <SelectItem value="C">Regime C</SelectItem>
+                <SelectItem value="D">Regime D</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="flex items-center gap-2">
             <div className="inline-flex rounded-md border border-[hsl(200_18%_88%)] bg-white p-0.5">
@@ -227,12 +254,23 @@ export default function ViagensPage() {
                               <Eye className="size-4" /> Detalhes
                             </Link>
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              const d = avaliarCarregamento(v.id);
+                              toast(`Motor: ${d.tier}`, {
+                                type: d.tier === "BLOQUEIO" ? "error" : d.tier === "ALERTA" ? "info" : "success",
+                                desc: d.regra,
+                              });
+                            }}
+                          >
                             <Sparkles className="size-4" /> Re-validar regras
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem>Imprimir guia</DropdownMenuItem>
-                          <DropdownMenuItem>Cancelar viagem</DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => { printPDF(); toast("Abrindo impressão da guia", { type: "info", desc: "Use 'Salvar como PDF'." }); }}
+                          >
+                            Imprimir guia
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>

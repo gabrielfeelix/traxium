@@ -3,7 +3,6 @@
 import { useState } from "react";
 import {
   IdCard,
-  Plus,
   Search,
   Download,
   Phone,
@@ -24,11 +23,23 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatusBadge } from "@/components/shell/status-badge";
 import { motoristas } from "@/lib/mock-data";
+import { useToast } from "@/components/ui/toast";
+import { downloadCSV } from "@/lib/export";
 import { cn, formatDate } from "@/lib/utils";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useSession } from "@/lib/store/session";
+import { CadastrarMotoristaModal } from "@/components/modals/cadastrar-motorista-modal";
+import { AgendarTreinamentoModal } from "@/components/modals/agendar-treinamento-modal";
+import { RenovarCertificacaoModal, type RenovarTarget } from "@/components/modals/renovar-certificacao-modal";
 
 export default function MotoristasPage() {
+  const { toast } = useToast();
+  const { version } = useSession();
   const [search, setSearch] = useState("");
+  const [treinoOpen, setTreinoOpen] = useState(false);
+  const [treinoPre, setTreinoPre] = useState<string[]>([]);
+  const [renovarTarget, setRenovarTarget] = useState<RenovarTarget | null>(null);
+  function abrirTreino(pre: string[]) { setTreinoPre(pre); setTreinoOpen(true); }
   const filtered = motoristas.filter((m) => m.nome.toLowerCase().includes(search.toLowerCase()));
 
   const initials = (nome: string) =>
@@ -40,21 +51,29 @@ export default function MotoristasPage() {
       .toUpperCase();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-v={version}>
       <PageHeader
         title="Motoristas e subcontratados"
         description="Gerencie motoristas próprios, agregados e subcontratados. Cada motorista opera sob o FSMS da transportadora contratante e precisa de certificação válida."
         actions={
           <>
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline" size="sm"
+              onClick={() => {
+                downloadCSV(
+                  "traxium-motoristas",
+                  ["Nome", "Tipo", "CNH cat.", "Cidade", "UF", "Viagens", "Conformidade %", "Status", "Letramento"],
+                  motoristas.map((m) => [m.nome, m.tipo, m.cnh.categoria, m.cidade, m.uf, m.totalViagens, m.conformidadeMedia, m.status, m.letramentoDigital])
+                );
+                toast("CSV exportado", { desc: `${motoristas.length} motoristas.` });
+              }}
+            >
               <Download className="size-4" /> Exportar
             </Button>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={() => abrirTreino([])}>
               <GraduationCap className="size-4" /> Agendar treinamento
             </Button>
-            <Button variant="gradient" size="sm">
-              <Plus className="size-4" /> Cadastrar motorista
-            </Button>
+            <CadastrarMotoristaModal />
           </>
         }
       />
@@ -171,15 +190,15 @@ export default function MotoristasPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem>Detalhes</DropdownMenuItem>
-                              <DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => toast(m.nome, { type: "info", desc: `${m.tipo} · ${m.cidade}/${m.uf} · ${m.totalViagens} viagens` })}>Detalhes</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => window.open(`https://wa.me/55${m.telefone.replace(/\D/g, "")}`, "_blank", "noopener")}>
                                 <Phone className="size-4" /> Contatar
                               </DropdownMenuItem>
-                              <DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => abrirTreino([m.id])}>
                                 <GraduationCap className="size-4" /> Agendar treinamento
                               </DropdownMenuItem>
-                              <DropdownMenuItem>Histórico de viagens</DropdownMenuItem>
-                              <DropdownMenuItem>Renovar certificação</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => toast(`Histórico de ${m.nome}`, { type: "info", desc: `${m.totalViagens} viagens registradas` })}>Histórico de viagens</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => setRenovarTarget({ kind: "motorista", id: m.id, nome: m.nome, certs: m.certificacoes })}>Renovar certificação</DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
@@ -202,6 +221,9 @@ export default function MotoristasPage() {
           <SubList motoristas={motoristas.filter((m) => m.tipo === "Subcontratado")} initials={initials} />
         </TabsContent>
       </Tabs>
+
+      <AgendarTreinamentoModal open={treinoOpen} onOpenChange={setTreinoOpen} preselect={treinoPre} />
+      <RenovarCertificacaoModal open={!!renovarTarget} onOpenChange={(o) => { if (!o) setRenovarTarget(null); }} target={renovarTarget} />
     </div>
   );
 }

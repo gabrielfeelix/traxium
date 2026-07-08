@@ -112,6 +112,8 @@ export type Viagem = {
   loteEUDR?: string;
   km: number;
   alertas: number;
+  /** Justificativa registrada quando a viagem é criada sob ALERTA do motor. */
+  justificativa?: string;
 };
 
 export const viagens: Viagem[] = [
@@ -694,6 +696,15 @@ export type NaoConformidade = {
   abertaEm: string;
   status: "Aberta" | "Em tratamento" | "Resolvida" | "Justificada";
   responsavel?: string;
+  // CAPA — correção imediata NÃO basta; auditor cobra causa raiz + ação corretiva + eficácia
+  capa?: {
+    acaoImediata: string;
+    causaRaiz: string;
+    acaoCorretiva: string;
+    responsavelAcao: string;
+    prazo: string;
+    eficaciaVerificada: boolean;
+  };
 };
 
 export const naoConformidades: NaoConformidade[] = [
@@ -709,6 +720,14 @@ export const naoConformidades: NaoConformidade[] = [
     abertaEm: "2026-05-25T14:35:00",
     status: "Aberta",
     responsavel: "Gerência de Compliance",
+    capa: {
+      acaoImediata: "Carregamento bloqueado pelo motor de regras; carreta retida para limpeza.",
+      causaRaiz: "Histórico T-3 do compartimento não consultado antes do despacho e limpeza Regime D não executada após defensivo.",
+      acaoCorretiva: "Consulta T-3 obrigatória no despacho, treinamento do tráfego e exigência de evidência de limpeza D.",
+      responsavelAcao: "Gerência de Compliance",
+      prazo: "2026-07-15",
+      eficaciaVerificada: false,
+    },
   },
   {
     id: "nc-002",
@@ -720,6 +739,14 @@ export const naoConformidades: NaoConformidade[] = [
     abertaEm: "2026-05-25T14:35:00",
     status: "Em tratamento",
     responsavel: "RH",
+    capa: {
+      acaoImediata: "Motorista bloqueado para novas viagens sob cadeia GMP+.",
+      causaRaiz: "Ausência de alerta automático de vencimento de certificação do motorista.",
+      acaoCorretiva: "Ativar alerta 60/30/15 dias e renovar o MOPP.",
+      responsavelAcao: "RH",
+      prazo: "2026-07-20",
+      eficaciaVerificada: false,
+    },
   },
   {
     id: "nc-003",
@@ -731,6 +758,14 @@ export const naoConformidades: NaoConformidade[] = [
     abertaEm: "2026-05-25T14:35:00",
     status: "Em tratamento",
     responsavel: "Frota",
+    capa: {
+      acaoImediata: "Carreta impedida de operar sob cadeia GMP+ certificada.",
+      causaRaiz: "Recertificação não agendada; controle de validade mantido em planilha manual.",
+      acaoCorretiva: "Migrar controle de certificados para o sistema com bloqueio automático no vencimento.",
+      responsavelAcao: "Frota",
+      prazo: "2026-07-10",
+      eficaciaVerificada: false,
+    },
   },
   {
     id: "nc-004",
@@ -743,6 +778,14 @@ export const naoConformidades: NaoConformidade[] = [
     abertaEm: "2026-05-25T11:18:00",
     status: "Resolvida",
     responsavel: "José Roberto Santos",
+    capa: {
+      acaoImediata: "Recaptura da foto com GPS solicitada ao motorista.",
+      causaRaiz: "GPS do aparelho desativado no momento da captura.",
+      acaoCorretiva: "App passa a bloquear a captura de foto crítica sem GPS ativo.",
+      responsavelAcao: "José Roberto Santos",
+      prazo: "2026-05-26",
+      eficaciaVerificada: true,
+    },
   },
 ];
 
@@ -760,7 +803,7 @@ export type AuditoriaEvento = {
 export const auditorias: AuditoriaEvento[] = [
   {
     id: "a-001",
-    data: "2026-06-18",
+    data: "2026-07-31",
     tipo: "GMP+ Anual",
     auditor: "Helena Marques",
     organismo: "Único Organismo Certificador BR",

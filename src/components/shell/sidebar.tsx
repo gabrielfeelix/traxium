@@ -6,12 +6,17 @@ import {
   LayoutDashboard,
   Truck,
   ClipboardCheck,
+  Boxes,
   Container,
+  Droplets,
+  Building2,
   IdCard,
   Trees,
   PackageCheck,
   ShieldCheck,
   AlertOctagon,
+  Gavel,
+  FileCheck2,
   FileText,
   Settings,
   Smartphone,
@@ -22,12 +27,14 @@ import {
 } from "lucide-react";
 import { TraxiumLogo } from "@/components/logo";
 import { cn } from "@/lib/utils";
+import { useSession } from "@/lib/store/session";
+import { produtosIDTF, subcontratados, excecoes, nivelVencimento } from "@/lib/domain/model";
+import { viagens, naoConformidades, lotes } from "@/lib/mock-data";
 
 type NavItem = {
   href: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
-  badge?: string;
   badgeTone?: "default" | "danger" | "warning";
 };
 
@@ -41,23 +48,27 @@ const navigation: NavGroup[] = [
     title: "Operação",
     items: [
       { href: "/", label: "Dashboard", icon: LayoutDashboard },
-      { href: "/viagens", label: "Viagens", icon: Truck, badge: "184" },
-      { href: "/checklists", label: "Checklists LCI", icon: ClipboardCheck },
-      { href: "/bloqueios", label: "Não conformidades", icon: AlertOctagon, badge: "7", badgeTone: "danger" },
+      { href: "/viagens", label: "Viagens", icon: Truck },
+      { href: "/idtf", label: "Motor IDTF", icon: Boxes, badgeTone: "warning" },
+      { href: "/checklists", label: "Inspeção LCI", icon: ClipboardCheck },
+      { href: "/limpezas", label: "Limpezas", icon: Droplets },
+      { href: "/bloqueios", label: "Não conformidades", icon: AlertOctagon, badgeTone: "danger" },
+      { href: "/excecoes", label: "Exceções", icon: Gavel, badgeTone: "warning" },
     ],
   },
   {
     title: "Cadastros",
     items: [
-      { href: "/frota", label: "Frota", icon: Container },
+      { href: "/frota", label: "Ativos e frota", icon: Container },
       { href: "/motoristas", label: "Motoristas", icon: IdCard },
+      { href: "/subcontratados", label: "Subcontratados", icon: Building2, badgeTone: "danger" },
       { href: "/fazendas", label: "Fazendas e polígonos", icon: Trees },
     ],
   },
   {
     title: "EUDR · TRACES NT",
     items: [
-      { href: "/lotes", label: "Lotes e DDS", icon: PackageCheck, badge: "4" },
+      { href: "/lotes", label: "Lotes e DDS", icon: PackageCheck },
       { href: "/traces", label: "Gateway TRACES", icon: Database },
     ],
   },
@@ -65,6 +76,7 @@ const navigation: NavGroup[] = [
     title: "Compliance",
     items: [
       { href: "/auditoria", label: "Auditoria", icon: ShieldCheck },
+      { href: "/dossie", label: "Dossiê de auditoria", icon: FileCheck2 },
       { href: "/conformidade", label: "Conformidade", icon: BadgeCheck },
       { href: "/documentos", label: "Documentos", icon: FileText },
       { href: "/atividade", label: "Atividade", icon: Activity },
@@ -81,6 +93,31 @@ const navigation: NavGroup[] = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { version } = useSession();
+
+  // Badges derivados do estado real (movem quando algo é criado). Só o que é caro
+  // de derivar (score EUDR etc.) fica fora — aqui tudo é .length/filter honesto.
+  void version;
+  const badgeFor = (href: string): number => {
+    switch (href) {
+      case "/viagens":
+        return viagens.length;
+      case "/idtf":
+        return produtosIDTF.filter((p) => p.statusClassificacao === "em_fila").length;
+      case "/bloqueios":
+        return naoConformidades.length;
+      case "/excecoes":
+        return excecoes.filter((e) => e.status === "pendente").length;
+      case "/subcontratados":
+        return subcontratados.filter(
+          (s) => nivelVencimento(s.certGMP.validade).nivel === "vencido" || s.certGMP.statusBasePublica !== "Ativo"
+        ).length;
+      case "/lotes":
+        return lotes.length;
+      default:
+        return 0;
+    }
+  };
 
   return (
     <aside className="hidden md:flex h-screen w-[260px] shrink-0 flex-col bg-[hsl(195_30%_8%)] text-[hsl(195_15%_82%)] sticky top-0 relative overflow-hidden">
@@ -112,6 +149,7 @@ export function Sidebar() {
                 const Icon = item.icon;
                 const isActive =
                   item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+                const count = badgeFor(item.href);
                 return (
                   <li key={item.href}>
                     <Link
@@ -128,7 +166,7 @@ export function Sidebar() {
                       )}
                       <Icon className={cn("size-[15px] shrink-0", isActive ? "text-[hsl(176_84%_55%)]" : "text-white/55 group-hover:text-white/85")} />
                       <span className="flex-1 truncate">{item.label}</span>
-                      {item.badge && (
+                      {count > 0 && (
                         <span
                           className={cn(
                             "min-w-[20px] h-[18px] rounded-[5px] px-1 text-[10px] font-semibold flex items-center justify-center num",
@@ -141,7 +179,7 @@ export function Sidebar() {
                               : "bg-white/[0.07] text-white/70"
                           )}
                         >
-                          {item.badge}
+                          {count}
                         </span>
                       )}
                     </Link>
