@@ -24,18 +24,23 @@ import {
   BadgeCheck,
   Activity,
   ChevronDown,
+  Eye,
 } from "lucide-react";
 import { TraxiumLogo } from "@/components/logo";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/lib/store/session";
-import { produtosIDTF, subcontratados, excecoes, nivelVencimento } from "@/lib/domain/model";
+import { produtosIDTF, subcontratados, excecoes, nivelVencimento, type Papel } from "@/lib/domain/model";
 import { viagens, naoConformidades, lotes } from "@/lib/mock-data";
 
+type Acesso = "full" | "read";
+// Visibilidade por papel de escritório, derivada da matriz §3. Papel ausente = oculto.
+// Master (isMaster) vê tudo como `full`. Campo/portal/auditor têm nav própria (não usam esta).
 type NavItem = {
   href: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   badgeTone?: "default" | "danger" | "warning";
+  access: Partial<Record<Papel, Acesso>>;
 };
 
 type NavGroup = {
@@ -47,53 +52,57 @@ const navigation: NavGroup[] = [
   {
     title: "Operação",
     items: [
-      { href: "/", label: "Dashboard", icon: LayoutDashboard },
-      { href: "/viagens", label: "Viagens", icon: Truck },
-      { href: "/idtf", label: "Motor IDTF", icon: Boxes, badgeTone: "warning" },
-      { href: "/checklists", label: "Inspeção LCI", icon: ClipboardCheck },
-      { href: "/limpezas", label: "Limpezas", icon: Droplets },
-      { href: "/bloqueios", label: "Não conformidades", icon: AlertOctagon, badgeTone: "danger" },
-      { href: "/excecoes", label: "Exceções", icon: Gavel, badgeTone: "warning" },
+      { href: "/", label: "Dashboard", icon: LayoutDashboard, access: { gestor: "full", despachante: "full", diretoria_rt: "full", admin_subcontratados: "full", auditor_interno: "read" } },
+      { href: "/viagens", label: "Viagens", icon: Truck, access: { gestor: "read", despachante: "full", diretoria_rt: "read", auditor_interno: "read" } },
+      { href: "/idtf", label: "Motor IDTF", icon: Boxes, badgeTone: "warning", access: { gestor: "full", despachante: "read", auditor_interno: "read" } },
+      { href: "/checklists", label: "Inspeção LCI", icon: ClipboardCheck, access: { gestor: "read", auditor_interno: "read" } },
+      { href: "/limpezas", label: "Limpezas", icon: Droplets, access: { gestor: "full", auditor_interno: "read" } },
+      { href: "/bloqueios", label: "Não conformidades", icon: AlertOctagon, badgeTone: "danger", access: { gestor: "full", despachante: "read", diretoria_rt: "read", admin_subcontratados: "read", auditor_interno: "full" } },
+      { href: "/excecoes", label: "Exceções", icon: Gavel, badgeTone: "warning", access: { gestor: "full", despachante: "full", diretoria_rt: "full", auditor_interno: "read" } },
     ],
   },
   {
     title: "Cadastros",
     items: [
-      { href: "/frota", label: "Ativos e frota", icon: Container },
-      { href: "/motoristas", label: "Motoristas", icon: IdCard },
-      { href: "/subcontratados", label: "Subcontratados", icon: Building2, badgeTone: "danger" },
-      { href: "/fazendas", label: "Fazendas e polígonos", icon: Trees },
+      { href: "/frota", label: "Ativos e frota", icon: Container, access: { gestor: "read", despachante: "read", admin_subcontratados: "full", auditor_interno: "read" } },
+      { href: "/motoristas", label: "Motoristas", icon: IdCard, access: { gestor: "read", despachante: "read", admin_subcontratados: "full", auditor_interno: "read" } },
+      { href: "/subcontratados", label: "Subcontratados", icon: Building2, badgeTone: "danger", access: { gestor: "read", despachante: "read", admin_subcontratados: "full", auditor_interno: "read" } },
+      { href: "/fazendas", label: "Fazendas e polígonos", icon: Trees, access: { gestor: "full", auditor_interno: "read" } },
     ],
   },
   {
     title: "EUDR · TRACES NT",
     items: [
-      { href: "/lotes", label: "Lotes e DDS", icon: PackageCheck },
-      { href: "/traces", label: "Gateway TRACES", icon: Database },
+      { href: "/lotes", label: "Lotes e DDS", icon: PackageCheck, access: { gestor: "full", auditor_interno: "read" } },
+      { href: "/traces", label: "Gateway TRACES", icon: Database, access: { gestor: "full" } },
     ],
   },
   {
     title: "Compliance",
     items: [
-      { href: "/auditoria", label: "Auditoria", icon: ShieldCheck },
-      { href: "/dossie", label: "Dossiê de auditoria", icon: FileCheck2 },
-      { href: "/conformidade", label: "Conformidade", icon: BadgeCheck },
-      { href: "/documentos", label: "Documentos", icon: FileText },
-      { href: "/atividade", label: "Atividade", icon: Activity },
+      { href: "/auditoria", label: "Auditoria", icon: ShieldCheck, access: { gestor: "full", diretoria_rt: "read", auditor_interno: "full" } },
+      { href: "/dossie", label: "Dossiê de auditoria", icon: FileCheck2, access: { gestor: "full", despachante: "read", diretoria_rt: "read", auditor_interno: "read" } },
+      { href: "/conformidade", label: "Conformidade", icon: BadgeCheck, access: { gestor: "full", despachante: "read", diretoria_rt: "full", admin_subcontratados: "read", auditor_interno: "read" } },
+      { href: "/documentos", label: "Documentos", icon: FileText, access: { gestor: "full", despachante: "read", diretoria_rt: "read", admin_subcontratados: "read", auditor_interno: "read" } },
+      { href: "/atividade", label: "Atividade", icon: Activity, access: { gestor: "full", despachante: "read", diretoria_rt: "read", admin_subcontratados: "read", auditor_interno: "full" } },
     ],
   },
   {
     title: "Sistema",
     items: [
-      { href: "/mobile", label: "Preview Mobile", icon: Smartphone },
-      { href: "/configuracoes", label: "Configurações", icon: Settings },
+      { href: "/mobile", label: "Preview Mobile", icon: Smartphone, access: { gestor: "full" } },
+      { href: "/configuracoes", label: "Configurações", icon: Settings, access: { gestor: "read", diretoria_rt: "full" } },
     ],
   },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { version } = useSession();
+  const { version, papel, isMaster } = useSession();
+
+  // Modo de acesso do papel atual a um item (Master vê tudo). undefined = oculto.
+  const acessoDe = (item: NavItem): Acesso | undefined =>
+    isMaster ? "full" : item.access[papel];
 
   // Badges derivados do estado real (movem quando algo é criado). Só o que é caro
   // de derivar (score EUDR etc.) fica fora — aqui tudo é .length/filter honesto.
@@ -139,56 +148,71 @@ export function Sidebar() {
       </div>
 
       <nav className="relative flex-1 overflow-y-auto px-3 py-4 space-y-5">
-        {navigation.map((group) => (
-          <div key={group.title}>
-            <p className="px-3 mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/35">
-              {group.title}
-            </p>
-            <ul className="space-y-px">
-              {group.items.map((item) => {
-                const Icon = item.icon;
-                const isActive =
-                  item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
-                const count = badgeFor(item.href);
-                return (
-                  <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      className={cn(
-                        "group relative flex items-center gap-3 rounded-md px-3 py-2 text-[13px] font-medium transition-all",
-                        isActive
-                          ? "bg-white/[0.07] text-white shadow-[inset_1px_0_0_hsl(176_84%_45%)]"
-                          : "text-white/65 hover:bg-white/[0.04] hover:text-white"
-                      )}
-                    >
-                      {isActive && (
-                        <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 rounded-r bg-gradient-to-b from-[hsl(176_84%_55%)] to-[hsl(200_92%_45%)]" />
-                      )}
-                      <Icon className={cn("size-[15px] shrink-0", isActive ? "text-[hsl(176_84%_55%)]" : "text-white/55 group-hover:text-white/85")} />
-                      <span className="flex-1 truncate">{item.label}</span>
-                      {count > 0 && (
-                        <span
-                          className={cn(
-                            "min-w-[20px] h-[18px] rounded-[5px] px-1 text-[10px] font-semibold flex items-center justify-center num",
-                            item.badgeTone === "danger"
-                              ? "bg-[hsl(0_78%_50%)] text-white"
-                              : item.badgeTone === "warning"
-                              ? "bg-[hsl(28_92%_48%)] text-white"
-                              : isActive
-                              ? "bg-white/15 text-white"
-                              : "bg-white/[0.07] text-white/70"
-                          )}
-                        >
-                          {count}
-                        </span>
-                      )}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        ))}
+        {navigation.map((group) => {
+          // Filtra pela matriz §3: some o que é `—`; grupo sem itens visíveis desaparece.
+          const visiveis = group.items
+            .map((item) => ({ item, mode: acessoDe(item) }))
+            .filter((x): x is { item: NavItem; mode: Acesso } => Boolean(x.mode));
+          if (visiveis.length === 0) return null;
+          return (
+            <div key={group.title}>
+              <p className="px-3 mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/35">
+                {group.title}
+              </p>
+              <ul className="space-y-px">
+                {visiveis.map(({ item, mode }) => {
+                  const Icon = item.icon;
+                  const isActive =
+                    item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+                  const count = badgeFor(item.href);
+                  const readOnly = mode === "read";
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        className={cn(
+                          "group relative flex items-center gap-3 rounded-md px-3 py-2 text-[13px] font-medium transition-all",
+                          isActive
+                            ? "bg-white/[0.07] text-white shadow-[inset_1px_0_0_hsl(176_84%_45%)]"
+                            : readOnly
+                            ? "text-white/45 hover:bg-white/[0.04] hover:text-white/70"
+                            : "text-white/65 hover:bg-white/[0.04] hover:text-white"
+                        )}
+                        title={readOnly ? `${item.label} · somente leitura` : item.label}
+                      >
+                        {isActive && (
+                          <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 rounded-r bg-gradient-to-b from-[hsl(176_84%_55%)] to-[hsl(200_92%_45%)]" />
+                        )}
+                        <Icon className={cn("size-[15px] shrink-0", isActive ? "text-[hsl(176_84%_55%)]" : readOnly ? "text-white/40 group-hover:text-white/60" : "text-white/55 group-hover:text-white/85")} />
+                        <span className="flex-1 truncate">{item.label}</span>
+                        {count > 0 ? (
+                          <span
+                            className={cn(
+                              "min-w-[20px] h-[18px] rounded-[5px] px-1 text-[10px] font-semibold flex items-center justify-center num",
+                              item.badgeTone === "danger"
+                                ? "bg-[hsl(0_78%_50%)] text-white"
+                                : item.badgeTone === "warning"
+                                ? "bg-[hsl(28_92%_48%)] text-white"
+                                : isActive
+                                ? "bg-white/15 text-white"
+                                : "bg-white/[0.07] text-white/70"
+                            )}
+                          >
+                            {count}
+                          </span>
+                        ) : (
+                          readOnly && (
+                            <Eye className="size-3.5 shrink-0 text-white/30" aria-label="somente leitura" />
+                          )
+                        )}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          );
+        })}
       </nav>
 
       <div className="relative p-3 border-t border-white/[0.06]">
