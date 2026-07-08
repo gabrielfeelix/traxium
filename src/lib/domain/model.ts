@@ -381,6 +381,10 @@ export type CleaningEvent = {
   fotos: number;
   geo?: { lat: number; lng: number };
   assinatura: boolean;
+  /** Todos os campos coletados pelo formulário dinâmico (inclui a evidência específica
+   *  do Regime D: desinfetante, dosagem, tempo de contato, eficácia, aprovação). Nada
+   *  do que a norma exige por regime é descartado. */
+  camposEvidencia?: Record<string, string | boolean | number>;
 };
 
 export const cleaningEvents: CleaningEvent[] = [
@@ -450,7 +454,9 @@ export function ultimaLimpeza(compartimentoId: string): CleaningEvent | undefine
 export type InspectionEvent = {
   id: string;
   compartimentoId: string;
-  viagemId: string;
+  /** Opcional: inspeção standalone no pátio ocorre ANTES da viagem existir (pergunta 11).
+   *  Quando vinculada a uma viagem, destrava o LCI dela. */
+  viagemId?: string;
   resultado: "aprovado" | "reprovado" | "pendente";
   itensOk: number;
   itensTotal: number;
@@ -565,6 +571,60 @@ export const NIVEL_LABEL: Record<NivelAutoridade, string> = {
   diretoria_rt: "Diretoria + Resp. Técnico + Qualidade",
   cliente: "Cliente/Embarcador (só escopo comercial)",
 };
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Papéis (RBAC) — Fase I usa: gestor/qualidade, despachante, motorista, inspetor,
+// diretoria/RT e admin de subcontratados (PLANO §3, pergunta 03).
+// Regra dura (pergunta 04): o MOTORISTA nunca libera exceção sozinho.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type Papel =
+  | "gestor"
+  | "despachante"
+  | "motorista"
+  | "inspetor"
+  | "diretoria_rt"
+  | "admin_subcontratados";
+
+export const PAPEL_LABEL: Record<Papel, string> = {
+  gestor: "Gestor GMP+/Qualidade",
+  despachante: "Despachante/Tráfego",
+  motorista: "Motorista",
+  inspetor: "Inspetor de pátio",
+  diretoria_rt: "Diretoria + Resp. Técnico",
+  admin_subcontratados: "Admin de subcontratados",
+};
+
+/** Quem pode aprovar uma exceção do nível exigido. Motorista/inspetor/despachante NUNCA. */
+export function podeAprovarExcecao(papel: Papel, nivel: NivelAutoridade): boolean {
+  if (nivel === "gestor") return papel === "gestor" || papel === "diretoria_rt";
+  if (nivel === "diretoria_rt") return papel === "diretoria_rt";
+  // "cliente" = escopo comercial (atraso/troca), nunca contaminação — fora do gate interno.
+  return false;
+}
+
+/** Ações de escrita gated por papel — usado para esconder/mostrar botões (RBAC-lite). */
+export function podeExecutar(
+  papel: Papel,
+  acao: "criarViagem" | "classificarIDTF" | "qualificarSubcontratado" | "registrarInspecao" | "registrarLimpeza" | "aprovarExcecao"
+): boolean {
+  switch (acao) {
+    case "criarViagem":
+      return papel === "despachante" || papel === "gestor" || papel === "diretoria_rt";
+    case "classificarIDTF":
+      return papel === "gestor" || papel === "diretoria_rt";
+    case "qualificarSubcontratado":
+      return papel === "gestor" || papel === "diretoria_rt" || papel === "admin_subcontratados";
+    case "registrarInspecao":
+      return papel === "inspetor" || papel === "motorista" || papel === "gestor";
+    case "registrarLimpeza":
+      return papel === "inspetor" || papel === "motorista" || papel === "gestor";
+    case "aprovarExcecao":
+      return papel === "gestor" || papel === "diretoria_rt";
+    default:
+      return false;
+  }
+}
 
 export const excecoes: Excecao[] = [
   {

@@ -10,6 +10,7 @@ import {
   Lock,
   FlaskConical,
   ShieldCheck,
+  AlertTriangle,
 } from "lucide-react";
 import { PageHeader } from "@/components/shell/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -24,8 +25,10 @@ import {
   cleaningEvents,
   compartimentos,
   findImplemento,
+  ORDEM_REGIME,
   type Regime,
 } from "@/lib/domain/model";
+import { statusCompartimento } from "@/lib/domain/rules-engine";
 import { useSession } from "@/lib/store/session";
 import { useToast } from "@/components/ui/toast";
 import { formatDate, cn } from "@/lib/utils";
@@ -88,6 +91,11 @@ export default function LimpezasPage() {
 
   const campos = REGIMES[regime].campos;
 
+  // Status atual do compartimento (recalcula ao vivo após registrar → feedback antes→depois).
+  const st = statusCompartimento(comp);
+  const regimeExigido = st.regimeExigido;
+  const insuficiente = regimeExigido != null && ORDEM_REGIME[regime] < ORDEM_REGIME[regimeExigido];
+
   const preenchido = (c: Campo): boolean => {
     const v = valores[c.id];
     if (c.tipo === "toggle") return v === true;
@@ -108,6 +116,7 @@ export default function LimpezasPage() {
 
   function registrar() {
     const s = (id: string) => (typeof valores[id] === "string" ? (valores[id] as string) : undefined);
+    const antes = statusCompartimento(comp);
     addCleaningEvent({
       compartimentoId: comp,
       regime,
@@ -121,9 +130,20 @@ export default function LimpezasPage() {
       comprovanteEstacao: valores["comprovante"] === true,
       fotos: typeof valores["fotos"] === "number" ? (valores["fotos"] as number) : 0,
       assinatura: valores["assinatura"] === true,
+      // Guarda TODOS os campos coletados — nada da evidência do Regime D é descartado.
+      camposEvidencia: { ...valores },
     });
+    const depois = statusCompartimento(comp);
     const imp = findImplemento(compartimentos.find((c) => c.id === comp)?.implementoId ?? "");
-    toast(`Limpeza Regime ${regime} registrada`, { desc: `${imp?.placa ?? ""} · status do compartimento atualizado.` });
+    const mudou = antes.status !== depois.status;
+    toast(`Limpeza Regime ${regime} registrada`, {
+      type: depois.status === "apto" ? "success" : "info",
+      desc: mudou
+        ? `${imp?.placa ?? ""} · compartimento: ${antes.label} → ${depois.label}.`
+        : depois.status === "apto"
+        ? `${imp?.placa ?? ""} · compartimento apto.`
+        : `${imp?.placa ?? ""} · segue ${depois.label} — regime aplicado não cobre o exigido.`,
+    });
     setValores({});
   }
 
@@ -183,6 +203,38 @@ export default function LimpezasPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Status atual do compartimento — feedback antes→depois no próprio lugar da ação */}
+              <div className="flex items-center gap-2 flex-wrap text-[12px]">
+                <span className="text-[hsl(210_14%_42%)]">Status agora:</span>
+                <span
+                  className={cn(
+                    "text-[11px] font-bold rounded px-1.5 py-0.5",
+                    st.status === "apto" && "bg-[hsl(142_65%_93%)] text-[hsl(142_71%_24%)]",
+                    st.status === "bloqueado" && "bg-[hsl(0_72%_94%)] text-[hsl(0_70%_38%)]",
+                    st.status === "requer_limpeza" && "bg-[hsl(36_95%_92%)] text-[hsl(24_88%_32%)]",
+                    st.status === "sem_historico" && "bg-[hsl(200_18%_94%)] text-[hsl(210_14%_42%)]"
+                  )}
+                >
+                  {st.label}
+                </span>
+                {regimeExigido && (
+                  <>
+                    <span className="text-[hsl(210_14%_42%)]">· exige</span>
+                    <RegimeBadge regime={regimeExigido} size="sm" />
+                  </>
+                )}
+              </div>
+
+              {insuficiente && (
+                <div className="rounded-lg border border-[hsl(28_92%_82%)] bg-[hsl(36_95%_98%)] p-2.5 text-[11px] text-[hsl(24_88%_32%)] flex items-start gap-1.5">
+                  <AlertTriangle className="size-3.5 mt-0.5 shrink-0" />
+                  <span>
+                    Regime {regime} é <strong>insuficiente</strong>: a última carga exige Regime {regimeExigido}. Pode registrar,
+                    mas o compartimento continuará pendente até uma limpeza compatível.
+                  </span>
+                </div>
+              )}
 
               {/* Regime info + progresso */}
               <div className="rounded-lg bg-[hsl(174_64%_97%)] border border-[hsl(176_60%_82%)] p-3">

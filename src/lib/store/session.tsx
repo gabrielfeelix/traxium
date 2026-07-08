@@ -31,9 +31,13 @@ import {
   cleaningEvents,
   inspectionEvents,
   loadHistory,
+  excecoes,
   compartimentoPorViagem,
   produtoAtualPorViagem,
   VERSAO_BASE_IDTF,
+  HOJE,
+  PAPEL_LABEL,
+  podeAprovarExcecao,
   type Cavalo,
   type Implemento,
   type Compartimento,
@@ -42,6 +46,8 @@ import {
   type InspectionEvent,
   type Regime,
   type ProdutoIDTF,
+  type Papel,
+  type Excecao,
 } from "@/lib/domain/model";
 
 let seq = 5000;
@@ -111,8 +117,13 @@ export type NovaAuditoriaInput = {
   organismo: string;
 };
 
+export type NovaExcecaoInput = Omit<Excecao, "id" | "status" | "aprovador" | "decididoEm">;
+
 type SessionCtx = {
   version: number;
+  /** Papel do usuário atual (RBAC-lite do protótipo). */
+  papel: Papel;
+  setPapel: (p: Papel) => void;
   addViagem: (i: NovaViagemInput) => string;
   addNaoConformidade: (nc: Omit<NaoConformidade, "id">) => string;
   addCavalo: (c: Omit<Cavalo, "id">) => string;
@@ -126,6 +137,9 @@ type SessionCtx = {
   addCleaningEvent: (c: Omit<CleaningEvent, "id">) => string;
   addInspectionEvent: (i: Omit<InspectionEvent, "id">) => string;
   updateViagemStatus: (viagemId: string, status: Viagem["status"]) => void;
+  addExcecao: (i: NovaExcecaoInput) => string;
+  /** Decide uma exceção. Retorna false se o papel atual não pode aprovar (gate de autoridade). */
+  decidirExcecao: (id: string, status: "aprovada" | "negada") => boolean;
   addLote: (i: NovoLoteInput) => string;
   updateLoteStatus: (id: string, status: Lote["statusDDS"]) => void;
   addFazenda: (i: NovaFazendaInput) => string;
@@ -145,6 +159,7 @@ const Ctx = createContext<SessionCtx | null>(null);
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [version, setVersion] = useState(0);
   const bump = useCallback(() => setVersion((v) => v + 1), []);
+  const [papel, setPapel] = useState<Papel>("gestor");
 
   const addViagem = useCallback<SessionCtx["addViagem"]>((i) => {
     const id = nextId("v");
@@ -261,6 +276,31 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     if (v) { v.status = status; bump(); }
   }, [bump]);
 
+  const addExcecao = useCallback<SessionCtx["addExcecao"]>((i) => {
+    const id = nextId("exc");
+    excecoes.unshift({ ...i, id, status: "pendente" });
+    bump();
+    return id;
+  }, [bump]);
+
+  const decidirExcecao = useCallback<SessionCtx["decidirExcecao"]>((id, status) => {
+    const e = excecoes.find((x) => x.id === id);
+    if (!e) return false;
+    // Gate de autoridade (pergunta 04): quem não pode aprovar, não decide. Defesa no
+    // store além de esconder o botão — impede persistir uma liberação por papel errado.
+    if (!podeAprovarExcecao(papel, e.nivelRequerido)) return false;
+    e.status = status;
+    e.aprovador = `${PAPEL_LABEL[papel]} · aprovação simulada`;
+    e.decididoEm = `${HOJE}T10:00:00`;
+    // Aprovada → destrava a viagem bloqueada (Bloqueada → Agendada).
+    if (status === "aprovada" && e.viagemId) {
+      const v = viagens.find((x) => x.id === e.viagemId);
+      if (v && v.status === "Bloqueada") { v.status = "Agendada"; v.alertas = 0; }
+    }
+    bump();
+    return true;
+  }, [papel, bump]);
+
   const addLote = useCallback<SessionCtx["addLote"]>((i) => {
     const id = nextId("l");
     const codigo = `LOT-2026-0${150 + (seq % 800)}`;
@@ -370,6 +410,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
   const value: SessionCtx = {
     version,
+    papel,
+    setPapel,
     addViagem,
     addNaoConformidade,
     addCavalo,
@@ -380,6 +422,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     addCleaningEvent,
     addInspectionEvent,
     updateViagemStatus,
+    addExcecao,
+    decidirExcecao,
     addLote,
     updateLoteStatus,
     addFazenda,

@@ -30,13 +30,14 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RegimeBadge } from "@/components/shell/status-badge";
-import { checklistsTemplates, type Checklist } from "@/lib/mock-data";
+import { checklistsTemplates, viagens, type Checklist } from "@/lib/mock-data";
 import { NovoModeloModal } from "@/components/modals/novo-modelo-modal";
 import {
   compartimentos,
   findImplemento,
   findCompartimento,
   inspectionEvents,
+  compartimentoPorViagem,
 } from "@/lib/domain/model";
 import { statusCompartimento } from "@/lib/domain/rules-engine";
 import { useSession } from "@/lib/store/session";
@@ -71,12 +72,15 @@ export default function ChecklistsPage() {
   const [modelos, setModelos] = useState<Checklist[]>(checklistsTemplates);
   const [modeloOpen, setModeloOpen] = useState(false);
   const [comp, setComp] = useState(compartimentos[0]?.id ?? "");
+  const [viagemLink, setViagemLink] = useState<string>("");
   const [cond, setCond] = useState<Record<string, Estado>>({});
   const [fotos, setFotos] = useState<Record<string, number>>({});
   const [assinatura, setAssinatura] = useState(false);
 
   const st = statusCompartimento(comp);
   const imp = findImplemento(findCompartimento(comp)?.implementoId ?? "");
+  // Viagens que usam este compartimento — para vincular a inspeção (opcional).
+  const viagensDoComp = viagens.filter((v) => compartimentoPorViagem[v.id] === comp);
 
   const anyNC = CONDICOES.some((c) => cond[c.id] === "nc");
   const allOk = CONDICOES.every((c) => cond[c.id] === "ok");
@@ -90,9 +94,10 @@ export default function ChecklistsPage() {
 
   function registrar() {
     if (resultado === "pendente") return;
+    const vinc = viagemLink || undefined;
     addInspectionEvent({
       compartimentoId: comp,
-      viagemId: "",
+      viagemId: vinc,
       resultado,
       itensOk: CONDICOES.filter((c) => cond[c.id] === "ok").length,
       itensTotal: CONDICOES.length,
@@ -100,18 +105,24 @@ export default function ChecklistsPage() {
       dataHora: "2026-07-08T10:00:00",
       offline: false,
     });
+    const codViagem = vinc ? viagens.find((v) => v.id === vinc)?.codigo : undefined;
     toast(
       resultado === "aprovado" ? "Inspeção aprovada registrada" : "Reprovação registrada",
-      { type: resultado === "reprovado" ? "error" : "success", desc: `${imp?.placa ?? ""} · registro imutável vinculado ao compartimento.` }
+      {
+        type: resultado === "reprovado" ? "error" : "success",
+        desc: vinc
+          ? `${imp?.placa ?? ""} · vinculada à viagem ${codViagem ?? ""}${resultado === "aprovado" ? " (LCI liberado)" : ""}.`
+          : `${imp?.placa ?? ""} · inspeção de pátio (sem viagem vinculada).`,
+      }
     );
-    setCond({}); setFotos({}); setAssinatura(false);
+    setCond({}); setFotos({}); setAssinatura(false); setViagemLink("");
   }
 
   return (
     <div className="space-y-6" data-v={version}>
       <PageHeader
         title="Inspeção LCI"
-        description="Loading Compartment Inspection pré-carregamento. Separa o mínimo obrigatório para liberar (condições visuais, fotos por ângulo, assinatura) da evidência complementar. Cada inspeção gera um registro imutável vinculado ao compartimento e à viagem."
+        description="Loading Compartment Inspection pré-carregamento. Separa o mínimo obrigatório para liberar (condições visuais, fotos por ângulo, assinatura) da evidência complementar. Cada inspeção gera um registro imutável vinculado ao compartimento — e à viagem quando feita em contexto de despacho."
         actions={
           <Button variant="outline" size="sm" onClick={() => toast("Modelos de checklist", { type: "info", desc: "Veja a aba Modelos." })}>
             <Copy className="size-4" /> Modelos
@@ -136,17 +147,29 @@ export default function ChecklistsPage() {
                   <CardTitle>Compartimento inspecionado</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <div>
-                    <Label className="text-[11px]">Selecionar compartimento</Label>
-                    <Select value={comp} onValueChange={setComp}>
-                      <SelectTrigger className="h-9 mt-1"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {compartimentos.map((c) => {
-                          const i = findImplemento(c.implementoId);
-                          return <SelectItem key={c.id} value={c.id}>{i?.placa} · {c.identificador}</SelectItem>;
-                        })}
-                      </SelectContent>
-                    </Select>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <Label className="text-[11px]">Selecionar compartimento</Label>
+                      <Select value={comp} onValueChange={(v) => { setComp(v); setViagemLink(""); }}>
+                        <SelectTrigger className="h-9 mt-1"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {compartimentos.map((c) => {
+                            const i = findImplemento(c.implementoId);
+                            return <SelectItem key={c.id} value={c.id}>{i?.placa} · {c.identificador}</SelectItem>;
+                          })}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-[11px]">Vincular à viagem (opcional)</Label>
+                      <Select value={viagemLink || "none"} onValueChange={(v) => setViagemLink(v === "none" ? "" : v)}>
+                        <SelectTrigger className="h-9 mt-1"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">Inspeção de pátio (sem viagem)</SelectItem>
+                          {viagensDoComp.map((v) => <SelectItem key={v.id} value={v.id}>{v.codigo} · {v.status}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                   <div className="rounded-lg bg-[hsl(174_64%_97%)] border border-[hsl(176_60%_82%)] p-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
                     <Ctx label="Implemento" value={imp?.placa ?? "—"} mono />
@@ -257,7 +280,7 @@ export default function ChecklistsPage() {
                   </Button>
 
                   <p className="text-[10px] text-[hsl(210_14%_42%)] leading-relaxed">
-                    O registro vincula-se ao compartimento e à viagem, com geo, timestamp e hash. Fica imutável após envio; correção só por retificação.
+                    O registro vincula-se ao compartimento (e à viagem, se selecionada), com geo, timestamp e hash. Fica imutável após envio; correção só por retificação.
                   </p>
                 </CardContent>
               </Card>

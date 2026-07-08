@@ -25,6 +25,7 @@ import {
   HOJE,
   type CleaningEvent,
 } from "./model";
+import { viagens } from "@/lib/mock-data";
 
 export type Tier = "BLOQUEIO" | "ALERTA" | "LIBERADO";
 
@@ -82,14 +83,18 @@ function diasAte(validade: string, refISO: string): number {
  * Avalia o carregamento de uma viagem contra o histórico do compartimento.
  * Ordem das regras segue a severidade: bloqueios primeiro, depois alertas.
  *
- * @param refISO data de referência para validade de certificados (default: saída da viagem)
+ * @param refISO data de referência para validade de certificados. Default: a data de
+ *   carregamento da própria viagem (`iniciadaEm`) — o certificado é avaliado NO MOMENTO
+ *   da viagem, não "hoje" (pergunta 20 / auditabilidade). Fallback: hoje.
  */
-export function avaliarCarregamento(viagemId: string, refISO = "2026-05-25T00:00:00"): Decisao {
+export function avaliarCarregamento(viagemId: string, refISO?: string): Decisao {
   const compartimentoId = compartimentoPorViagem[viagemId];
+  const viagem = viagens.find((v) => v.id === viagemId);
+  const ref = refISO ?? viagem?.iniciadaEm ?? `${HOJE}T00:00:00`;
   const base = {
     versaoBaseIDTF: VERSAO_BASE_IDTF,
     compartimentoId: compartimentoId ?? "—",
-    avaliadoEm: refISO,
+    avaliadoEm: ref,
   };
 
   if (!compartimentoId) {
@@ -188,7 +193,7 @@ export function avaliarCarregamento(viagemId: string, refISO = "2026-05-25T00:00
 
   // ── Regra 5: certificado GMP+ (implemento / subcontratado) ────────────────
   const certImpVencida = imp?.certGMP.status === "Vencida";
-  const subVencido = sub ? diasAte(sub.certGMP.validade, refISO) < 0 : false;
+  const subVencido = sub ? diasAte(sub.certGMP.validade, ref) < 0 : false;
   checagens.push({
     nome: "Certificação GMP+",
     ok: !certImpVencida && !subVencido,
@@ -213,11 +218,11 @@ export function avaliarCarregamento(viagemId: string, refISO = "2026-05-25T00:00
   // ── Alertas (não bloqueiam, exigem justificativa) ─────────────────────────
   const alertas: string[] = [];
   if (sub) {
-    const d = diasAte(sub.certGMP.validade, refISO);
+    const d = diasAte(sub.certGMP.validade, ref);
     if (d >= 0 && d <= 60) alertas.push(`Certificado do subcontratado vence em ${d} dias.`);
   }
   if (imp) {
-    const d = diasAte(imp.certGMP.validade, refISO);
+    const d = diasAte(imp.certGMP.validade, ref);
     if (d >= 0 && d <= 60) alertas.push(`Certificação do implemento ${imp.placa} vence em ${d} dias.`);
   }
   if (inspecao?.offline) alertas.push("Inspeção realizada offline — validar carimbo de sincronização.");

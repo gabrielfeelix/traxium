@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import {
   Gavel,
@@ -15,12 +14,15 @@ import {
   CheckCircle2,
   XCircle,
   Info,
+  Lock,
 } from "lucide-react";
 import { PageHeader } from "@/components/shell/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { excecoes, NIVEL_LABEL, type Excecao } from "@/lib/domain/model";
+import { excecoes, NIVEL_LABEL, PAPEL_LABEL, podeAprovarExcecao, type Excecao, type Papel } from "@/lib/domain/model";
+import { useSession } from "@/lib/store/session";
+import { useToast } from "@/components/ui/toast";
 import { formatDateTime, cn } from "@/lib/utils";
 
 const MATRIZ = [
@@ -51,25 +53,38 @@ const MATRIZ = [
 ];
 
 export default function ExcecoesPage() {
-  const [items, setItems] = useState<Excecao[]>(excecoes);
+  const { version, papel, decidirExcecao } = useSession();
+  const { toast } = useToast();
+  void version;
 
-  const decidir = (id: string, status: "aprovada" | "negada") =>
-    setItems((s) =>
-      s.map((e) =>
-        e.id === id
-          ? { ...e, status, aprovador: status === "aprovada" ? "Você · aprovação simulada" : undefined, decididoEm: "2026-07-08T10:00:00" }
-          : e
-      )
-    );
+  const decidir = (e: Excecao, status: "aprovada" | "negada") => {
+    const ok = decidirExcecao(e.id, status);
+    if (!ok) {
+      toast("Sem autoridade para decidir", {
+        type: "error",
+        desc: `Seu papel (${PAPEL_LABEL[papel]}) não libera exceção que exige ${NIVEL_LABEL[e.nivelRequerido]}.`,
+      });
+      return;
+    }
+    toast(status === "aprovada" ? "Exceção aprovada — viagem liberada" : "Bloqueio mantido", {
+      type: status === "aprovada" ? "success" : "info",
+      desc: status === "aprovada" ? "Trilha de autoridade registrada; viagem destravada." : "Registro na trilha de auditoria.",
+    });
+  };
 
-  const pendentes = items.filter((e) => e.status === "pendente");
-  const decididas = items.filter((e) => e.status !== "pendente");
+  const pendentes = excecoes.filter((e) => e.status === "pendente");
+  const decididas = excecoes.filter((e) => e.status !== "pendente");
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="Exceções e liberações"
         description="Quando o motor bloqueia, a liberação segue matriz de autoridade. O motorista nunca libera sozinho — apenas registra ocorrência, anexa evidência e solicita análise. Cada decisão fica na trilha de auditoria."
+        accessory={
+          <Badge variant="outline" className="text-[10px]">
+            <UserCog className="size-3" /> Você: {PAPEL_LABEL[papel]}
+          </Badge>
+        }
       />
 
       {/* Matriz de autoridade */}
@@ -121,7 +136,7 @@ export default function ExcecoesPage() {
         </h2>
         <div className="space-y-3">
           {pendentes.map((e) => (
-            <ExcecaoCard key={e.id} e={e} onDecidir={decidir} />
+            <ExcecaoCard key={e.id} e={e} papel={papel} onDecidir={decidir} />
           ))}
           {!pendentes.length && (
             <Card><CardContent className="p-6 text-center text-[13px] text-[hsl(210_14%_42%)]">Nenhuma exceção pendente.</CardContent></Card>
@@ -135,7 +150,7 @@ export default function ExcecoesPage() {
           <h2 className="text-[13px] font-semibold text-[hsl(195_30%_8%)] mb-2">Histórico de decisões</h2>
           <div className="space-y-3">
             {decididas.map((e) => (
-              <ExcecaoCard key={e.id} e={e} onDecidir={decidir} />
+              <ExcecaoCard key={e.id} e={e} papel={papel} onDecidir={decidir} />
             ))}
           </div>
         </div>
@@ -144,8 +159,9 @@ export default function ExcecoesPage() {
   );
 }
 
-function ExcecaoCard({ e, onDecidir }: { e: Excecao; onDecidir: (id: string, s: "aprovada" | "negada") => void }) {
+function ExcecaoCard({ e, papel, onDecidir }: { e: Excecao; papel: Papel; onDecidir: (e: Excecao, s: "aprovada" | "negada") => void }) {
   const critico = e.nivelRequerido === "diretoria_rt";
+  const podeDecidir = podeAprovarExcecao(papel, e.nivelRequerido);
   return (
     <Card className={cn(e.status === "pendente" && critico && "border-[hsl(0_72%_82%)]")}>
       <CardContent className="p-4">
@@ -200,14 +216,21 @@ function ExcecaoCard({ e, onDecidir }: { e: Excecao; onDecidir: (id: string, s: 
           </div>
 
           {e.status === "pendente" && (
-            <div className="flex flex-col gap-2 shrink-0">
-              <Button variant="outline" size="sm" onClick={() => onDecidir(e.id, "aprovada")}>
-                <Check className="size-4" /> Aprovar liberação
-              </Button>
-              <Button variant="destructive" size="sm" onClick={() => onDecidir(e.id, "negada")}>
-                <X className="size-4" /> Manter bloqueio
-              </Button>
-            </div>
+            podeDecidir ? (
+              <div className="flex flex-col gap-2 shrink-0">
+                <Button variant="outline" size="sm" onClick={() => onDecidir(e, "aprovada")}>
+                  <Check className="size-4" /> Aprovar liberação
+                </Button>
+                <Button variant="destructive" size="sm" onClick={() => onDecidir(e, "negada")}>
+                  <X className="size-4" /> Manter bloqueio
+                </Button>
+              </div>
+            ) : (
+              <div className="shrink-0 max-w-[170px] text-[10px] text-[hsl(210_14%_42%)] flex items-start gap-1.5 bg-[hsl(200_18%_97%)] rounded-md p-2">
+                <Lock className="size-3.5 mt-0.5 shrink-0" />
+                <span>Requer <strong>{NIVEL_LABEL[e.nivelRequerido]}</strong>. Seu papel não decide esta exceção.</span>
+              </div>
+            )
           )}
         </div>
       </CardContent>
