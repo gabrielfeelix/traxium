@@ -16,12 +16,14 @@ import {
   fazendas,
   motoristas,
   auditorias,
+  tenants,
   type Viagem,
   type NaoConformidade,
   type Lote,
   type Fazenda,
   type Motorista,
   type AuditoriaEvento,
+  type Tenant,
 } from "@/lib/mock-data";
 import {
   cavalos,
@@ -159,6 +161,8 @@ type SessionCtx = {
   impersonar: (tenantId: string, tenantName: string) => void;
   /** Encerra a impersonation e volta ao Console. */
   sairImpersonation: () => void;
+  /** Console → cria um tenant de demonstração (flag sandbox) para test users (§6). */
+  addTenant: (input: { name: string; plano?: Tenant["plano"] }) => string;
   addViagem: (i: NovaViagemInput) => string;
   addNaoConformidade: (nc: Omit<NaoConformidade, "id">) => string;
   updateNCCapa: (ncId: string, patch: Partial<NonNullable<NaoConformidade["capa"]>>) => void;
@@ -228,6 +232,25 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const sairImpersonation = useCallback(() => {
     setImpersonating(null);
     bump();
+  }, [bump]);
+
+  const addTenant = useCallback<SessionCtx["addTenant"]>((input) => {
+    const id = nextId("tnt");
+    tenants.push({
+      id,
+      name: input.name,
+      cnpj: "00.000.000/0001-00",
+      cidade: "Sandbox",
+      uf: "MT",
+      plano: input.plano ?? "Profissional",
+      certificacaoGMP: true,
+      certificacaoEUDR: false,
+      motoristas: 0,
+      caminhoes: 0,
+      sandbox: true,
+    });
+    bump();
+    return id;
   }, [bump]);
 
   // Impersonation força a superfície B; senão deriva de (accountType, papel).
@@ -534,6 +557,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     impersonating,
     impersonar,
     sairImpersonation,
+    addTenant,
     addViagem,
     addNaoConformidade,
     updateNCCapa,

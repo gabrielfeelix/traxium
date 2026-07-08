@@ -12,6 +12,8 @@ export type Tenant = {
   motoristas: number;
   caminhoes: number;
   logo?: string;
+  /** Tenant de demonstração criado pelo Console (§6) — semeado, descartável. */
+  sandbox?: boolean;
 };
 
 export const tenants: Tenant[] = [
