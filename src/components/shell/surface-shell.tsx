@@ -8,7 +8,7 @@
 // A/C/D/E ignoram `children` (rotas do back-office) e renderizam a própria superfície.
 
 import { useRouter } from "next/navigation";
-import { ShieldAlert, Sparkles, X } from "lucide-react";
+import { ShieldAlert, X } from "lucide-react";
 import { Sidebar } from "@/components/shell/sidebar";
 import { Topbar } from "@/components/shell/topbar";
 import { useSession } from "@/lib/store/session";
@@ -28,7 +28,7 @@ export function SurfaceShell({ children }: { children: React.ReactNode }) {
 
 function BackOfficeShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { impersonating, isMaster, sairImpersonation } = useSession();
+  const { impersonating, sairImpersonation } = useSession();
   return (
     <div className="flex min-h-screen bg-[hsl(180_14%_97%)]">
       <Sidebar />
@@ -52,16 +52,6 @@ function BackOfficeShell({ children }: { children: React.ReactNode }) {
             >
               <X className="size-3" /> Sair da impersonation
             </button>
-          </div>
-        )}
-
-        {/* Rótulo do modo apresentação (§2 · A0) — sempre visível quando Master. */}
-        {isMaster && !impersonating && (
-          <div className="flex items-center gap-2 border-b border-[hsl(38_80%_70%)] bg-[hsl(45_92%_95%)] px-6 py-1.5 text-[hsl(38_70%_30%)]">
-            <Sparkles className="size-3.5 shrink-0" />
-            <p className="text-[11px] font-semibold leading-tight">
-              Modo apresentação — tudo liberado. Não é papel de produção.
-            </p>
           </div>
         )}
 
