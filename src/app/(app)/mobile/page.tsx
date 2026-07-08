@@ -23,6 +23,9 @@ import {
   Hash,
   ImageOff,
   Lock,
+  Navigation,
+  Droplets,
+  Clock,
 } from "lucide-react";
 import { PageHeader } from "@/components/shell/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -30,7 +33,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 
-type Screen = "login" | "home" | "viagem" | "checklist" | "foto" | "bloqueio" | "sync";
+type Screen = "login" | "home" | "viagem" | "checklist" | "foto" | "bloqueio" | "sync" | "lavagem";
 
 const CHECK_ITENS = [
   "Compartimento varrido e seco",
@@ -119,9 +122,10 @@ export default function MobilePreviewPage() {
                 <div className="h-full pt-[44px]">
                   {screen === "home" && <HomeScreen onSelect={setScreen} online={online} synced={synced} check={check} />}
                   {screen === "viagem" && <ViagemScreen onBack={() => setScreen("home")} onChecklist={() => setScreen("checklist")} />}
-                  {screen === "checklist" && <ChecklistScreen check={check} setCheck={setCheck} onBack={() => setScreen("viagem")} onFoto={() => setScreen("foto")} />}
+                  {screen === "checklist" && <ChecklistScreen check={check} setCheck={setCheck} onBack={() => setScreen("viagem")} onFoto={() => setScreen("foto")} onEnviar={() => setScreen("sync")} />}
                   {screen === "foto" && <FotoScreen fotos={fotos} onCapturar={capturarFoto} onBack={() => setScreen("checklist")} />}
-                  {screen === "bloqueio" && <BloqueioScreen onBack={() => setScreen("home")} />}
+                  {screen === "bloqueio" && <BloqueioScreen onBack={() => setScreen("home")} onLavagem={() => setScreen("lavagem")} />}
+                  {screen === "lavagem" && <LavagemScreen onBack={() => setScreen("bloqueio")} />}
                   {screen === "sync" && <SyncScreen online={online} synced={synced} check={check} fotos={fotos} onSync={sincronizar} onBack={() => setScreen("home")} />}
                   {screen === "login" && <LoginScreen onLogin={() => setScreen("home")} />}
                 </div>
@@ -442,8 +446,9 @@ function InfoRow({ label, value, sub, mono }: { label: string; value: string; su
   );
 }
 
-function ChecklistScreen({ check, setCheck, onBack, onFoto }: { check: boolean[]; setCheck: (f: (c: boolean[]) => boolean[]) => void; onBack: () => void; onFoto: () => void }) {
+function ChecklistScreen({ check, setCheck, onBack, onFoto, onEnviar }: { check: boolean[]; setCheck: (f: (c: boolean[]) => boolean[]) => void; onBack: () => void; onFoto: () => void; onEnviar: () => void }) {
   const feitos = check.filter(Boolean).length;
+  const completo = feitos === CHECK_ITENS.length;
   const pct = Math.round((feitos / CHECK_ITENS.length) * 100);
   const toggle = (i: number) => setCheck((c) => c.map((v, idx) => (idx === i ? !v : v)));
   return (
@@ -487,12 +492,21 @@ function ChecklistScreen({ check, setCheck, onBack, onFoto }: { check: boolean[]
             </button>
           );
         })}
-        <button
-          onClick={onFoto}
-          className="w-full mt-2 bg-gradient-to-r from-[hsl(176_84%_25%)] to-[hsl(200_92%_28%)] text-white font-bold py-3.5 rounded-xl text-[13px] flex items-center justify-center gap-2 shadow-brand-md active:scale-[0.98] transition-transform"
-        >
-          <Camera className="size-4" /> Câmera com GPS
-        </button>
+        {completo ? (
+          <button
+            onClick={onEnviar}
+            className="w-full mt-2 bg-gradient-to-r from-[hsl(142_71%_32%)] to-[hsl(160_71%_30%)] text-white font-bold py-3.5 rounded-xl text-[13px] flex items-center justify-center gap-2 shadow-brand-md active:scale-[0.98] transition-transform"
+          >
+            <CheckCircle2 className="size-4" /> Enviar inspeção
+          </button>
+        ) : (
+          <button
+            onClick={onFoto}
+            className="w-full mt-2 bg-gradient-to-r from-[hsl(176_84%_25%)] to-[hsl(200_92%_28%)] text-white font-bold py-3.5 rounded-xl text-[13px] flex items-center justify-center gap-2 shadow-brand-md active:scale-[0.98] transition-transform"
+          >
+            <Camera className="size-4" /> Câmera com GPS
+          </button>
+        )}
       </div>
     </div>
   );
@@ -590,7 +604,7 @@ function FotoScreen({ fotos, onCapturar, onBack }: { fotos: number; onCapturar: 
   );
 }
 
-function BloqueioScreen({ onBack }: { onBack: () => void }) {
+function BloqueioScreen({ onBack, onLavagem }: { onBack: () => void; onLavagem: () => void }) {
   return (
     <div className="h-full bg-white flex flex-col overflow-y-auto">
       <div className="bg-gradient-to-br from-[hsl(0_78%_50%)] to-[hsl(0_70%_38%)] text-white p-5 relative">
@@ -634,12 +648,98 @@ function BloqueioScreen({ onBack }: { onBack: () => void }) {
           </ol>
         </div>
 
-        <button className="w-full bg-gradient-to-r from-[hsl(176_84%_25%)] to-[hsl(200_92%_28%)] text-white font-bold py-3.5 rounded-xl text-[13px] shadow-brand-md flex items-center justify-center gap-2">
+        <button
+          onClick={onLavagem}
+          className="w-full bg-gradient-to-r from-[hsl(176_84%_25%)] to-[hsl(200_92%_28%)] text-white font-bold py-3.5 rounded-xl text-[13px] shadow-brand-md flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+        >
           <MapPin className="size-4" /> Ver pontos de lavagem próximos
         </button>
-        <button className="w-full bg-white border-2 border-[hsl(200_18%_85%)] text-[hsl(195_30%_8%)] font-bold py-3 rounded-xl text-[13px] flex items-center justify-center gap-2">
+        <a href="tel:+5566999999999" className="w-full bg-white border-2 border-[hsl(200_18%_85%)] text-[hsl(195_30%_8%)] font-bold py-3 rounded-xl text-[13px] flex items-center justify-center gap-2 active:scale-[0.98] transition-transform">
           <Phone className="size-4" /> Falar com despachante
+        </a>
+      </div>
+    </div>
+  );
+}
+
+function LavagemScreen({ onBack }: { onBack: () => void }) {
+  const estacoes = [
+    { nome: "Lava-Jato Rota do Grão", dist: "2,3 km", regime: "Regime D certificado", aberto: true, hora: "24h", top: "38%", left: "30%" },
+    { nome: "Estação AgroClean", dist: "5,1 km", regime: "Regime C / D", aberto: true, hora: "06–22h", top: "58%", left: "66%" },
+    { nome: "Posto Trevo · Higienização", dist: "8,7 km", regime: "Regime D", aberto: false, hora: "fecha 18:00", top: "22%", left: "72%" },
+  ];
+  return (
+    <div className="h-full bg-white flex flex-col overflow-y-auto">
+      <div className="bg-gradient-to-br from-[hsl(180_80%_18%)] to-[hsl(200_92%_24%)] text-white p-5 relative">
+        <button onClick={onBack} className="text-white/80 mb-2 flex items-center gap-1 text-[12px] font-semibold">
+          <ArrowLeft className="size-4" /> Voltar
         </button>
+        <div className="flex items-center gap-2">
+          <Droplets className="size-5" />
+          <h2 className="text-[18px] font-bold">Pontos de lavagem</h2>
+        </div>
+        <p className="text-[12px] text-white/80 mt-1">Estações que fazem Regime D perto de você · Sorriso/MT</p>
+      </div>
+
+      {/* Mapa mock (offline, só CSS) */}
+      <div className="relative h-[220px] bg-[hsl(90_20%_92%)] overflow-hidden shrink-0">
+        {/* "terreno" */}
+        <div className="absolute inset-0" style={{ background: "radial-gradient(circle at 30% 40%, hsl(140 25% 88%), transparent 45%), radial-gradient(circle at 70% 60%, hsl(200 30% 88%), transparent 40%)" }} />
+        {/* estradas */}
+        <div className="absolute top-1/2 left-0 right-0 h-2.5 bg-white/80 -rotate-6 shadow-sm" />
+        <div className="absolute top-0 bottom-0 left-[45%] w-2.5 bg-white/80 rotate-3 shadow-sm" />
+        <div className="absolute top-[20%] left-0 right-0 h-1.5 bg-white/60 rotate-12" />
+        {/* grid sutil */}
+        <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: "linear-gradient(hsl(0 0% 0%) 1px, transparent 1px), linear-gradient(90deg, hsl(0 0% 0%) 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
+
+        {/* Você (centro, pulsando) */}
+        <div className="absolute" style={{ top: "50%", left: "48%", transform: "translate(-50%,-50%)" }}>
+          <span className="absolute inset-0 -m-2 rounded-full bg-[hsl(200_92%_45%)]/30 animate-ping" />
+          <span className="relative block size-3.5 rounded-full bg-[hsl(200_92%_36%)] ring-2 ring-white shadow" />
+        </div>
+
+        {/* pins das estações */}
+        {estacoes.map((e, i) => (
+          <div key={i} className="absolute -translate-x-1/2 -translate-y-full flex flex-col items-center" style={{ top: e.top, left: e.left }}>
+            <div className={cn("size-7 rounded-full flex items-center justify-center text-white shadow-md ring-2 ring-white", e.aberto ? "bg-[hsl(176_84%_28%)]" : "bg-[hsl(210_10%_55%)]")}>
+              <Droplets className="size-3.5" />
+            </div>
+            <div className="size-1.5 rotate-45 bg-white -mt-1 shadow" />
+          </div>
+        ))}
+      </div>
+
+      {/* lista */}
+      <div className="p-3 space-y-2 flex-1">
+        {estacoes.map((e, i) => (
+          <div key={i} className="rounded-xl border-2 border-[hsl(200_18%_90%)] p-3 flex items-start gap-3">
+            <div className={cn("size-9 rounded-lg flex items-center justify-center text-white shrink-0", e.aberto ? "bg-[hsl(176_84%_28%)]" : "bg-[hsl(210_10%_55%)]")}>
+              <Droplets className="size-4" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[14px] font-bold leading-tight">{e.nome}</p>
+              <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[hsl(180_80%_18%)] bg-[hsl(174_64%_94%)] rounded px-1.5 py-0.5">
+                  <CheckCircle2 className="size-2.5" /> {e.regime}
+                </span>
+                <span className={cn("inline-flex items-center gap-1 text-[10px] font-bold rounded px-1.5 py-0.5", e.aberto ? "text-[hsl(142_71%_24%)] bg-[hsl(142_65%_94%)]" : "text-[hsl(24_88%_32%)] bg-[hsl(36_95%_92%)]")}>
+                  <Clock className="size-2.5" /> {e.aberto ? "Aberto" : "Fechado"} · {e.hora}
+                </span>
+              </div>
+              <p className="text-[11px] text-[hsl(210_14%_42%)] mt-1 num">{e.dist} de você</p>
+            </div>
+            <a
+              href="https://www.google.com/maps/dir/?api=1&destination=-12.53,-55.70"
+              target="_blank"
+              rel="noreferrer"
+              className="size-9 rounded-full bg-[hsl(176_84%_25%)] text-white flex items-center justify-center shadow-md active:scale-95 transition-transform shrink-0"
+              aria-label="Traçar rota"
+            >
+              <Navigation className="size-4" />
+            </a>
+          </div>
+        ))}
+        <p className="text-[10px] text-[hsl(210_12%_58%)] text-center pt-1">Mapa ilustrativo do protótipo · pontos e distâncias fictícios.</p>
       </div>
     </div>
   );
