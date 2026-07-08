@@ -971,3 +971,64 @@ function SyncItem({ t, sub, estado }: { t: string; sub: string; estado: EstadoSy
     </div>
   );
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MotoristaFlow — a SUPERFÍCIE C real (full-screen), não o preview emoldurado.
+// Reusa exatamente as mesmas telas do simulador acima; a diferença é o container:
+// aqui o app É a tela (coluna mobile centrada), sem phone frame e sem back-office.
+// Consumido por AppCampo quando o papel é `motorista` (PLANO-PERFIS §2 · C1).
+// ─────────────────────────────────────────────────────────────────────────────
+export function MotoristaFlow() {
+  const { toast } = useToast();
+  const [screen, setScreen] = useState<Screen>("home");
+  const [online, setOnline] = useState(false);
+  const [check, setCheck] = useState<boolean[]>([true, true, true, false, false, false, false]);
+  const [fotos, setFotos] = useState(0);
+  const [synced, setSynced] = useState(false);
+
+  const capturarFoto = () =>
+    setFotos((f) => {
+      const n = Math.min(6, f + 1);
+      if (n >= 6) setCheck((c) => c.map((v, i) => (i === 5 ? true : v)));
+      return n;
+    });
+  const sincronizar = () => {
+    if (!online || synced) return;
+    setSynced(true);
+    toast("Sincronizado com sucesso", { desc: "Itens enviados ao servidor e travados para edição." });
+  };
+  const toggleOnline = () => setOnline((o) => { if (o) setSynced(false); return !o; });
+
+  return (
+    <div className="mx-auto flex min-h-[100dvh] w-full max-w-[440px] flex-col bg-white shadow-2xl">
+      {/* Barra de status (não é o phone frame — é o topo do app real) */}
+      <div className="flex h-[38px] shrink-0 items-center justify-between px-6 pt-1.5 text-[11px] font-semibold">
+        <span className="num flex items-center gap-1">
+          09:42
+          {!online && <span className="text-[9px] font-bold uppercase tracking-wide text-[hsl(28_92%_48%)]">offline</span>}
+        </span>
+        <button
+          onClick={toggleOnline}
+          title="Toque para simular o sinal (offline-first)"
+          className="flex items-center gap-1"
+        >
+          <Signal className="size-3" />
+          {online ? <Wifi className="size-3" /> : <WifiOff className="size-3 text-[hsl(28_92%_48%)]" />}
+          <Battery className="size-3.5" />
+        </button>
+      </div>
+
+      <div className="min-h-0 flex-1">
+        {screen === "home" && <HomeScreen onSelect={setScreen} online={online} synced={synced} check={check} />}
+        {screen === "viagem" && <ViagemScreen onBack={() => setScreen("home")} onChecklist={() => setScreen("checklist")} />}
+        {screen === "checklist" && <ChecklistScreen check={check} setCheck={setCheck} onBack={() => setScreen("viagem")} onFoto={() => setScreen("foto")} onAssinar={() => setScreen("assinatura")} onEnviar={() => setScreen("sync")} />}
+        {screen === "foto" && <FotoScreen fotos={fotos} onCapturar={capturarFoto} onBack={() => setScreen("checklist")} />}
+        {screen === "assinatura" && <AssinaturaScreen onConfirm={() => { setCheck((c) => c.map((v, i) => (i === 6 ? true : v))); setScreen("checklist"); }} onBack={() => setScreen("checklist")} />}
+        {screen === "bloqueio" && <BloqueioScreen onBack={() => setScreen("home")} onLavagem={() => setScreen("lavagem")} />}
+        {screen === "lavagem" && <LavagemScreen onBack={() => setScreen("bloqueio")} />}
+        {screen === "sync" && <SyncScreen online={online} synced={synced} check={check} fotos={fotos} onSync={sincronizar} onBack={() => setScreen("home")} />}
+        {screen === "login" && <LoginScreen onLogin={() => setScreen("home")} />}
+      </div>
+    </div>
+  );
+}

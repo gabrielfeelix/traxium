@@ -1,43 +1,29 @@
 "use client";
 
 // Superfície C — App de campo (tenant_user + papel de campo). "O sistema muda
-// inteiramente": sem sidebar, sem back-office, sem desktop. Motorista e Inspetor.
-// Este é o esqueleto full-screen; o fluxo real (checklist/foto/limpeza/assinatura/
-// sync · inspeção LCI) entra em T5, reusando a base de /mobile.
+// inteiramente": sem sidebar, sem back-office, sem desktop. O papel decide o app:
+//   motorista → fluxo do §2·C1 (viagem → checklist → foto → limpeza → assinatura → sync)
+//   inspetor  → fluxo do §2·C2 (fila → LCI tri-state + 6 ângulos → aprovar/reprovar → NC)
+// Ambos são full-screen e reusam a base de /mobile (MotoristaFlow) e /checklists.
 
-import { Truck, ClipboardCheck } from "lucide-react";
+import { MotoristaFlow } from "@/app/(app)/mobile/page";
+import { InspetorFlow } from "@/components/mobile/inspetor-flow";
 import { SurfacePerfilMenu } from "@/components/shell/surface-perfil-menu";
 import { useSession } from "@/lib/store/session";
-import { PERFIL_POR_ID } from "@/lib/domain/model";
 
 export function AppCampo() {
-  const { papel, perfilId } = useSession();
+  const { papel } = useSession();
   const inspetor = papel === "inspetor";
-  const Icon = inspetor ? ClipboardCheck : Truck;
   return (
-    <div className="min-h-screen bg-[hsl(202_45%_10%)] text-white flex flex-col">
-      {/* Controle de demo pra sair do fluxo / trocar de perfil. Num app real não existe. */}
-      <div className="flex items-center justify-between px-4 pt-4">
-        <span className="text-[10px] uppercase tracking-[0.16em] text-white/40 font-bold">
+    <div className="min-h-[100dvh] bg-[hsl(202_45%_9%)]">
+      {/* Faixa de demo (num app real não existe) — deixa você "virar" outro perfil e voltar. */}
+      <div className="mx-auto flex h-11 max-w-[440px] items-center justify-between px-3">
+        <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">
           Traxium · App de campo
         </span>
         <SurfacePerfilMenu tone="dark" />
       </div>
-
-      <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
-        <div className="size-16 rounded-2xl bg-white/[0.06] border border-white/10 flex items-center justify-center text-[hsl(176_84%_60%)]">
-          <Icon className="size-8" />
-        </div>
-        <h1 className="mt-5 text-[24px] font-bold tracking-[-0.01em]">
-          {inspetor ? "Aguardando inspeção" : "Minha próxima viagem"}
-        </h1>
-        <p className="mt-2 max-w-xs text-[13px] text-white/60 leading-relaxed">
-          {PERFIL_POR_ID[perfilId].label} · esta é a superfície C. Sem sidebar, sem back-office.
-        </p>
-        <p className="mt-6 rounded-lg border border-dashed border-white/15 px-4 py-2 text-[11px] text-white/45">
-          Fluxo operável completo entra em T5.
-        </p>
-      </div>
+      {inspetor ? <InspetorFlow /> : <MotoristaFlow />}
     </div>
   );
 }
