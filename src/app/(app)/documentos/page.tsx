@@ -6,7 +6,6 @@ import {
   Search,
   Upload,
   Download,
-  Folder,
   MoreHorizontal,
   Check,
   X,
@@ -26,6 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ExpiryHorizon } from "@/components/kit/expiry-horizon";
 import { documentos, type Documento } from "@/lib/mock-data";
 import { nivelVencimento } from "@/lib/domain/model";
@@ -87,14 +87,9 @@ export default function DocumentosPage() {
         title="Documentos"
         description="Repositório central de certificados, políticas, procedimentos, DDS, relatórios de auditoria e materiais de treinamento."
         actions={
-          <>
-            <Button variant="outline" size="sm" onClick={() => toast("Pastas", { type: "info", desc: "Organização por tipo de documento." })}>
-              <Folder className="size-4" /> Pastas
-            </Button>
-            <Button variant="gradient" size="sm" onClick={() => setEnviarOpen(true)}>
-              <Upload className="size-4" /> Enviar documento
-            </Button>
-          </>
+          <Button variant="gradient" size="sm" onClick={() => setEnviarOpen(true)}>
+            <Upload className="size-4" /> Enviar documento
+          </Button>
         }
       />
 
@@ -246,12 +241,34 @@ export default function DocumentosPage() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
-                          <Button variant="ghost" size="icon-sm" onClick={() => toast(`Baixando ${d.nome}`, { desc: `${d.tipo} · ${d.tamanho}` })}>
+                          <Button variant="ghost" size="icon-sm" aria-label={`Baixar ${d.nome}`} onClick={() => toast(`Baixando ${d.nome}`, { desc: `${d.tipo} · ${d.tamanho}` })}>
                             <Download className="size-4" />
                           </Button>
-                          <Button variant="ghost" size="icon-sm" onClick={() => toast(d.nome, { type: "info", desc: `Autor: ${d.autor}` })}>
-                            <MoreHorizontal className="size-4" />
-                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon-sm" aria-label={`Mais ações: ${d.nome}`}>
+                                <MoreHorizontal className="size-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setDocs((cur) => cur.map((x) => (x.id === d.id ? { ...x, vigente: !x.vigente } : x)));
+                                  toast(d.vigente ? "Documento arquivado" : "Documento restaurado", { desc: d.nome });
+                                }}
+                              >
+                                {d.vigente ? "Arquivar" : "Restaurar como vigente"}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  navigator.clipboard?.writeText(d.nome);
+                                  toast("Nome copiado", { desc: d.nome });
+                                }}
+                              >
+                                Copiar nome
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       </TableCell>
                     </TableRow>

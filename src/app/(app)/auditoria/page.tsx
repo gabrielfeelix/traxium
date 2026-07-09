@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   AlertOctagon,
 } from "lucide-react";
+import { useState } from "react";
 import { PageHeader } from "@/components/shell/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -69,8 +70,8 @@ function prontidao() {
 }
 
 export default function AuditoriaPage() {
-  const { toast } = useToast();
   const { version } = useSession();
+  const [aba, setAba] = useState<string>("programadas");
   const programada = auditorias.find((a) => a.status === "Programada");
   return (
     <div className="space-y-6" data-v={version}>
@@ -79,7 +80,7 @@ export default function AuditoriaPage() {
         description="Auditorias GMP+ FSA, EUDR, internas e de clientes compradores. Programe, prepare e arquive cada ciclo de verificação."
         actions={
           <>
-            <Button variant="outline" size="sm" onClick={() => toast("Histórico de auditorias", { type: "info", desc: `${auditorias.length} ciclos registrados.` })}>
+            <Button variant="outline" size="sm" onClick={() => setAba("historico")}>
               <Download className="size-4" /> Histórico
             </Button>
             <ProgramarAuditoriaModal />
@@ -139,7 +140,7 @@ export default function AuditoriaPage() {
         );
       })()}
 
-      <Tabs defaultValue="programadas">
+      <Tabs value={aba} onValueChange={setAba}>
         <TabsList>
           <TabsTrigger value="programadas">Programadas</TabsTrigger>
           <TabsTrigger value="historico">Histórico</TabsTrigger>

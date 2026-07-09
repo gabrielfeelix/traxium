@@ -25,6 +25,15 @@ import { useToast } from "@/components/ui/toast";
 import { useState, Fragment } from "react";
 import { cn } from "@/lib/utils";
 import { ConvidarUsuarioModal, type Convidado } from "@/components/modals/convidar-usuario-modal";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+const PAPEIS_EQUIPE = ["Admin", "Compliance", "Operação", "Auditor (acesso limitado)"] as const;
 import { navigation } from "@/components/shell/sidebar";
 import { PAPEL_LABEL, type Papel } from "@/lib/domain/model";
 import { useSession } from "@/lib/store/session";
@@ -305,9 +314,35 @@ export default function ConfiguracoesPage() {
                       <Badge variant={u.papel === "Owner" ? "default" : "outline"} className="text-[10px]">
                         {u.papel}
                       </Badge>
-                      <Button variant="ghost" size="sm">
-                        Gerenciar
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" disabled={u.papel === "Owner"}>
+                            Gerenciar
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          {PAPEIS_EQUIPE.filter((p) => p !== u.papel).map((p) => (
+                            <DropdownMenuItem
+                              key={p}
+                              onClick={() => {
+                                setEquipe((cur) => cur.map((x, xi) => (xi === i ? { ...x, papel: p } : x)));
+                                toast("Papel alterado", { desc: `${u.nome} → ${p}` });
+                              }}
+                            >
+                              Tornar {p}
+                            </DropdownMenuItem>
+                          ))}
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setEquipe((cur) => cur.filter((_, xi) => xi !== i));
+                              toast("Usuário removido", { type: "error", desc: u.nome });
+                            }}
+                          >
+                            Remover da equipe
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   ))}
                 </CardContent>

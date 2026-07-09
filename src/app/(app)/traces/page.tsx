@@ -16,15 +16,33 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatTile } from "@/components/kit/stat-tile";
 import { MonitorConexao } from "@/components/traces/monitor-conexao";
-import { traceNTLogs } from "@/lib/mock-data";
+import { useState } from "react";
+import { traceNTLogs, type TraceLog } from "@/lib/mock-data";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 
 export default function TracesPage() {
   const { toast } = useToast();
+  // Re-sincronizações disparadas nesta sessão entram no monitor de verdade.
+  const [extras, setExtras] = useState<TraceLog[]>([]);
+  const logs = [...traceNTLogs, ...extras];
+
+  function resync() {
+    const n = extras.length + 1;
+    const novo: TraceLog = {
+      ts: `2026-07-08T11:${String(n).padStart(2, "0")}:00`,
+      direcao: "out",
+      evento: `StatusQuery · re-sincronização manual #${n}`,
+      payload: `Reference: TRX-NT-${99820 + n}`,
+      status: "Accepted",
+      latenciaMs: 190 + n * 7,
+    };
+    setExtras((cur) => [...cur, novo]);
+    toast("Fila SOAP re-sincronizada", { desc: `StatusQuery enviado — resposta em ${novo.latenciaMs}ms.` });
+  }
 
   // KPIs derivados do log real do gateway — nada chumbado.
-  const saidas = traceNTLogs.filter((l) => l.direcao === "out");
+  const saidas = logs.filter((l) => l.direcao === "out");
   const latMedia = Math.round(saidas.reduce((acc, l) => acc + l.latenciaMs, 0) / Math.max(saidas.length, 1));
   const sucesso = Math.round((saidas.filter((l) => l.status !== "Rejected").length / Math.max(saidas.length, 1)) * 100);
   const ddsEnviadas = saidas.filter((l) => l.evento.startsWith("SubmitDDS")).length;
@@ -36,7 +54,7 @@ export default function TracesPage() {
         description="Integração M2M com o portal da Comissão Europeia para submissão automática de Declarações de Devida Diligência (DDS). Protocolo SOAP com WS-Security."
         actions={
           <>
-            <Button variant="outline" size="sm" onClick={() => toast("Re-sincronizar com TRACES NT", { type: "info", desc: "Reprocessamento da fila SOAP — em breve." })}>
+            <Button variant="outline" size="sm" onClick={resync}>
               <RefreshCw className="size-4" /> Re-sincronizar
             </Button>
             <Button variant="gradient" size="sm" onClick={() => toast("Conexão OK", { desc: "Handshake WS-Security bem-sucedido." })}>
@@ -91,7 +109,7 @@ export default function TracesPage() {
       </div>
 
       {/* Momento-assinatura: o log SOAP como sequência bidirecional Traxium ↔ CE. */}
-      <MonitorConexao logs={traceNTLogs} />
+      <MonitorConexao logs={logs} />
 
       <Tabs defaultValue="config">
         <TabsList>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   Search,
   Send,
@@ -23,6 +23,15 @@ import { StatTile } from "@/components/kit/stat-tile";
 import { SequenceRail, type RailStepDef } from "@/components/kit/sequence-rail";
 import { lotes, type Lote } from "@/lib/mock-data";
 import { OrigensMap } from "@/components/map/origens-map-dynamic";
+import { Sheet, SheetContent, SheetHeader, SheetBody, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { downloadJSON } from "@/lib/export";
+
+// Biblioteca de modelos DDS por país — estrutura pronta para o gateway.
+const MODELOS_DDS = [
+  { pais: "Holanda (NL)", schema: "EUDR_DueDiligenceStatement_v1.2", operador: "Cargill BV — Rotterdam", hs: "1201.90" },
+  { pais: "Alemanha (DE)", schema: "EUDR_DueDiligenceStatement_v1.2", operador: "ADM Hamburg GmbH", hs: "1201.90" },
+  { pais: "Bélgica (BE)", schema: "EUDR_DueDiligenceStatement_v1.2", operador: "Vanden Avenne — Gent", hs: "2304.00" },
+];
 import { NovoLoteModal } from "@/components/modals/novo-lote-modal";
 import { useSession } from "@/lib/store/session";
 import { useToast } from "@/components/ui/toast";
@@ -62,7 +71,15 @@ export default function LotesPage() {
   const [search, setSearch] = useState("");
   // Herói master-detalhe: lote selecionado alimenta o painel de origens.
   const [sel, setSel] = useState<string | null>(() => lotes[0]?.id ?? null);
+  const [modelosOpen, setModelosOpen] = useState(false);
+  const heroiRef = useRef<HTMLElement | null>(null);
   const loteSel = lotes.find((l) => l.id === sel) ?? lotes[0];
+
+  /** Olhinho da tabela: seleciona o lote no herói e rola até ele. */
+  function verLote(id: string) {
+    setSel(id);
+    heroiRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
   const filtered = lotes.filter(
     (l) =>
       l.codigo.toLowerCase().includes(search.toLowerCase()) ||
@@ -83,7 +100,7 @@ export default function LotesPage() {
         description="Lotes de exportação para a União Europeia. Cada lote agrega cargas de fazendas verificadas e gera uma Declaração de Devida Diligência transmitida via gateway TRACES NT (SOAP/WS-Security)."
         actions={
           <>
-            <Button variant="outline" size="sm" onClick={() => toast("Modelos DDS", { type: "info", desc: "Biblioteca de modelos por país destino — em breve." })}>
+            <Button variant="outline" size="sm" onClick={() => setModelosOpen(true)}>
               <FileText className="size-4" /> Modelos DDS
             </Button>
             <NovoLoteModal />
@@ -99,7 +116,7 @@ export default function LotesPage() {
       </div>
 
       {/* Momento-assinatura: o ciclo DDS de cada lote como rail + origens do selecionado. */}
-      <section className="rounded-xl border border-border-soft bg-bg-elev shadow-brand-sm p-5">
+      <section ref={heroiRef} className="rounded-xl border border-border-soft bg-bg-elev shadow-brand-sm p-5 scroll-mt-4">
         <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-fg">Ciclo DDS por lote</h2>
         <p className="text-[12px] text-fg-muted leading-snug mt-0.5 mb-4 max-w-2xl">
           Onde cada declaração está no caminho Rascunho → Pronto → Enviado → Aprovado. Clique num lote
@@ -257,7 +274,7 @@ export default function LotesPage() {
                           <Send className="size-3.5" /> Enviar
                         </Button>
                       )}
-                      <Button variant="ghost" size="icon-sm" onClick={() => toast(l.codigo, { type: "info", desc: `${l.fazendas.length} origem(ns) · ${l.destinatarioFinal}` })}>
+                      <Button variant="ghost" size="icon-sm" aria-label={`Ver ${l.codigo} no ciclo DDS`} onClick={() => verLote(l.id)}>
                         <Eye className="size-3.5" />
                       </Button>
                     </div>
@@ -305,6 +322,46 @@ export default function LotesPage() {
           ))}
         </CardContent>
       </Card>
+
+      {/* Biblioteca de modelos DDS — download real da estrutura por país. */}
+      <Sheet open={modelosOpen} onOpenChange={setModelosOpen}>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>Modelos DDS por país destino</SheetTitle>
+            <SheetDescription>
+              Estruturas prontas no schema oficial da CE — baixe e use como base da declaração.
+            </SheetDescription>
+          </SheetHeader>
+          <SheetBody className="space-y-2">
+            {MODELOS_DDS.map((m) => (
+              <div key={m.pais} className="flex items-center gap-3 p-3 rounded-lg border border-border-soft">
+                <FileText className="size-4 text-brand-500 shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] font-semibold">{m.pais}</p>
+                  <p className="text-[10px] font-mono text-fg-muted truncate">{m.schema} · HS {m.hs}</p>
+                  <p className="text-[10px] text-fg-soft truncate">{m.operador}</p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    downloadJSON(`modelo-dds-${m.pais.slice(-3, -1).toLowerCase()}`, {
+                      schema: m.schema,
+                      paisDestino: m.pais,
+                      operador: m.operador,
+                      hsCode: m.hs,
+                      campos: { lote: "", toneladas: 0, fazendas: [], poligonos: [], dataColheita: "" },
+                    });
+                    toast("Modelo baixado", { desc: `${m.pais} · ${m.schema}` });
+                  }}
+                >
+                  Baixar
+                </Button>
+              </div>
+            ))}
+          </SheetBody>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

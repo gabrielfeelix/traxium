@@ -32,6 +32,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RegimeBadge } from "@/components/shell/status-badge";
 import { checklistsTemplates, viagens, type Checklist } from "@/lib/mock-data";
 import { NovoModeloModal } from "@/components/modals/novo-modelo-modal";
+import { Sheet, SheetContent, SheetHeader, SheetBody, SheetFooter, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import {
   compartimentos,
   findImplemento,
@@ -86,6 +87,8 @@ export default function ChecklistsPage() {
   const { toast } = useToast();
   const [modelos, setModelos] = useState<Checklist[]>(checklistsTemplates);
   const [modeloOpen, setModeloOpen] = useState(false);
+  // Editor de modelo em painel lateral — salva no estado de verdade.
+  const [editando, setEditando] = useState<Checklist | null>(null);
   const [comp, setComp] = useState(compartimentos[0]?.id ?? "");
   const [viagemLink, setViagemLink] = useState<string>("");
   const [cond, setCond] = useState<Record<string, Estado>>({});
@@ -431,7 +434,7 @@ export default function ChecklistsPage() {
                   </div>
                   <p className="text-[10px] text-fg-soft mb-3">Última revisão: {formatDate(ck.ultimaRevisao)}</p>
                   <div className="flex items-center gap-1">
-                    <Button variant="outline" size="sm" className="flex-1 h-8" onClick={() => toast("Edição de modelo", { type: "info", desc: "Editor de modelos — em breve." })}><FileEdit className="size-3.5" /> Editar</Button>
+                    <Button variant="outline" size="sm" className="flex-1 h-8" onClick={() => setEditando(ck)}><FileEdit className="size-3.5" /> Editar</Button>
                     <Button
                       variant="outline" size="sm" className="h-8"
                       onClick={() => {
@@ -466,6 +469,24 @@ export default function ChecklistsPage() {
         </TabsContent>
       </Tabs>
 
+      {/* Editor de modelo — painel lateral com salvamento real no estado. */}
+      <Sheet open={!!editando} onOpenChange={(o) => { if (!o) setEditando(null); }}>
+        <SheetContent>
+          {editando && (
+            <EditorModelo
+              key={editando.id}
+              modelo={editando}
+              onSave={(patch) => {
+                setModelos((cur) => cur.map((x) => (x.id === editando.id ? { ...x, ...patch, ultimaRevisao: "2026-07-08" } : x)));
+                toast("Modelo atualizado", { desc: patch.titulo });
+                setEditando(null);
+              }}
+              onCancel={() => setEditando(null)}
+            />
+          )}
+        </SheetContent>
+      </Sheet>
+
       <NovoModeloModal
         open={modeloOpen}
         onOpenChange={setModeloOpen}
@@ -477,6 +498,72 @@ export default function ChecklistsPage() {
         }
       />
     </div>
+  );
+}
+
+function EditorModelo({
+  modelo,
+  onSave,
+  onCancel,
+}: {
+  modelo: Checklist;
+  onSave: (patch: Pick<Checklist, "titulo" | "tipo" | "itens" | "obrigatorio">) => void;
+  onCancel: () => void;
+}) {
+  const [titulo, setTitulo] = useState(modelo.titulo);
+  const [tipo, setTipo] = useState(modelo.tipo);
+  const [itens, setItens] = useState(modelo.itens);
+  const [obrigatorio, setObrigatorio] = useState(modelo.obrigatorio);
+  return (
+    <>
+      <SheetHeader>
+        <SheetTitle>Editar modelo</SheetTitle>
+        <SheetDescription>
+          {modelo.fonteNormativa} · última revisão {formatDate(modelo.ultimaRevisao)}
+        </SheetDescription>
+      </SheetHeader>
+      <SheetBody className="space-y-4">
+        <div>
+          <Label className="text-[11px]">Título</Label>
+          <Input value={titulo} onChange={(e) => setTitulo(e.target.value)} className="h-9 mt-1" />
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <Label className="text-[11px]">Tipo</Label>
+            <Select value={tipo} onValueChange={(v) => setTipo(v as Checklist["tipo"])}>
+              <SelectTrigger className="h-9 mt-1"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {(["LCI Pré-carregamento", "LCI Pós-descarregamento", "Inspeção de Carreta", "Higienização Compartimento"] as const).map((t) => (
+                  <SelectItem key={t} value={t}>{t}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label className="text-[11px]">Nº de itens</Label>
+            <Input
+              type="number" min={1} value={itens}
+              onChange={(e) => setItens(Math.max(1, Number(e.target.value) || 1))}
+              className="h-9 mt-1"
+            />
+          </div>
+        </div>
+        <div className="flex items-center justify-between p-2.5 rounded-lg border border-border-soft">
+          <Label htmlFor="obrig" className="text-[13px] cursor-pointer">Obrigatório para liberação</Label>
+          <Switch id="obrig" checked={obrigatorio} onCheckedChange={setObrigatorio} />
+        </div>
+      </SheetBody>
+      <SheetFooter>
+        <Button variant="outline" size="sm" onClick={onCancel}>Cancelar</Button>
+        <Button
+          variant="gradient" size="sm"
+          disabled={!titulo.trim()}
+          onClick={() => onSave({ titulo: titulo.trim(), tipo, itens, obrigatorio })}
+        >
+          Salvar modelo
+        </Button>
+      </SheetFooter>
+    </>
   );
 }
 

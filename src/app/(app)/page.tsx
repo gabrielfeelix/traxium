@@ -119,10 +119,7 @@ export default function DashboardPage() {
                 {PERIODOS.map((p) => (
                   <DropdownMenuItem
                     key={p}
-                    onSelect={() => {
-                      setPeriodo(p);
-                      toast(`Período: ${p}`, { type: "info", desc: "Recorte de período (dados do protótipo não recalculam)." });
-                    }}
+                    onSelect={() => setPeriodo(p)}
                   >
                     {p}
                   </DropdownMenuItem>

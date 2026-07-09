@@ -34,6 +34,9 @@ import { CadastrarMotoristaModal } from "@/components/modals/cadastrar-motorista
 import { AgendarTreinamentoModal } from "@/components/modals/agendar-treinamento-modal";
 import { RenovarCertificacaoModal, type RenovarTarget } from "@/components/modals/renovar-certificacao-modal";
 import { Credencial } from "@/components/motoristas/credencial";
+import { Sheet, SheetContent, SheetHeader, SheetBody, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { viagens, type Motorista } from "@/lib/mock-data";
+import Link from "next/link";
 
 const confClass = (n: number) =>
   n >= 95 ? "text-success-700" : n >= 80 ? "text-warning-700" : "text-danger-700";
@@ -47,6 +50,8 @@ export default function MotoristasPage() {
   const [renovarTarget, setRenovarTarget] = useState<RenovarTarget | null>(null);
   // Herói conectado ao detalhe: clicar numa credencial foca o motorista na tabela.
   const [foco, setFoco] = useState<string | null>(null);
+  // "Detalhes"/"Histórico" do kebab abrem o dossiê do motorista em painel lateral.
+  const [detalhe, setDetalhe] = useState<Motorista | null>(null);
   function abrirTreino(pre: string[]) { setTreinoPre(pre); setTreinoOpen(true); }
   const filtered = motoristas.filter((m) =>
     foco ? m.id === foco : m.nome.toLowerCase().includes(search.toLowerCase())
@@ -228,14 +233,14 @@ export default function MotoristasPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => toast(m.nome, { type: "info", desc: `${m.tipo} · ${m.cidade}/${m.uf} · ${m.totalViagens} viagens` })}>Detalhes</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => setDetalhe(m)}>Detalhes</DropdownMenuItem>
                               <DropdownMenuItem onClick={() => window.open(`https://wa.me/55${m.telefone.replace(/\D/g, "")}`, "_blank", "noopener")}>
                                 <Phone className="size-4" /> Contatar
                               </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => abrirTreino([m.id])}>
                                 <GraduationCap className="size-4" /> Agendar treinamento
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => toast(`Histórico de ${m.nome}`, { type: "info", desc: `${m.totalViagens} viagens registradas` })}>Histórico de viagens</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => setDetalhe(m)}>Histórico de viagens</DropdownMenuItem>
                               <DropdownMenuItem onClick={() => setRenovarTarget({ kind: "motorista", id: m.id, nome: m.nome, certs: m.certificacoes })}>Renovar certificação</DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -262,6 +267,64 @@ export default function MotoristasPage() {
 
       <AgendarTreinamentoModal open={treinoOpen} onOpenChange={setTreinoOpen} preselect={treinoPre} />
       <RenovarCertificacaoModal open={!!renovarTarget} onOpenChange={(o) => { if (!o) setRenovarTarget(null); }} target={renovarTarget} />
+
+      {/* Dossiê do motorista: credencial + histórico real de viagens. */}
+      <Sheet open={!!detalhe} onOpenChange={(o) => { if (!o) setDetalhe(null); }}>
+        <SheetContent>
+          {detalhe && (
+            <>
+              <SheetHeader>
+                <SheetTitle>{detalhe.nome}</SheetTitle>
+                <SheetDescription>
+                  {detalhe.tipo} · {detalhe.cidade}/{detalhe.uf} · letramento digital {detalhe.letramentoDigital.toLowerCase()}
+                </SheetDescription>
+              </SheetHeader>
+              <SheetBody className="space-y-4">
+                <Credencial
+                  m={detalhe}
+                  selecionado={false}
+                  onFocar={() => { setFoco(detalhe.id); setDetalhe(null); }}
+                  onTreinar={() => { setDetalhe(null); abrirTreino([detalhe.id]); }}
+                  onRenovar={() => { setDetalhe(null); setRenovarTarget({ kind: "motorista", id: detalhe.id, nome: detalhe.nome, certs: detalhe.certificacoes }); }}
+                />
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.12em] font-bold text-fg-muted mb-2">
+                    Histórico de viagens
+                  </p>
+                  {(() => {
+                    const doMotorista = viagens.filter((v) => v.motorista === detalhe.nome);
+                    return doMotorista.length ? (
+                      <div className="space-y-1.5">
+                        {doMotorista.map((v) => (
+                          <Link
+                            key={v.id}
+                            href={`/viagens/${v.id}`}
+                            className="flex items-center gap-3 p-2.5 rounded-lg border border-border-soft hover:border-brand-500/40 hover:bg-brand-50/40 transition-colors"
+                          >
+                            <div className="flex-1 min-w-0">
+                              <p className="font-mono text-[12px] font-semibold text-brand-700">{v.codigo}</p>
+                              <p className="text-[10px] text-fg-muted truncate">
+                                {v.produto} · {v.origem.split("·")[0].trim()} → {v.destino.split("·")[0].trim()}
+                              </p>
+                            </div>
+                            <StatusBadge status={v.status} size="sm" />
+                            <span className={cn("text-[12px] font-bold num", confClass(v.conformidade))}>{v.conformidade}%</span>
+                          </Link>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-[12px] text-fg-muted">
+                        Nenhuma viagem registrada no recorte do protótipo — total histórico:{" "}
+                        <span className="num font-semibold">{detalhe.totalViagens}</span>.
+                      </p>
+                    );
+                  })()}
+                </div>
+              </SheetBody>
+            </>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
