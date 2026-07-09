@@ -14,6 +14,8 @@ import {
   AlertTriangle,
   Sparkles,
   Layers3,
+  XCircle,
+  CheckCircle2,
 } from "lucide-react";
 import { NovaViagemModal } from "@/components/modals/nova-viagem-modal";
 import { useSession } from "@/lib/store/session";
@@ -36,8 +38,49 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { StatusBadge, RegimeBadge } from "@/components/shell/status-badge";
 import { StatTile } from "@/components/kit/stat-tile";
-import { viagens, filialDaViagem, pertenceAFilial } from "@/lib/mock-data";
-import { formatDateTime, cn } from "@/lib/utils";
+import { SequenceRail, type RailStepDef } from "@/components/kit/sequence-rail";
+import { RegimeDisc } from "@/components/kit/regime";
+import { viagens, filialDaViagem, pertenceAFilial, type Viagem } from "@/lib/mock-data";
+import { compartimentoPorViagem, ORDEM_REGIME } from "@/lib/domain/model";
+import type { Decisao } from "@/lib/domain/rules-engine";
+import { formatDate, formatDateTime, cn } from "@/lib/utils";
+
+const TIER_PESO = { BLOQUEIO: 0, ALERTA: 1, LIBERADO: 2 } as const;
+
+const confClass = (n: number) =>
+  n >= 90 ? "text-success-700" : n >= 70 ? "text-warning-700" : "text-danger-700";
+
+/** Rail T-3 da viagem: cargas antigas → determinante → portão de regime → veredito do motor. */
+function railSteps(v: Viagem, d: Decisao): RailStepDef[] {
+  const cargas = [...v.cargasAnteriores].slice(0, 3).reverse(); // mais antiga → determinante
+  const steps: RailStepDef[] = cargas.map((c, i) => ({
+    key: `t${i}`,
+    titulo: c.produto,
+    sub: formatDate(c.data),
+    tone: i === cargas.length - 1 ? "brand" : "neutro",
+  }));
+  const gateOk = !!(
+    d.regimeAplicado && d.regimeExigido &&
+    ORDEM_REGIME[d.regimeAplicado] >= ORDEM_REGIME[d.regimeExigido]
+  );
+  steps.push({
+    key: "regime",
+    titulo: `Regime ${d.regimeExigido ?? "—"}`,
+    sub: d.regimeAplicado ? `aplicado ${d.regimeAplicado}` : "sem limpeza",
+    marcador: d.regimeExigido ? <RegimeDisc regime={d.regimeExigido} className="size-5 text-[10px]" /> : undefined,
+    tone: gateOk ? "ok" : "falha",
+    quebraAntes: d.regra === "Carga anterior proibida",
+  });
+  steps.push({
+    key: "veredito",
+    titulo: d.tier === "BLOQUEIO" ? "Bloqueio" : d.tier === "ALERTA" ? "Alerta" : "Liberado",
+    sub: d.regra,
+    tone: d.tier === "BLOQUEIO" ? "falha" : d.tier === "ALERTA" ? "atencao" : "ok",
+    atual: d.tier === "BLOQUEIO",
+    quebraAntes: d.tier === "BLOQUEIO",
+  });
+  return steps;
+}
 
 export default function ViagensPage() {
   const { version, filialId } = useSession();
@@ -46,11 +89,20 @@ export default function ViagensPage() {
   const [statusFilter, setStatusFilter] = useState<string>("todos");
   const [regimeFilter, setRegimeFilter] = useState<string>("todos");
   const [view, setView] = useState<"tabela" | "cards">("tabela");
+  // Herói conectado ao detalhe: clicar num rail foca a viagem na tabela.
+  const [foco, setFoco] = useState<string | null>(null);
 
   // Re-escopo por filial (§5) — a lista e os contadores mudam com a filial ativa.
   const escopadas = viagens.filter((v) => pertenceAFilial(filialId, filialDaViagem(v)));
 
+  // Fila de decisão: viagens avaliáveis pelo motor, mais graves primeiro.
+  const fila = escopadas
+    .filter((v) => compartimentoPorViagem[v.id])
+    .map((v) => ({ v, d: avaliarCarregamento(v.id) }))
+    .sort((a, b) => TIER_PESO[a.d.tier] - TIER_PESO[b.d.tier]);
+
   const filtered = escopadas.filter((v) => {
+    if (foco) return v.id === foco;
     const matchSearch =
       v.codigo.toLowerCase().includes(search.toLowerCase()) ||
       v.motorista.toLowerCase().includes(search.toLowerCase()) ||
@@ -101,6 +153,54 @@ export default function ViagensPage() {
         <StatTile icon={Calendar} label="Concluídas (7d)" value={counts.concluida} hint="100% conformidade" tone="success" />
       </div>
 
+      {/* Momento-assinatura: a sequência que decide cada carregamento, mais graves primeiro. */}
+      {fila.length > 0 && (
+        <section className="rounded-xl border border-border-soft bg-bg-elev shadow-brand-sm p-5">
+          <div className="flex items-start justify-between gap-3 flex-wrap">
+            <div>
+              <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-fg">Fila de decisão T-3</h2>
+              <p className="text-[12px] text-fg-muted leading-snug mt-0.5 max-w-2xl">
+                As três cargas anteriores puxam o regime exigido pela IDTF; o motor fecha o veredito.
+                Clique numa viagem para focá-la na tabela.
+              </p>
+            </div>
+            {foco && (
+              <Button variant="outline" size="sm" onClick={() => setFoco(null)}>
+                <XCircle className="size-3.5" /> Limpar foco
+              </Button>
+            )}
+          </div>
+          <div className="mt-3 space-y-1">
+            {fila.map(({ v, d }) => (
+              <button
+                key={v.id}
+                type="button"
+                aria-pressed={foco === v.id}
+                onClick={() => setFoco(foco === v.id ? null : v.id)}
+                className={cn(
+                  "w-full grid grid-cols-1 lg:grid-cols-[170px_minmax(0,1fr)_54px] items-center gap-2 lg:gap-4 rounded-md px-2.5 py-2 text-left transition-colors",
+                  foco === v.id ? "bg-brand-50 ring-1 ring-brand-500/40" : "hover:bg-bg"
+                )}
+              >
+                <div className="min-w-0">
+                  <p className="font-mono text-[12px] font-semibold text-brand-700 leading-tight">{v.codigo}</p>
+                  <p className="text-[10px] text-fg-muted truncate">{v.motorista}</p>
+                </div>
+                <SequenceRail steps={railSteps(v, d)} />
+                <span className={cn("text-[12px] font-bold num lg:text-right", confClass(v.conformidade))}>
+                  {v.conformidade}%
+                </span>
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center gap-3 flex-wrap mt-3 pt-3 border-t border-border-soft text-[9px] font-semibold uppercase tracking-[0.1em] text-fg-muted">
+            <span className="inline-flex items-center gap-1"><XCircle className="size-3 text-danger-500" /> Bloqueio</span>
+            <span className="inline-flex items-center gap-1"><AlertTriangle className="size-3 text-warning-500" /> Alerta</span>
+            <span className="inline-flex items-center gap-1"><CheckCircle2 className="size-3 text-success-500" /> Liberado</span>
+          </div>
+        </section>
+      )}
+
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-3 flex-wrap pb-3">
           <div className="flex items-center gap-2 flex-1 min-w-[240px]">
@@ -147,7 +247,7 @@ export default function ViagensPage() {
                 onClick={() => setView("tabela")}
                 className={cn(
                   "px-2.5 py-1 text-[11px] font-semibold rounded-[5px] transition-colors",
-                  view === "tabela" ? "bg-[hsl(176_84%_25%)] text-white" : "text-fg-muted hover:bg-bg"
+                  view === "tabela" ? "bg-brand-600 text-white" : "text-fg-muted hover:bg-bg"
                 )}
               >
                 Tabela
@@ -156,7 +256,7 @@ export default function ViagensPage() {
                 onClick={() => setView("cards")}
                 className={cn(
                   "px-2.5 py-1 text-[11px] font-semibold rounded-[5px] transition-colors",
-                  view === "cards" ? "bg-[hsl(176_84%_25%)] text-white" : "text-fg-muted hover:bg-bg"
+                  view === "cards" ? "bg-brand-600 text-white" : "text-fg-muted hover:bg-bg"
                 )}
               >
                 <Layers3 className="size-3 inline mr-1" /> Cards
@@ -186,7 +286,7 @@ export default function ViagensPage() {
                   <TableRow key={v.id}>
                     <TableCell>
                       <Link href={`/viagens/${v.id}`} className="block">
-                        <p className="font-mono text-[12px] font-semibold text-[hsl(180_80%_18%)] hover:underline">
+                        <p className="font-mono text-[12px] font-semibold text-brand-700 hover:underline">
                           {v.codigo}
                         </p>
                         <p className="text-[10px] text-fg-soft mt-0.5 font-mono">
@@ -216,28 +316,18 @@ export default function ViagensPage() {
                       <div className="inline-flex items-center gap-1.5">
                         <div className="w-12 h-1 rounded-full bg-bg overflow-hidden">
                           <div
-                            className="h-full rounded-full"
-                            style={{
-                              width: `${v.conformidade}%`,
-                              background:
-                                v.conformidade >= 90
-                                  ? "linear-gradient(90deg, hsl(176 84% 30%), hsl(142 71% 36%))"
-                                  : v.conformidade >= 70
-                                  ? "linear-gradient(90deg, hsl(36 95% 50%), hsl(24 88% 42%))"
-                                  : "linear-gradient(90deg, hsl(0 78% 50%), hsl(0 70% 38%))",
-                            }}
+                            className={cn(
+                              "h-full rounded-full bg-gradient-to-r",
+                              v.conformidade >= 90
+                                ? "from-brand-500 to-success-500"
+                                : v.conformidade >= 70
+                                ? "from-warning-500 to-warning-700"
+                                : "from-danger-500 to-danger-700"
+                            )}
+                            style={{ width: `${v.conformidade}%` }}
                           />
                         </div>
-                        <span
-                          className={cn(
-                            "text-[13px] font-bold num min-w-[36px] text-right",
-                            v.conformidade >= 90
-                              ? "text-[hsl(142_71%_24%)]"
-                              : v.conformidade >= 70
-                              ? "text-[hsl(24_88%_32%)]"
-                              : "text-[hsl(0_70%_38%)]"
-                          )}
-                        >
+                        <span className={cn("text-[13px] font-bold num min-w-[36px] text-right", confClass(v.conformidade))}>
                           {v.conformidade}%
                         </span>
                       </div>
@@ -291,13 +381,13 @@ export default function ViagensPage() {
                   className={cn(
                     "block rounded-lg border p-4 transition-all hover:shadow-brand-md",
                     v.status === "Bloqueada"
-                      ? "border-[hsl(0_72%_80%)] bg-[hsl(0_72%_98%)]"
-                      : "border-border-soft hover:border-[hsl(176_60%_60%)]"
+                      ? "border-danger-500/40 bg-danger-50/50"
+                      : "border-border-soft hover:border-brand-500/50"
                   )}
                 >
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <div>
-                      <p className="font-mono text-[12px] font-semibold text-[hsl(180_80%_18%)]">{v.codigo}</p>
+                      <p className="font-mono text-[12px] font-semibold text-brand-700">{v.codigo}</p>
                       <p className="text-[10px] text-fg-soft mt-0.5 font-mono">
                         {v.cavalo} · {v.carreta}
                       </p>
@@ -314,16 +404,7 @@ export default function ViagensPage() {
                   </p>
                   <div className="mt-3 pt-3 border-t border-border-soft flex items-center justify-between">
                     <span className="text-[11px] text-fg-muted num">{formatDateTime(v.iniciadaEm)}</span>
-                    <span
-                      className={cn(
-                        "text-[14px] font-bold num",
-                        v.conformidade >= 90
-                          ? "text-[hsl(142_71%_24%)]"
-                          : v.conformidade >= 70
-                          ? "text-[hsl(24_88%_32%)]"
-                          : "text-[hsl(0_70%_38%)]"
-                      )}
-                    >
+                    <span className={cn("text-[14px] font-bold num", confClass(v.conformidade))}>
                       {v.conformidade}%
                     </span>
                   </div>
