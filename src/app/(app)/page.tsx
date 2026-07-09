@@ -59,11 +59,26 @@ import {
 } from "recharts";
 import { formatDateTime, cn } from "@/lib/utils";
 import { HOJE, diasEntre } from "@/lib/domain/model";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+const confClass = (n: number) =>
+  n >= 90 ? "text-success-700" : n >= 70 ? "text-warning-700" : "text-danger-700";
+
+/** Só o último ponto da série ganha marcador — o "onde estamos agora". */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const dotUltimo = (cor: string, lastIdx: number) => (props: any) => {
+  const { cx, cy, index } = props;
+  if (index !== lastIdx) return <g key={index} />;
+  return (
+    <g key={index}>
+      <circle cx={cx} cy={cy} r={7} fill={cor} opacity={0.15} />
+      <circle cx={cx} cy={cy} r={4} fill={cor} stroke="var(--color-bg-elev)" strokeWidth={2} />
+    </g>
+  );
+};
 import { NovaViagemModal } from "@/components/modals/nova-viagem-modal";
 import { ProgramarAuditoriaModal } from "@/components/modals/programar-auditoria-modal";
 import { useSession } from "@/lib/store/session";
-import { useToast } from "@/components/ui/toast";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -75,8 +90,12 @@ const PERIODOS = ["Últimos 7 dias", "Últimos 30 dias", "Últimos 90 dias", "Tu
 
 export default function DashboardPage() {
   const { version, filialId } = useSession();
-  const { toast } = useToast();
   const [periodo, setPeriodo] = useState("Últimos 30 dias");
+  // Dispara as animações de entrada (barras de regime) após a hidratação.
+  const [pronto, setPronto] = useState(false);
+  useEffect(() => setPronto(true), []);
+  const ultimoConf = conformidadeChart[conformidadeChart.length - 1];
+  const lastIdx = conformidadeChart.length - 1;
   const proximaAuditoria = auditorias.find((a) => a.status === "Programada");
   // Re-escopo por filial (§5) — KPIs de viagem e a lista recente seguem a filial ativa.
   const viagensEscopadas = viagens.filter((v) => pertenceAFilial(filialId, filialDaViagem(v)));
@@ -183,39 +202,75 @@ export default function DashboardPage() {
                 <CardDescription>GMP+ FSA e maturidade EUDR · 6 meses</CardDescription>
               </div>
               <div className="flex items-center gap-3 text-[11px]">
-                <Legend color="hsl(176 84% 25%)" label="GMP+ FSA" value="97.8%" />
-                <Legend color="hsl(200 90% 36%)" label="EUDR" value="88.0%" />
+                <Legend color="var(--color-brand-600)" label="GMP+ FSA" value={`${ultimoConf.gmpPlus}%`} />
+                <Legend color="var(--color-sky-500)" label="EUDR" value={`${ultimoConf.eudr}%`} />
               </div>
             </div>
           </CardHeader>
           <CardContent className="pt-2">
             <ResponsiveContainer width="100%" height={240}>
-              <AreaChart data={conformidadeChart} margin={{ top: 10, right: 10, bottom: 0, left: -20 }}>
+              <AreaChart data={conformidadeChart} margin={{ top: 10, right: 14, bottom: 0, left: -20 }}>
                 <defs>
                   <linearGradient id="gmp" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(176 84% 25%)" stopOpacity={0.32} />
-                    <stop offset="95%" stopColor="hsl(176 84% 25%)" stopOpacity={0} />
+                    <stop offset="0%" stopColor="var(--color-brand-500)" stopOpacity={0.42} />
+                    <stop offset="45%" stopColor="var(--color-brand-500)" stopOpacity={0.14} />
+                    <stop offset="100%" stopColor="var(--color-brand-500)" stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="eudr" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(200 90% 36%)" stopOpacity={0.25} />
-                    <stop offset="95%" stopColor="hsl(200 90% 36%)" stopOpacity={0} />
+                    <stop offset="0%" stopColor="var(--color-sky-500)" stopOpacity={0.3} />
+                    <stop offset="45%" stopColor="var(--color-sky-500)" stopOpacity={0.1} />
+                    <stop offset="100%" stopColor="var(--color-sky-500)" stopOpacity={0} />
                   </linearGradient>
+                  {/* Traço com sombra da marca — profundidade sem poluir */}
+                  <filter id="glowGmp" x="-20%" y="-40%" width="140%" height="200%">
+                    <feDropShadow dx="0" dy="4" stdDeviation="5" floodColor="var(--color-brand-600)" floodOpacity="0.28" />
+                  </filter>
+                  <filter id="glowEudr" x="-20%" y="-40%" width="140%" height="200%">
+                    <feDropShadow dx="0" dy="4" stdDeviation="5" floodColor="var(--color-sky-500)" floodOpacity="0.22" />
+                  </filter>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(200 18% 92%)" vertical={false} />
-                <XAxis dataKey="data" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "hsl(210 14% 42%)" }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "hsl(210 14% 42%)" }} domain={[50, 100]} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-soft)" vertical={false} />
+                <XAxis dataKey="data" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "var(--color-fg-muted)" }} dy={4} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "var(--color-fg-muted)" }} domain={[50, 100]} />
                 <Tooltip
                   contentStyle={{
-                    background: "white",
-                    border: "1px solid hsl(200 18% 92%)",
-                    borderRadius: 8,
+                    background: "var(--color-bg-elev)",
+                    border: "1px solid var(--color-border-soft)",
+                    borderRadius: 10,
                     fontSize: 12,
-                    boxShadow: "0 4px 20px hsl(200 40% 20% / 0.1)",
+                    boxShadow: "0 8px 28px hsl(200 40% 20% / 0.14)",
                   }}
-                  cursor={{ stroke: "hsl(176 84% 25%)", strokeDasharray: "3 3" }}
+                  cursor={{ stroke: "var(--color-brand-500)", strokeDasharray: "4 4", strokeOpacity: 0.5 }}
                 />
-                <Area type="monotone" dataKey="gmpPlus" stroke="hsl(176 84% 25%)" strokeWidth={2.5} fill="url(#gmp)" />
-                <Area type="monotone" dataKey="eudr" stroke="hsl(200 90% 36%)" strokeWidth={2.5} fill="url(#eudr)" />
+                <Area
+                  type="monotone"
+                  dataKey="eudr"
+                  name="EUDR"
+                  stroke="var(--color-sky-500)"
+                  strokeWidth={2.5}
+                  strokeLinecap="round"
+                  fill="url(#eudr)"
+                  filter="url(#glowEudr)"
+                  dot={dotUltimo("var(--color-sky-500)", lastIdx)}
+                  activeDot={{ r: 4.5, strokeWidth: 2, stroke: "var(--color-bg-elev)" }}
+                  animationDuration={1300}
+                  animationEasing="ease-out"
+                />
+                <Area
+                  type="monotone"
+                  dataKey="gmpPlus"
+                  name="GMP+ FSA"
+                  stroke="var(--color-brand-600)"
+                  strokeWidth={2.5}
+                  strokeLinecap="round"
+                  fill="url(#gmp)"
+                  filter="url(#glowGmp)"
+                  dot={dotUltimo("var(--color-brand-600)", lastIdx)}
+                  activeDot={{ r: 4.5, strokeWidth: 2, stroke: "var(--color-bg-elev)" }}
+                  animationDuration={1300}
+                  animationBegin={150}
+                  animationEasing="ease-out"
+                />
               </AreaChart>
             </ResponsiveContainer>
           </CardContent>
@@ -290,30 +345,30 @@ export default function DashboardPage() {
                 key={v.id}
                 href={`/viagens/${v.id}`}
                 className={cn(
-                  "block rounded-lg border p-3 transition-all hover:shadow-brand-sm",
+                  "group block rounded-lg border p-3 transition-all hover:shadow-brand-md hover:-translate-y-px",
                   v.status === "Bloqueada"
-                    ? "border-[hsl(0_72%_80%)] bg-[hsl(0_72%_98%)] hover:border-[hsl(0_78%_60%)]"
-                    : "border-[hsl(200_18%_92%)] hover:border-[hsl(176_60%_60%)] hover:bg-[hsl(174_64%_99%)]"
+                    ? "border-danger-500/40 bg-danger-50/40 hover:border-danger-500/60"
+                    : "border-border-soft hover:border-brand-500/50 hover:bg-brand-50/30"
                 )}
               >
                 <div className="flex items-start gap-3">
                   <div
                     className={cn(
-                      "size-9 rounded-md flex items-center justify-center shrink-0",
+                      "size-9 rounded-md flex items-center justify-center shrink-0 transition-transform group-hover:scale-105",
                       v.status === "Bloqueada"
-                        ? "bg-[hsl(0_72%_94%)] text-[hsl(0_70%_38%)]"
-                        : "bg-gradient-to-br from-[hsl(176_84%_28%)] to-[hsl(200_92%_28%)] text-white"
+                        ? "bg-danger-50 text-danger-700"
+                        : "bg-gradient-to-br from-brand-600 to-sky-600 text-white"
                     )}
                   >
                     <Truck className="size-4" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
-                      <span className="font-mono text-[11px] font-semibold text-[hsl(195_30%_8%)]">{v.codigo}</span>
+                      <span className="font-mono text-[11px] font-semibold text-fg">{v.codigo}</span>
                       <StatusBadge status={v.status} size="sm" />
                       <RegimeBadge regime={v.regimeLimpeza} size="sm" />
                       {v.alertas > 0 && (
-                        <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-[hsl(0_70%_38%)]">
+                        <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-danger-700">
                           <AlertTriangle className="size-2.5" />
                           {v.alertas}
                         </span>
@@ -321,29 +376,21 @@ export default function DashboardPage() {
                     </div>
                     <p className="text-[13px] font-medium truncate">
                       {v.motorista}
-                      <span className="text-[hsl(210_14%_42%)] font-normal"> · {v.produto}</span>
+                      <span className="text-fg-muted font-normal"> · {v.produto}</span>
                     </p>
-                    <p className="text-[11px] text-[hsl(210_12%_58%)] truncate mt-0.5">
+                    <p className="text-[11px] text-fg-soft truncate mt-0.5">
                       {v.origem.split("·")[0].trim()} → {v.destino.split("·")[0].trim()}
                     </p>
                   </div>
                   <div className="text-right shrink-0">
-                    <p
-                      className={cn(
-                        "text-[18px] font-bold num leading-none",
-                        v.conformidade >= 90
-                          ? "text-[hsl(142_71%_24%)]"
-                          : v.conformidade >= 70
-                          ? "text-[hsl(24_88%_32%)]"
-                          : "text-[hsl(0_70%_38%)]"
-                      )}
-                    >
+                    <p className={cn("text-[18px] font-bold num leading-none", confClass(v.conformidade))}>
                       {v.conformidade}%
                     </p>
-                    <p className="text-[10px] text-[hsl(210_14%_42%)] uppercase tracking-wider font-semibold mt-1">
+                    <p className="text-[10px] text-fg-muted uppercase tracking-wider font-semibold mt-1">
                       conf.
                     </p>
                   </div>
+                  <ChevronRight className="size-4 self-center shrink-0 text-fg-soft opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 group-hover:text-brand-600 transition-all" aria-hidden />
                 </div>
               </Link>
             ))}
@@ -396,13 +443,13 @@ export default function DashboardPage() {
             <CardDescription>Distribuição IDTF · últimos 30 dias</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3.5">
-            {regimesDistribuicao.map((r) => {
+            {regimesDistribuicao.map((r, i) => {
               const regimeLetter = r.regime.charAt(7) as "A" | "B" | "C" | "D";
-              const colors = {
-                A: "linear-gradient(90deg, hsl(176 84% 30%), hsl(142 71% 36%))",
-                B: "linear-gradient(90deg, hsl(48 95% 50%), hsl(38 90% 45%))",
-                C: "linear-gradient(90deg, hsl(36 95% 50%), hsl(24 88% 42%))",
-                D: "linear-gradient(90deg, hsl(0 78% 50%), hsl(0 70% 38%))",
+              const barra: Record<"A" | "B" | "C" | "D", string> = {
+                A: "bg-gradient-to-r from-brand-500 to-success-500",
+                B: "bg-gradient-to-r from-warning-500/60 to-warning-500",
+                C: "bg-gradient-to-r from-warning-500 to-warning-700",
+                D: "bg-gradient-to-r from-danger-500 to-danger-700",
               };
               return (
                 <div key={r.regime}>
@@ -410,17 +457,21 @@ export default function DashboardPage() {
                     <RegimeBadge regime={regimeLetter} size="sm" />
                     <div className="flex items-baseline gap-1.5">
                       <span className="text-[14px] font-bold num">{r.quantidade}</span>
-                      <span className="text-[10px] text-[hsl(210_14%_42%)] num">({r.percentual}%)</span>
+                      <span className="text-[10px] text-fg-muted num">({r.percentual}%)</span>
                     </div>
                   </div>
-                  <div className="h-1.5 rounded-full bg-[hsl(200_18%_94%)] overflow-hidden">
-                    <div className="h-full rounded-full" style={{ width: `${r.percentual}%`, background: colors[regimeLetter] }} />
+                  <div className="h-1.5 rounded-full bg-bg overflow-hidden">
+                    {/* Cresce em cascata na entrada — largura anima de 0 ao percentual */}
+                    <div
+                      className={cn("h-full rounded-full transition-[width] duration-700 ease-out", barra[regimeLetter])}
+                      style={{ width: pronto ? `${r.percentual}%` : "0%", transitionDelay: `${i * 130}ms` }}
+                    />
                   </div>
                 </div>
               );
             })}
-            <div className="mt-4 p-2.5 rounded-md bg-[hsl(174_64%_97%)] border border-[hsl(176_60%_85%)]">
-              <p className="text-[11px] text-[hsl(180_80%_18%)] leading-snug">
+            <div className="mt-4 p-2.5 rounded-md bg-brand-50/60 border border-brand-500/30">
+              <p className="text-[11px] text-brand-700 leading-snug">
                 <Zap className="size-3 inline mr-1 -mt-0.5" />
                 Regime determinado automaticamente pelo motor T-3 cruzando IDTF do GMP+ FSA.
               </p>
@@ -449,28 +500,30 @@ export default function DashboardPage() {
               </p>
             ) : (
               fazendasRisco.map((f) => (
-                <div
+                <Link
                   key={f.id}
-                  className="flex items-start gap-2.5 p-2.5 rounded-lg border border-[hsl(200_18%_92%)] hover:border-[hsl(176_60%_60%)] hover:bg-[hsl(174_64%_99%)] transition-colors"
+                  href="/fazendas"
+                  className="group flex items-start gap-2.5 p-2.5 rounded-lg border border-border-soft hover:border-brand-500/50 hover:bg-brand-50/30 hover:shadow-brand-sm transition-all"
                 >
-                  <div className="size-7 rounded-md bg-[hsl(36_95%_92%)] text-[hsl(24_88%_32%)] flex items-center justify-center shrink-0">
+                  <div className="size-7 rounded-md bg-warning-50 text-warning-700 flex items-center justify-center shrink-0 transition-transform group-hover:scale-105">
                     <Trees className="size-3.5" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[12px] font-semibold truncate">{f.nome}</p>
-                    <p className="text-[10px] text-[hsl(210_14%_42%)] mt-0.5 truncate">
+                    <p className="text-[10px] text-fg-muted mt-0.5 truncate">
                       {f.cidade}/{f.uf} · <span className="num">{f.areaTotalHa.toLocaleString("pt-BR")}</span> ha
                     </p>
                     <div className="flex items-center gap-1 mt-1">
                       <RiscoBadge risco={f.scoreRiscoEUDR} />
                       {f.desmatamentoPos2020 && (
-                        <span className="inline-flex items-center gap-0.5 text-[9px] font-bold text-[hsl(0_70%_38%)]">
+                        <span className="inline-flex items-center gap-0.5 text-[9px] font-bold text-danger-700">
                           <ShieldAlert className="size-2.5" /> PÓS-2020
                         </span>
                       )}
                     </div>
                   </div>
-                </div>
+                  <ChevronRight className="size-3.5 self-center shrink-0 text-fg-soft opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 group-hover:text-brand-600 transition-all" aria-hidden />
+                </Link>
               ))
             )}
           </CardContent>
@@ -492,17 +545,18 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="space-y-2">
             {ncCriticas.slice(0, 4).map((nc) => (
-              <div
+              <Link
                 key={nc.id}
-                className="p-2.5 rounded-lg border border-[hsl(200_18%_92%)] hover:border-[hsl(176_60%_60%)] hover:bg-[hsl(174_64%_99%)] transition-colors"
+                href="/bloqueios"
+                className="group block p-2.5 rounded-lg border border-border-soft hover:border-brand-500/50 hover:bg-brand-50/30 hover:shadow-brand-sm transition-all"
               >
                 <div className="flex items-start gap-2">
                   <div
                     className={cn(
-                      "size-7 rounded-md flex items-center justify-center shrink-0",
-                      nc.severidade === "Crítica" && "bg-[hsl(0_72%_94%)] text-[hsl(0_70%_38%)]",
-                      nc.severidade === "Maior" && "bg-[hsl(36_95%_92%)] text-[hsl(24_88%_32%)]",
-                      nc.severidade === "Menor" && "bg-[hsl(48_95%_90%)] text-[hsl(38_90%_28%)]"
+                      "size-7 rounded-md flex items-center justify-center shrink-0 transition-transform group-hover:scale-105",
+                      nc.severidade === "Crítica" && "bg-danger-50 text-danger-700",
+                      nc.severidade === "Maior" && "bg-warning-50 text-warning-700",
+                      nc.severidade === "Menor" && "bg-warning-50/60 text-warning-700"
                     )}
                   >
                     <AlertOctagon className="size-3.5" />
@@ -524,12 +578,13 @@ export default function DashboardPage() {
                       </Badge>
                     </div>
                     <p className="text-[11px] mt-1 line-clamp-2 leading-snug">{nc.descricao}</p>
-                    <p className="text-[9px] text-[hsl(210_12%_58%)] mt-1.5 uppercase tracking-wider font-semibold">
+                    <p className="text-[9px] text-fg-soft mt-1.5 uppercase tracking-wider font-semibold">
                       {formatDateTime(nc.abertaEm)}
                     </p>
                   </div>
+                  <ChevronRight className="size-3.5 self-center shrink-0 text-fg-soft opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 group-hover:text-brand-600 transition-all" aria-hidden />
                 </div>
-              </div>
+              </Link>
             ))}
           </CardContent>
         </Card>

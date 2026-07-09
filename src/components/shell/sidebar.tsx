@@ -172,11 +172,9 @@ export function Sidebar() {
                       <Link
                         href={item.href}
                         className={cn(
-                          "group relative flex items-center gap-3 rounded-md px-3 py-2 text-[13px] font-medium transition-all",
+                          "group relative flex items-center gap-3.5 rounded-md px-3 py-2 text-[13px] font-medium transition-all",
                           isActive
                             ? "bg-white/[0.07] text-white shadow-[inset_1px_0_0_hsl(176_84%_45%)]"
-                            : readOnly
-                            ? "text-white/45 hover:bg-white/[0.04] hover:text-white/70"
                             : "text-white/65 hover:bg-white/[0.04] hover:text-white"
                         )}
                         title={readOnly ? `${item.label} · somente leitura` : item.label}
@@ -184,7 +182,7 @@ export function Sidebar() {
                         {isActive && (
                           <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 rounded-r bg-gradient-to-b from-[hsl(176_84%_55%)] to-[hsl(200_92%_45%)]" />
                         )}
-                        <Icon className={cn("size-[15px] shrink-0", isActive ? "text-[hsl(176_84%_55%)]" : readOnly ? "text-white/40 group-hover:text-white/60" : "text-white/55 group-hover:text-white/85")} />
+                        <Icon className={cn("size-[15px] shrink-0", isActive ? "text-[hsl(176_84%_55%)]" : "text-white/55 group-hover:text-white/85")} />
                         <span className="flex-1 truncate">{item.label}</span>
                         {count > 0 ? (
                           <span
