@@ -1,15 +1,12 @@
 "use client";
 
 import {
-  Database,
   Send,
   Check,
-  X,
   RefreshCw,
   Globe2,
   Code2,
   ShieldCheck,
-  Activity,
 } from "lucide-react";
 import { PageHeader } from "@/components/shell/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -18,12 +15,20 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatTile } from "@/components/kit/stat-tile";
+import { MonitorConexao } from "@/components/traces/monitor-conexao";
 import { traceNTLogs } from "@/lib/mock-data";
 import { useToast } from "@/components/ui/toast";
-import { cn, formatDateTime } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 export default function TracesPage() {
   const { toast } = useToast();
+
+  // KPIs derivados do log real do gateway — nada chumbado.
+  const saidas = traceNTLogs.filter((l) => l.direcao === "out");
+  const latMedia = Math.round(saidas.reduce((acc, l) => acc + l.latenciaMs, 0) / Math.max(saidas.length, 1));
+  const sucesso = Math.round((saidas.filter((l) => l.status !== "Rejected").length / Math.max(saidas.length, 1)) * 100);
+  const ddsEnviadas = saidas.filter((l) => l.evento.startsWith("SubmitDDS")).length;
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -43,7 +48,7 @@ export default function TracesPage() {
 
       {/* Status do gateway */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <Card className="lg:col-span-2 bg-gradient-to-br from-[hsl(174_64%_97%)] via-white to-[hsl(200_60%_97%)] border-[hsl(174_72%_60%)]">
+        <Card className="lg:col-span-2 bg-gradient-to-br from-brand-50 via-bg-elev to-brand-50/40 border-brand-500/40">
           <CardHeader>
             <div className="flex items-start justify-between">
               <div>
@@ -51,25 +56,23 @@ export default function TracesPage() {
                 <CardDescription>Conectado ao endpoint produtivo da CE · ec.europa.eu/traces</CardDescription>
               </div>
               <div className="flex items-center gap-2">
-                <div className="relative">
-                  <div className="size-2.5 rounded-full bg-[hsl(142_71%_40%)] animate-pulse" />
-                </div>
-                <span className="text-xs font-semibold text-[hsl(142_71%_30%)]">Online</span>
+                <div className="size-2.5 rounded-full bg-success-500 animate-pulse-ring" />
+                <span className="text-xs font-semibold text-success-700">Online</span>
               </div>
             </div>
           </CardHeader>
           <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <StatTile label="Latência" value="312ms" />
-            <StatTile label="Sucesso 24h" value="98.4%" />
-            <StatTile label="DDS hoje" value="14" />
-            <StatTile label="Próx. sync" value="2 min" />
+            <StatTile label="Latência média" value={`${latMedia}ms`} hint="round-trip de envio" />
+            <StatTile label="Sucesso (7d)" value={`${sucesso}%`} hint="submissões sem rejeição" tone={sucesso >= 90 ? "success" : "warning"} />
+            <StatTile label="DDS enviadas (7d)" value={ddsEnviadas} hint="inclui retries" tone="brand" />
+            <StatTile label="Próx. sync" value="2 min" hint="agenda do batch" />
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <ShieldCheck className="size-4 text-[hsl(174_72%_35%)]" />
+              <ShieldCheck className="size-4 text-brand-500" />
               Credenciais
             </CardTitle>
             <CardDescription>WS-Security X.509 + ICP-Brasil</CardDescription>
@@ -79,65 +82,23 @@ export default function TracesPage() {
             <KV label="Algoritmo" value="RSA-2048 + SHA-256" />
             <KV label="Vencimento" value="14/11/2027" />
             <KV label="Autoridade emissora" value="Autoridade BR Federal" />
-            <div className="flex items-center justify-between p-2 rounded-md bg-[hsl(142_71%_96%)]">
-              <span className="text-[hsl(142_71%_28%)] font-medium">Certificado válido</span>
-              <Check className="size-3.5 text-[hsl(142_71%_28%)]" />
+            <div className="flex items-center justify-between p-2 rounded-md bg-success-50">
+              <span className="text-success-700 font-medium">Certificado válido</span>
+              <Check className="size-3.5 text-success-700" />
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <Tabs defaultValue="logs">
+      {/* Momento-assinatura: o log SOAP como sequência bidirecional Traxium ↔ CE. */}
+      <MonitorConexao logs={traceNTLogs} />
+
+      <Tabs defaultValue="config">
         <TabsList>
-          <TabsTrigger value="logs">Logs SOAP</TabsTrigger>
           <TabsTrigger value="config">Configuração</TabsTrigger>
           <TabsTrigger value="schemas">Schemas XSD</TabsTrigger>
           <TabsTrigger value="webhooks">Webhooks</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="logs">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Activity className="size-4" />
-                Logs de comunicação · Últimos 7 dias
-              </CardTitle>
-              <CardDescription>Cada operação é registrada com payload, assinatura e resposta</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-1.5 font-mono text-xs">
-              {traceNTLogs.map((log, i) => (
-                <div
-                  key={i}
-                  className="flex items-center gap-3 p-2 rounded-md hover:bg-[hsl(174_64%_98%)] border border-border-soft"
-                >
-                  <span className="text-fg-muted tabular-nums shrink-0">{formatDateTime(log.ts)}</span>
-                  <Badge
-                    variant={log.direcao === "out" ? "secondary" : "default"}
-                    className="text-[9px] font-mono"
-                  >
-                    {log.direcao === "out" ? "→ OUT" : "← IN"}
-                  </Badge>
-                  <span className="flex-1 truncate">{log.evento}</span>
-                  <span className="text-fg-muted truncate max-w-[200px]">{log.payload}</span>
-                  <Badge
-                    variant={
-                      log.status === "Approved"
-                        ? "success"
-                        : log.status === "Accepted"
-                        ? "default"
-                        : log.status === "Pending Review"
-                        ? "warning"
-                        : "destructive"
-                    }
-                    className="text-[9px]"
-                  >
-                    {log.status}
-                  </Badge>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </TabsContent>
 
         <TabsContent value="config">
           <Card>
@@ -180,9 +141,9 @@ export default function TracesPage() {
               ].map((s) => (
                 <div
                   key={s}
-                  className="flex items-center gap-3 p-3 rounded-md border border-border-soft hover:bg-[hsl(174_64%_98%)]"
+                  className="flex items-center gap-3 p-3 rounded-md border border-border-soft hover:bg-brand-50/50"
                 >
-                  <Code2 className="size-4 text-[hsl(174_72%_35%)]" />
+                  <Code2 className="size-4 text-brand-500" />
                   <span className="text-sm font-mono flex-1">{s}</span>
                   <Badge variant="success" className="text-[10px]">
                     Atualizado
@@ -209,7 +170,7 @@ export default function TracesPage() {
                 { ev: "system.maintenance", desc: "TRACES NT em manutenção programada", on: false },
               ].map((w, i) => (
                 <div key={i} className="flex items-center gap-3 p-3 rounded-md border border-border-soft">
-                  <Send className="size-4 text-[hsl(174_72%_35%)]" />
+                  <Send className="size-4 text-brand-500" />
                   <div className="flex-1">
                     <p className="text-sm font-mono font-semibold">{w.ev}</p>
                     <p className="text-[11px] text-fg-muted">{w.desc}</p>
@@ -245,7 +206,7 @@ function ConfigRow({ label, value, mono }: { label: string; value: string; mono?
 
 function ToggleRow({ label, defaultChecked }: { label: string; defaultChecked?: boolean }) {
   return (
-    <div className="flex items-center justify-between p-2.5 rounded-md hover:bg-[hsl(174_64%_98%)]">
+    <div className="flex items-center justify-between p-2.5 rounded-md hover:bg-brand-50/50">
       <span className="text-sm">{label}</span>
       <Switch defaultChecked={defaultChecked} />
     </div>

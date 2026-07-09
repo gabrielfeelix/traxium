@@ -949,11 +949,26 @@ export const documentos: Documento[] = [
   { id: "doc-6", nome: "Material de Treinamento GMP+ — Motoristas", tipo: "Treinamento", tamanho: "5.6 MB", atualizadoEm: "2026-03-05", autor: "Rafael · RD Insight", vigente: true },
 ];
 
-export const traceNTLogs = [
-  { ts: "2026-05-25T16:40:12", direcao: "out", evento: "SubmitDDS · LOT-2026-0142", payload: "DDS-DE-2026-B7C82E14", status: "Accepted" },
-  { ts: "2026-05-25T16:40:18", direcao: "in", evento: "ACK · TRACES NT", payload: "Reference: TRX-NT-99812", status: "Pending Review" },
-  { ts: "2026-05-21T14:18:02", direcao: "in", evento: "DDS Validated", payload: "DDS-NL-2026-A4F71B92", status: "Approved" },
-  { ts: "2026-05-18T10:22:48", direcao: "out", evento: "SubmitDDS · LOT-2026-0140", payload: "DDS-NL-2026-A4F71B92", status: "Accepted" },
+export type TraceLog = {
+  ts: string;
+  direcao: "out" | "in";
+  evento: string;
+  payload: string;
+  status: "Accepted" | "Pending Review" | "Approved" | "Rejected";
+  /** Latência do round-trip SOAP medida no gateway (ms). */
+  latenciaMs: number;
+};
+
+export const traceNTLogs: TraceLog[] = [
+  { ts: "2026-05-18T10:22:48", direcao: "out", evento: "SubmitDDS · LOT-2026-0140", payload: "DDS-NL-2026-A4F71B92", status: "Accepted", latenciaMs: 284 },
+  { ts: "2026-05-19T09:04:31", direcao: "out", evento: "SubmitDDS · LOT-2026-0141", payload: "DDS-BE-2026-C9D04F55", status: "Rejected", latenciaMs: 1240 },
+  { ts: "2026-05-19T09:04:33", direcao: "in", evento: "Rejection · schema", payload: "GeolocationPolygon inválido (v1.0)", status: "Rejected", latenciaMs: 98 },
+  { ts: "2026-05-19T11:47:20", direcao: "out", evento: "SubmitDDS · LOT-2026-0141 (retry)", payload: "DDS-BE-2026-C9D04F55", status: "Accepted", latenciaMs: 318 },
+  { ts: "2026-05-20T08:15:09", direcao: "in", evento: "DDS Validated", payload: "DDS-BE-2026-C9D04F55", status: "Approved", latenciaMs: 112 },
+  { ts: "2026-05-21T14:18:02", direcao: "in", evento: "DDS Validated", payload: "DDS-NL-2026-A4F71B92", status: "Approved", latenciaMs: 104 },
+  { ts: "2026-05-23T07:52:44", direcao: "out", evento: "StatusQuery · lote em análise", payload: "Reference: TRX-NT-99735", status: "Accepted", latenciaMs: 206 },
+  { ts: "2026-05-25T16:40:12", direcao: "out", evento: "SubmitDDS · LOT-2026-0142", payload: "DDS-DE-2026-B7C82E14", status: "Accepted", latenciaMs: 342 },
+  { ts: "2026-05-25T16:40:18", direcao: "in", evento: "ACK · TRACES NT", payload: "Reference: TRX-NT-99812", status: "Pending Review", latenciaMs: 91 },
 ];
 
 export type Notificacao = {
