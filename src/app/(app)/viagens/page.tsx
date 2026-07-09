@@ -16,6 +16,7 @@ import {
   Layers3,
   XCircle,
   CheckCircle2,
+  ChevronRight,
 } from "lucide-react";
 import { NovaViagemModal } from "@/components/modals/nova-viagem-modal";
 import { useSession } from "@/lib/store/session";
@@ -38,7 +39,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { StatusBadge, RegimeBadge } from "@/components/shell/status-badge";
 import { StatTile } from "@/components/kit/stat-tile";
-import { SequenceRail, type RailStepDef } from "@/components/kit/sequence-rail";
 import { RegimeDisc } from "@/components/kit/regime";
 import { viagens, filialDaViagem, pertenceAFilial, type Viagem } from "@/lib/mock-data";
 import { compartimentoPorViagem, ORDEM_REGIME } from "@/lib/domain/model";
@@ -50,36 +50,128 @@ const TIER_PESO = { BLOQUEIO: 0, ALERTA: 1, LIBERADO: 2 } as const;
 const confClass = (n: number) =>
   n >= 90 ? "text-success-700" : n >= 70 ? "text-warning-700" : "text-danger-700";
 
-/** Rail T-3 da viagem: cargas antigas → determinante → portão de regime → veredito do motor. */
-function railSteps(v: Viagem, d: Decisao): RailStepDef[] {
-  const cargas = [...v.cargasAnteriores].slice(0, 3).reverse(); // mais antiga → determinante
-  const steps: RailStepDef[] = cargas.map((c, i) => ({
-    key: `t${i}`,
-    titulo: c.produto,
-    sub: formatDate(c.data),
-    tone: i === cargas.length - 1 ? "brand" : "neutro",
-  }));
+const TIER_META = {
+  BLOQUEIO: { chip: "bg-danger-50 text-danger-700", Icon: XCircle, rotulo: "Bloqueio", accent: "bg-danger-500" },
+  ALERTA: { chip: "bg-warning-50 text-warning-700", Icon: AlertTriangle, rotulo: "Alerta", accent: "bg-warning-500" },
+  LIBERADO: { chip: "bg-success-50 text-success-700", Icon: CheckCircle2, rotulo: "Liberado", accent: "bg-success-500" },
+} as const;
+
+/** Célula da fila: eyebrow + conteúdo — colunas alinham entre as linhas. */
+function CargaCell({
+  etapa,
+  produto,
+  data,
+  destaque,
+  seta,
+}: {
+  etapa: string;
+  produto?: string;
+  data?: string;
+  destaque?: boolean;
+  seta?: boolean;
+}) {
+  return (
+    <div className="min-w-0">
+      <p className={cn(
+        "text-[9px] uppercase tracking-[0.12em] font-semibold mb-0.5 flex items-center gap-0.5",
+        destaque ? "text-brand-600" : "text-fg-soft"
+      )}>
+        {seta && <ChevronRight className="size-2.5 shrink-0" aria-hidden />}
+        {etapa}
+      </p>
+      <p className={cn("text-[12px] leading-tight truncate", destaque ? "font-bold text-fg" : "font-medium text-fg")}>
+        {produto ?? "—"}
+      </p>
+      <p className="text-[10px] text-fg-muted num leading-tight">{data ? formatDate(data) : " "}</p>
+    </div>
+  );
+}
+
+function FilaLinha({
+  v,
+  d,
+  selecionado,
+  onClick,
+}: {
+  v: Viagem;
+  d: Decisao;
+  selecionado: boolean;
+  onClick: () => void;
+}) {
+  const M = TIER_META[d.tier];
+  // Mais antiga → determinante; preenche à esquerda quando o histórico é curto.
+  const cargas: ((typeof v.cargasAnteriores)[number] | undefined)[] = [...v.cargasAnteriores].slice(0, 3).reverse();
+  while (cargas.length < 3) cargas.unshift(undefined);
   const gateOk = !!(
     d.regimeAplicado && d.regimeExigido &&
     ORDEM_REGIME[d.regimeAplicado] >= ORDEM_REGIME[d.regimeExigido]
   );
-  steps.push({
-    key: "regime",
-    titulo: `Regime ${d.regimeExigido ?? "—"}`,
-    sub: d.regimeAplicado ? `aplicado ${d.regimeAplicado}` : "sem limpeza",
-    marcador: d.regimeExigido ? <RegimeDisc regime={d.regimeExigido} className="size-5 text-[10px]" /> : undefined,
-    tone: gateOk ? "ok" : "falha",
-    quebraAntes: d.regra === "Carga anterior proibida",
-  });
-  steps.push({
-    key: "veredito",
-    titulo: d.tier === "BLOQUEIO" ? "Bloqueio" : d.tier === "ALERTA" ? "Alerta" : "Liberado",
-    sub: d.regra,
-    tone: d.tier === "BLOQUEIO" ? "falha" : d.tier === "ALERTA" ? "atencao" : "ok",
-    atual: d.tier === "BLOQUEIO",
-    quebraAntes: d.tier === "BLOQUEIO",
-  });
-  return steps;
+
+  return (
+    <button
+      type="button"
+      aria-pressed={selecionado}
+      onClick={onClick}
+      className={cn(
+        "relative w-full text-left rounded-lg border overflow-hidden transition-all group cursor-pointer",
+        "grid grid-cols-2 lg:grid-cols-[140px_1fr_1fr_1.15fr_150px_120px_82px] gap-x-4 gap-y-2 items-center py-2.5 pl-5 pr-3",
+        selecionado
+          ? "border-brand-500/50 bg-brand-50/60 ring-1 ring-brand-500/30"
+          : "border-border-soft bg-bg-elev hover:border-brand-500/40 hover:shadow-brand-md"
+      )}
+    >
+      {/* Barra de severidade — cor + chip com ícone e rótulo (nunca só cor) */}
+      <span className={cn("absolute left-0 top-0 bottom-0 w-1", M.accent)} aria-hidden />
+
+      <div className="min-w-0">
+        <p className="font-mono text-[12px] font-semibold text-brand-700 leading-tight">{v.codigo}</p>
+        <p className="text-[10px] text-fg-muted truncate">{v.motorista}</p>
+      </div>
+
+      <CargaCell etapa="Carga T-3" produto={cargas[0]?.produto} data={cargas[0]?.data} />
+      <CargaCell etapa="Carga T-2" produto={cargas[1]?.produto} data={cargas[1]?.data} seta />
+      <CargaCell etapa="Determinante" produto={cargas[2]?.produto} data={cargas[2]?.data} seta destaque />
+
+      <div className="min-w-0">
+        <p className="text-[9px] uppercase tracking-[0.12em] font-semibold text-fg-soft mb-0.5 flex items-center gap-0.5">
+          <ChevronRight className="size-2.5 shrink-0" aria-hidden /> Regime IDTF
+        </p>
+        <div className="flex items-center gap-1.5">
+          {d.regimeExigido ? (
+            <RegimeDisc regime={d.regimeExigido} className="size-6 text-[11px]" />
+          ) : (
+            <span className="text-[12px] text-fg-muted">—</span>
+          )}
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold text-fg leading-tight">exigido {d.regimeExigido ?? "—"}</p>
+            <p className={cn("text-[10px] leading-tight", gateOk ? "text-success-700" : "text-danger-700 font-semibold")}>
+              {d.regimeAplicado ? `aplicado ${d.regimeAplicado}` : "sem limpeza"}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <p className="text-[9px] uppercase tracking-[0.12em] font-semibold text-fg-soft mb-0.5 flex items-center gap-0.5">
+          <ChevronRight className="size-2.5 shrink-0" aria-hidden /> Veredito
+        </p>
+        <span
+          className={cn(
+            "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold whitespace-nowrap",
+            M.chip,
+            d.tier === "BLOQUEIO" && "animate-pulse-ring"
+          )}
+        >
+          <M.Icon className="size-3 shrink-0" /> {M.rotulo}
+        </span>
+      </div>
+
+      <div className="flex items-center justify-end gap-1.5">
+        <span className={cn("text-[13px] font-bold num", confClass(v.conformidade))}>{v.conformidade}%</span>
+        <ChevronRight className="size-4 text-fg-soft group-hover:text-brand-600 group-hover:translate-x-0.5 transition-all shrink-0" aria-hidden />
+      </div>
+    </button>
+  );
 }
 
 export default function ViagensPage() {
@@ -170,33 +262,16 @@ export default function ViagensPage() {
               </Button>
             )}
           </div>
-          <div className="mt-3 space-y-1">
+          <div className="mt-3 space-y-2">
             {fila.map(({ v, d }) => (
-              <button
+              <FilaLinha
                 key={v.id}
-                type="button"
-                aria-pressed={foco === v.id}
+                v={v}
+                d={d}
+                selecionado={foco === v.id}
                 onClick={() => setFoco(foco === v.id ? null : v.id)}
-                className={cn(
-                  "w-full grid grid-cols-1 lg:grid-cols-[170px_minmax(0,1fr)_54px] items-center gap-2 lg:gap-4 rounded-md px-2.5 py-2 text-left transition-colors",
-                  foco === v.id ? "bg-brand-50 ring-1 ring-brand-500/40" : "hover:bg-bg"
-                )}
-              >
-                <div className="min-w-0">
-                  <p className="font-mono text-[12px] font-semibold text-brand-700 leading-tight">{v.codigo}</p>
-                  <p className="text-[10px] text-fg-muted truncate">{v.motorista}</p>
-                </div>
-                <SequenceRail steps={railSteps(v, d)} />
-                <span className={cn("text-[12px] font-bold num lg:text-right", confClass(v.conformidade))}>
-                  {v.conformidade}%
-                </span>
-              </button>
+              />
             ))}
-          </div>
-          <div className="flex items-center gap-3 flex-wrap mt-3 pt-3 border-t border-border-soft text-[9px] font-semibold uppercase tracking-[0.1em] text-fg-muted">
-            <span className="inline-flex items-center gap-1"><XCircle className="size-3 text-danger-500" /> Bloqueio</span>
-            <span className="inline-flex items-center gap-1"><AlertTriangle className="size-3 text-warning-500" /> Alerta</span>
-            <span className="inline-flex items-center gap-1"><CheckCircle2 className="size-3 text-success-500" /> Liberado</span>
           </div>
         </section>
       )}
