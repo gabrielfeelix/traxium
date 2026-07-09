@@ -21,7 +21,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { StatusBadge } from "@/components/shell/status-badge";
 import { StatTile } from "@/components/kit/stat-tile";
 import { SequenceRail, type RailStepDef } from "@/components/kit/sequence-rail";
-import { lotes, fazendas, type Lote } from "@/lib/mock-data";
+import { lotes, type Lote } from "@/lib/mock-data";
+import { OrigensMap } from "@/components/map/origens-map-dynamic";
 import { NovoLoteModal } from "@/components/modals/novo-lote-modal";
 import { useSession } from "@/lib/store/session";
 import { useToast } from "@/components/ui/toast";
@@ -54,35 +55,6 @@ function railDDS(l: Lote): RailStepDef[] {
   }));
 }
 
-/** Mini-mapa das origens: centroides reais, fazendas do lote em brand. */
-function MiniMapa({ ids }: { ids: string[] }) {
-  const lats = fazendas.map((f) => f.centroide.lat);
-  const lngs = fazendas.map((f) => f.centroide.lng);
-  const minLat = Math.min(...lats), maxLat = Math.max(...lats);
-  const minLng = Math.min(...lngs), maxLng = Math.max(...lngs);
-  const x = (lng: number) => 8 + ((lng - minLng) / (maxLng - minLng || 1)) * 84;
-  const y = (lat: number) => 8 + (1 - (lat - minLat) / (maxLat - minLat || 1)) * 56;
-  return (
-    <svg viewBox="0 0 100 72" role="img" aria-label="Posição relativa das fazendas de origem"
-      className="w-full rounded-lg border border-border-soft bg-brand-50/30">
-      {fazendas.map((f) => {
-        const sel = ids.includes(f.id);
-        return (
-          <g key={f.id}>
-            <title>{f.nome} · {f.cidade}/{f.uf}</title>
-            {sel && <circle cx={x(f.centroide.lng)} cy={y(f.centroide.lat)} r={5} className="fill-brand-500/20" />}
-            <circle
-              cx={x(f.centroide.lng)}
-              cy={y(f.centroide.lat)}
-              r={sel ? 2.8 : 1.6}
-              className={sel ? "fill-brand-600" : "fill-fg-soft/40"}
-            />
-          </g>
-        );
-      })}
-    </svg>
-  );
-}
 
 export default function LotesPage() {
   const { updateLoteStatus, version } = useSession();
@@ -172,7 +144,7 @@ export default function LotesPage() {
               <p className="text-[10px] uppercase tracking-[0.12em] font-bold text-fg-muted">
                 Origens · {loteSel.codigo}
               </p>
-              <MiniMapa ids={loteSel.fazendas.map((f) => f.id)} />
+              <OrigensMap ids={loteSel.fazendas.map((f) => f.id)} />
               <div className="space-y-1.5">
                 {loteSel.fazendas.map((f) => (
                   <div key={f.id}>
