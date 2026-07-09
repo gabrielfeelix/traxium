@@ -10,9 +10,7 @@ import {
   ShieldAlert,
   Clock,
   CheckCheck,
-  MessageSquare,
   ChevronRight,
-  ChevronDown,
   Zap,
   GitBranch,
   Wrench,
@@ -32,6 +30,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { StatusBadge } from "@/components/shell/status-badge";
 import { StatTile } from "@/components/kit/stat-tile";
 import { ChainConn, ChainNode } from "@/components/kit/causal-chain";
+import { Sheet, SheetContent, SheetHeader, SheetBody, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { avaliarCapa } from "@/lib/domain/rules-engine";
 import { naoConformidades, type NaoConformidade } from "@/lib/mock-data";
 import { ReportarNCModal } from "@/components/modals/reportar-nc-modal";
@@ -40,14 +39,19 @@ import { useToast } from "@/components/ui/toast";
 import { downloadCSV } from "@/lib/export";
 import { cn, formatDate, formatDateTime } from "@/lib/utils";
 
+// Severidade: barra de acento + chip sutil — sinal sem pintar o card inteiro.
+const SEV_META = {
+  Crítica: { accent: "bg-danger-500", chip: "bg-danger-50 text-danger-700" },
+  Maior: { accent: "bg-warning-500", chip: "bg-warning-50 text-warning-700" },
+  Menor: { accent: "bg-warning-500/50", chip: "bg-warning-50/60 text-warning-700" },
+} as const;
+
 export default function BloqueiosPage() {
   const { version, updateNCCapa } = useSession();
   const { toast } = useToast();
   const [filter, setFilter] = useState<"todas" | "abertas" | "tratamento" | "resolvidas">("todas");
-  // Assinatura da tela visível já no load: primeira NC tratável abre expandida.
-  const [expanded, setExpanded] = useState<string | null>(
-    () => naoConformidades.find((n) => n.capa && n.status !== "Resolvida")?.id ?? null
-  );
+  // O tratamento abre em painel lateral (Sheet) — a lista fica limpa atrás.
+  const [capaNC, setCapaNC] = useState<NaoConformidade | null>(null);
   const [busca, setBusca] = useState("");
   const [sev, setSev] = useState("todas");
   const [cat, setCat] = useState("todas");
@@ -141,13 +145,13 @@ export default function BloqueiosPage() {
             Todas <span className="ml-1.5 text-fg-soft num">({naoConformidades.length})</span>
           </TabsTrigger>
           <TabsTrigger value="abertas">
-            Abertas <span className="ml-1.5 text-[hsl(0_70%_38%)] font-bold num">({counts.abertas})</span>
+            Abertas <span className="ml-1.5 text-danger-700 font-bold num">({counts.abertas})</span>
           </TabsTrigger>
           <TabsTrigger value="tratamento">
-            Em tratamento <span className="ml-1.5 text-[hsl(24_88%_32%)] font-bold num">({counts.tratamento})</span>
+            Em tratamento <span className="ml-1.5 text-warning-700 font-bold num">({counts.tratamento})</span>
           </TabsTrigger>
           <TabsTrigger value="resolvidas">
-            Resolvidas <span className="ml-1.5 text-[hsl(142_71%_24%)] num">({counts.resolvidas})</span>
+            Resolvidas <span className="ml-1.5 text-success-700 num">({counts.resolvidas})</span>
           </TabsTrigger>
         </TabsList>
 
@@ -186,104 +190,61 @@ export default function BloqueiosPage() {
                 </SelectContent>
               </Select>
             </CardHeader>
-            <CardContent className="space-y-3 pt-0">
-              {filtered.map((nc) => (
-                <div
-                  key={nc.id}
-                  className={cn(
-                    "group rounded-lg border p-4 hover:shadow-brand-md transition-all cursor-pointer",
-                    nc.severidade === "Crítica" && "border-[hsl(0_72%_80%)] bg-gradient-to-r from-[hsl(0_72%_98%)] to-white",
-                    nc.severidade === "Maior" && "border-[hsl(28_92%_80%)] bg-gradient-to-r from-[hsl(36_95%_98%)] to-white",
-                    nc.severidade === "Menor" && "border-border-soft"
-                  )}
-                >
-                  <div className="flex items-start gap-4">
-                    {/* Severity ribbon */}
-                    <div className="flex flex-col items-center gap-1.5 shrink-0">
-                      <div
-                        className={cn(
-                          "size-11 rounded-xl flex items-center justify-center shadow-brand-sm",
-                          nc.severidade === "Crítica" && "bg-gradient-to-br from-[hsl(0_78%_50%)] to-[hsl(0_70%_38%)] text-white",
-                          nc.severidade === "Maior" && "bg-gradient-to-br from-[hsl(28_92%_48%)] to-[hsl(24_88%_38%)] text-white",
-                          nc.severidade === "Menor" && "bg-gradient-to-br from-[hsl(48_95%_50%)] to-[hsl(38_90%_42%)] text-white"
-                        )}
-                      >
-                        <AlertOctagon className="size-5" />
+            <CardContent className="space-y-2 pt-0">
+              {filtered.map((nc) => {
+                const S = SEV_META[nc.severidade];
+                return (
+                  <div
+                    key={nc.id}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => setCapaNC(nc)}
+                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setCapaNC(nc); } }}
+                    className="group relative rounded-lg border border-border-soft bg-bg-elev overflow-hidden transition-all cursor-pointer hover:border-brand-500/40 hover:shadow-brand-sm"
+                  >
+                    <span className={cn("absolute left-0 top-0 bottom-0 w-1", S.accent)} aria-hidden />
+                    <div className="flex items-start gap-4 p-3.5 pl-5">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap mb-1">
+                          <span className="font-mono text-[12px] font-bold text-fg">{nc.codigo}</span>
+                          <span className={cn("inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.08em]", S.chip)}>
+                            <AlertOctagon className="size-2.5" aria-hidden /> {nc.severidade}
+                          </span>
+                          <Badge variant="outline" className="text-[10px]">{nc.categoria}</Badge>
+                          <StatusBadge status={nc.status} size="sm" />
+                        </div>
+                        <p className="text-[13px] font-medium leading-snug text-fg">{nc.descricao}</p>
+                        <div className="flex items-center gap-x-4 gap-y-1 mt-2 text-[11px] text-fg-muted flex-wrap">
+                          {nc.viagem && (
+                            <span><span className="text-fg-soft">Viagem:</span>{" "}<span className="font-mono font-semibold">{nc.viagem}</span></span>
+                          )}
+                          {nc.motorista && (
+                            <span><span className="text-fg-soft">Motorista:</span>{" "}<span className="font-semibold">{nc.motorista}</span></span>
+                          )}
+                          {nc.veiculo && (
+                            <span><span className="text-fg-soft">Veículo:</span>{" "}<span className="font-mono font-semibold">{nc.veiculo}</span></span>
+                          )}
+                          {nc.responsavel && (
+                            <span><span className="text-fg-soft">Responsável:</span>{" "}<span className="font-semibold">{nc.responsavel}</span></span>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-fg-soft uppercase tracking-[0.1em] font-semibold mt-2">
+                          Aberta em {formatDateTime(nc.abertaEm)}
+                          {nc.capa && (
+                            <span className={cn("ml-2", nc.capa.eficaciaVerificada ? "text-success-700" : "text-warning-700")}>
+                              · CAPA {nc.capa.eficaciaVerificada ? "eficácia verificada" : "em andamento"}
+                            </span>
+                          )}
+                        </p>
                       </div>
-                      <span
-                        className={cn(
-                          "text-[9px] font-bold uppercase tracking-[0.1em]",
-                          nc.severidade === "Crítica" && "text-[hsl(0_70%_38%)]",
-                          nc.severidade === "Maior" && "text-[hsl(24_88%_32%)]",
-                          nc.severidade === "Menor" && "text-[hsl(38_90%_28%)]"
-                        )}
-                      >
-                        {nc.severidade}
-                      </span>
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap mb-1">
-                        <span className="font-mono text-[12px] font-bold text-fg">{nc.codigo}</span>
-                        <Badge variant="outline" className="text-[10px]">
-                          {nc.categoria}
-                        </Badge>
-                        <StatusBadge status={nc.status} size="sm" />
+                      <div className="flex items-center gap-1 shrink-0 self-center text-[11px] font-semibold text-fg-soft group-hover:text-brand-600 transition-colors">
+                        Tratar CAPA
+                        <ChevronRight className="size-4 group-hover:translate-x-0.5 transition-transform" aria-hidden />
                       </div>
-                      <p className="text-[13px] font-medium leading-snug text-fg">{nc.descricao}</p>
-                      <div className="flex items-center gap-x-4 gap-y-1 mt-3 text-[11px] text-fg-muted flex-wrap">
-                        {nc.viagem && (
-                          <span>
-                            <span className="text-fg-soft">Viagem:</span>{" "}
-                            <span className="font-mono font-semibold">{nc.viagem}</span>
-                          </span>
-                        )}
-                        {nc.motorista && (
-                          <span>
-                            <span className="text-fg-soft">Motorista:</span>{" "}
-                            <span className="font-semibold">{nc.motorista}</span>
-                          </span>
-                        )}
-                        {nc.veiculo && (
-                          <span>
-                            <span className="text-fg-soft">Veículo:</span>{" "}
-                            <span className="font-mono font-semibold">{nc.veiculo}</span>
-                          </span>
-                        )}
-                        {nc.responsavel && (
-                          <span>
-                            <span className="text-fg-soft">Responsável:</span>{" "}
-                            <span className="font-semibold">{nc.responsavel}</span>
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-[10px] text-fg-soft uppercase tracking-wider font-semibold mt-2">
-                        Aberta em {formatDateTime(nc.abertaEm)}
-                        {nc.capa && (
-                          <span className={cn("ml-2", nc.capa.eficaciaVerificada ? "text-success-700" : "text-warning-700")}>
-                            · CAPA {nc.capa.eficaciaVerificada ? "eficácia verificada" : "em andamento"}
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                    <div className="flex flex-col gap-1.5 shrink-0">
-                      <Button variant="outline" size="sm" onClick={() => setExpanded(expanded === nc.id ? null : nc.id)}>
-                        <MessageSquare className="size-3.5" /> CAPA
-                        <ChevronDown className={cn("size-3 transition-transform", expanded === nc.id && "rotate-180")} />
-                      </Button>
-                      {nc.severidade === "Crítica" && (
-                        <Button asChild variant="ghost" size="sm" className="text-[11px]">
-                          <Link href="/excecoes">Exceção <ChevronRight className="size-3" /></Link>
-                        </Button>
-                      )}
                     </div>
                   </div>
-
-                  {expanded === nc.id && nc.capa && (
-                    <CapaPanel nc={nc} onUpdate={(patch) => { updateNCCapa(nc.id, patch); toast("CAPA atualizada", { desc: nc.codigo }); }} />
-                  )}
-                </div>
-              ))}
+                );
+              })}
               {!filtered.length && (
                 <div className="flex flex-col items-center gap-2 py-12 text-center">
                   <CheckCheck className="size-8 text-fg-soft" />
@@ -296,6 +257,52 @@ export default function BloqueiosPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Painel lateral de tratamento — a cadeia CAPA abre por cima do contexto. */}
+      <Sheet open={!!capaNC} onOpenChange={(o) => { if (!o) setCapaNC(null); }}>
+        <SheetContent>
+          {capaNC && (
+            <>
+              <SheetHeader>
+                <SheetTitle className="flex items-center gap-2 flex-wrap">
+                  <span className="font-mono">{capaNC.codigo}</span>
+                  <span className={cn("inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.08em]", SEV_META[capaNC.severidade].chip)}>
+                    <AlertOctagon className="size-2.5" aria-hidden /> {capaNC.severidade}
+                  </span>
+                  <StatusBadge status={capaNC.status} size="sm" />
+                </SheetTitle>
+                <SheetDescription>{capaNC.descricao}</SheetDescription>
+              </SheetHeader>
+              <SheetBody className="space-y-4">
+                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[11px]">
+                  {capaNC.viagem && (
+                    <div><p className="text-[9px] uppercase tracking-[0.12em] font-semibold text-fg-soft">Viagem</p><p className="font-mono font-semibold text-fg">{capaNC.viagem}</p></div>
+                  )}
+                  {capaNC.motorista && (
+                    <div><p className="text-[9px] uppercase tracking-[0.12em] font-semibold text-fg-soft">Motorista</p><p className="font-semibold text-fg">{capaNC.motorista}</p></div>
+                  )}
+                  {capaNC.veiculo && (
+                    <div><p className="text-[9px] uppercase tracking-[0.12em] font-semibold text-fg-soft">Veículo</p><p className="font-mono font-semibold text-fg">{capaNC.veiculo}</p></div>
+                  )}
+                  <div><p className="text-[9px] uppercase tracking-[0.12em] font-semibold text-fg-soft">Aberta em</p><p className="font-semibold text-fg num">{formatDateTime(capaNC.abertaEm)}</p></div>
+                </div>
+
+                <CapaPanel
+                  key={capaNC.id}
+                  nc={capaNC}
+                  onUpdate={(patch) => { updateNCCapa(capaNC.id, patch); toast("CAPA atualizada", { desc: capaNC.codigo }); }}
+                />
+
+                {capaNC.severidade === "Crítica" && (
+                  <Button asChild variant="outline" size="sm" className="w-full">
+                    <Link href="/excecoes">Solicitar exceção <ChevronRight className="size-3.5" /></Link>
+                  </Button>
+                )}
+              </SheetBody>
+            </>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
@@ -307,7 +314,11 @@ function CapaPanel({
   nc: NaoConformidade;
   onUpdate: (patch: Partial<NonNullable<NaoConformidade["capa"]>>) => void;
 }) {
-  const capa = nc.capa!;
+  // NC sem plano ainda: começa em branco — salvar cria o CAPA no store.
+  const capa = nc.capa ?? {
+    acaoImediata: "", causaRaiz: "", acaoCorretiva: "",
+    responsavelAcao: nc.responsavel ?? "", prazo: "", eficaciaVerificada: false,
+  };
   const [acaoImediata, setAcaoImediata] = useState(capa.acaoImediata);
   const [causaRaiz, setCausaRaiz] = useState(capa.causaRaiz);
   const [acaoCorretiva, setAcaoCorretiva] = useState(capa.acaoCorretiva);
@@ -333,7 +344,7 @@ function CapaPanel({
   }[av.situacao];
 
   return (
-    <div className="mt-3 rounded-lg border border-border-soft bg-bg p-3.5 space-y-3">
+    <div className="space-y-3">
       <span className="text-[10px] uppercase tracking-[0.12em] font-bold text-fg-muted">
         CAPA · Cadeia de tratamento (editável)
       </span>
