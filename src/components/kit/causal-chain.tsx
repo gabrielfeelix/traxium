@@ -40,16 +40,19 @@ export function ChainConn({
   gate,
   gateLabel,
   broken,
+  vertical,
 }: {
   label?: string;
   gate?: ChainGate;
   /** Sobrescreve o rótulo padrão do portão (satisfaz/falha/pendente). */
   gateLabel?: string;
   broken?: boolean;
+  /** Força orientação vertical (ex.: dentro de um Sheet) — ignora o breakpoint. */
+  vertical?: boolean;
 }) {
   const g = gate ? GATE[gate] : null;
   return (
-    <div className="flex lg:flex-col items-center justify-center gap-1 shrink-0 lg:w-16 py-1 lg:py-0">
+    <div className={cn("flex items-center justify-center gap-1 shrink-0 py-1", !vertical && "lg:flex-col lg:w-16 lg:py-0")}>
       {g ? (
         <span
           className={cn(
@@ -63,8 +66,14 @@ export function ChainConn({
       ) : label ? (
         <span className="text-[8px] uppercase tracking-[0.1em] text-fg-soft whitespace-nowrap">{label}</span>
       ) : null}
-      <ChevronRight className={cn("hidden lg:block size-4", broken ? "text-danger-500" : "text-fg-soft")} />
-      <ChevronDown className={cn("lg:hidden size-4", broken ? "text-danger-500" : "text-fg-soft")} />
+      {vertical ? (
+        <ChevronDown className={cn("size-4", broken ? "text-danger-500" : "text-fg-soft")} />
+      ) : (
+        <>
+          <ChevronRight className={cn("hidden lg:block size-4", broken ? "text-danger-500" : "text-fg-soft")} />
+          <ChevronDown className={cn("lg:hidden size-4", broken ? "text-danger-500" : "text-fg-soft")} />
+        </>
+      )}
     </div>
   );
 }

@@ -349,8 +349,8 @@ function CapaPanel({
         CAPA · Cadeia de tratamento (editável)
       </span>
 
-      {/* Assinatura: a cadeia causal É o formulário — preencher completa o fluxo. */}
-      <div className="flex flex-col lg:flex-row lg:items-stretch gap-2 lg:gap-0">
+      {/* Assinatura: a cadeia causal É o formulário — vertical dentro do Sheet. */}
+      <div className="flex flex-col gap-1">
         <ChainNode etapa="Evento">
           <div className="flex items-center gap-2">
             <span
@@ -368,7 +368,7 @@ function CapaPanel({
           </div>
         </ChainNode>
 
-        <ChainConn label="conter" broken={broken(1)} />
+        <ChainConn vertical label="conter" broken={broken(1)} />
 
         <ChainNode etapa="Ação imediata" tone={quebraEm === 1 ? "border-danger-500/40" : undefined}>
           <div className="flex items-center gap-2">
@@ -385,7 +385,7 @@ function CapaPanel({
           </div>
         </ChainNode>
 
-        <ChainConn label="5 porquês" broken={broken(2)} />
+        <ChainConn vertical label="5 porquês" broken={broken(2)} />
 
         <ChainNode etapa="Causa raiz" tone={quebraEm === 2 ? "border-danger-500/40" : undefined}>
           <div className="flex items-center gap-2">
@@ -402,7 +402,7 @@ function CapaPanel({
           </div>
         </ChainNode>
 
-        <ChainConn label="corrigir" broken={broken(3)} />
+        <ChainConn vertical label="corrigir" broken={broken(3)} />
 
         <ChainNode etapa="Ação corretiva" tone={quebraEm === 3 ? "border-danger-500/40" : undefined}>
           <div className="flex items-center gap-2">
@@ -420,6 +420,7 @@ function CapaPanel({
         </ChainNode>
 
         <ChainConn
+          vertical
           gate={av.situacao === "eficaz" ? "ok" : av.situacao === "aguardando_eficacia" ? "pending" : "fail"}
           gateLabel={av.situacao === "eficaz" ? "verificada" : av.situacao === "aguardando_eficacia" ? "pendente" : "impedida"}
           broken={quebraEm !== null}
