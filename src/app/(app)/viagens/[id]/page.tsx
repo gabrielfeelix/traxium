@@ -29,7 +29,8 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { StatusBadge, RegimeBadge } from "@/components/shell/status-badge";
-import { viagens } from "@/lib/mock-data";
+import { RastreioMap } from "@/components/map/rastreio-map-dynamic";
+import { viagens, fazendas, type Viagem } from "@/lib/mock-data";
 import {
   compartimentoPorViagem,
   findCompartimento,
@@ -49,6 +50,40 @@ import { TrocarVeiculoModal } from "@/components/modals/trocar-veiculo-modal";
 import { printPDF } from "@/lib/export";
 import { formatDate, formatDateTime, cn } from "@/lib/utils";
 import { notFound } from "next/navigation";
+
+// Portos/terminais de destino conhecidos — coordenadas reais.
+const DESTINOS: { chave: string; lat: number; lng: number }[] = [
+  { chave: "Santos", lat: -23.982, lng: -46.299 },
+  { chave: "Paranaguá", lat: -25.502, lng: -48.514 },
+  { chave: "Itaqui", lat: -2.578, lng: -44.367 },
+  { chave: "Rondonópolis", lat: -16.466, lng: -54.637 },
+];
+
+function coordsDestino(destino: string) {
+  const hit = DESTINOS.find((d) => destino.includes(d.chave));
+  return { lat: hit?.lat ?? -23.982, lng: hit?.lng ?? -46.299, label: destino.split("·")[0].trim() };
+}
+
+function coordsOrigem(v: Viagem) {
+  const faz = fazendas.find((f) => f.nome === v.fazendaOrigem);
+  return {
+    lat: faz?.centroide.lat ?? -12.55,
+    lng: faz?.centroide.lng ?? -55.72,
+    label: v.origem.split("·")[0].trim(),
+  };
+}
+
+/** Fração da rota percorrida, derivada do status da viagem (telemetria mock). */
+function progressoDe(status: Viagem["status"]): number {
+  switch (status) {
+    case "Agendada": return 0;
+    case "Em carregamento": return 4;
+    case "Em trânsito": return 62;
+    case "Descarregando": return 96;
+    case "Concluída": return 100;
+    case "Bloqueada": return 0;
+  }
+}
 
 export default function ViagemDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -450,40 +485,14 @@ export default function ViagemDetailPage({ params }: { params: Promise<{ id: str
                   <CardDescription>Integração com seguradora de carga e telemetria OEM</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="aspect-[16/9] rounded-lg bg-gradient-to-br from-[hsl(180_14%_94%)] to-[hsl(200_18%_88%)] relative overflow-hidden border border-[hsl(200_18%_92%)]">
-                    <svg viewBox="0 0 800 450" className="w-full h-full">
-                      <defs>
-                        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                          <path d="M 40 0 L 0 0 0 40" fill="none" stroke="hsl(200 18% 88%)" strokeWidth="0.5" />
-                        </pattern>
-                      </defs>
-                      <rect width="800" height="450" fill="url(#grid)" />
-                      <path
-                        d="M 100 320 Q 250 280 400 220 T 700 80"
-                        stroke="hsl(176 84% 25%)"
-                        strokeWidth="3"
-                        fill="none"
-                        strokeDasharray="6 3"
-                      />
-                      <circle cx="100" cy="320" r="10" fill="hsl(176 84% 25%)" />
-                      <text x="115" y="325" fontSize="12" fill="hsl(195 30% 8%)" fontWeight="600">
-                        Origem · MT
-                      </text>
-                      <circle cx="450" cy="200" r="14" fill="hsl(200 90% 36%)">
-                        <animate attributeName="r" values="12;18;12" dur="2s" repeatCount="indefinite" />
-                      </circle>
-                      <text x="470" y="205" fontSize="12" fill="hsl(195 30% 8%)" fontWeight="600">
-                        Posição atual · 62% da rota
-                      </text>
-                      <circle cx="700" cy="80" r="10" fill="hsl(0 78% 50%)" />
-                      <text x="610" y="70" fontSize="12" fill="hsl(195 30% 8%)" fontWeight="600">
-                        Destino · Santos
-                      </text>
-                    </svg>
-                  </div>
+                  <RastreioMap
+                    origem={coordsOrigem(viagem)}
+                    destino={coordsDestino(viagem.destino)}
+                    progresso={progressoDe(viagem.status)}
+                  />
                   <div className="grid grid-cols-4 gap-2 mt-3">
-                    <MetricBox label="Velocidade" value="78 km/h" />
-                    <MetricBox label="Restante" value="699 km" />
+                    <MetricBox label="Velocidade" value={viagem.status === "Em trânsito" ? "78 km/h" : "—"} />
+                    <MetricBox label="Restante" value={`${Math.round(viagem.km * (1 - progressoDe(viagem.status) / 100))} km`} />
                     <MetricBox label="Última pos." value="há 2 min" />
                     <MetricBox label="Status seguro" value="Ativo" tone="success" />
                   </div>
