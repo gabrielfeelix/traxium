@@ -180,12 +180,11 @@ function MapaSistemas({ sistemas }: { sistemas: Sistema[] }) {
 }
 
 const EQUIPE_INICIAL: Convidado[] = [
-  { nome: "Leonardo Felix", email: "leonardo@bomfrete.com.br", papel: "Owner" },
-  { nome: "Beto Souza", email: "beto@bomfrete.com.br", papel: "Admin" },
-  { nome: "Rafael · RD Insight", email: "rafael@rdinsight.com.br", papel: "Compliance" },
-  { nome: "Gabriel Felix", email: "gabriel@traxium.com.br", papel: "UX · Admin" },
-  { nome: "Matheus Bruno", email: "matheus@traxium.com.br", papel: "Engenharia" },
-  { nome: "Helena Marques", email: "helena@auditoria-gmp.com.br", papel: "Auditor (acesso limitado)" },
+  { nome: "Leonardo do Prado Guedes", email: "leonardo@traxium.com.br", papel: "Owner" },
+  { nome: "Carlos Roberto Pires Guedes Filho", email: "carlos@traxium.com.br", papel: "Admin" },
+  { nome: "Gabriel Felix Barbosa", email: "gabriel@traxium.com.br", papel: "UX · Admin" },
+  { nome: "Matheus Ferreira Bruno", email: "matheus@traxium.com.br", papel: "Engenharia" },
+  { nome: "Rafael Rodrigo Domingos", email: "rafael@traxium.com.br", papel: "Compliance" },
 ];
 
 export default function ConfiguracoesPage() {
