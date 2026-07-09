@@ -40,16 +40,9 @@ import {
 import { avaliarCarregamento, getT3, type Tier } from "@/lib/domain/rules-engine";
 import { useToast } from "@/components/ui/toast";
 import { downloadCSV, downloadJSON, printPDF } from "@/lib/export";
-import { formatDate, formatDateTime, cn } from "@/lib/utils";
+import { formatDate, formatDateTime, cn, hash32 } from "@/lib/utils";
 
 const EMISSAO = "2026-07-08";
-
-/** Hash djb2-32 determinístico — o mesmo conteúdo gera sempre o mesmo selo. */
-function hash32(s: string): string {
-  let h = 5381;
-  for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0;
-  return h.toString(16).padStart(8, "0");
-}
 
 export default function DossiePage() {
   const { toast } = useToast();

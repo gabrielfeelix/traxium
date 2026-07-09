@@ -42,7 +42,22 @@ import {
 import { statusCompartimento } from "@/lib/domain/rules-engine";
 import { useSession } from "@/lib/store/session";
 import { useToast } from "@/components/ui/toast";
-import { formatDate, formatDateTime, cn } from "@/lib/utils";
+import { formatDate, formatDateTime, cn, hash32 } from "@/lib/utils";
+
+// Pátio de Rondonópolis — origem do geo embarcado nas capturas simuladas.
+const PATIO = { lat: -16.4673, lng: -54.6372 };
+
+/** Metadados determinísticos da captura: geo + hora + hash (mesma foto, mesmo selo). */
+function fotoMeta(compId: string, anguloId: string, n: number) {
+  const h = hash32(`${compId}|${anguloId}|${n}`);
+  const jitter = (parseInt(h.slice(0, 4), 16) % 90) / 100000;
+  return {
+    hash: h,
+    lat: (PATIO.lat + jitter).toFixed(5),
+    lng: (PATIO.lng - jitter).toFixed(5),
+    hora: `10:${String((parseInt(h.slice(4, 6), 16) % 50) + 10).padStart(2, "0")}`,
+  };
+}
 
 // Condições visuais essenciais (mínimo obrigatório para liberar — pergunta 10/11)
 const CONDICOES = [
@@ -177,11 +192,11 @@ export default function ChecklistsPage() {
                       </Select>
                     </div>
                   </div>
-                  <div className="rounded-lg bg-[hsl(174_64%_97%)] border border-[hsl(176_60%_82%)] p-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  <div className="rounded-lg bg-brand-50/60 border border-brand-500/30 p-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
                     <Ctx label="Implemento" value={imp?.placa ?? "—"} mono />
                     <Ctx label="Última carga" value={st.ultimaCarga?.nomeCanonico ?? "—"} />
                     <div>
-                      <p className="text-[10px] uppercase tracking-[0.1em] text-[hsl(180_60%_28%)] font-semibold">Regime exigido</p>
+                      <p className="text-[10px] uppercase tracking-[0.1em] text-brand-700 font-semibold">Regime exigido</p>
                       {st.regimeExigido ? <RegimeBadge regime={st.regimeExigido} size="sm" /> : "—"}
                     </div>
                   </div>
@@ -211,23 +226,55 @@ export default function ChecklistsPage() {
                   <CardDescription>Captura só pela câmera do app · geo, timestamp e hash embarcados.</CardDescription>
                 </CardHeader>
                 <CardContent>
+                  {/* Momento-assinatura: o grid de 6 ângulos — cada captura vira
+                      thumbnail com geo, hora e hash embarcados (evidência, não contador). */}
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {ANGULOS.map((a) => {
                       const n = fotos[a.id] ?? 0;
+                      const meta = n >= 1 ? fotoMeta(comp, a.id, n) : null;
                       return (
                         <button
                           key={a.id}
+                          type="button"
                           onClick={() => setFotos((s) => ({ ...s, [a.id]: (s[a.id] ?? 0) + 1 }))}
+                          aria-label={n >= 1 ? `${a.label} — capturar nova foto (${n} registrada${n > 1 ? "s" : ""})` : `Capturar foto: ${a.label}`}
                           className={cn(
-                            "rounded-lg border p-2.5 text-left transition-all",
-                            n >= 1 ? "border-[hsl(142_60%_75%)] bg-[hsl(142_65%_98%)]" : "border-dashed border-border hover:border-[hsl(176_60%_60%)]"
+                            "rounded-lg border text-left transition-all overflow-hidden group",
+                            n >= 1
+                              ? "border-success-500/40 hover:shadow-brand-sm"
+                              : "border-dashed border-border hover:border-brand-500/50"
                           )}
                         >
-                          <div className="flex items-center justify-between">
-                            {n >= 1 ? <CheckCircle2 className="size-4 text-[hsl(142_71%_36%)]" /> : <Camera className="size-4 text-fg-muted" />}
-                            <span className="text-[10px] num text-fg-muted">{n}</span>
-                          </div>
-                          <p className="text-[11px] font-medium mt-1 leading-tight">{a.label}</p>
+                          {n >= 1 && meta ? (
+                            <>
+                              {/* Thumbnail simulado da captura */}
+                              <div className="relative h-16 bg-gradient-to-br from-ink via-ink-2 to-brand-700/70">
+                                <Camera className="absolute inset-0 m-auto size-5 text-white/25" aria-hidden />
+                                <CheckCircle2 className="absolute top-1.5 left-1.5 size-3.5 text-success-500 bg-bg-elev rounded-full" aria-hidden />
+                                {n > 1 && (
+                                  <span className="absolute top-1 right-1.5 text-[9px] font-bold text-white/90 num">×{n}</span>
+                                )}
+                              </div>
+                              <div className="p-2">
+                                <p className="text-[11px] font-medium leading-tight">{a.label}</p>
+                                <p className="flex items-center gap-1 font-mono text-[8px] text-fg-soft mt-1 truncate">
+                                  <MapPin className="size-2.5 shrink-0" aria-hidden />{meta.lat},{meta.lng}
+                                  <Clock className="size-2.5 shrink-0 ml-0.5" aria-hidden />{meta.hora}
+                                </p>
+                                <p className="flex items-center gap-1 font-mono text-[8px] text-fg-soft truncate">
+                                  <Hash className="size-2.5 shrink-0" aria-hidden />{meta.hash}
+                                </p>
+                              </div>
+                            </>
+                          ) : (
+                            <div className="p-2.5 h-full min-h-[112px] flex flex-col">
+                              <Camera className="size-4 text-fg-muted" aria-hidden />
+                              <p className="text-[11px] font-medium mt-1 leading-tight flex-1">{a.label}</p>
+                              <p className="text-[9px] uppercase tracking-[0.12em] font-semibold text-fg-soft group-hover:text-brand-600 transition-colors">
+                                Capturar
+                              </p>
+                            </div>
+                          )}
                         </button>
                       );
                     })}
@@ -251,7 +298,7 @@ export default function ChecklistsPage() {
                   <Input placeholder="Observações do inspetor…" className="h-9" />
                   <div className="flex items-center justify-between p-2.5 rounded-lg border border-border-soft">
                     <Label htmlFor="assin" className="text-[13px] cursor-pointer flex items-center gap-2">
-                      <PenLine className="size-4 text-[hsl(176_84%_25%)]" /> Assinatura digital do inspetor
+                      <PenLine className="size-4 text-brand-600" /> Assinatura digital do inspetor
                     </Label>
                     <Switch id="assin" checked={assinatura} onCheckedChange={setAssinatura} />
                   </div>
@@ -313,15 +360,15 @@ export default function ChecklistsPage() {
                       key={i.id}
                       className={cn(
                         "flex items-center gap-3 p-3 rounded-lg border",
-                        i.resultado === "aprovado" && "border-[hsl(142_60%_78%)] bg-[hsl(142_65%_98%)]",
-                        i.resultado === "reprovado" && "border-[hsl(0_72%_82%)] bg-[hsl(0_72%_98%)]",
-                        i.resultado === "pendente" && "border-[hsl(48_95%_78%)] bg-[hsl(48_95%_98%)]"
+                        i.resultado === "aprovado" && "border-success-500/30 bg-success-50/40",
+                        i.resultado === "reprovado" && "border-danger-500/40 bg-danger-50/40",
+                        i.resultado === "pendente" && "border-warning-500/40 bg-warning-50/40"
                       )}
                     >
                       <div
                         className={cn(
                           "size-8 rounded-md flex items-center justify-center text-white shrink-0",
-                          i.resultado === "aprovado" ? "bg-[hsl(142_71%_36%)]" : i.resultado === "reprovado" ? "bg-[hsl(0_78%_50%)]" : "bg-[hsl(48_95%_50%)]"
+                          i.resultado === "aprovado" ? "bg-success-500" : i.resultado === "reprovado" ? "bg-danger-500" : "bg-warning-500"
                         )}
                       >
                         {i.resultado === "aprovado" ? <CheckCircle2 className="size-4" /> : <XCircle className="size-4" />}
@@ -332,14 +379,14 @@ export default function ChecklistsPage() {
                         </p>
                         <p className="text-[11px] text-fg-muted">
                           {i.inspetor} · <span className="num">{i.itensOk}/{i.itensTotal}</span> itens · {formatDateTime(i.dataHora)}
-                          {i.offline && <span className="text-[hsl(38_90%_28%)]"> · offline</span>}
+                          {i.offline && <span className="text-warning-700"> · offline</span>}
                         </p>
                       </div>
                       <Badge variant={i.resultado === "aprovado" ? "success" : i.resultado === "reprovado" ? "destructive" : "warning"} className="text-[10px] capitalize shrink-0">
                         {i.resultado}
                       </Badge>
                       {i.viagemId && (
-                        <Link href={`/viagens/${i.viagemId}`} className="text-[11px] text-[hsl(176_84%_25%)] hover:underline shrink-0">
+                        <Link href={`/viagens/${i.viagemId}`} className="text-[11px] text-brand-600 hover:underline shrink-0">
                           viagem
                         </Link>
                       )}
@@ -369,8 +416,8 @@ export default function ChecklistsPage() {
               <Card key={ck.id} className="hover:shadow-md transition-shadow">
                 <CardHeader>
                   <div className="flex items-start justify-between gap-3">
-                    <div className="rounded-lg bg-[hsl(174_64%_96%)] p-2">
-                      <ClipboardCheck className="size-5 text-[hsl(174_72%_35%)]" />
+                    <div className="rounded-lg bg-brand-50 p-2">
+                      <ClipboardCheck className="size-5 text-brand-500" />
                     </div>
                     {ck.regime && <RegimeBadge regime={ck.regime} size="sm" />}
                   </div>
@@ -440,7 +487,7 @@ function TriState({ value, onChange }: { value: Estado; onChange: (v: Estado) =>
         onClick={() => onChange(value === "ok" ? undefined : "ok")}
         className={cn(
           "size-8 rounded-md flex items-center justify-center border transition-all",
-          value === "ok" ? "bg-[hsl(142_71%_36%)] text-white border-[hsl(142_71%_36%)]" : "border-border text-[hsl(142_71%_36%)] hover:bg-[hsl(142_65%_96%)]"
+          value === "ok" ? "bg-success-500 text-white border-success-500" : "border-border text-success-500 hover:bg-success-50"
         )}
         aria-label="Conforme"
       >
@@ -450,7 +497,7 @@ function TriState({ value, onChange }: { value: Estado; onChange: (v: Estado) =>
         onClick={() => onChange(value === "nc" ? undefined : "nc")}
         className={cn(
           "size-8 rounded-md flex items-center justify-center border transition-all",
-          value === "nc" ? "bg-[hsl(0_78%_50%)] text-white border-[hsl(0_78%_50%)]" : "border-border text-[hsl(0_78%_50%)] hover:bg-[hsl(0_72%_97%)]"
+          value === "nc" ? "bg-danger-500 text-white border-danger-500" : "border-border text-danger-500 hover:bg-danger-50"
         )}
         aria-label="Não conforme"
       >
@@ -462,8 +509,8 @@ function TriState({ value, onChange }: { value: Estado; onChange: (v: Estado) =>
 
 function ResultadoBadge({ resultado }: { resultado: "aprovado" | "reprovado" | "pendente" }) {
   const cfg = {
-    aprovado: { bg: "bg-[hsl(142_65%_96%)]", ring: "border-[hsl(142_60%_75%)]", text: "text-[hsl(142_71%_24%)]", label: "Pronto para aprovar", icon: <CheckCircle2 className="size-6" /> },
-    reprovado: { bg: "bg-[hsl(0_72%_97%)]", ring: "border-[hsl(0_72%_82%)]", text: "text-[hsl(0_70%_38%)]", label: "Reprovado", icon: <XCircle className="size-6" /> },
+    aprovado: { bg: "bg-success-50/60", ring: "border-success-500/40", text: "text-success-700", label: "Pronto para aprovar", icon: <CheckCircle2 className="size-6" /> },
+    reprovado: { bg: "bg-danger-50/60", ring: "border-danger-500/40", text: "text-danger-700", label: "Reprovado", icon: <XCircle className="size-6" /> },
     pendente: { bg: "bg-bg", ring: "border-border", text: "text-fg-muted", label: "Pendente", icon: <Clock className="size-6" /> },
   }[resultado];
   return (
@@ -480,7 +527,7 @@ function ResultadoBadge({ resultado }: { resultado: "aprovado" | "reprovado" | "
 function Linha({ ok, label, detalhe }: { ok: boolean; label: string; detalhe: string }) {
   return (
     <div className="flex items-center gap-2">
-      {ok ? <CheckCircle2 className="size-3.5 text-[hsl(142_71%_36%)] shrink-0" /> : <Clock className="size-3.5 text-fg-muted shrink-0" />}
+      {ok ? <CheckCircle2 className="size-3.5 text-success-500 shrink-0" /> : <Clock className="size-3.5 text-fg-muted shrink-0" />}
       <span className="text-fg-muted">{label}:</span>
       <span className="font-medium text-fg ml-auto">{detalhe}</span>
     </div>
@@ -490,15 +537,15 @@ function Linha({ ok, label, detalhe }: { ok: boolean; label: string; detalhe: st
 function Ctx({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
     <div>
-      <p className="text-[10px] uppercase tracking-[0.1em] text-[hsl(180_60%_28%)] font-semibold">{label}</p>
-      <p className={cn("text-[13px] font-medium text-[hsl(180_80%_18%)]", mono && "font-mono")}>{value}</p>
+      <p className="text-[10px] uppercase tracking-[0.1em] text-brand-700 font-semibold">{label}</p>
+      <p className={cn("text-[13px] font-medium text-brand-700", mono && "font-mono")}>{value}</p>
     </div>
   );
 }
 
 function Chip({ icon, t }: { icon: React.ReactNode; t: string }) {
   return (
-    <span className="inline-flex items-center gap-1 text-[10px] text-[hsl(180_80%_18%)] bg-[hsl(174_64%_94%)] rounded px-1.5 py-0.5 font-medium">
+    <span className="inline-flex items-center gap-1 text-[10px] text-brand-700 bg-brand-50 rounded px-1.5 py-0.5 font-medium">
       {icon} {t}
     </span>
   );
