@@ -938,15 +938,17 @@ export type Documento = {
   atualizadoEm: string;
   autor: string;
   vigente: boolean;
+  /** Data-limite do documento (vencimento do cert, revisão da política, janela da DDS). Ausente = não expira. */
+  validade?: string;
 };
 
 export const documentos: Documento[] = [
-  { id: "doc-1", nome: "Certificado GMP+ FSA — Bom Frete 2026", tipo: "Certificado", tamanho: "1.2 MB", atualizadoEm: "2026-01-15", autor: "Único Organismo Certificador BR", vigente: true },
-  { id: "doc-2", nome: "Política de Sequenciamento de Cargas", tipo: "Política", tamanho: "320 KB", atualizadoEm: "2026-03-10", autor: "Rafael · RD Insight", vigente: true },
-  { id: "doc-3", nome: "Procedimento de Higienização — Regime C", tipo: "Procedimento", tamanho: "880 KB", atualizadoEm: "2026-02-22", autor: "Rafael · RD Insight", vigente: true },
-  { id: "doc-4", nome: "DDS LOT-2026-0140 — Cargill Rotterdam", tipo: "DDS", tamanho: "240 KB", atualizadoEm: "2026-05-21", autor: "Sistema TRACES Gateway", vigente: true },
+  { id: "doc-1", nome: "Certificado GMP+ FSA — Bom Frete 2026", tipo: "Certificado", tamanho: "1.2 MB", atualizadoEm: "2026-01-15", autor: "Único Organismo Certificador BR", vigente: true, validade: "2027-01-15" },
+  { id: "doc-2", nome: "Política de Sequenciamento de Cargas", tipo: "Política", tamanho: "320 KB", atualizadoEm: "2026-03-10", autor: "Rafael · RD Insight", vigente: true, validade: "2026-06-15" },
+  { id: "doc-3", nome: "Procedimento de Higienização — Regime C", tipo: "Procedimento", tamanho: "880 KB", atualizadoEm: "2026-02-22", autor: "Rafael · RD Insight", vigente: true, validade: "2026-07-30" },
+  { id: "doc-4", nome: "DDS LOT-2026-0140 — Cargill Rotterdam", tipo: "DDS", tamanho: "240 KB", atualizadoEm: "2026-05-21", autor: "Sistema TRACES Gateway", vigente: true, validade: "2026-06-05" },
   { id: "doc-5", nome: "Relatório de Auditoria Surpresa 2026-04-22", tipo: "Auditoria", tamanho: "2.1 MB", atualizadoEm: "2026-04-25", autor: "Único Organismo Certificador BR", vigente: true },
-  { id: "doc-6", nome: "Material de Treinamento GMP+ — Motoristas", tipo: "Treinamento", tamanho: "5.6 MB", atualizadoEm: "2026-03-05", autor: "Rafael · RD Insight", vigente: true },
+  { id: "doc-6", nome: "Material de Treinamento GMP+ — Motoristas", tipo: "Treinamento", tamanho: "5.6 MB", atualizadoEm: "2026-03-05", autor: "Rafael · RD Insight", vigente: true, validade: "2026-06-30" },
 ];
 
 export type TraceLog = {

@@ -194,6 +194,10 @@ body {
 .leaflet-container {
   font-family: var(--font-sans);
   background: hsl(180 14% 94%);
+  /* Contém os z-index internos do Leaflet (panes até 700, controles 1000)
+     para o mapa nunca vazar por cima de modais/overlays (Radix usa z-50). */
+  z-index: 0;
+  isolation: isolate;
 }
 .leaflet-tile-pane { filter: saturate(0.85) brightness(1.02); }
 .leaflet-control-attribution {
