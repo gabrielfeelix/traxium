@@ -22,8 +22,153 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/toast";
-import { useState } from "react";
+import { useState, Fragment } from "react";
+import { cn } from "@/lib/utils";
 import { ConvidarUsuarioModal, type Convidado } from "@/components/modals/convidar-usuario-modal";
+import { navigation } from "@/components/shell/sidebar";
+import { PAPEL_LABEL, type Papel } from "@/lib/domain/model";
+import { useSession } from "@/lib/store/session";
+
+// Papéis de escritório (campo tem superfície própria e não usa esta matriz).
+const PAPEIS_MATRIZ: Papel[] = ["gestor", "despachante", "diretoria_rt", "admin_subcontratados", "auditor_interno"];
+
+/** Matriz papel×permissão — derivada da MESMA fonte que filtra a sidebar (§3). */
+function MatrizPermissoes() {
+  const { papel } = useSession();
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse min-w-[620px]">
+        <thead>
+          <tr>
+            <th className="text-left text-[9px] uppercase tracking-[0.12em] font-semibold text-fg-soft pb-2 pr-3">
+              Módulo
+            </th>
+            {PAPEIS_MATRIZ.map((p) => (
+              <th
+                key={p}
+                className={cn(
+                  "text-center text-[9px] uppercase tracking-[0.1em] font-semibold pb-2 px-1.5 leading-tight",
+                  p === papel ? "text-brand-700" : "text-fg-muted"
+                )}
+              >
+                {PAPEL_LABEL[p]}
+                {p === papel && <span className="block text-[8px] font-bold text-brand-500">você</span>}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {navigation.map((grupo) => (
+            <Fragment key={grupo.title}>
+              <tr>
+                <td colSpan={PAPEIS_MATRIZ.length + 1} className="pt-3 pb-1">
+                  <span className="text-[9px] uppercase tracking-[0.14em] font-bold text-fg-soft">{grupo.title}</span>
+                </td>
+              </tr>
+              {grupo.items.map((item) => (
+                <tr key={item.href} className="border-t border-border-soft">
+                  <td className="py-1.5 pr-3">
+                    <span className="flex items-center gap-1.5 text-[12px] font-medium text-fg whitespace-nowrap">
+                      <item.icon className="size-3.5 text-fg-muted" /> {item.label}
+                    </span>
+                  </td>
+                  {PAPEIS_MATRIZ.map((p) => {
+                    const acesso = item.access[p];
+                    return (
+                      <td key={p} className={cn("text-center py-1.5 px-1.5", p === papel && "bg-brand-50/40")}>
+                        {acesso === "full" ? (
+                          <span className="inline-block rounded-full bg-brand-600 text-white text-[9px] font-bold px-2 py-0.5">
+                            edita
+                          </span>
+                        ) : acesso === "read" ? (
+                          <span className="inline-block rounded-full border border-border text-fg-muted text-[9px] font-bold px-2 py-0.5">
+                            vê
+                          </span>
+                        ) : (
+                          <span className="text-[10px] text-fg-soft" aria-label="sem acesso">—</span>
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </Fragment>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// ── Mapa de sistemas conectados ───────────────────────────────────────────────
+
+type Sistema = { id: string; nome: string; desc: string; categoria: string; on: boolean };
+
+const SISTEMAS_INICIAIS: Sistema[] = [
+  { id: "traces", nome: "TRACES NT", desc: "Submissão M2M de DDS · Comissão Europeia", categoria: "Regulatório", on: true },
+  { id: "car", nome: "CAR", desc: "Cadastro Ambiental Rural · validação de fazendas", categoria: "Regulatório", on: true },
+  { id: "sefaz", nome: "SEFAZ", desc: "CT-e e MDF-e · emissão e consulta fiscal", categoria: "Fiscal", on: true },
+  { id: "inpe", nome: "INPE", desc: "TerraBrasilis · detecção de desmatamento", categoria: "Monitoramento", on: true },
+  { id: "mapbiomas", nome: "MapBiomas", desc: "Alerta · validação cruzada de polígonos", categoria: "Monitoramento", on: true },
+  { id: "sascar", nome: "Sascar", desc: "Rastreador veicular · telemetria em tempo real", categoria: "Telemetria", on: true },
+  { id: "buonny", nome: "Buonny", desc: "Seguradora de carga · compliance de rota", categoria: "Telemetria", on: true },
+  { id: "slack", nome: "Slack", desc: "Notificações em canal", categoria: "Comunicação", on: true },
+  { id: "teams", nome: "Teams", desc: "Notificações em canal · Microsoft", categoria: "Comunicação", on: false },
+  { id: "powerbi", nome: "Power BI", desc: "Conector OData para BI", categoria: "BI", on: false },
+];
+
+/** Mapa hub-and-spoke: Traxium no centro, cada sistema num raio com status. */
+function MapaSistemas({ sistemas }: { sistemas: Sistema[] }) {
+  const cx = 380, cy = 175, rx = 290, ry = 125;
+  return (
+    <svg viewBox="0 0 760 350" role="img" aria-label="Mapa de sistemas conectados ao Traxium" className="w-full">
+      {sistemas.map((s, i) => {
+        const ang = (i / sistemas.length) * Math.PI * 2 - Math.PI / 2;
+        const x = cx + Math.cos(ang) * rx;
+        const y = cy + Math.sin(ang) * ry;
+        const anchor = Math.cos(ang) > 0.35 ? "start" : Math.cos(ang) < -0.35 ? "end" : "middle";
+        const dy = Math.sin(ang) > 0.4 ? 22 : Math.sin(ang) < -0.4 ? -14 : 4;
+        const dx = anchor === "start" ? 12 : anchor === "end" ? -12 : 0;
+        return (
+          <g key={s.id}>
+            <line
+              x1={cx} y1={cy} x2={x} y2={y}
+              stroke={s.on ? "var(--color-brand-500)" : "var(--color-fg-soft)"}
+              strokeWidth={s.on ? 1.5 : 1}
+              strokeDasharray={s.on ? undefined : "4 4"}
+              opacity={s.on ? 0.45 : 0.3}
+            />
+            <circle cx={x} cy={y} r={s.on ? 6 : 4.5} fill={s.on ? "var(--color-brand-500)" : "var(--color-fg-soft)"} opacity={s.on ? 1 : 0.5} />
+            {s.on && <circle cx={x} cy={y} r={9} fill="none" stroke="var(--color-brand-500)" strokeWidth={1} opacity={0.3} />}
+            <text
+              x={x + dx} y={y + dy}
+              textAnchor={anchor}
+              fontSize={11}
+              fontWeight={700}
+              fill={s.on ? "var(--color-fg)" : "var(--color-fg-soft)"}
+            >
+              {s.nome}
+            </text>
+            <text
+              x={x + dx} y={y + dy + 11}
+              textAnchor={anchor}
+              fontSize={8}
+              fill="var(--color-fg-soft)"
+              style={{ textTransform: "uppercase", letterSpacing: "0.1em" }}
+            >
+              {s.on ? s.categoria : "desligado"}
+            </text>
+          </g>
+        );
+      })}
+      {/* Hub */}
+      <rect x={cx - 62} y={cy - 21} width={124} height={42} rx={10} fill="var(--color-brand-700)" />
+      <text x={cx} y={cy + 4.5} textAnchor="middle" fontSize={13} fontWeight={700} fill="white" style={{ letterSpacing: "0.14em" }}>
+        TRAXIUM
+      </text>
+    </svg>
+  );
+}
 
 const EQUIPE_INICIAL: Convidado[] = [
   { nome: "Leonardo Felix", email: "leonardo@bomfrete.com.br", papel: "Owner" },
@@ -38,6 +183,7 @@ export default function ConfiguracoesPage() {
   const { toast } = useToast();
   const [convidarOpen, setConvidarOpen] = useState(false);
   const [equipe, setEquipe] = useState<Convidado[]>(EQUIPE_INICIAL);
+  const [sistemas, setSistemas] = useState<Sistema[]>(SISTEMAS_INICIAIS);
   return (
     <div className="space-y-6">
       <PageHeader
@@ -118,11 +264,25 @@ export default function ConfiguracoesPage() {
               </Card>
             </TabsContent>
 
-            <TabsContent value="equipe">
+            <TabsContent value="equipe" className="space-y-4">
+              {/* Momento-assinatura: a matriz papel×permissão — a MESMA fonte que filtra a sidebar. */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Matriz papel × permissão</CardTitle>
+                  <CardDescription>
+                    O que cada papel de escritório vê e edita — derivada da mesma matriz (§3) que monta a
+                    navegação. Motorista e inspetor operam no App de campo, fora desta matriz.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <MatrizPermissoes />
+                </CardContent>
+              </Card>
+
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
                   <div>
-                    <CardTitle>Equipe e permissões</CardTitle>
+                    <CardTitle>Equipe</CardTitle>
                     <CardDescription>Usuários internos e papéis no sistema</CardDescription>
                   </div>
                   <Button variant="gradient" size="sm" onClick={() => setConvidarOpen(true)}>
@@ -133,13 +293,13 @@ export default function ConfiguracoesPage() {
                   {equipe.map((u, i) => (
                     <div
                       key={i}
-                      className="flex items-center gap-3 p-3 rounded-lg border border-border-soft hover:bg-[hsl(174_64%_98%)]"
+                      className="flex items-center gap-3 p-3 rounded-lg border border-border-soft hover:bg-brand-50/50"
                     >
                       <Avatar>
                         <AvatarFallback>{u.nome.split(" ").slice(0, 2).map((n) => n[0]).join("")}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
-                        <p className="text-sm font-semibold">{u.nome}</p>
+                        <p className="text-[13px] font-semibold">{u.nome}</p>
                         <p className="text-[11px] text-fg-muted">{u.email}</p>
                       </div>
                       <Badge variant={u.papel === "Owner" ? "default" : "outline"} className="text-[10px]">
@@ -174,7 +334,7 @@ export default function ConfiguracoesPage() {
                   ].map((n, i) => (
                     <div
                       key={i}
-                      className="flex items-center justify-between p-3 rounded-md hover:bg-[hsl(174_64%_98%)]"
+                      className="flex items-center justify-between p-3 rounded-md hover:bg-brand-50/50"
                     >
                       <div className="flex items-center gap-3">
                         <Mail className="size-4 text-fg-muted" />
@@ -220,30 +380,36 @@ export default function ConfiguracoesPage() {
             <TabsContent value="integracoes">
               <Card>
                 <CardHeader>
-                  <CardTitle>Integrações</CardTitle>
-                  <CardDescription>Sistemas conectados ao Traxium</CardDescription>
+                  <CardTitle>Mapa de sistemas conectados</CardTitle>
+                  <CardDescription>
+                    O ecossistema ao redor do Traxium — conexão ativa em linha cheia, desligada em tracejado.
+                    Os interruptores abaixo refletem no mapa na hora.
+                  </CardDescription>
                 </CardHeader>
-                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {[
-                    { nome: "TRACES NT · Comissão Europeia", desc: "Submissão M2M de DDS", on: true },
-                    { nome: "INPE TerraBrasilis", desc: "Detecção de desmatamento", on: true },
-                    { nome: "MapBiomas Alerta", desc: "Validação cruzada de polígonos", on: true },
-                    { nome: "CAR · Cadastro Ambiental Rural", desc: "Validação de fazendas BR", on: true },
-                    { nome: "SEFAZ · CT-e e MDF-e", desc: "Emissão e consulta fiscal", on: true },
-                    { nome: "Sascar · Rastreador veicular", desc: "Telemetria em tempo real", on: true },
-                    { nome: "Buonny · Seguradora de carga", desc: "Compliance de rota", on: true },
-                    { nome: "Slack", desc: "Notificações em canal", on: true },
-                    { nome: "Microsoft Teams", desc: "Notificações em canal", on: false },
-                    { nome: "Power BI", desc: "Conector OData para BI", on: false },
-                  ].map((s, i) => (
-                    <div key={i} className="flex items-center justify-between gap-2 p-3 rounded-lg border border-border-soft">
-                      <div>
-                        <p className="text-sm font-semibold">{s.nome}</p>
-                        <p className="text-[11px] text-fg-muted">{s.desc}</p>
+                <CardContent className="space-y-4">
+                  {/* Momento-assinatura: hub-and-spoke com status vivo. */}
+                  <MapaSistemas sistemas={sistemas} />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 border-t border-border-soft pt-4">
+                    {sistemas.map((s) => (
+                      <div key={s.id} className="flex items-center justify-between gap-2 p-3 rounded-lg border border-border-soft">
+                        <div className="min-w-0">
+                          <p className="text-[13px] font-semibold flex items-center gap-1.5">
+                            <span className={cn("size-1.5 rounded-full shrink-0", s.on ? "bg-success-500" : "bg-fg-soft/50")} aria-hidden />
+                            {s.nome}
+                            <span className="text-[9px] uppercase tracking-[0.1em] font-bold text-fg-soft">{s.categoria}</span>
+                          </p>
+                          <p className="text-[11px] text-fg-muted truncate">{s.desc}</p>
+                        </div>
+                        <Switch
+                          checked={s.on}
+                          aria-label={`${s.on ? "Desligar" : "Ligar"} integração ${s.nome}`}
+                          onCheckedChange={(on) =>
+                            setSistemas((cur) => cur.map((x) => (x.id === s.id ? { ...x, on } : x)))
+                          }
+                        />
                       </div>
-                      <Switch defaultChecked={s.on} />
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -261,7 +427,7 @@ export default function ConfiguracoesPage() {
                     { nome: "Webhook ERP", token: "trx_live_•••••••••••2d11", criadoEm: "18/05/2026" },
                   ].map((t, i) => (
                     <div key={i} className="flex items-center gap-3 p-3 rounded-lg border border-border-soft">
-                      <KeyRound className="size-4 text-[hsl(174_72%_35%)]" />
+                      <KeyRound className="size-4 text-brand-500" />
                       <div className="flex-1">
                         <p className="text-sm font-semibold">{t.nome}</p>
                         <p className="text-[11px] font-mono text-fg-muted">{t.token}</p>
@@ -284,12 +450,12 @@ export default function ConfiguracoesPage() {
                   <CardDescription>Plano Enterprise · 312 caminhões · 487 motoristas</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="rounded-lg bg-gradient-to-br from-[hsl(174_64%_97%)] to-[hsl(200_60%_97%)] border border-[hsl(174_72%_60%)] p-4">
+                  <div className="rounded-lg bg-gradient-to-br from-brand-50 to-brand-50/40 border border-brand-500/40 p-4">
                     <div className="flex items-center justify-between">
                       <div>
                         <Badge variant="default" className="text-[10px]">Plano Enterprise</Badge>
-                        <p className="text-3xl font-bold mt-2 tabular-nums">
-                          R$ 28.400<span className="text-base font-normal">/mês</span>
+                        <p className="text-[28px] font-bold mt-2 tabular-nums tracking-[-0.02em]">
+                          R$ 28.400<span className="text-[14px] font-normal">/mês</span>
                         </p>
                         <p className="text-xs text-fg-muted mt-1">+ R$ 0,42 por viagem acima de 6.000</p>
                       </div>
@@ -329,7 +495,7 @@ export default function ConfiguracoesPage() {
 
 function SwitchRow({ label, defaultChecked }: { label: string; defaultChecked?: boolean }) {
   return (
-    <div className="flex items-center justify-between p-3 rounded-md hover:bg-[hsl(174_64%_98%)]">
+    <div className="flex items-center justify-between p-3 rounded-md hover:bg-brand-50/50">
       <span className="text-sm">{label}</span>
       <Switch defaultChecked={defaultChecked} />
     </div>

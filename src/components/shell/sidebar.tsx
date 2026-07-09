@@ -32,10 +32,11 @@ import { useSession } from "@/lib/store/session";
 import { produtosIDTF, subcontratados, excecoes, nivelVencimento, type Papel } from "@/lib/domain/model";
 import { viagens, naoConformidades, lotes, filialDaViagem, pertenceAFilial } from "@/lib/mock-data";
 
-type Acesso = "full" | "read";
+export type Acesso = "full" | "read";
 // Visibilidade por papel de escritório, derivada da matriz §3. Papel ausente = oculto.
 // Master (isMaster) vê tudo como `full`. Campo/portal/auditor têm nav própria (não usam esta).
-type NavItem = {
+// Exportada como FONTE ÚNICA da matriz papel×permissão (Configurações deriva daqui).
+export type NavItem = {
   href: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
@@ -43,12 +44,12 @@ type NavItem = {
   access: Partial<Record<Papel, Acesso>>;
 };
 
-type NavGroup = {
+export type NavGroup = {
   title: string;
   items: NavItem[];
 };
 
-const navigation: NavGroup[] = [
+export const navigation: NavGroup[] = [
   {
     title: "Operação",
     items: [
