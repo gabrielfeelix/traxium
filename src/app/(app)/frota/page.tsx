@@ -27,15 +27,55 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatusBadge, RegimeBadge, CompartimentoStatusBadge } from "@/components/shell/status-badge";
 import { StatTile } from "@/components/kit/stat-tile";
+import { RegimeDisc } from "@/components/kit/regime";
 import {
   cavalos,
   implementos,
   compartimentos,
   findImplemento,
   findSubcontratado,
+  type Compartimento,
 } from "@/lib/domain/model";
 import { statusCompartimento } from "@/lib/domain/rules-engine";
-import { formatDate } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
+
+// Tom da vaga pelo veredito do motor — cor + badge com rótulo (nunca só cor).
+const VAGA_TONE: Record<string, string> = {
+  apto: "border-success-500/40 bg-success-50/40",
+  bloqueado: "border-danger-500/50 bg-danger-50/50",
+  requer_limpeza: "border-warning-500/50 bg-warning-50/40",
+  sem_historico: "border-dashed border-border bg-bg",
+};
+
+/** Célula do pátio: um compartimento como "vaga" com status T-3 do motor. */
+function Vaga({ c }: { c: Compartimento }) {
+  const st = statusCompartimento(c.id);
+  return (
+    <Link
+      href={`/frota/compartimento/${c.id}`}
+      className={cn(
+        "block rounded-lg border-2 p-2.5 transition-all hover:shadow-brand-md hover:-translate-y-px",
+        VAGA_TONE[st.status]
+      )}
+    >
+      <div className="flex items-center justify-between gap-1.5 mb-1.5">
+        <p className="text-[9px] uppercase tracking-[0.12em] font-bold text-fg-muted truncate">
+          {c.identificador}
+        </p>
+        {st.regimeExigido && <RegimeDisc regime={st.regimeExigido} className="size-5 text-[10px]" />}
+      </div>
+      <CompartimentoStatusBadge status={st.status} size="sm" />
+      {st.ultimaCarga ? (
+        <p className="text-[10px] text-fg-muted mt-1.5 leading-tight truncate">
+          T-1: <span className="font-semibold text-fg">{st.ultimaCarga.nomeCanonico}</span>
+          {st.ultimaCargaData && <span className="num"> · {formatDate(st.ultimaCargaData)}</span>}
+        </p>
+      ) : (
+        <p className="text-[10px] text-fg-soft mt-1.5">sem histórico de carga</p>
+      )}
+    </Link>
+  );
+}
 
 export default function FrotaPage() {
   const { version } = useSession();
@@ -103,6 +143,38 @@ export default function FrotaPage() {
         <StatTile icon={Boxes} label="Compartimentos" value={compartimentos.length} tone="brand" />
         <StatTile icon={ShieldAlert} label="Compart. bloqueados" value={bloqueados} tone="danger" />
       </div>
+
+      {/* Momento-assinatura: o pátio — cada implemento é uma baia, cada
+          compartimento uma vaga com o veredito T-3 do motor. */}
+      <section className="rounded-xl border border-border-soft bg-bg-elev shadow-brand-sm p-5">
+        <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-fg">Pátio de compartimentos</h2>
+        <p className="text-[12px] text-fg-muted leading-snug mt-0.5 mb-4 max-w-2xl">
+          O status T-3 de cada vaga, direto do motor: apto, bloqueado ou aguardando limpeza.
+          Clique numa vaga para abrir a cadeia de proveniência do compartimento.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+          {implementos.map((imp) => {
+            const comps = compartimentos.filter((c) => c.implementoId === imp.id);
+            const sub = findSubcontratado(imp.subcontratadoId);
+            return (
+              <div key={imp.id} className="rounded-lg border border-border-soft bg-bg p-3">
+                <div className="flex items-center justify-between gap-2 mb-2.5">
+                  <div className="min-w-0">
+                    <p className="font-mono text-[12px] font-bold text-fg leading-tight">{imp.placa}</p>
+                    <p className="text-[10px] text-fg-muted truncate">
+                      {imp.tipo} · {sub ? sub.razaoSocial : imp.proprietario}
+                    </p>
+                  </div>
+                  <StatusBadge status={imp.certGMP.status} size="sm" />
+                </div>
+                <div className={cn("grid gap-2", comps.length > 1 ? "grid-cols-2" : "grid-cols-1")}>
+                  {comps.map((c) => <Vaga key={c.id} c={c} />)}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
 
       <Tabs defaultValue="compartimentos">
         <TabsList>
@@ -181,7 +253,7 @@ export default function FrotaPage() {
                                 </span>
                               </div>
                             ) : (
-                              <span className="text-[11px] text-[hsl(0_70%_45%)]">não evidenciada</span>
+                              <span className="text-[11px] text-danger-700">não evidenciada</span>
                             )}
                           </TableCell>
                           <TableCell>
@@ -239,7 +311,7 @@ export default function FrotaPage() {
                               <span className="text-[10px] text-fg-soft">vence {formatDate(i.certGMP.validade)}</span>
                               <button
                                 onClick={() => setRenovarTarget({ kind: "implemento", id: i.id, placa: i.placa, validadeAtual: i.certGMP.validade })}
-                                className="text-[10px] font-semibold text-[hsl(176_84%_25%)] hover:underline"
+                                className="text-[10px] font-semibold text-brand-600 hover:underline"
                               >
                                 Renovar
                               </button>
@@ -253,7 +325,7 @@ export default function FrotaPage() {
               </CardContent>
             </Card>
             {certVencidas > 0 && (
-              <p className="mt-2 flex items-center gap-1.5 text-[11px] text-[hsl(0_70%_45%)]">
+              <p className="mt-2 flex items-center gap-1.5 text-[11px] text-danger-700">
                 <ShieldAlert className="size-3.5" /> {certVencidas} implemento(s) com certificação GMP+ vencida geram bloqueio automático.
               </p>
             )}

@@ -6,7 +6,6 @@ import {
   Search,
   Upload,
   Download,
-  Folder,
   MoreHorizontal,
   Check,
   X,
@@ -26,10 +25,21 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { ExpiryHorizon } from "@/components/kit/expiry-horizon";
 import { documentos, type Documento } from "@/lib/mock-data";
+import { nivelVencimento } from "@/lib/domain/model";
 import { useToast } from "@/components/ui/toast";
 import { formatDate, cn } from "@/lib/utils";
 import { EnviarDocumentoModal } from "@/components/modals/enviar-documento-modal";
+
+const NIVEL_TXT: Record<string, string> = {
+  vencido: "text-danger-700",
+  critico: "text-danger-700",
+  alto: "text-warning-700",
+  alerta: "text-warning-700",
+  ok: "text-success-700",
+};
 
 type Tipo = Documento["tipo"];
 type Aba = "todos" | "vigentes" | "arquivados";
@@ -53,13 +63,23 @@ export default function DocumentosPage() {
   const [tipoFiltro, setTipoFiltro] = useState<Tipo | null>(null);
   const [aba, setAba] = useState<Aba>("todos");
   const [enviarOpen, setEnviarOpen] = useState(false);
+  // Herói conectado ao detalhe: clicar na timeline foca o documento na tabela.
+  const [foco, setFoco] = useState<string | null>(null);
 
   const visible = docs.filter((d) => {
+    if (foco) return d.id === foco;
     const mq = d.nome.toLowerCase().includes(search.toLowerCase());
     const mt = !tipoFiltro || d.tipo === tipoFiltro;
     const ms = aba === "todos" ? true : aba === "vigentes" ? d.vigente : !d.vigente;
     return mq && mt && ms;
   });
+
+  const horizonItems = docs
+    .filter((d) => d.validade)
+    .map((d) => {
+      const v = nivelVencimento(d.validade!);
+      return { id: d.id, rotulo: d.nome, sublabel: d.tipo, validade: d.validade!, dias: v.dias, nivel: v.nivel };
+    });
 
   return (
     <div className="space-y-6">
@@ -67,14 +87,9 @@ export default function DocumentosPage() {
         title="Documentos"
         description="Repositório central de certificados, políticas, procedimentos, DDS, relatórios de auditoria e materiais de treinamento."
         actions={
-          <>
-            <Button variant="outline" size="sm" onClick={() => toast("Pastas", { type: "info", desc: "Organização por tipo de documento." })}>
-              <Folder className="size-4" /> Pastas
-            </Button>
-            <Button variant="gradient" size="sm" onClick={() => setEnviarOpen(true)}>
-              <Upload className="size-4" /> Enviar documento
-            </Button>
-          </>
+          <Button variant="gradient" size="sm" onClick={() => setEnviarOpen(true)}>
+            <Upload className="size-4" /> Enviar documento
+          </Button>
         }
       />
 
@@ -110,6 +125,15 @@ export default function DocumentosPage() {
         })}
       </div>
 
+      {/* Momento-assinatura: cada documento com data-limite contra a janela regulatória. */}
+      <ExpiryHorizon
+        titulo="Timeline de validade"
+        descricao="Certificados, políticas, DDS e treinamentos com data-limite contra a janela de 60 dias — quem cruza a linha precisa de renovação antes da auditoria. Clique para focar o documento."
+        items={horizonItems}
+        selectedId={foco}
+        onSelect={setFoco}
+      />
+
       <Tabs value={aba} onValueChange={(v) => setAba(v as Aba)}>
         <TabsList>
           <TabsTrigger value="todos">Todos</TabsTrigger>
@@ -134,6 +158,16 @@ export default function DocumentosPage() {
               <X className="size-3" />
             </button>
           )}
+          {foco && (
+            <button
+              type="button"
+              onClick={() => setFoco(null)}
+              className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 text-brand-700 text-[11px] font-semibold px-2.5 py-1 hover:bg-brand-100 transition-colors"
+            >
+              Foco da timeline
+              <X className="size-3" />
+            </button>
+          )}
           <span className="ml-auto num text-[11px] text-fg-muted">{visible.length} documento{visible.length === 1 ? "" : "s"}</span>
         </CardHeader>
         <CardContent className="p-0">
@@ -145,6 +179,7 @@ export default function DocumentosPage() {
                 <TableHead>Tamanho</TableHead>
                 <TableHead>Autor</TableHead>
                 <TableHead>Atualizado em</TableHead>
+                <TableHead>Validade</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead></TableHead>
               </TableRow>
@@ -152,7 +187,7 @@ export default function DocumentosPage() {
             <TableBody>
               {visible.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-10 text-[12px] text-fg-muted">
+                  <TableCell colSpan={8} className="text-center py-10 text-[12px] text-fg-muted">
                     Nenhum documento
                     {tipoFiltro ? ` do tipo ${tipoFiltro}` : ""}
                     {aba !== "todos" ? ` ${aba}` : ""}
@@ -179,6 +214,23 @@ export default function DocumentosPage() {
                       <TableCell className="text-[12px] text-fg">{d.autor}</TableCell>
                       <TableCell className="text-[11px] text-fg-muted num">{formatDate(d.atualizadoEm)}</TableCell>
                       <TableCell>
+                        {d.validade ? (
+                          (() => {
+                            const v = nivelVencimento(d.validade);
+                            return (
+                              <span className={cn("text-[11px] font-semibold num", NIVEL_TXT[v.nivel])}>
+                                {formatDate(d.validade)}
+                                <span className="block text-[9px] font-medium">
+                                  {v.nivel === "vencido" ? `há ${Math.abs(v.dias)}d` : `${v.dias}d`}
+                                </span>
+                              </span>
+                            );
+                          })()
+                        ) : (
+                          <span className="text-[11px] text-fg-soft">—</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
                         {d.vigente ? (
                           <Badge variant="success" className="text-[10px]">
                             <Check className="size-2.5" /> Vigente
@@ -189,12 +241,34 @@ export default function DocumentosPage() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
-                          <Button variant="ghost" size="icon-sm" onClick={() => toast(`Baixando ${d.nome}`, { desc: `${d.tipo} · ${d.tamanho}` })}>
+                          <Button variant="ghost" size="icon-sm" aria-label={`Baixar ${d.nome}`} onClick={() => toast(`Baixando ${d.nome}`, { desc: `${d.tipo} · ${d.tamanho}` })}>
                             <Download className="size-4" />
                           </Button>
-                          <Button variant="ghost" size="icon-sm" onClick={() => toast(d.nome, { type: "info", desc: `Autor: ${d.autor}` })}>
-                            <MoreHorizontal className="size-4" />
-                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon-sm" aria-label={`Mais ações: ${d.nome}`}>
+                                <MoreHorizontal className="size-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setDocs((cur) => cur.map((x) => (x.id === d.id ? { ...x, vigente: !x.vigente } : x)));
+                                  toast(d.vigente ? "Documento arquivado" : "Documento restaurado", { desc: d.nome });
+                                }}
+                              >
+                                {d.vigente ? "Arquivar" : "Restaurar como vigente"}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  navigator.clipboard?.writeText(d.nome);
+                                  toast("Nome copiado", { desc: d.nome });
+                                }}
+                              >
+                                Copiar nome
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       </TableCell>
                     </TableRow>

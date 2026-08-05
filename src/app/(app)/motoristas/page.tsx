@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   TrendingUp,
   Users,
+  XCircle,
 } from "lucide-react";
 import { PageHeader } from "@/components/shell/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -32,6 +33,13 @@ import { useSession } from "@/lib/store/session";
 import { CadastrarMotoristaModal } from "@/components/modals/cadastrar-motorista-modal";
 import { AgendarTreinamentoModal } from "@/components/modals/agendar-treinamento-modal";
 import { RenovarCertificacaoModal, type RenovarTarget } from "@/components/modals/renovar-certificacao-modal";
+import { Credencial } from "@/components/motoristas/credencial";
+import { Sheet, SheetContent, SheetHeader, SheetBody, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { viagens, type Motorista } from "@/lib/mock-data";
+import Link from "next/link";
+
+const confClass = (n: number) =>
+  n >= 95 ? "text-success-700" : n >= 80 ? "text-warning-700" : "text-danger-700";
 
 export default function MotoristasPage() {
   const { toast } = useToast();
@@ -40,8 +48,21 @@ export default function MotoristasPage() {
   const [treinoOpen, setTreinoOpen] = useState(false);
   const [treinoPre, setTreinoPre] = useState<string[]>([]);
   const [renovarTarget, setRenovarTarget] = useState<RenovarTarget | null>(null);
+  // Herói conectado ao detalhe: clicar numa credencial foca o motorista na tabela.
+  const [foco, setFoco] = useState<string | null>(null);
+  // "Detalhes"/"Histórico" do kebab abrem o dossiê do motorista em painel lateral.
+  const [detalhe, setDetalhe] = useState<Motorista | null>(null);
   function abrirTreino(pre: string[]) { setTreinoPre(pre); setTreinoOpen(true); }
-  const filtered = motoristas.filter((m) => m.nome.toLowerCase().includes(search.toLowerCase()));
+  const filtered = motoristas.filter((m) =>
+    foco ? m.id === foco : m.nome.toLowerCase().includes(search.toLowerCase())
+  );
+
+  // Deck de credenciais: quem precisa de atenção primeiro.
+  const deck = [...motoristas].sort((a, b) => {
+    const peso = (m: (typeof motoristas)[number]) =>
+      m.status === "Bloqueado" ? 0 : m.certificacoes.some((c) => c.status !== "Válida") ? 1 : 2;
+    return peso(a) - peso(b) || b.conformidadeMedia - a.conformidadeMedia;
+  });
 
   const initials = (nome: string) =>
     nome
@@ -85,6 +106,36 @@ export default function MotoristasPage() {
         <StatTile icon={AlertCircle} label="Bloqueados" value={motoristas.filter((m) => m.status === "Bloqueado").length} tone="danger" />
         <StatTile icon={TrendingUp} label="Conf. média" value={`${(motoristas.reduce((acc, m) => acc + m.conformidadeMedia, 0) / motoristas.length).toFixed(1)}%`} />
       </div>
+
+      {/* Momento-assinatura: o deck de credenciais de qualificação. */}
+      <section className="rounded-xl border border-border-soft bg-bg-elev shadow-brand-sm p-5">
+        <div className="flex items-start justify-between gap-3 flex-wrap mb-4">
+          <div>
+            <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-fg">Credenciais de qualificação</h2>
+            <p className="text-[12px] text-fg-muted leading-snug mt-0.5 max-w-2xl">
+              O crachá de cada motorista: anel de conformidade, CNH e certificações com validade.
+              Quem precisa de atenção aparece primeiro. Clique para focar na tabela.
+            </p>
+          </div>
+          {foco && (
+            <Button variant="outline" size="sm" onClick={() => setFoco(null)}>
+              <XCircle className="size-3.5" /> Limpar foco
+            </Button>
+          )}
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3">
+          {deck.map((m) => (
+            <Credencial
+              key={m.id}
+              m={m}
+              selecionado={foco === m.id}
+              onFocar={() => setFoco(foco === m.id ? null : m.id)}
+              onTreinar={() => abrirTreino([m.id])}
+              onRenovar={() => setRenovarTarget({ kind: "motorista", id: m.id, nome: m.nome, certs: m.certificacoes })}
+            />
+          ))}
+        </div>
+      </section>
 
       <Tabs defaultValue="todos">
         <TabsList>
@@ -167,16 +218,7 @@ export default function MotoristasPage() {
                         </TableCell>
                         <TableCell className="text-right tabular-nums font-semibold">{m.totalViagens}</TableCell>
                         <TableCell className="text-right">
-                          <span
-                            className={cn(
-                              "text-sm font-bold tabular-nums",
-                              m.conformidadeMedia >= 95
-                                ? "text-[hsl(142_71%_30%)]"
-                                : m.conformidadeMedia >= 80
-                                ? "text-[hsl(32_95%_30%)]"
-                                : "text-[hsl(0_72%_40%)]"
-                            )}
-                          >
+                          <span className={cn("text-sm font-bold tabular-nums", confClass(m.conformidadeMedia))}>
                             {m.conformidadeMedia.toFixed(1)}%
                           </span>
                         </TableCell>
@@ -191,14 +233,14 @@ export default function MotoristasPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => toast(m.nome, { type: "info", desc: `${m.tipo} · ${m.cidade}/${m.uf} · ${m.totalViagens} viagens` })}>Detalhes</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => setDetalhe(m)}>Detalhes</DropdownMenuItem>
                               <DropdownMenuItem onClick={() => window.open(`https://wa.me/55${m.telefone.replace(/\D/g, "")}`, "_blank", "noopener")}>
                                 <Phone className="size-4" /> Contatar
                               </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => abrirTreino([m.id])}>
                                 <GraduationCap className="size-4" /> Agendar treinamento
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => toast(`Histórico de ${m.nome}`, { type: "info", desc: `${m.totalViagens} viagens registradas` })}>Histórico de viagens</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => setDetalhe(m)}>Histórico de viagens</DropdownMenuItem>
                               <DropdownMenuItem onClick={() => setRenovarTarget({ kind: "motorista", id: m.id, nome: m.nome, certs: m.certificacoes })}>Renovar certificação</DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -225,6 +267,64 @@ export default function MotoristasPage() {
 
       <AgendarTreinamentoModal open={treinoOpen} onOpenChange={setTreinoOpen} preselect={treinoPre} />
       <RenovarCertificacaoModal open={!!renovarTarget} onOpenChange={(o) => { if (!o) setRenovarTarget(null); }} target={renovarTarget} />
+
+      {/* Dossiê do motorista: credencial + histórico real de viagens. */}
+      <Sheet open={!!detalhe} onOpenChange={(o) => { if (!o) setDetalhe(null); }}>
+        <SheetContent>
+          {detalhe && (
+            <>
+              <SheetHeader>
+                <SheetTitle>{detalhe.nome}</SheetTitle>
+                <SheetDescription>
+                  {detalhe.tipo} · {detalhe.cidade}/{detalhe.uf} · letramento digital {detalhe.letramentoDigital.toLowerCase()}
+                </SheetDescription>
+              </SheetHeader>
+              <SheetBody className="space-y-4">
+                <Credencial
+                  m={detalhe}
+                  selecionado={false}
+                  onFocar={() => { setFoco(detalhe.id); setDetalhe(null); }}
+                  onTreinar={() => { setDetalhe(null); abrirTreino([detalhe.id]); }}
+                  onRenovar={() => { setDetalhe(null); setRenovarTarget({ kind: "motorista", id: detalhe.id, nome: detalhe.nome, certs: detalhe.certificacoes }); }}
+                />
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.12em] font-bold text-fg-muted mb-2">
+                    Histórico de viagens
+                  </p>
+                  {(() => {
+                    const doMotorista = viagens.filter((v) => v.motorista === detalhe.nome);
+                    return doMotorista.length ? (
+                      <div className="space-y-1.5">
+                        {doMotorista.map((v) => (
+                          <Link
+                            key={v.id}
+                            href={`/viagens/${v.id}`}
+                            className="flex items-center gap-3 p-2.5 rounded-lg border border-border-soft hover:border-brand-500/40 hover:bg-brand-50/40 transition-colors"
+                          >
+                            <div className="flex-1 min-w-0">
+                              <p className="font-mono text-[12px] font-semibold text-brand-700">{v.codigo}</p>
+                              <p className="text-[10px] text-fg-muted truncate">
+                                {v.produto} · {v.origem.split("·")[0].trim()} → {v.destino.split("·")[0].trim()}
+                              </p>
+                            </div>
+                            <StatusBadge status={v.status} size="sm" />
+                            <span className={cn("text-[12px] font-bold num", confClass(v.conformidade))}>{v.conformidade}%</span>
+                          </Link>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-[12px] text-fg-muted">
+                        Nenhuma viagem registrada no recorte do protótipo — total histórico:{" "}
+                        <span className="num font-semibold">{detalhe.totalViagens}</span>.
+                      </p>
+                    );
+                  })()}
+                </div>
+              </SheetBody>
+            </>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
@@ -238,7 +338,7 @@ function SubList({ motoristas, initials }: { motoristas: typeof import("@/lib/mo
       </CardHeader>
       <CardContent className="space-y-2">
         {motoristas.map((m) => (
-          <div key={m.id} className="flex items-center gap-3 p-3 rounded-lg border border-border-soft hover:bg-[hsl(174_64%_98%)]">
+          <div key={m.id} className="flex items-center gap-3 p-3 rounded-lg border border-border-soft hover:bg-brand-50/50">
             <Avatar><AvatarFallback>{initials(m.nome)}</AvatarFallback></Avatar>
             <div className="flex-1">
               <p className="text-sm font-medium">{m.nome}</p>

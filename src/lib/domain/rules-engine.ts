@@ -356,6 +356,62 @@ export function scoreConformidade(d: Decisao): number {
   return Math.round((ok / d.checagens.length) * 100);
 }
 
+// ---------------------------------------------------------------------------
+// CAPA — correção imediata não basta: auditor cobra contenção → causa raiz →
+// ação corretiva → eficácia verificada, nesta ordem. A cadeia quebra na
+// primeira etapa não registrada.
+
+export type CapaInput = {
+  acaoImediata: string;
+  causaRaiz: string;
+  acaoCorretiva: string;
+  eficaciaVerificada: boolean;
+};
+
+export type CapaVeredito = {
+  /** Etapas registradas em sequência: 0–3 (contenção, causa raiz, corretiva). */
+  etapasCompletas: number;
+  situacao: "incompleta" | "aguardando_eficacia" | "eficaz";
+  motivo: string;
+};
+
+export function avaliarCapa(capa: CapaInput): CapaVeredito {
+  const ok = (s: string) => s.trim().length > 0;
+  if (!ok(capa.acaoImediata)) {
+    return {
+      etapasCompletas: 0,
+      situacao: "incompleta",
+      motivo: "Sem ação imediata registrada — a NC segue sem contenção do dano.",
+    };
+  }
+  if (!ok(capa.causaRaiz)) {
+    return {
+      etapasCompletas: 1,
+      situacao: "incompleta",
+      motivo: "Contenção feita, mas sem causa raiz o auditor reprova: corrigir o sintoma não evita reincidência.",
+    };
+  }
+  if (!ok(capa.acaoCorretiva)) {
+    return {
+      etapasCompletas: 2,
+      situacao: "incompleta",
+      motivo: "Causa raiz identificada sem ação corretiva — nada impede o problema de voltar.",
+    };
+  }
+  if (!capa.eficaciaVerificada) {
+    return {
+      etapasCompletas: 3,
+      situacao: "aguardando_eficacia",
+      motivo: "Plano completo. Falta verificar a eficácia — só ela encerra a NC perante o auditor.",
+    };
+  }
+  return {
+    etapasCompletas: 3,
+    situacao: "eficaz",
+    motivo: "Ciclo CAPA completo: contenção, causa raiz, ação corretiva e eficácia verificada.",
+  };
+}
+
 function fmt(iso: string): string {
   const [y, m, dd] = iso.slice(0, 10).split("-");
   return `${dd}/${m}/${y}`;

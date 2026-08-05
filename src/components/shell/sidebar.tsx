@@ -23,8 +23,8 @@ import {
   Database,
   BadgeCheck,
   Activity,
-  ChevronDown,
   Eye,
+  LogOut,
 } from "lucide-react";
 import { TraxiumLogo } from "@/components/logo";
 import { cn } from "@/lib/utils";
@@ -32,7 +32,7 @@ import { useSession } from "@/lib/store/session";
 import { produtosIDTF, subcontratados, excecoes, nivelVencimento, type Papel } from "@/lib/domain/model";
 import { viagens, naoConformidades, lotes, filialDaViagem, pertenceAFilial } from "@/lib/mock-data";
 
-type Acesso = "full" | "read";
+export type Acesso = "full" | "read";
 // Visibilidade por papel de escritório, derivada da matriz §3. Papel ausente = oculto.
 // Master (isMaster) vê tudo como `full`. Campo/portal/auditor têm nav própria (não usam esta).
 
@@ -57,7 +57,8 @@ const PILAR_ORDER: Pilar[] = [
   "Sistema",
 ];
 
-type NavItem = {
+// Exportada como FONTE ÚNICA da matriz papel×permissão (Configurações deriva daqui).
+export type NavItem = {
   href: string;
   label: string;
   /** Rótulo alternativo no modo MVP (ex.: Dashboard → Torre de Controle). */
@@ -71,12 +72,12 @@ type NavItem = {
   mvp: boolean;
 };
 
-type NavGroup = {
+export type NavGroup = {
   title: string;
   items: NavItem[];
 };
 
-const navigation: NavGroup[] = [
+export const navigation: NavGroup[] = [
   {
     title: "Operação",
     items: [
@@ -220,11 +221,9 @@ export function Sidebar() {
                       <Link
                         href={item.href}
                         className={cn(
-                          "group relative flex items-center gap-3 rounded-md px-3 py-2 text-[13px] font-medium transition-all",
+                          "group relative flex items-center gap-3.5 rounded-md px-3 py-2 text-[13px] font-medium transition-all",
                           isActive
                             ? "bg-white/[0.07] text-white shadow-[inset_1px_0_0_hsl(176_84%_45%)]"
-                            : readOnly
-                            ? "text-white/45 hover:bg-white/[0.04] hover:text-white/70"
                             : "text-white/65 hover:bg-white/[0.04] hover:text-white"
                         )}
                         title={readOnly ? `${label} · somente leitura` : label}
@@ -265,23 +264,14 @@ export function Sidebar() {
       </nav>
 
       <div className="relative p-3 border-t border-white/[0.06]">
-        <button className="w-full flex items-center gap-3 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] transition-colors p-2.5 group">
-          <div className="size-9 rounded-md bg-gradient-to-br from-[hsl(176_84%_30%)] to-[hsl(200_92%_28%)] flex items-center justify-center text-white font-bold text-xs shadow-md">
-            BF
-          </div>
-          <div className="flex-1 text-left min-w-0">
-            <p className="text-[10px] uppercase tracking-wider text-white/45 font-semibold leading-tight">
-              Tenant ativo
-            </p>
-            <p className="text-[12px] font-semibold text-white truncate leading-tight mt-0.5">
-              Bom Frete Transportes
-            </p>
-            <p className="text-[10px] text-white/50 leading-tight">
-              Rondonópolis/MT · Enterprise
-            </p>
-          </div>
-          <ChevronDown className="size-3.5 text-white/40 group-hover:text-white/70" />
-        </button>
+        {/* Tenant já aparece no header — aqui fica só a saída. */}
+        <Link
+          href="/login"
+          className="w-full flex items-center gap-3 rounded-lg hover:bg-white/[0.06] transition-colors p-2.5 text-white/60 hover:text-white"
+        >
+          <LogOut className="size-4 shrink-0" />
+          <span className="text-[13px] font-medium">Sair</span>
+        </Link>
       </div>
     </aside>
   );
