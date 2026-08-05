@@ -28,6 +28,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { PageHeader } from "@/components/shell/page-header";
 import { KPICard } from "@/components/shell/kpi-card";
+import { TorreDeControle } from "@/components/shell/torre-de-controle";
 import { StatusBadge, RegimeBadge, RiscoBadge } from "@/components/shell/status-badge";
 import {
   dashboardKPIs,
@@ -74,9 +75,13 @@ import {
 const PERIODOS = ["Últimos 7 dias", "Últimos 30 dias", "Últimos 90 dias", "Tudo"];
 
 export default function DashboardPage() {
-  const { version, filialId } = useSession();
+  const { version, filialId, produto } = useSession();
   const { toast } = useToast();
   const [periodo, setPeriodo] = useState("Últimos 30 dias");
+
+  // MVP → Torre de Controle (bloqueio-first, §5.4). Completa → dashboard consolidado.
+  if (produto === "mvp") return <TorreDeControle />;
+
   const proximaAuditoria = auditorias.find((a) => a.status === "Programada");
   // Re-escopo por filial (§5) — KPIs de viagem e a lista recente seguem a filial ativa.
   const viagensEscopadas = viagens.filter((v) => pertenceAFilial(filialId, filialDaViagem(v)));

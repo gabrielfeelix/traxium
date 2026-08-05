@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 
 const CATEGORIAS: NaoConformidade["categoria"][] = [
   "Limpeza inadequada", "Documentação ausente", "Certificação vencida",
-  "Foto não auditável", "Geolocalização inválida", "Carga incompatível", "Carreta não certificada",
+  "Foto não auditável", "Geolocalização inválida", "Carga incompatível", "Empresa não certificada",
 ];
 
 export function ReportarNCModal() {

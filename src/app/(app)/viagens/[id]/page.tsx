@@ -74,7 +74,7 @@ export default function ViagemDetailPage({ params }: { params: Promise<{ id: str
     { item: "Foto pré-carregamento com GPS", status: blocked ? "pending" : "ok", quando: "—" },
     { item: "Validação documental (CT-e, manifesto)", status: "ok", quando: "08:44" },
     { item: "Validação de certificação do motorista", status: "ok", quando: "08:46" },
-    { item: "Validação de certificação da carreta", status: blocked ? "fail" : "ok", quando: "08:47" },
+    { item: "Certificado GMP+ da empresa (escopo Road Transport)", status: blocked ? "fail" : "ok", quando: "08:47" },
   ];
 
   return (

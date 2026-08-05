@@ -13,7 +13,7 @@ import { motoristas } from "@/lib/mock-data";
 import { useToast } from "@/components/ui/toast";
 import { formatDate, cn } from "@/lib/utils";
 
-const TIPOS = ["GMP+ Básico", "GMP+ Avançado", "MOPP", "EUDR"];
+const TIPOS = ["GMP+ Básico", "GMP+ Avançado", "GMP+ FSA (reciclagem)", "EUDR"];
 
 export function AgendarTreinamentoModal({
   open, onOpenChange, preselect = [],

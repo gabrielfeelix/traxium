@@ -7,7 +7,7 @@
 // arrays — então tudo que é criado aqui é imediatamente validado pelas regras.
 // Recarregar a página reseta (módulos são re-avaliados). É o comportamento esperado num protótipo.
 
-import { createContext, useContext, useState, useCallback } from "react";
+import { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { avaliarCarregamento } from "@/lib/domain/rules-engine";
 import {
   viagens,
@@ -63,6 +63,12 @@ import {
 
 let seq = 5000;
 const nextId = (p: string) => `${p}-${++seq}`;
+
+// ── Eixo de ESCOPO (produto) — decide QUANTA superfície aparece ───────────────
+// Ortogonal ao accountType/papel: aqueles decidem QUAL superfície e o que o papel
+// vê; este decide se o produto é o MVP (5 pilares) ou a Solução completa.
+export type ProdutoModo = "mvp" | "completa";
+const PRODUTO_KEY = "traxium.produto";
 
 // ── Tipos de entrada dos formulários (parciais → o store completa) ────────────
 
@@ -141,6 +147,9 @@ export type Impersonation = { tenantId: string; tenantName: string } | null;
 
 type SessionCtx = {
   version: number;
+  /** Modo de produto (eixo de escopo): 'mvp' = 5 pilares · 'completa' = tudo. */
+  produto: ProdutoModo;
+  setProduto: (m: ProdutoModo) => void;
   /** Papel do usuário atual (RBAC-lite do protótipo — eixo 2). */
   papel: Papel;
   setPapel: (p: Papel) => void;
@@ -209,6 +218,19 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [version, setVersion] = useState(0);
   const bump = useCallback(() => setVersion((v) => v + 1), []);
   const [papel, setPapel] = useState<Papel>("gestor");
+
+  // Eixo de escopo (MVP vs completa). Default 'mvp'; persistido em localStorage
+  // (é preferência de visão, não dado de domínio). Hydration-safe: o estado inicial
+  // é sempre 'mvp' (bate no SSR); a leitura do localStorage acontece pós-mount.
+  const [produto, setProdutoState] = useState<ProdutoModo>("mvp");
+  useEffect(() => {
+    const saved = typeof window !== "undefined" ? window.localStorage.getItem(PRODUTO_KEY) : null;
+    if (saved === "mvp" || saved === "completa") setProdutoState(saved);
+  }, []);
+  const setProduto = useCallback((m: ProdutoModo) => {
+    setProdutoState(m);
+    try { window.localStorage.setItem(PRODUTO_KEY, m); } catch { /* modo privado */ }
+  }, []);
 
   // ── Eixo 1 — accountType + superfície + impersonation ───────────────────────
   const [accountType, setAccountType] = useState<AccountType>("tenant_user");
@@ -554,6 +576,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
   const value: SessionCtx = {
     version,
+    produto,
+    setProduto,
     papel,
     setPapel,
     accountType,

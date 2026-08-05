@@ -132,8 +132,8 @@ export default function ChecklistsPage() {
   return (
     <div className="space-y-6" data-v={version}>
       <PageHeader
-        title="Inspeção LCI"
-        description="Loading Compartment Inspection pré-carregamento. Separa o mínimo obrigatório para liberar (condições visuais, fotos por ângulo, assinatura) da evidência complementar. Cada inspeção gera um registro imutável vinculado ao compartimento — e à viagem quando feita em contexto de despacho."
+        title="Inspeção pré-carregamento do implemento"
+        description="Verificação higiênica e estrutural do compartimento antes de carregar (LCI). Separa o mínimo obrigatório para liberar (condições visuais, fotos por ângulo, assinatura) da evidência complementar. Cada inspeção gera um registro imutável vinculado ao compartimento — e à viagem quando feita em contexto de despacho."
       />
 
       <Tabs defaultValue="nova">

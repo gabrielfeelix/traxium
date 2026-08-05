@@ -719,7 +719,7 @@ export type NaoConformidade = {
   id: string;
   codigo: string;
   severidade: "Crítica" | "Maior" | "Menor";
-  categoria: "Limpeza inadequada" | "Documentação ausente" | "Certificação vencida" | "Foto não auditável" | "Geolocalização inválida" | "Carga incompatível" | "Carreta não certificada";
+  categoria: "Limpeza inadequada" | "Documentação ausente" | "Certificação vencida" | "Foto não auditável" | "Geolocalização inválida" | "Carga incompatível" | "Empresa não certificada";
   viagem?: string;
   motorista?: string;
   veiculo?: string;
@@ -766,14 +766,14 @@ export const naoConformidades: NaoConformidade[] = [
     severidade: "Maior",
     categoria: "Certificação vencida",
     motorista: "Mauricio Lima",
-    descricao: "MOPP do motorista vencido em 12/04/2026. Renovação pendente.",
+    descricao: "Treinamento GMP+ FSA do motorista vencido em 12/04/2026. Renovação pendente — motorista não elegível para operação até reciclagem.",
     abertaEm: "2026-05-25T14:35:00",
     status: "Em tratamento",
-    responsavel: "RH",
+    responsavel: "Qualidade",
     capa: {
       acaoImediata: "Motorista bloqueado para novas viagens sob cadeia GMP+.",
-      causaRaiz: "Ausência de alerta automático de vencimento de certificação do motorista.",
-      acaoCorretiva: "Ativar alerta 60/30/15 dias e renovar o MOPP.",
+      causaRaiz: "Ausência de alerta automático de vencimento do treinamento do motorista.",
+      acaoCorretiva: "Ativar alerta 60/30/15 dias e agendar reciclagem do treinamento GMP+ FSA.",
       responsavelAcao: "RH",
       prazo: "2026-07-20",
       eficaciaVerificada: false,
@@ -783,17 +783,17 @@ export const naoConformidades: NaoConformidade[] = [
     id: "nc-003",
     codigo: "NC-2026-1040",
     severidade: "Maior",
-    categoria: "Certificação vencida",
+    categoria: "Empresa não certificada",
     veiculo: "JKL-9C44",
-    descricao: "Certificação GMP+ da carreta vencida em 22/03/2026. Recertificação não agendada.",
+    descricao: "Certificado GMP+ da empresa subcontratada vencido em 22/03/2026. Escopo Road Transport of Feed não confirmado — implemento JKL-9C44 não elegível até recertificação da empresa.",
     abertaEm: "2026-05-25T14:35:00",
     status: "Em tratamento",
-    responsavel: "Frota",
+    responsavel: "Qualidade",
     capa: {
-      acaoImediata: "Carreta impedida de operar sob cadeia GMP+ certificada.",
-      causaRaiz: "Recertificação não agendada; controle de validade mantido em planilha manual.",
-      acaoCorretiva: "Migrar controle de certificados para o sistema com bloqueio automático no vencimento.",
-      responsavelAcao: "Frota",
+      acaoImediata: "Implemento impedido de operar sob cadeia GMP+ (certificado da empresa vencido).",
+      causaRaiz: "Recertificação da empresa não agendada; controle de validade mantido em planilha manual.",
+      acaoCorretiva: "Migrar controle de certificados de empresa para o sistema com bloqueio automático no vencimento.",
+      responsavelAcao: "Qualidade",
       prazo: "2026-07-10",
       eficaciaVerificada: false,
     },

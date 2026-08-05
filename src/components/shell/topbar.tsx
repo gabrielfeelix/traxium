@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { notificacoes, filiais, findFilial, FILIAL_TODAS } from "@/lib/mock-data";
 import { CommandPalette } from "@/components/shell/command-palette";
+import { ProdutoToggle } from "@/components/shell/produto-toggle";
 import { PerfilModal, PreferenciasModal, AjudaModal, CopilotModal } from "@/components/shell/header-modals";
 import { useToast } from "@/components/ui/toast";
 import { useSession } from "@/lib/store/session";
@@ -85,6 +86,11 @@ export function Topbar() {
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
+
+        <div className="hidden md:block w-px h-6 bg-[hsl(200_18%_90%)] mx-0.5" />
+
+        {/* Escopo do produto (MVP ⇄ Solução completa) */}
+        <ProdutoToggle />
 
         {/* Command palette (busca ⌘K) */}
         <CommandPalette />

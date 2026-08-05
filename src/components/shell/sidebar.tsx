@@ -35,12 +35,40 @@ import { viagens, naoConformidades, lotes, filialDaViagem, pertenceAFilial } fro
 type Acesso = "full" | "read";
 // Visibilidade por papel de escritório, derivada da matriz §3. Papel ausente = oculto.
 // Master (isMaster) vê tudo como `full`. Campo/portal/auditor têm nav própria (não usam esta).
+
+// Pilares do MVP (diretriz técnica dos 5 pilares). No modo 'mvp' a nav é reagrupada
+// por pilar; no modo 'completa' volta ao agrupamento funcional (navigation abaixo).
+type Pilar =
+  | "Torre de Controle"
+  | "Gatekeeper"
+  | "Academy"
+  | "IDTF Brasil"
+  | "Network"
+  | "App do motorista"
+  | "Sistema";
+
+const PILAR_ORDER: Pilar[] = [
+  "Torre de Controle",
+  "Gatekeeper",
+  "Academy",
+  "IDTF Brasil",
+  "Network",
+  "App do motorista",
+  "Sistema",
+];
+
 type NavItem = {
   href: string;
   label: string;
+  /** Rótulo alternativo no modo MVP (ex.: Dashboard → Torre de Controle). */
+  labelMvp?: string;
   icon: React.ComponentType<{ className?: string }>;
   badgeTone?: "default" | "danger" | "warning";
   access: Partial<Record<Papel, Acesso>>;
+  /** Pilar do MVP a que este item pertence (agrupamento no modo 'mvp'). */
+  pilar: Pilar;
+  /** Aparece no escopo MVP? false = só na Solução completa. */
+  mvp: boolean;
 };
 
 type NavGroup = {
@@ -52,53 +80,70 @@ const navigation: NavGroup[] = [
   {
     title: "Operação",
     items: [
-      { href: "/", label: "Dashboard", icon: LayoutDashboard, access: { gestor: "full", despachante: "full", diretoria_rt: "full", admin_subcontratados: "full", auditor_interno: "read" } },
-      { href: "/viagens", label: "Viagens", icon: Truck, access: { gestor: "read", despachante: "full", diretoria_rt: "read", auditor_interno: "read" } },
-      { href: "/idtf", label: "Motor IDTF", icon: Boxes, badgeTone: "warning", access: { gestor: "full", despachante: "read", auditor_interno: "read" } },
-      { href: "/checklists", label: "Inspeção LCI", icon: ClipboardCheck, access: { gestor: "read", auditor_interno: "read" } },
-      { href: "/limpezas", label: "Limpezas", icon: Droplets, access: { gestor: "full", auditor_interno: "read" } },
-      { href: "/bloqueios", label: "Não conformidades", icon: AlertOctagon, badgeTone: "danger", access: { gestor: "full", despachante: "read", diretoria_rt: "read", admin_subcontratados: "read", auditor_interno: "full" } },
-      { href: "/excecoes", label: "Exceções", icon: Gavel, badgeTone: "warning", access: { gestor: "full", despachante: "full", diretoria_rt: "full", auditor_interno: "read" } },
+      { href: "/", label: "Dashboard", labelMvp: "Torre de Controle", icon: LayoutDashboard, pilar: "Torre de Controle", mvp: true, access: { gestor: "full", despachante: "full", diretoria_rt: "full", admin_subcontratados: "full", auditor_interno: "read" } },
+      { href: "/viagens", label: "Viagens", icon: Truck, pilar: "Torre de Controle", mvp: true, access: { gestor: "read", despachante: "full", diretoria_rt: "read", auditor_interno: "read" } },
+      { href: "/idtf", label: "Motor IDTF", icon: Boxes, badgeTone: "warning", pilar: "IDTF Brasil", mvp: true, access: { gestor: "full", despachante: "read", auditor_interno: "read" } },
+      { href: "/checklists", label: "Inspeção pré-carregamento", icon: ClipboardCheck, pilar: "Gatekeeper", mvp: true, access: { gestor: "read", auditor_interno: "read" } },
+      { href: "/limpezas", label: "Limpezas", icon: Droplets, pilar: "IDTF Brasil", mvp: true, access: { gestor: "full", auditor_interno: "read" } },
+      { href: "/bloqueios", label: "Não conformidades", icon: AlertOctagon, badgeTone: "danger", pilar: "Torre de Controle", mvp: true, access: { gestor: "full", despachante: "read", diretoria_rt: "read", admin_subcontratados: "read", auditor_interno: "full" } },
+      { href: "/excecoes", label: "Exceções", icon: Gavel, badgeTone: "warning", pilar: "Torre de Controle", mvp: true, access: { gestor: "full", despachante: "full", diretoria_rt: "full", auditor_interno: "read" } },
     ],
   },
   {
     title: "Cadastros",
     items: [
-      { href: "/frota", label: "Ativos e frota", icon: Container, access: { gestor: "read", despachante: "read", admin_subcontratados: "full", auditor_interno: "read" } },
-      { href: "/motoristas", label: "Motoristas", icon: IdCard, access: { gestor: "read", despachante: "read", admin_subcontratados: "full", auditor_interno: "read" } },
-      { href: "/subcontratados", label: "Subcontratados", icon: Building2, badgeTone: "danger", access: { gestor: "read", despachante: "read", admin_subcontratados: "full", auditor_interno: "read" } },
-      { href: "/fazendas", label: "Fazendas e polígonos", icon: Trees, access: { gestor: "full", auditor_interno: "read" } },
+      { href: "/frota", label: "Ativos e frota", icon: Container, pilar: "Network", mvp: true, access: { gestor: "read", despachante: "read", admin_subcontratados: "full", auditor_interno: "read" } },
+      { href: "/motoristas", label: "Motoristas", icon: IdCard, pilar: "Academy", mvp: true, access: { gestor: "read", despachante: "read", admin_subcontratados: "full", auditor_interno: "read" } },
+      { href: "/subcontratados", label: "Subcontratados", icon: Building2, badgeTone: "danger", pilar: "Gatekeeper", mvp: true, access: { gestor: "read", despachante: "read", admin_subcontratados: "full", auditor_interno: "read" } },
+      { href: "/fazendas", label: "Fazendas e polígonos", icon: Trees, pilar: "Network", mvp: false, access: { gestor: "full", auditor_interno: "read" } },
     ],
   },
   {
     title: "EUDR · TRACES NT",
     items: [
-      { href: "/lotes", label: "Lotes e DDS", icon: PackageCheck, access: { gestor: "full", auditor_interno: "read" } },
-      { href: "/traces", label: "Gateway TRACES", icon: Database, access: { gestor: "full" } },
+      { href: "/lotes", label: "Lotes e DDS", icon: PackageCheck, pilar: "IDTF Brasil", mvp: false, access: { gestor: "full", auditor_interno: "read" } },
+      { href: "/traces", label: "Gateway TRACES", icon: Database, pilar: "IDTF Brasil", mvp: false, access: { gestor: "full" } },
     ],
   },
   {
     title: "Compliance",
     items: [
-      { href: "/auditoria", label: "Auditoria", icon: ShieldCheck, access: { gestor: "full", diretoria_rt: "read", auditor_interno: "full" } },
-      { href: "/dossie", label: "Dossiê de auditoria", icon: FileCheck2, access: { gestor: "full", despachante: "read", diretoria_rt: "read", auditor_interno: "read" } },
-      { href: "/conformidade", label: "Conformidade", icon: BadgeCheck, access: { gestor: "full", despachante: "read", diretoria_rt: "full", admin_subcontratados: "read", auditor_interno: "read" } },
-      { href: "/documentos", label: "Documentos", icon: FileText, access: { gestor: "full", despachante: "read", diretoria_rt: "read", admin_subcontratados: "read", auditor_interno: "read" } },
-      { href: "/atividade", label: "Atividade", icon: Activity, access: { gestor: "full", despachante: "read", diretoria_rt: "read", admin_subcontratados: "read", auditor_interno: "full" } },
+      { href: "/auditoria", label: "Auditoria", icon: ShieldCheck, pilar: "Torre de Controle", mvp: false, access: { gestor: "full", diretoria_rt: "read", auditor_interno: "full" } },
+      { href: "/dossie", label: "Dossiê de auditoria", icon: FileCheck2, pilar: "Torre de Controle", mvp: true, access: { gestor: "full", despachante: "read", diretoria_rt: "read", auditor_interno: "read" } },
+      { href: "/conformidade", label: "Conformidade", icon: BadgeCheck, pilar: "Torre de Controle", mvp: false, access: { gestor: "full", despachante: "read", diretoria_rt: "full", admin_subcontratados: "read", auditor_interno: "read" } },
+      { href: "/documentos", label: "Documentos", icon: FileText, pilar: "Gatekeeper", mvp: false, access: { gestor: "full", despachante: "read", diretoria_rt: "read", admin_subcontratados: "read", auditor_interno: "read" } },
+      { href: "/atividade", label: "Atividade", icon: Activity, pilar: "Torre de Controle", mvp: false, access: { gestor: "full", despachante: "read", diretoria_rt: "read", admin_subcontratados: "read", auditor_interno: "full" } },
     ],
   },
   {
     title: "Sistema",
     items: [
-      { href: "/mobile", label: "Preview Mobile", icon: Smartphone, access: { gestor: "full" } },
-      { href: "/configuracoes", label: "Configurações", icon: Settings, access: { gestor: "read", diretoria_rt: "full" } },
+      { href: "/mobile", label: "Preview Mobile", labelMvp: "App do motorista", icon: Smartphone, pilar: "App do motorista", mvp: true, access: { gestor: "full" } },
+      { href: "/configuracoes", label: "Configurações", icon: Settings, pilar: "Sistema", mvp: true, access: { gestor: "read", diretoria_rt: "full" } },
     ],
   },
 ];
 
+// Rotas que existem no escopo MVP (as demais são só na Solução completa).
+const HREFS_MVP: string[] = navigation.flatMap((g) => g.items).filter((i) => i.mvp).map((i) => i.href);
+
+/** A rota atual está no escopo MVP? Usado pelo soft-gate do shell. */
+export function rotaVisivelNoMvp(pathname: string): boolean {
+  return HREFS_MVP.some((h) => (h === "/" ? pathname === "/" : pathname === h || pathname.startsWith(h + "/")));
+}
+
+// No modo MVP a nav é reagrupada pelos 5 pilares (+ App e Sistema), só com itens `mvp`.
+function gruposPorPilar(): NavGroup[] {
+  const itens = navigation.flatMap((g) => g.items).filter((i) => i.mvp);
+  return PILAR_ORDER.map((p) => ({
+    title: p,
+    items: itens.filter((i) => i.pilar === p),
+  })).filter((g) => g.items.length > 0);
+}
+
 export function Sidebar() {
   const pathname = usePathname();
-  const { version, papel, isMaster, filialId } = useSession();
+  const { version, papel, isMaster, filialId, produto } = useSession();
 
   // Modo de acesso do papel atual a um item (Master vê tudo). undefined = oculto.
   const acessoDe = (item: NavItem): Acesso | undefined =>
@@ -128,6 +173,9 @@ export function Sidebar() {
     }
   };
 
+  // MVP → nav reagrupada pelos 5 pilares · Completa → agrupamento funcional.
+  const groups = produto === "mvp" ? gruposPorPilar() : navigation;
+
   return (
     <aside className="hidden md:flex h-screen w-[260px] shrink-0 flex-col bg-[hsl(195_30%_8%)] text-[hsl(195_15%_82%)] sticky top-0 relative overflow-hidden">
       {/* Subtle gradient overlay top */}
@@ -148,7 +196,7 @@ export function Sidebar() {
       </div>
 
       <nav className="relative flex-1 overflow-y-auto px-3 py-4 space-y-5">
-        {navigation.map((group) => {
+        {groups.map((group) => {
           // Filtra pela matriz §3: some o que é `—`; grupo sem itens visíveis desaparece.
           const visiveis = group.items
             .map((item) => ({ item, mode: acessoDe(item) }))
@@ -166,6 +214,7 @@ export function Sidebar() {
                     item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
                   const count = badgeFor(item.href);
                   const readOnly = mode === "read";
+                  const label = produto === "mvp" && item.labelMvp ? item.labelMvp : item.label;
                   return (
                     <li key={item.href}>
                       <Link
@@ -178,13 +227,13 @@ export function Sidebar() {
                             ? "text-white/45 hover:bg-white/[0.04] hover:text-white/70"
                             : "text-white/65 hover:bg-white/[0.04] hover:text-white"
                         )}
-                        title={readOnly ? `${item.label} · somente leitura` : item.label}
+                        title={readOnly ? `${label} · somente leitura` : label}
                       >
                         {isActive && (
                           <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 rounded-r bg-gradient-to-b from-[hsl(176_84%_55%)] to-[hsl(200_92%_45%)]" />
                         )}
                         <Icon className={cn("size-[15px] shrink-0", isActive ? "text-[hsl(176_84%_55%)]" : readOnly ? "text-white/40 group-hover:text-white/60" : "text-white/55 group-hover:text-white/85")} />
-                        <span className="flex-1 truncate">{item.label}</span>
+                        <span className="flex-1 truncate">{label}</span>
                         {count > 0 ? (
                           <span
                             className={cn(

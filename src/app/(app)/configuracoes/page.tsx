@@ -165,7 +165,7 @@ export default function ConfiguracoesPage() {
                     "Carga bloqueada por motor de regras",
                     "Auditoria GMP+ agendada (D-30, D-7, D-1)",
                     "Certificação de motorista a vencer (D-30)",
-                    "Certificação de carreta a vencer (D-30)",
+                    "Certificado GMP+ da empresa a vencer (D-30)",
                     "DDS aprovada pelo TRACES NT",
                     "DDS rejeitada pelo TRACES NT",
                     "Alerta de desmatamento em fazenda cadastrada",

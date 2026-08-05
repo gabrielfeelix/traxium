@@ -7,10 +7,11 @@
 //   E → Visão do auditor (somente leitura)
 // A/C/D/E ignoram `children` (rotas do back-office) e renderizam a própria superfície.
 
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { ShieldAlert, X } from "lucide-react";
-import { Sidebar } from "@/components/shell/sidebar";
+import { Sidebar, rotaVisivelNoMvp } from "@/components/shell/sidebar";
 import { Topbar } from "@/components/shell/topbar";
+import { EscopoCompletaGate } from "@/components/shell/escopo-gate";
 import { useSession } from "@/lib/store/session";
 import { AppCampo } from "@/components/shell/surfaces/app-campo";
 import { ConsoleA } from "@/components/shell/surfaces/console-a";
@@ -28,7 +29,10 @@ export function SurfaceShell({ children }: { children: React.ReactNode }) {
 
 function BackOfficeShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { impersonating, sairImpersonation } = useSession();
+  const pathname = usePathname();
+  const { impersonating, sairImpersonation, produto } = useSession();
+  // Modo MVP acessando rota da Solução completa → empty-state, não 404.
+  const foraDoEscopo = produto === "mvp" && !rotaVisivelNoMvp(pathname);
   return (
     <div className="flex min-h-screen bg-[hsl(180_14%_97%)]">
       <Sidebar />
@@ -55,7 +59,9 @@ function BackOfficeShell({ children }: { children: React.ReactNode }) {
           </div>
         )}
 
-        <main className="flex-1 px-6 py-6 max-w-screen-2xl w-full mx-auto">{children}</main>
+        <main className="flex-1 px-6 py-6 max-w-screen-2xl w-full mx-auto">
+          {foraDoEscopo ? <EscopoCompletaGate /> : children}
+        </main>
       </div>
     </div>
   );

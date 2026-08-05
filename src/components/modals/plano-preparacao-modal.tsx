@@ -17,7 +17,7 @@ const ITENS = [
   { item: "Evidências de limpeza Regime D/C com foto e GPS", resp: "Operação", ok: false },
   { item: "Certificados GMP+ de subcontratados vigentes", resp: "Qualidade", ok: false },
   { item: "T-3 por compartimento reconstruído e imutável", resp: "Sistema", ok: true },
-  { item: "Treinamentos GMP+/MOPP comprovados por motorista", resp: "RH", ok: false },
+  { item: "Treinamentos GMP+ FSA comprovados por motorista", resp: "Qualidade", ok: false },
   { item: "Matriz de risco IDTF atualizada para produtos novos", resp: "Rafael · RD Insight", ok: true },
   { item: "Política de sequenciamento de cargas revisada", resp: "Rafael · RD Insight", ok: true },
   { item: "Relatório de NC dos últimos 12 meses com CAPA", resp: "Compliance", ok: false },

@@ -195,7 +195,7 @@ export default function ConformidadePage() {
         </CardHeader>
         <CardContent className="space-y-2">
           {[
-            { acao: "Renovar MOPP de 3 motoristas vencidos", impacto: "+4.2 pts", dim: "Certificações", esforco: "Baixo" },
+            { acao: "Renovar treinamento GMP+ de 3 motoristas vencidos", impacto: "+4.2 pts", dim: "Competência", esforco: "Baixo" },
             { acao: "Concluir 2 inspeções de carreta atrasadas", impacto: "+2.8 pts", dim: "Higienização", esforco: "Médio" },
             { acao: "Treinar 12 subcontratados em LCI versão 2026", impacto: "+5.1 pts", dim: "Treinamentos", esforco: "Alto" },
             { acao: "Atualizar política de sequenciamento conforme IDTF 2026.Q2", impacto: "+1.5 pts", dim: "Documentação", esforco: "Baixo" },
