@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import {
   LayoutDashboard,
   Truck,
@@ -142,7 +143,35 @@ function gruposPorPilar(): NavGroup[] {
   })).filter((g) => g.items.length > 0);
 }
 
+/**
+ * Sidebar fixa — só a partir de `lg`. Abaixo disso os 260px não cabem sem
+ * empurrar a topbar para fora da tela, então a mesma nav vai para o drawer.
+ */
 export function Sidebar() {
+  return (
+    <aside className="hidden lg:flex h-screen w-[260px] shrink-0 flex-col bg-[hsl(195_30%_8%)] text-[hsl(195_15%_82%)] sticky top-0 overflow-hidden">
+      <SidebarConteudo />
+    </aside>
+  );
+}
+
+/** A mesma navegação em painel lateral, para telas estreitas. */
+export function SidebarDrawer({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent
+        side="left"
+        aria-describedby={undefined}
+        className="bg-[hsl(195_30%_8%)] text-[hsl(195_15%_82%)] border-r-0 p-0 overflow-hidden"
+      >
+        <SheetTitle className="sr-only">Navegação</SheetTitle>
+        <SidebarConteudo onNavigate={() => onOpenChange(false)} />
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+function SidebarConteudo({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const { version, papel, isMaster, filialId, produto } = useSession();
 
@@ -178,7 +207,7 @@ export function Sidebar() {
   const groups = produto === "mvp" ? gruposPorPilar() : navigation;
 
   return (
-    <aside className="hidden md:flex h-screen w-[260px] shrink-0 flex-col bg-[hsl(195_30%_8%)] text-[hsl(195_15%_82%)] sticky top-0 relative overflow-hidden">
+    <div className="relative flex h-full min-h-0 flex-1 flex-col">
       {/* Subtle gradient overlay top */}
       <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[hsl(176_84%_25%_/_0.15)] to-transparent pointer-events-none" />
       {/* Subtle grid pattern */}
@@ -191,7 +220,7 @@ export function Sidebar() {
       />
 
       <div className="relative px-5 pt-5 pb-4 border-b border-white/[0.06]">
-        <Link href="/" className="flex items-center">
+        <Link href="/" className="flex items-center" onClick={onNavigate}>
           <TraxiumLogo variant="light" />
         </Link>
       </div>
@@ -205,7 +234,7 @@ export function Sidebar() {
           if (visiveis.length === 0) return null;
           return (
             <div key={group.title}>
-              <p className="px-3 mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/35">
+              <p className="px-3 mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/55">
                 {group.title}
               </p>
               <ul className="space-y-px">
@@ -220,8 +249,9 @@ export function Sidebar() {
                     <li key={item.href}>
                       <Link
                         href={item.href}
+                        onClick={onNavigate}
                         className={cn(
-                          "group relative flex items-center gap-3.5 rounded-md px-3 py-2 text-[13px] font-medium transition-all",
+                          "group relative flex items-center gap-3.5 rounded-md px-3 py-2 text-[13px] font-medium transition-colors",
                           isActive
                             ? "bg-white/[0.07] text-white shadow-[inset_1px_0_0_hsl(176_84%_45%)]"
                             : "text-white/65 hover:bg-white/[0.04] hover:text-white"
@@ -231,7 +261,7 @@ export function Sidebar() {
                         {isActive && (
                           <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 rounded-r bg-gradient-to-b from-[hsl(176_84%_55%)] to-[hsl(200_92%_45%)]" />
                         )}
-                        <Icon className={cn("size-[15px] shrink-0", isActive ? "text-[hsl(176_84%_55%)]" : readOnly ? "text-white/40 group-hover:text-white/60" : "text-white/55 group-hover:text-white/85")} />
+                        <Icon className={cn("size-[15px] shrink-0", isActive ? "text-[hsl(176_84%_55%)]" : readOnly ? "text-white/55 group-hover:text-white/75" : "text-white/55 group-hover:text-white/85")} />
                         <span className="flex-1 truncate">{label}</span>
                         {count > 0 ? (
                           <span
@@ -250,7 +280,7 @@ export function Sidebar() {
                           </span>
                         ) : (
                           readOnly && (
-                            <Eye className="size-3.5 shrink-0 text-white/30" aria-label="somente leitura" />
+                            <Eye className="size-3.5 shrink-0 text-white/55" aria-label="somente leitura" />
                           )
                         )}
                       </Link>
@@ -267,12 +297,13 @@ export function Sidebar() {
         {/* Tenant já aparece no header — aqui fica só a saída. */}
         <Link
           href="/login"
-          className="w-full flex items-center gap-3 rounded-lg hover:bg-white/[0.06] transition-colors p-2.5 text-white/60 hover:text-white"
+          onClick={onNavigate}
+          className="w-full flex items-center gap-3 rounded-lg hover:bg-white/[0.06] transition-colors p-2.5 text-white/70 hover:text-white"
         >
           <LogOut className="size-4 shrink-0" />
           <span className="text-[13px] font-medium">Sair</span>
         </Link>
       </div>
-    </aside>
+    </div>
   );
 }

@@ -22,7 +22,7 @@ import {
   excecoes, produtosIDTF, subcontratados, nivelVencimento, NIVEL_LABEL, NIVEL_CURTO,
   estadoQualificacao, ESTADO_QUALIFICACAO, type NivelAutoridade,
 } from "@/lib/domain/model";
-import { triarViagens, automacao, type ItemTriagem } from "@/lib/domain/control-tower";
+import { triarViagens, automacao, tempoEmFila, type ItemTriagem } from "@/lib/domain/control-tower";
 import { formatDate, formatDateTime, cn } from "@/lib/utils";
 
 type Tier = "bloqueio" | "analise";
@@ -35,6 +35,8 @@ type ItemFila = {
   /** Nível que pode liberar. `tecnico` = ninguém: só a regularização. */
   autoridade: NivelAutoridade;
   meta?: string;
+  /** Desde quando espera. Ausente = a entidade não guarda esse carimbo. */
+  desde?: string;
   href: string;
 };
 
@@ -78,6 +80,7 @@ export function TorreDeControle() {
       meta: t.excecao
         ? `Exceção aberta por ${t.excecao.solicitante}`
         : `Entrega prev. ${formatDateTime(t.viagem.previsaoEntrega).split(",")[0]}`,
+      desde: t.excecao?.solicitadoEm ?? t.viagem.iniciadaEm,
       href: t.excecao ? "/excecoes" : `/viagens/${t.viagem.id}`,
     })),
     ...subPendentes.map(({ s, q }): ItemFila => ({
@@ -98,6 +101,7 @@ export function TorreDeControle() {
       motivo: e.motivoBloqueio,
       autoridade: e.nivelRequerido,
       meta: `Solicitado por ${e.solicitante}`,
+      desde: e.solicitadoEm,
       href: "/excecoes",
     })),
     ...produtosFila.map((p): ItemFila => ({
@@ -107,9 +111,17 @@ export function TorreDeControle() {
       motivo: "Produto não classificado na IDTF. Uso travado até definição da Qualidade.",
       // Classificar é ato técnico da Qualidade — não é liberar exceção.
       autoridade: "gestor",
+      desde: p.emFilaDesde,
       href: "/idtf",
     })),
-  ].sort((a, b) => (a.tier === b.tier ? 0 : a.tier === "bloqueio" ? -1 : 1));
+  ];
+
+  // Agrupada por severidade: é o que dá forma de fila à lista. Dentro do grupo,
+  // quem espera há mais tempo sobe — a fila envelhece de cima para baixo.
+  const idade = (i: ItemFila) => (i.desde ? tempoEmFila(i.desde).horas : -1);
+  const grupos = (["bloqueio", "analise"] as const)
+    .map((tier) => ({ tier, itens: fila.filter((i) => i.tier === tier).sort((a, b) => idade(b) - idade(a)) }))
+    .filter((g) => g.itens.length > 0);
 
   // ── Certificados a vencer (60/30/15) — o que vai travar em breve ──────────
   const certsAVencer = subcontratados
@@ -129,7 +141,7 @@ export function TorreDeControle() {
     <div className="space-y-5" data-v={version}>
       <PageHeader
         title="Torre de Controle"
-        description="O que exige decisão agora: quem está bloqueado, por quê e quem precisa agir. O sistema libera o que está conforme e traz ao humano apenas as exceções."
+        description="O que exige decisão agora. O motor libera o que está conforme e traz ao humano apenas as exceções."
         accessory={
           <span className="inline-flex items-center gap-1.5 rounded-full border border-border-soft bg-white px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-fg-muted">
             <span className="size-1.5 rounded-full bg-success-500 animate-pulse" />
@@ -165,30 +177,59 @@ export function TorreDeControle() {
                 <p className="mt-1 text-[12px] text-fg-muted">Toda operação em aberto está conforme.</p>
               </div>
             ) : (
-              <ul className="divide-y divide-border-soft">
-                {fila.map((it) => (
-                  <li key={it.id}>
-                    <Link
-                      href={it.href}
-                      className="group flex items-start gap-3.5 py-3 -mx-1 px-1 rounded-lg hover:bg-brand-50/50 transition-colors"
-                    >
-                      <TierMark tier={it.tier} tecnico={it.autoridade === "tecnico"} />
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <p className="text-[13px] font-semibold text-fg leading-tight">{it.titulo}</p>
-                          {it.codigo && <span className="font-mono text-[11px] text-fg-muted">{it.codigo}</span>}
-                        </div>
-                        <p className="mt-1 text-[12px] leading-snug text-fg-muted line-clamp-2">{it.motivo}</p>
-                        <div className="mt-1.5 flex items-center gap-2.5 text-[11px] text-fg-muted">
-                          <QuemLibera nivel={it.autoridade} />
-                          {it.meta && <span className="text-fg-soft">· {it.meta}</span>}
-                        </div>
-                      </div>
-                      <ChevronRight className="mt-0.5 size-4 shrink-0 text-fg-soft group-hover:text-brand-600" />
-                    </Link>
-                  </li>
+              <div className="space-y-4">
+                {grupos.map((g) => (
+                  <section key={g.tier}>
+                    <div className="mb-1.5 flex items-center gap-2">
+                      <span className={cn("h-3 w-[3px] rounded-full", g.tier === "bloqueio" ? "bg-danger-500" : "bg-warning-500")} />
+                      <h3 className={cn(
+                        "text-[10px] font-bold uppercase tracking-[0.12em]",
+                        g.tier === "bloqueio" ? "text-danger-700" : "text-warning-700"
+                      )}>
+                        {g.tier === "bloqueio" ? "Impedidos de carregar" : "Aguardando decisão"}
+                      </h3>
+                      <span className="text-[10px] font-bold text-fg-soft num">{g.itens.length}</span>
+                    </div>
+
+                    {/* A espinha corre atrás das marcas e é o que transforma a lista
+                        numa fila: dá um trilho contínuo com a cor da severidade. */}
+                    <ul className="relative">
+                      <span
+                        aria-hidden
+                        className={cn(
+                          "absolute left-[11px] top-3 bottom-3 w-px",
+                          g.tier === "bloqueio" ? "bg-danger-500/35" : "bg-warning-500/40"
+                        )}
+                      />
+                      {g.itens.map((it, i) => (
+                        <li key={it.id} className="animate-list-in" style={{ "--i": i } as React.CSSProperties}>
+                          <Link
+                            href={it.href}
+                            className="group flex items-start gap-3 rounded-lg py-2.5 pr-1 transition-colors hover:bg-brand-50/50"
+                          >
+                            <TierMark tier={it.tier} tecnico={it.autoridade === "tecnico"} />
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-baseline gap-2 flex-wrap">
+                                <p className="text-[13px] font-semibold text-fg leading-tight">{it.titulo}</p>
+                                {it.codigo && <span className="font-mono text-[11px] text-fg-muted">{it.codigo}</span>}
+                              </div>
+                              <p className="mt-1 text-[12px] leading-snug text-fg-muted line-clamp-2">{it.motivo}</p>
+                              <div className="mt-1.5 flex items-center gap-x-2.5 gap-y-1 flex-wrap text-[11px]">
+                                <QuemLibera nivel={it.autoridade} />
+                                {it.meta && <span className="text-fg-soft">{it.meta}</span>}
+                              </div>
+                            </div>
+                            <div className="flex shrink-0 items-center gap-1 pt-0.5">
+                              <TempoEmFila desde={it.desde} />
+                              <ChevronRight className="size-4 text-fg-soft transition-colors group-hover:text-brand-600" />
+                            </div>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
                 ))}
-              </ul>
+              </div>
             )}
           </CardContent>
         </Card>
@@ -210,10 +251,10 @@ export function TorreDeControle() {
                 </p>
               ) : (
                 <ul className="space-y-2.5">
-                  {liberadasPeloMotor.slice(0, 5).map((t) => {
+                  {liberadasPeloMotor.slice(0, 5).map((t, i) => {
                     const ok = t.decisao.checagens.filter((c) => c.ok).length;
                     return (
-                      <li key={t.viagem.id}>
+                      <li key={t.viagem.id} className="animate-list-in" style={{ "--i": i } as React.CSSProperties}>
                         <Link
                           href={`/viagens/${t.viagem.id}`}
                           className="group block rounded-lg px-2 py-1.5 -mx-2 hover:bg-brand-50/50 transition-colors"
@@ -280,40 +321,40 @@ export function TorreDeControle() {
             </CardContent>
           </Card>
 
-          {/* Entrada nos pilares */}
+          {/* Carga pendente por pilar. Não é menu — a sidebar já navega para os
+              mesmos cinco destinos. Aqui só interessa onde a pendência está. */}
           <Card>
             <CardHeader>
-              <CardTitle>Pilares do MVP</CardTitle>
-              <CardDescription>As entradas que alimentam a decisão</CardDescription>
+              <CardTitle>Onde a pendência está</CardTitle>
+              <CardDescription>Itens em aberto por pilar</CardDescription>
             </CardHeader>
             <CardContent className="pt-1">
-              <ul className="space-y-1">
+              <ul className="space-y-2">
                 {pilares.map((p) => {
                   const Icon = p.icon;
+                  const maior = Math.max(...pilares.map((x) => x.count), 1);
                   return (
                     <li key={p.nome}>
-                      <Link
-                        href={p.href}
-                        className="group flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-brand-50/50 transition-colors"
-                      >
-                        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-border-soft bg-bg text-brand-600 group-hover:border-brand-300">
-                          <Icon className="size-4" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-[13px] font-semibold text-fg leading-tight">{p.nome}</p>
-                          <p className="text-[11px] text-fg-muted leading-tight">{p.desc}</p>
-                        </div>
-                        {p.count > 0 && (
-                          <span
-                            className={cn(
-                              "shrink-0 min-w-[20px] h-[18px] rounded-[5px] px-1 text-[10px] font-bold flex items-center justify-center num text-white",
-                              p.tone === "danger" ? "bg-danger-500" : "bg-warning-500"
-                            )}
-                          >
+                      <Link href={p.href} className="group block rounded-lg px-1.5 py-1 -mx-1.5 transition-colors hover:bg-brand-50/50">
+                        <div className="flex items-center gap-2">
+                          <Icon className={cn("size-3.5 shrink-0", p.count > 0 ? "text-fg-muted" : "text-fg-soft")} />
+                          <span className={cn("flex-1 truncate text-[12px]", p.count > 0 ? "font-semibold text-fg" : "text-fg-muted")}>
+                            {p.nome}
+                          </span>
+                          <span className={cn("text-[12px] font-bold num", p.count > 0 ? "text-fg" : "text-fg-soft")}>
                             {p.count}
                           </span>
-                        )}
-                        <ChevronRight className="size-4 shrink-0 text-fg-soft group-hover:text-brand-600" />
+                        </div>
+                        {/* Barra proporcional ao maior pilar — mostra onde o volume está. */}
+                        <div className="mt-1 ml-[22px] h-1 overflow-hidden rounded-full bg-bg">
+                          <span
+                            className={cn(
+                              "block h-full rounded-full transition-[width] duration-500",
+                              p.tone === "danger" ? "bg-danger-500" : p.count > 0 ? "bg-warning-500" : "bg-transparent"
+                            )}
+                            style={{ width: `${(p.count / maior) * 100}%` }}
+                          />
+                        </div>
                       </Link>
                     </li>
                   );
@@ -380,15 +421,17 @@ function FaixaTriagem({ auto, triagem }: { auto: ReturnType<typeof automacao>; t
                     />
                   ))}
                 </div>
-                <ul className="mt-3 grid grid-cols-2 gap-x-5 gap-y-2 sm:grid-cols-4">
-                  {segmentos.map((s) => (
-                    <li key={s.rotulo} className="min-w-0">
+                {/* 4 colunas só a partir de xl — abaixo disso os rótulos truncavam
+                    ("Libera…", "Aguar…"), que é pior que quebrar em duas linhas. */}
+                <ul className="mt-3 grid grid-cols-2 gap-x-5 gap-y-3 xl:grid-cols-4">
+                  {segmentos.map((s, i) => (
+                    <li key={s.rotulo} className="min-w-0 animate-list-in" style={{ "--i": i } as React.CSSProperties}>
                       <div className="flex items-center gap-1.5">
                         <span className={cn("size-2 shrink-0 rounded-full", s.cor)} />
                         <span className="text-[15px] font-bold leading-none text-fg num">{s.n}</span>
                       </div>
-                      <p className="mt-1 truncate text-[11px] font-medium text-fg" title={s.rotulo}>{s.rotulo}</p>
-                      <p className="truncate text-[10px] text-fg-soft" title={s.hint}>{s.hint}</p>
+                      <p className="mt-1 text-[11px] font-medium leading-tight text-fg">{s.rotulo}</p>
+                      <p className="text-[10px] leading-tight text-fg-soft">{s.hint}</p>
                     </li>
                   ))}
                 </ul>
@@ -420,11 +463,37 @@ function QuemLibera({ nivel }: { nivel: NivelAutoridade }) {
   );
 }
 
+/**
+ * Tempo em fila. Só aparece quando há carimbo real — subcontratado não guarda
+ * "pendente desde", então ali não se inventa uma idade.
+ */
+function TempoEmFila({ desde }: { desde?: string }) {
+  if (!desde) return null;
+  const t = tempoEmFila(desde);
+  // A fila envelhece: acima de 30 dias deixa de ser espera e vira problema.
+  const tom = t.dias >= 30 ? "danger" : t.dias >= 7 ? "warning" : "muted";
+  return (
+    <span
+      title={`Na fila desde ${formatDate(desde.slice(0, 10))}`}
+      className={cn(
+        "rounded-md px-1.5 py-0.5 text-[10.5px] font-semibold num whitespace-nowrap",
+        tom === "danger" && "bg-danger-50 text-danger-700",
+        tom === "warning" && "bg-warning-50 text-warning-700",
+        tom === "muted" && "text-fg-soft"
+      )}
+    >
+      {t.rotulo}
+    </span>
+  );
+}
+
 function TierMark({ tier, tecnico }: { tier: Tier; tecnico: boolean }) {
+  // `ring-4 ring-white` recorta a espinha atrás da marca, em vez de escondê-la.
+  const base = "relative z-10 mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-lg ring-4 ring-white";
   if (tier === "bloqueio") {
     return (
       <span
-        className="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-lg bg-danger-50 text-danger-700"
+        className={cn(base, "bg-danger-50 text-danger-700")}
         title={tecnico ? "Bloqueio técnico — sem liberação por autoridade" : "Bloqueio"}
       >
         {tecnico ? <ShieldOff className="size-3.5" /> : <AlertOctagon className="size-3.5" />}
@@ -432,7 +501,7 @@ function TierMark({ tier, tecnico }: { tier: Tier; tecnico: boolean }) {
     );
   }
   return (
-    <span className="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-lg bg-warning-50 text-warning-700" title="Aguardando análise">
+    <span className={cn(base, "bg-warning-50 text-warning-700")} title="Aguardando análise">
       <Gavel className="size-3.5" />
     </span>
   );

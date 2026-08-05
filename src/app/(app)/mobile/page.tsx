@@ -112,7 +112,7 @@ export default function MobilePreviewPage() {
                 <div className="absolute top-0 left-0 right-0 h-[44px] flex items-center justify-between px-7 pt-3 text-[11px] font-semibold z-10">
                   <span className="num flex items-center gap-1">
                     09:42
-                    {!online && <span className="text-[9px] font-bold text-[hsl(28_92%_48%)] uppercase tracking-wide">offline</span>}
+                    {!online && <span className="text-[9px] font-bold text-warning-700 uppercase tracking-wide">offline</span>}
                   </span>
                   <div className="flex items-center gap-1">
                     <Signal className="size-3" />
@@ -1008,7 +1008,7 @@ export function MotoristaFlow() {
       <div className="flex h-[38px] shrink-0 items-center justify-between px-6 pt-1.5 text-[11px] font-semibold">
         <span className="num flex items-center gap-1">
           09:42
-          {!online && <span className="text-[9px] font-bold uppercase tracking-wide text-[hsl(28_92%_48%)]">offline</span>}
+          {!online && <span className="text-[9px] font-bold uppercase tracking-wide text-warning-700">offline</span>}
         </span>
         <button
           onClick={toggleOnline}

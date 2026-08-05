@@ -200,7 +200,7 @@ export default function BloqueiosPage() {
                     tabIndex={0}
                     onClick={() => setCapaNC(nc)}
                     onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setCapaNC(nc); } }}
-                    className="group relative rounded-lg border border-border-soft bg-bg-elev overflow-hidden transition-all cursor-pointer hover:border-brand-500/40 hover:shadow-brand-sm"
+                    className="group relative rounded-lg border border-border-soft bg-bg-elev overflow-hidden transition-colors cursor-pointer hover:border-brand-500/40 hover:shadow-brand-sm"
                   >
                     <span className={cn("absolute left-0 top-0 bottom-0 w-1", S.accent)} aria-hidden />
                     <div className="flex items-start gap-4 p-3.5 pl-5">

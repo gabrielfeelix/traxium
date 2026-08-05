@@ -47,7 +47,10 @@
   --color-bg-elev:    hsl(0 0% 100%);
   --color-fg:         hsl(200 25% 12%);
   --color-fg-muted:   hsl(210 14% 42%);
-  --color-fg-soft:    hsl(210 12% 58%);
+  /* 58% dava 3,10:1 sobre branco — reprovava o mínimo de 4,5:1 do DESIGN §14,
+     justamente no tamanho em que mais aparece (10–11px). 46% dá ~4,8:1 e
+     mantém o degrau visível abaixo de fg-muted. */
+  --color-fg-soft:    hsl(210 14% 46%);
   --color-border:     hsl(200 18% 88%);
   --color-border-soft:hsl(200 18% 92%);
 
@@ -160,12 +163,6 @@ body {
   0% { background-position: -1000px 0; }
   100% { background-position: 1000px 0; }
 }
-.animate-shimmer {
-  background: linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.5), transparent);
-  background-size: 1000px 100%;
-  animation: shimmer 2.5s infinite;
-}
-
 @keyframes pulse-ring {
   0% { box-shadow: 0 0 0 0 hsl(176 84% 35% / 0.4); }
   70% { box-shadow: 0 0 0 14px hsl(176 84% 35% / 0); }
@@ -179,11 +176,44 @@ body {
 }
 .animate-fade-in { animation: fade-in 0.3s ease-out; }
 
-@keyframes slide-in {
-  from { opacity: 0; transform: translateX(-8px); }
-  to { opacity: 1; transform: translateX(0); }
+/* Entrada escalonada de lista. O índice vem inline via --i; o atraso é curto de
+   propósito — a lista precisa terminar de entrar antes do olho procurar o topo. */
+@keyframes list-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-.animate-slide-in { animation: slide-in 0.3s ease-out; }
+.animate-list-in {
+  animation: list-in 0.34s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
+
+/* Skeleton de carregamento — usa o shimmer que já existia e nunca foi aplicado. */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: hsl(200 18% 94%);
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.65), transparent);
+  background-size: 1000px 100%;
+  animation: shimmer 2.5s infinite;
+}
+
+/* Acessibilidade: quem pediu menos movimento não recebe pulse-ring em loop,
+   nem entrada escalonada, nem transição de nada. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
 
 /* Spotlight */
 .spotlight {

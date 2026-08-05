@@ -10,11 +10,25 @@
 //      um certificado vencido ou uma limpeza que não aconteceu. O que derruba
 //      um bloqueio técnico é a regularização do fato, não a hierarquia.
 
-import { excecoes, type Excecao, type NivelAutoridade } from "./model";
+import { excecoes, HOJE, type Excecao, type NivelAutoridade } from "./model";
 import { avaliarCarregamento, type Decisao } from "./rules-engine";
 import type { Viagem } from "@/lib/mock-data";
 
 export type Faixa = "verde" | "amarelo" | "vermelho";
+
+/**
+ * Tempo em fila (PDF §Control Tower, painel administrativo).
+ *
+ * Conta contra `HOJE` do protótipo, não contra `Date.now()`: a linha do tempo
+ * dos dados é fixa, então o relógio real faria a idade crescer sozinha e mentir.
+ */
+export function tempoEmFila(desde: string): { horas: number; dias: number; rotulo: string } {
+  const ms = new Date(`${HOJE}T12:00:00`).getTime() - new Date(desde).getTime();
+  const horas = Math.max(0, Math.floor(ms / 3_600_000));
+  const dias = Math.floor(horas / 24);
+  const rotulo = horas < 1 ? "agora" : horas < 24 ? `há ${horas}h` : `há ${dias}d`;
+  return { horas, dias, rotulo };
+}
 
 /** Quem liberou de fato. `null` = ninguém liberou ainda (amarelo/vermelho). */
 export type Liberador = "motor" | "autoridade" | null;

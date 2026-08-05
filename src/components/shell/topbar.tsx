@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Bell, ChevronDown, LogOut, Settings, User, HelpCircle, Sparkles, Building2, Check, UserCog } from "lucide-react";
+import { Bell, ChevronDown, LogOut, Settings, User, HelpCircle, Sparkles, Building2, Check, UserCog, Menu } from "lucide-react";
+import { SidebarDrawer } from "@/components/shell/sidebar";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -27,6 +28,7 @@ export function Topbar() {
   const [prefs, setPrefs] = useState(false);
   const [ajuda, setAjuda] = useState(false);
   const [copilot, setCopilot] = useState(false);
+  const [nav, setNav] = useState(false);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -42,20 +44,29 @@ export function Topbar() {
 
   return (
     <header className="sticky top-0 z-30 h-[60px] border-b border-[hsl(200_18%_90%)] bg-[hsl(0_0%_100%_/_0.78)] backdrop-blur-xl">
-      <div className="flex h-full items-center gap-3 px-5">
+      <div className="flex h-full items-center gap-2 px-3 sm:gap-3 sm:px-5">
+        {/* Abaixo de lg a sidebar vira drawer — este é o único acesso à navegação. */}
+        <button
+          onClick={() => setNav(true)}
+          aria-label="Abrir navegação"
+          className="lg:hidden size-9 shrink-0 rounded-md hover:bg-[hsl(200_18%_94%)] flex items-center justify-center transition-colors"
+        >
+          <Menu className="size-[18px] text-[hsl(200_25%_25%)]" />
+        </button>
+
         {/* Filial switcher — troca de FILIAL dentro do tenant (§5), NÃO de transportadora.
             Selecionar re-escopa o dado (viagens, KPIs), não só o rótulo. */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="group flex items-center gap-2.5 rounded-lg border border-[hsl(200_18%_90%)] bg-white px-2.5 py-1.5 hover:border-[hsl(176_60%_50%)] hover:shadow-brand-sm transition-all">
+            <button className="group flex shrink-0 items-center gap-2.5 rounded-lg border border-[hsl(200_18%_90%)] bg-white px-2 py-1.5 sm:px-2.5 hover:border-[hsl(176_60%_50%)] hover:shadow-brand-sm transition-colors">
               <div className="size-7 rounded-md bg-gradient-to-br from-[hsl(176_84%_30%)] to-[hsl(200_92%_28%)] flex items-center justify-center text-white font-bold text-[10px] shadow-sm">
                 {initials(tenantNome)}
               </div>
-              <div className="text-left">
+              <div className="text-left hidden xl:block">
                 <p className="text-[9px] uppercase tracking-[0.12em] text-[hsl(210_14%_42%)] font-semibold leading-none">Filial ativa</p>
-                <p className="text-[13px] font-semibold leading-tight mt-0.5">{filialAtiva}</p>
+                <p className="text-[13px] font-semibold leading-tight mt-0.5 max-w-[140px] truncate">{filialAtiva}</p>
               </div>
-              <ChevronDown className="size-3.5 text-[hsl(210_14%_42%)] group-hover:text-[hsl(176_84%_25%)]" />
+              <ChevronDown className="size-3.5 shrink-0 text-[hsl(210_14%_42%)] group-hover:text-[hsl(176_84%_25%)]" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-80">
@@ -87,7 +98,7 @@ export function Topbar() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <div className="hidden md:block w-px h-6 bg-[hsl(200_18%_90%)] mx-0.5" />
+        <div className="hidden lg:block w-px h-6 bg-[hsl(200_18%_90%)] mx-0.5" />
 
         {/* Escopo do produto (MVP ⇄ Solução completa) */}
         <ProdutoToggle />
@@ -96,13 +107,13 @@ export function Topbar() {
         <CommandPalette />
 
         {/* Right actions */}
-        <div className="ml-auto flex items-center gap-1">
-          <Button variant="outline" size="sm" onClick={() => setCopilot(true)} className="hidden lg:flex h-9 gap-1.5 border-[hsl(176_60%_75%)] text-[hsl(176_84%_25%)] hover:bg-[hsl(174_64%_96%)]">
+        <div className="ml-auto flex shrink-0 items-center gap-0.5 sm:gap-1">
+          <Button variant="outline" size="sm" onClick={() => setCopilot(true)} className="hidden xl:flex h-9 gap-1.5 border-[hsl(176_60%_75%)] text-[hsl(176_84%_25%)] hover:bg-[hsl(174_64%_96%)]">
             <Sparkles className="size-3.5" /> Copilot
             <kbd className="ml-1 inline-flex h-4 items-center rounded border border-[hsl(176_60%_75%)] bg-white px-1 text-[9px] font-semibold num">⌘J</kbd>
           </Button>
 
-          <div className="w-px h-6 bg-[hsl(200_18%_90%)] mx-1" />
+          <div className="hidden sm:block w-px h-6 bg-[hsl(200_18%_90%)] mx-1" />
 
           {/* Notifications */}
           <DropdownMenu>
@@ -145,7 +156,7 @@ export function Topbar() {
             <HelpCircle className="size-[18px] text-[hsl(200_25%_25%)]" />
           </button>
 
-          <div className="w-px h-6 bg-[hsl(200_18%_90%)] mx-1" />
+          <div className="hidden sm:block w-px h-6 bg-[hsl(200_18%_90%)] mx-1" />
 
           {/* User */}
           <DropdownMenu>
@@ -154,7 +165,7 @@ export function Topbar() {
                 <Avatar className="size-7 ring-2 ring-white shadow-sm">
                   <AvatarFallback className="text-[11px] bg-gradient-to-br from-[hsl(176_84%_30%)] to-[hsl(200_92%_30%)] text-white">GF</AvatarFallback>
                 </Avatar>
-                <div className="text-left hidden lg:block">
+                <div className="text-left hidden xl:block">
                   <p className="text-[12px] font-semibold leading-tight">Gabriel Felix</p>
                   <p className="text-[10px] text-[hsl(210_14%_42%)] leading-tight">{PERFIL_POR_ID[perfilId].label}</p>
                 </div>
@@ -177,6 +188,7 @@ export function Topbar() {
         </div>
       </div>
 
+      <SidebarDrawer open={nav} onOpenChange={setNav} />
       <PerfilModal open={perfil} onOpenChange={setPerfil} />
       <PreferenciasModal open={prefs} onOpenChange={setPrefs} />
       <AjudaModal open={ajuda} onOpenChange={setAjuda} />

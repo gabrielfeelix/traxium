@@ -59,6 +59,8 @@ export type ProdutoIDTF = {
   bloqueiaFeed: boolean;
   riscoEUDR: "N/A" | "Baixo" | "Médio" | "Alto";
   statusClassificacao: "classificado" | "em_fila" | "proibido";
+  /** Quando entrou na fila de classificação — alimenta o "tempo em fila" da Torre. */
+  emFilaDesde?: string;
   versaoBase: string;
 };
 
@@ -163,6 +165,7 @@ export const produtosIDTF: ProdutoIDTF[] = [
     bloqueiaFeed: false,
     riscoEUDR: "Médio",
     statusClassificacao: "em_fila",
+    emFilaDesde: "2026-06-24T08:15:00",
     versaoBase: VERSAO_BASE_IDTF,
   },
   {
@@ -174,6 +177,7 @@ export const produtosIDTF: ProdutoIDTF[] = [
     bloqueiaFeed: false,
     riscoEUDR: "N/A",
     statusClassificacao: "em_fila",
+    emFilaDesde: "2026-07-06T16:40:00",
     versaoBase: VERSAO_BASE_IDTF,
   },
 ];

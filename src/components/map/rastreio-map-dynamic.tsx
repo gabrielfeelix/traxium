@@ -6,12 +6,13 @@ export const RastreioMap = dynamic(
   () => import("./rastreio-map").then((m) => m.RastreioMap),
   {
     ssr: false,
+    // Leaflet é um chunk pesado e este é um carregamento real. O shimmer mostra a
+    // forma do que vem; um spinner solto só informa que algo trava.
     loading: () => (
-      <div className="bg-bg rounded-lg flex items-center justify-center" style={{ height: 420 }}>
-        <div className="flex flex-col items-center gap-2 text-fg-muted">
-          <div className="size-8 border-2 border-brand-600 border-t-transparent rounded-full animate-spin" />
-          <p className="text-xs font-medium">Carregando mapa…</p>
-        </div>
+      <div className="skeleton rounded-lg flex items-center justify-center" style={{ height: 420 }}>
+        <p className="relative z-10 text-[11px] font-medium uppercase tracking-[0.12em] text-fg-muted">
+          Carregando mapa
+        </p>
       </div>
     ),
   }

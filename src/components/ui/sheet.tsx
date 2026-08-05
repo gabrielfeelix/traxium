@@ -16,21 +16,34 @@ export const SheetClose = DialogPrimitive.Close;
 
 export const SheetContent = React.forwardRef<
   React.ComponentRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
+    /** Lado de entrada. `left` serve à navegação em telas estreitas. */
+    side?: "left" | "right";
+  }
+>(({ className, children, side = "right", ...props }, ref) => (
   <DialogPrimitive.Portal>
     <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/30 backdrop-blur-[2px] data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0" />
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed inset-y-0 right-0 z-50 w-full sm:max-w-[540px] bg-bg-elev border-l border-border-soft shadow-brand-lg flex flex-col",
-        "data-[state=open]:animate-in data-[state=open]:slide-in-from-right data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right duration-300",
+        "fixed inset-y-0 z-50 w-full bg-bg-elev shadow-brand-lg flex flex-col duration-300",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out",
+        side === "right"
+          ? "right-0 sm:max-w-[540px] border-l border-border-soft data-[state=open]:slide-in-from-right data-[state=closed]:slide-out-to-right"
+          : "left-0 max-w-[280px] border-r border-border-soft data-[state=open]:slide-in-from-left data-[state=closed]:slide-out-to-left",
         className
       )}
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-md p-1.5 text-fg-muted hover:bg-bg hover:text-fg transition-colors">
+      <DialogPrimitive.Close
+        className={cn(
+          "absolute top-4 rounded-md p-1.5 transition-colors",
+          side === "right"
+            ? "right-4 text-fg-muted hover:bg-bg hover:text-fg"
+            : "right-3 text-white/70 hover:bg-white/10 hover:text-white"
+        )}
+      >
         <X className="size-4" />
         <span className="sr-only">Fechar</span>
       </DialogPrimitive.Close>

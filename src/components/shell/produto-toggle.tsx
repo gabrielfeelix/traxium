@@ -15,7 +15,7 @@ const OPCOES: { modo: ProdutoModo; label: string }[] = [
 export function ProdutoToggle() {
   const { produto, setProduto } = useSession();
   return (
-    <div className="hidden md:inline-flex items-center gap-2">
+    <div className="hidden md:inline-flex shrink-0 items-center gap-2">
       <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-[hsl(210_14%_42%)] hidden xl:inline">
         Escopo
       </span>

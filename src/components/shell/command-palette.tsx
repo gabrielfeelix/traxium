@@ -144,7 +144,7 @@ export function CommandPalette() {
   }, [resultados]);
 
   return (
-    <div ref={raizRef} className="relative flex-1 max-w-2xl mx-2">
+    <div ref={raizRef} className="relative hidden sm:block w-full min-w-[140px] max-w-[280px] xl:max-w-[360px] mx-1 sm:mx-2">
       <div
         className={cn(
           "flex items-center h-9 rounded-md bg-bg border px-3 transition-colors",

@@ -74,7 +74,7 @@ export function Credencial({
       onClick={onFocar}
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onFocar(); } }}
       className={cn(
-        "rounded-xl border overflow-hidden bg-bg-elev text-left transition-all cursor-pointer group",
+        "rounded-xl border overflow-hidden bg-bg-elev text-left transition-colors cursor-pointer group",
         selecionado
           ? "border-brand-500/50 ring-1 ring-brand-500/30 shadow-brand-md"
           : bloqueado
