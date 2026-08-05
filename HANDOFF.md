@@ -43,6 +43,12 @@ O branch saiu de `b73836e` e ficou 8 commits atrás de `main`. Merge feito, 4 co
 - Dossiê: checagens item a item na §Decisão + nova **§Autoridade da liberação** (motor vs. pessoa deixam rastros diferentes).
 - Verificado no app rodando: 60% resolvido sem humano (3 de 5 em rota), técnico sem botão, dossiê nos dois ramos.
 
+### Revisão de UI/UX (commit `3fa2c2e`) — ver `REVISAO-UI-UX.md`
+- **Shell responsivo**: sidebar fixa só em `lg`; abaixo disso a mesma nav vai para drawer (`SidebarDrawer`), acionado pelo botão da topbar. `Sheet` ganhou `side="left"`. Copilot e nome do usuário só em `xl` (em `lg` a sidebar já come 260px).
+- **Contraste**: `fg-soft` foi para `210 14% 46%` (4,72:1); brancos da sidebar para `white/55`. `success-500`/`warning-500` **ficam como estão** — são usados em ícone, onde o critério é 3:1.
+- **Movimento**: `prefers-reduced-motion` global (não existia). `.animate-list-in` na fila/legenda/registro; `.skeleton` nos dois `dynamic()` de Leaflet. `animate-slide-in` e `.animate-shimmer` foram removidos: eram declarados e nunca usados.
+- **Torre**: fila agrupada por severidade com espinha contínua + **tempo em fila** (contado contra `HOJE`, não `Date.now()`). "Pilares do MVP" virou "Onde a pendência está".
+
 ## Mapa MVP: pilar → telas
 Torre de Controle (home + /viagens + /excecoes + /bloqueios + /dossie) · Gatekeeper (/subcontratados + /checklists) · Academy (/motoristas) · IDTF Brasil (/idtf + /limpezas) · Network (/frota) · App do motorista (/mobile). Escondido no MVP: /fazendas /lotes /traces /auditoria /conformidade /documentos /atividade + superfícies Console/Portal/Auditor.
 
@@ -58,6 +64,12 @@ Página pública de onboarding (fluxo do transportador), assinatura eletrônica 
 - **Reavaliação após regularização**: hoje o bloqueio técnico só cai porque o motor recalcula a cada render. Falta a ação explícita ("registrar limpeza → reavaliar") fechando o ciclo na tela, com o antes/depois visível.
 - **Trilha temporal da decisão automática**: `avaliadoEm` usa `viagem.iniciadaEm`. Um ledger real (append-only, com a versão da base vigente em cada avaliação) é o que sustenta "o motor decidiu às 14:22 com a base 2026.05".
 - **Regras novas não mapeadas** caem no fallback `gestor` em `autoridadeDaRegra()`. Ao acrescentar regra ao motor, mapear a autoridade junto — senão vira aprovável por descuido.
+
+## Dívida de UI/UX ainda aberta (ver `REVISAO-UI-UX.md`)
+- **PageHeaders longos** em quase todas as páginas (Subcontratados tem ~50 palavras antes do primeiro dado). Só a Torre foi enxugada.
+- **`transition-all` em ~43 lugares** — anima layout junto com cor. Só `input.tsx` e três telas foram estreitados.
+- **`emFilaDesde` só existe em `ProdutoIDTF`.** Subcontratado pendente não guarda desde quando espera, então não mostra tempo em fila. Para cobertura total do §Control Tower, o estado de qualificação precisa carregar carimbo.
+- **Telas fora do MVP não foram revisadas** em 375/768 (só o shell foi corrigido, o que já resolve o overflow; o conteúdo interno de /traces, /lotes, /fazendas não foi olhado).
 
 ## Pendência operacional
 `vercel deploy` está **não autorizado** nesta máquina (`vercel whoami` → Not authorized); `.vercel/project.json` está correto. Gabriel precisa rodar `vercel login` uma vez — a Fase 3 está commitada e pushada, mas **sem preview publicado**.
