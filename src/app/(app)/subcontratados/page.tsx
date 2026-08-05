@@ -21,8 +21,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { StatTile } from "@/components/kit/stat-tile";
-import { subcontratados, nivelVencimento, type Subcontratado } from "@/lib/domain/model";
+import { subcontratados, nivelVencimento, estadoQualificacao, ESTADO_QUALIFICACAO, type Subcontratado } from "@/lib/domain/model";
 import { QualificarSubcontratadoModal } from "@/components/modals/qualificar-subcontratado-modal";
+import { PassaporteFeedSafetyModal } from "@/components/modals/passaporte-modal";
+import { OnboardingLinkModal } from "@/components/modals/onboarding-link-modal";
+
+const TONE_VARIANT = { success: "success", warning: "warning", danger: "destructive", muted: "muted" } as const;
 import { useSession } from "@/lib/store/session";
 import { useToast } from "@/components/ui/toast";
 import { downloadCSV } from "@/lib/export";
@@ -37,11 +41,10 @@ export default function SubcontratadosPage() {
     (s) => s.razaoSocial.toLowerCase().includes(q) || s.cnpj.includes(q)
   );
 
-  const vencidos = subcontratados.filter((s) => nivelVencimento(s.certGMP.validade).nivel === "vencido").length;
-  const aVencer = subcontratados.filter((s) => {
-    const n = nivelVencimento(s.certGMP.validade).nivel;
-    return n === "critico" || n === "alto" || n === "alerta";
-  }).length;
+  const estados = subcontratados.map((s) => estadoQualificacao(s).estado);
+  const aptos = estados.filter((e) => ESTADO_QUALIFICACAO[e].opera).length;
+  const pendentes = estados.filter((e) => e.startsWith("Pendente") || e === "Pré-cadastrado").length;
+  const bloqueados = estados.filter((e) => e === "Bloqueado" || e === "Suspenso").length;
 
   return (
     <div className="space-y-6" data-v={version}>
@@ -68,6 +71,7 @@ export default function SubcontratadosPage() {
             >
               <Download className="size-4" /> Exportar
             </Button>
+            <OnboardingLinkModal />
             <QualificarSubcontratadoModal />
           </>
         }
@@ -75,9 +79,9 @@ export default function SubcontratadosPage() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatTile icon={Building2} label="Cadastrados" value={subcontratados.length} />
-        <StatTile icon={ShieldCheck} label="Escopo válido" value={subcontratados.length - vencidos} tone="success" />
-        <StatTile icon={AlertTriangle} label="A vencer (≤60d)" value={aVencer} tone="warning" />
-        <StatTile icon={ShieldAlert} label="Vencidos / bloqueados" value={vencidos} tone="danger" />
+        <StatTile icon={ShieldCheck} label="Aptos a operar" value={aptos} tone="success" />
+        <StatTile icon={AlertTriangle} label="Pendentes" value={pendentes} tone="warning" />
+        <StatTile icon={ShieldAlert} label="Bloqueados / suspensos" value={bloqueados} tone="danger" />
       </div>
 
       <div className="relative max-w-md">
@@ -101,10 +105,11 @@ export default function SubcontratadosPage() {
 
 function SubcontratadoCard({ s }: { s: Subcontratado }) {
   const venc = nivelVencimento(s.certGMP.validade);
-  const bloqueado = venc.nivel === "vencido" || s.certGMP.statusBasePublica !== "Ativo";
+  const { estado, motivo } = estadoQualificacao(s);
+  const meta = ESTADO_QUALIFICACAO[estado];
 
   return (
-    <Card className={cn(bloqueado && "border-[hsl(0_72%_80%)]")}>
+    <Card className={cn(meta.tone === "danger" && "border-[hsl(0_72%_80%)]")}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-0">
@@ -113,14 +118,18 @@ function SubcontratadoCard({ s }: { s: Subcontratado }) {
             </div>
             <div className="min-w-0">
               <CardTitle className="truncate">{s.razaoSocial}</CardTitle>
-              <p className="text-[11px] text-fg-muted font-mono">{s.cnpj}</p>
+              <div className="flex items-center gap-1.5">
+                <p className="text-[11px] text-fg-muted font-mono">{s.cnpj}</p>
+                {s.tipoVinculo && (
+                  <>
+                    <span className="text-fg-soft">·</span>
+                    <span className="text-[10px] font-medium text-fg-muted">{s.tipoVinculo}</span>
+                  </>
+                )}
+              </div>
             </div>
           </div>
-          {bloqueado ? (
-            <Badge variant="destructive" className="text-[9px] shrink-0">Bloqueado</Badge>
-          ) : (
-            <Badge variant="success" className="text-[9px] shrink-0">Apto</Badge>
-          )}
+          <Badge variant={TONE_VARIANT[meta.tone]} className="text-[9px] shrink-0">{estado}</Badge>
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -176,18 +185,21 @@ function SubcontratadoCard({ s }: { s: Subcontratado }) {
           </div>
         </div>
 
-        {bloqueado && (
-          <div className="rounded-lg bg-[hsl(0_72%_97%)] border border-[hsl(0_72%_88%)] p-2.5 flex items-start gap-2">
-            <ShieldAlert className="size-4 text-[hsl(0_70%_45%)] shrink-0 mt-0.5" />
-            <p className="text-[11px] text-[hsl(0_70%_38%)]">
-              {venc.nivel === "vencido"
-                ? `Certificado vencido em ${formatDate(s.certGMP.validade)}. `
-                : ""}
-              {s.certGMP.statusBasePublica !== "Ativo" ? `Status "${s.certGMP.statusBasePublica}" na base GMP+. ` : ""}
-              Carregamento sob cadeia certificada bloqueado até regularização.
-            </p>
+        {!meta.opera && (
+          <div
+            className={cn(
+              "rounded-lg border p-2.5 flex items-start gap-2",
+              meta.tone === "danger" ? "bg-[hsl(0_72%_97%)] border-[hsl(0_72%_88%)]" : "bg-[hsl(45_92%_95%)] border-[hsl(40_84%_82%)]"
+            )}
+          >
+            <ShieldAlert className={cn("size-4 shrink-0 mt-0.5", meta.tone === "danger" ? "text-[hsl(0_70%_45%)]" : "text-[hsl(30_84%_42%)]")} />
+            <p className={cn("text-[11px]", meta.tone === "danger" ? "text-[hsl(0_70%_38%)]" : "text-[hsl(28_72%_32%)]")}>{motivo}</p>
           </div>
         )}
+
+        <div className="pt-0.5">
+          <PassaporteFeedSafetyModal s={s} />
+        </div>
       </CardContent>
     </Card>
   );

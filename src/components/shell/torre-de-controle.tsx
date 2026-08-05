@@ -17,6 +17,7 @@ import { useSession } from "@/lib/store/session";
 import { viagens, motoristas, filialDaViagem, pertenceAFilial } from "@/lib/mock-data";
 import {
   excecoes, produtosIDTF, subcontratados, nivelVencimento, NIVEL_LABEL,
+  estadoQualificacao, ESTADO_QUALIFICACAO,
 } from "@/lib/domain/model";
 import { avaliarCarregamento } from "@/lib/domain/rules-engine";
 import { formatDateTime, cn } from "@/lib/utils";
@@ -43,15 +44,16 @@ export function TorreDeControle() {
   const liberadas = ativas.filter((v) => v.status !== "Bloqueada");
   const excecoesPendentes = excecoes.filter((e) => e.status === "pendente");
   const produtosFila = produtosIDTF.filter((p) => p.statusClassificacao === "em_fila");
-  const subBloqueados = subcontratados.filter(
-    (s) => nivelVencimento(s.certGMP.validade).nivel === "vencido" || s.certGMP.statusBasePublica !== "Ativo"
-  );
+  const subPendentes = subcontratados
+    .map((s) => ({ s, q: estadoQualificacao(s) }))
+    .filter((x) => !ESTADO_QUALIFICACAO[x.q.estado].opera);
+  const subBloqueioN = subPendentes.filter((x) => ESTADO_QUALIFICACAO[x.q.estado].tone === "danger").length;
   const academyPend = motoristas.filter((m) =>
     m.certificacoes.some((c) => c.status === "Vencida" && c.nome !== "MOPP")
   ).length;
 
-  const totalBloqueio = bloqueadas.length + subBloqueados.length;
-  const totalAnalise = excecoesPendentes.length + produtosFila.length;
+  const totalBloqueio = bloqueadas.length + subBloqueioN;
+  const totalAnalise = excecoesPendentes.length + produtosFila.length + (subPendentes.length - subBloqueioN);
 
   // ── Fila de decisões (unificada, bloqueio-first) ──────────────────────────
   const fila: ItemFila[] = [
@@ -68,21 +70,15 @@ export function TorreDeControle() {
         href: `/viagens/${v.id}`,
       };
     }),
-    ...subBloqueados.map((s): ItemFila => {
-      const nv = nivelVencimento(s.certGMP.validade);
-      return {
-        id: `s-${s.id}`,
-        tier: "bloqueio",
-        titulo: s.razaoSocial,
-        codigo: s.cnpj,
-        motivo:
-          s.certGMP.statusBasePublica !== "Ativo"
-            ? `Base pública GMP+ ${s.certGMP.statusBasePublica.toLowerCase()}. Escopo Road Transport não confirmado.`
-            : `Certificado GMP+ da empresa vencido há ${Math.abs(nv.dias)} dias. Implemento não elegível até renovação.`,
-        quemAge: "Admin de Subcontratados",
-        href: "/subcontratados",
-      };
-    }),
+    ...subPendentes.map(({ s, q }): ItemFila => ({
+      id: `s-${s.id}`,
+      tier: ESTADO_QUALIFICACAO[q.estado].tone === "danger" ? "bloqueio" : "analise",
+      titulo: s.razaoSocial,
+      codigo: s.cnpj,
+      motivo: `${q.estado}. ${q.motivo}`,
+      quemAge: "Admin de Subcontratados",
+      href: "/subcontratados",
+    })),
     ...excecoesPendentes.map((e): ItemFila => ({
       id: `e-${e.id}`,
       tier: "analise",
@@ -111,7 +107,7 @@ export function TorreDeControle() {
 
   const pilares = [
     { nome: "Operações", desc: "Viagens e liberação", icon: Truck, href: "/viagens", count: bloqueadas.length, tone: "danger" as const },
-    { nome: "Gatekeeper", desc: "Qualificação de terceiros", icon: Building2, href: "/subcontratados", count: subBloqueados.length, tone: "danger" as const },
+    { nome: "Gatekeeper", desc: "Qualificação de terceiros", icon: Building2, href: "/subcontratados", count: subPendentes.length, tone: (subBloqueioN > 0 ? "danger" : "warning") as "danger" | "warning" },
     { nome: "Academy", desc: "Competência do motorista", icon: GraduationCap, href: "/motoristas", count: academyPend, tone: "warning" as const },
     { nome: "IDTF Brasil", desc: "Consulta e regimes", icon: Boxes, href: "/idtf", count: produtosFila.length, tone: "warning" as const },
     { nome: "Network", desc: "Cadastro e ativos", icon: Container, href: "/frota", count: 0, tone: "default" as const },

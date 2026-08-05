@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { type Subcontratado, nivelVencimento, podeExecutar } from "@/lib/domain/model";
+import { type Subcontratado, estadoQualificacao, ESTADO_QUALIFICACAO, podeExecutar } from "@/lib/domain/model";
 import { useSession } from "@/lib/store/session";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
@@ -46,7 +46,7 @@ export function QualificarSubcontratadoModal() {
   const valido = cnpj && razao && numero && validade && escopos.length > 0;
 
   function salvar() {
-    addSubcontratado({
+    const novo = {
       cnpj, razaoSocial: razao,
       certGMP: {
         numero, certificadora, escopo: escopos, validade,
@@ -56,17 +56,14 @@ export function QualificarSubcontratadoModal() {
       veiculosAutorizados: veiculos.split(",").map((s) => s.trim()).filter(Boolean),
       motoristasAutorizados: mot.split(",").map((s) => s.trim()).filter(Boolean),
       treinamento: { comprovante: tComprovante, quiz: tQuiz, aceiteRegras: tAceite },
-    });
-    // Mesma lógica do card de /subcontratados: vencido OU base pública ≠ Ativo → bloqueado.
-    const vencido = nivelVencimento(validade).nivel === "vencido";
-    const bloqueado = vencido || statusBase !== "Ativo";
-    toast(`${razao} qualificado`, {
-      type: bloqueado ? "error" : "success",
-      desc: bloqueado
-        ? vencido
-          ? "Certificado GMP+ vencido → bloqueado até renovar."
-          : "Status na base pública não é Ativo → bloqueado."
-        : "Escopo válido e certificado vigente — apto a operar cadeia GMP+.",
+    };
+    addSubcontratado(novo);
+    // Estado real derivado (novo cadastro sem acordo firmado → Pendente documental).
+    const { estado, motivo } = estadoQualificacao(novo as Subcontratado);
+    const meta = ESTADO_QUALIFICACAO[estado];
+    toast(`${razao} · ${estado}`, {
+      type: meta.opera ? "success" : meta.tone === "danger" ? "error" : "info",
+      desc: motivo,
     });
     setOpen(false); reset();
   }

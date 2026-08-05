@@ -487,10 +487,31 @@ export function inspecoesDoCompartimento(compartimentoId: string): InspectionEve
 // Subcontratado (empresa) — entidade própria, escopo GMP+ validado (PLANO §1.2)
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Como o transportador se relaciona com a operação (Gatekeeper §3 — o sistema
+// precisa distinguir, não tratar todo terceiro como "fornecedor genérico").
+export type TipoVinculo =
+  | "TAC pessoa física"
+  | "ETC subcontratada"
+  | "Agregado"
+  | "Transportador certificado"
+  | "Condição Gatekeeper";
+
+// Acordo de Garantia da Qualidade digital (Gatekeeper §3) — deixa de ser arquivo
+// isolado e vira registro operacional controlado, com versão, vigência e assinatura.
+export type AcordoQA = {
+  versao: string;
+  vigenciaInicio: string;
+  vigenciaFim: string;
+  assinadoEm?: string;
+  assinante?: string;
+  dispositivo?: string;
+};
+
 export type Subcontratado = {
   id: string;
   cnpj: string;
   razaoSocial: string;
+  tipoVinculo?: TipoVinculo;
   certGMP: {
     numero: string;
     certificadora: string;
@@ -502,6 +523,35 @@ export type Subcontratado = {
   veiculosAutorizados: string[];
   motoristasAutorizados: string[];
   treinamento: { comprovante: boolean; quiz: boolean; aceiteRegras: boolean };
+  acordo?: AcordoQA;
+};
+
+// Estados de qualificação do transportador (Gatekeeper §3). Derivados do estado
+// real (cert, base pública, acordo, treinamento) — não um campo editável solto.
+export type EstadoQualificacao =
+  | "Pré-cadastrado"
+  | "Pendente documental"
+  | "Pendente de treinamento"
+  | "Pendente de inspeção"
+  | "Apto"
+  | "Apto com restrição"
+  | "Bloqueado"
+  | "Suspenso"
+  | "Inativo";
+
+export const ESTADO_QUALIFICACAO: Record<
+  EstadoQualificacao,
+  { tone: "success" | "warning" | "danger" | "muted"; opera: boolean }
+> = {
+  Apto: { tone: "success", opera: true },
+  "Apto com restrição": { tone: "warning", opera: true },
+  "Pré-cadastrado": { tone: "muted", opera: false },
+  "Pendente documental": { tone: "warning", opera: false },
+  "Pendente de treinamento": { tone: "warning", opera: false },
+  "Pendente de inspeção": { tone: "warning", opera: false },
+  Bloqueado: { tone: "danger", opera: false },
+  Suspenso: { tone: "danger", opera: false },
+  Inativo: { tone: "muted", opera: false },
 };
 
 export const subcontratados: Subcontratado[] = [
@@ -509,6 +559,7 @@ export const subcontratados: Subcontratado[] = [
     id: "sub-001",
     cnpj: "23.456.789/0001-01",
     razaoSocial: "Souza Transportes ME",
+    tipoVinculo: "Transportador certificado",
     certGMP: {
       numero: "GMP-BR-2024-8841",
       certificadora: "Único Organismo Certificador BR",
@@ -520,11 +571,20 @@ export const subcontratados: Subcontratado[] = [
     veiculosAutorizados: ["PHC-2B17", "UHB-9I02"],
     motoristasAutorizados: ["Edivaldo Souza", "Antonio Marcos"],
     treinamento: { comprovante: true, quiz: true, aceiteRegras: true },
+    acordo: {
+      versao: "v3.0",
+      vigenciaInicio: "2026-01-10",
+      vigenciaFim: "2027-01-10",
+      assinadoEm: "2026-01-10T09:12:00",
+      assinante: "Edivaldo Souza",
+      dispositivo: "Android 12 · Motorola E22",
+    },
   },
   {
     id: "sub-002",
     cnpj: "34.567.890/0001-12",
     razaoSocial: "Lima Logística Agrícola Ltda",
+    tipoVinculo: "ETC subcontratada",
     certGMP: {
       numero: "GMP-BR-2023-5510",
       certificadora: "Único Organismo Certificador BR",
@@ -536,11 +596,91 @@ export const subcontratados: Subcontratado[] = [
     veiculosAutorizados: ["MNB-7D29"],
     motoristasAutorizados: ["Mauricio Lima"],
     treinamento: { comprovante: true, quiz: false, aceiteRegras: true },
+    acordo: {
+      versao: "v2.0",
+      vigenciaInicio: "2025-02-01",
+      vigenciaFim: "2026-02-01", // vencido
+      assinadoEm: "2025-02-01T11:40:00",
+      assinante: "Mauricio Lima",
+      dispositivo: "Android 10 · Samsung A03",
+    },
+  },
+  {
+    id: "sub-003",
+    cnpj: "45.678.901/0001-23",
+    razaoSocial: "Rondon Fretes — José A. Ferreira (TAC)",
+    tipoVinculo: "TAC pessoa física",
+    certGMP: {
+      numero: "GMP-BR-2025-2077",
+      certificadora: "Único Organismo Certificador BR",
+      escopo: ["Road Transport of Feed"],
+      validade: "2026-08-04", // a vencer (~27 dias de HOJE)
+      sitesCobertos: ["Rondonópolis/MT"],
+      statusBasePublica: "Ativo",
+    },
+    veiculosAutorizados: ["RDN-5A18"],
+    motoristasAutorizados: ["José A. Ferreira"],
+    treinamento: { comprovante: true, quiz: true, aceiteRegras: true },
+    acordo: {
+      versao: "v3.0",
+      vigenciaInicio: "2026-03-15",
+      vigenciaFim: "2027-03-15",
+      assinadoEm: "2026-03-15T08:05:00",
+      assinante: "José A. Ferreira",
+      dispositivo: "Android 11 · Xiaomi Redmi 9",
+    },
+  },
+  {
+    id: "sub-004",
+    cnpj: "56.789.012/0001-34",
+    razaoSocial: "Agro Sul Agregados Ltda",
+    tipoVinculo: "Agregado",
+    certGMP: {
+      numero: "GMP-BR-2025-6642",
+      certificadora: "Único Organismo Certificador BR",
+      escopo: ["Road Transport of Feed", "Affreightment of Road Transport"],
+      validade: "2027-09-30",
+      sitesCobertos: ["Rondonópolis/MT", "Sorriso/MT"],
+      statusBasePublica: "Ativo",
+    },
+    veiculosAutorizados: ["ASL-3C55", "ASL-7D19"],
+    motoristasAutorizados: ["Reginaldo Alves", "Cleber Matos"],
+    treinamento: { comprovante: true, quiz: false, aceiteRegras: false },
+    acordo: {
+      versao: "v3.0",
+      vigenciaInicio: "2026-04-02",
+      vigenciaFim: "2027-04-02",
+      assinadoEm: "2026-04-02T14:20:00",
+      assinante: "Reginaldo Alves",
+      dispositivo: "Android 13 · Motorola G13",
+    },
   },
 ];
 
 export function findSubcontratado(id?: string): Subcontratado | undefined {
   return id ? subcontratados.find((s) => s.id === id) : undefined;
+}
+
+/** Estado de qualificação derivado do estado real (cert, base pública, acordo,
+ *  treinamento). Ordem = prioridade do que impede operar. Retorna estado + motivo. */
+export function estadoQualificacao(s: Subcontratado): { estado: EstadoQualificacao; motivo: string } {
+  const venc = nivelVencimento(s.certGMP.validade);
+  if (s.certGMP.statusBasePublica === "Suspenso")
+    return { estado: "Suspenso", motivo: "Status “Suspenso” na base pública GMP+ International." };
+  if (s.certGMP.statusBasePublica === "Não localizado")
+    return { estado: "Bloqueado", motivo: "Empresa não localizada na base pública GMP+ — escopo não confirmado." };
+  if (venc.nivel === "vencido")
+    return { estado: "Bloqueado", motivo: `Certificado GMP+ da empresa vencido há ${Math.abs(venc.dias)} dias.` };
+  if (!s.acordo || !s.acordo.assinadoEm || diasEntre(HOJE, s.acordo.vigenciaFim) < 0)
+    return {
+      estado: "Pendente documental",
+      motivo: !s.acordo ? "Acordo de Garantia da Qualidade não firmado." : "Acordo de Garantia da Qualidade vencido ou não assinado.",
+    };
+  if (!s.treinamento.comprovante || !s.treinamento.quiz || !s.treinamento.aceiteRegras)
+    return { estado: "Pendente de treinamento", motivo: "Treinamento GMP+ incompleto: falta comprovante, quiz ou aceite das regras." };
+  if (venc.nivel === "critico" || venc.nivel === "alto" || venc.nivel === "alerta")
+    return { estado: "Apto com restrição", motivo: `Certificado GMP+ vence em ${venc.dias} dias — programar renovação.` };
+  return { estado: "Apto", motivo: "Qualificação vigente. Apto a operar sob cadeia GMP+ FSA." };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
