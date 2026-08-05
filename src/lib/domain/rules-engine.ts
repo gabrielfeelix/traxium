@@ -317,11 +317,16 @@ export function avaliarNovoCarregamento(compartimentoId: string, refISO = `${HOJ
   tier: Tier;
   motivo: string;
   regimeExigido?: Regime;
+  /** Mesma nomenclatura de `Decisao.regra` — é o que roteia a autoridade (control-tower.ts). */
+  regra: string;
 } {
   const st = statusCompartimento(compartimentoId);
 
-  if (st.status === "bloqueado" || st.status === "requer_limpeza") {
-    return { tier: "BLOQUEIO", motivo: st.motivo, regimeExigido: st.regimeExigido };
+  if (st.status === "bloqueado") {
+    return { tier: "BLOQUEIO", motivo: st.motivo, regimeExigido: st.regimeExigido, regra: "Carga anterior proibida" };
+  }
+  if (st.status === "requer_limpeza") {
+    return { tier: "BLOQUEIO", motivo: st.motivo, regimeExigido: st.regimeExigido, regra: "Limpeza incompatível" };
   }
 
   // Compartimento ok (apto ou sem histórico) → checar certificação do implemento/subcontratado
@@ -330,22 +335,23 @@ export function avaliarNovoCarregamento(compartimentoId: string, refISO = `${HOJ
   const sub = findSubcontratado(imp?.subcontratadoId);
 
   if (imp?.certGMP.status === "Vencida") {
-    return { tier: "BLOQUEIO", motivo: `Certificação GMP+ do implemento ${imp.placa} vencida.`, regimeExigido: st.regimeExigido };
+    return { tier: "BLOQUEIO", motivo: `Certificação GMP+ do implemento ${imp.placa} vencida.`, regimeExigido: st.regimeExigido, regra: "Certificado vencido/incompatível" };
   }
   if (sub && nivelVencimento(sub.certGMP.validade, refISO.slice(0, 10)).nivel === "vencido") {
-    return { tier: "BLOQUEIO", motivo: `Certificado GMP+ do subcontratado ${sub.razaoSocial} vencido.`, regimeExigido: st.regimeExigido };
+    return { tier: "BLOQUEIO", motivo: `Certificado GMP+ do subcontratado ${sub.razaoSocial} vencido.`, regimeExigido: st.regimeExigido, regra: "Certificado vencido/incompatível" };
   }
 
   const nivelImp = imp ? nivelVencimento(imp.certGMP.validade, refISO.slice(0, 10)).nivel : "ok";
   const nivelSub = sub ? nivelVencimento(sub.certGMP.validade, refISO.slice(0, 10)).nivel : "ok";
   if ([nivelImp, nivelSub].some((n) => n === "critico" || n === "alto" || n === "alerta")) {
-    return { tier: "ALERTA", motivo: "Certificação a vencer em ≤60 dias — liberação exige justificativa.", regimeExigido: st.regimeExigido };
+    return { tier: "ALERTA", motivo: "Certificação a vencer em ≤60 dias — liberação exige justificativa.", regimeExigido: st.regimeExigido, regra: "Pendência sem risco direto" };
   }
 
   return {
     tier: "LIBERADO",
     motivo: st.status === "sem_historico" ? "Compartimento novo, sem histórico — apto." : st.motivo,
     regimeExigido: st.regimeExigido,
+    regra: "Conforme",
   };
 }
 

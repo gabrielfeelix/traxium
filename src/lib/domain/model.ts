@@ -688,7 +688,9 @@ export function estadoQualificacao(s: Subcontratado): { estado: EstadoQualificac
 // O motorista NUNCA libera exceção; apenas registra ocorrência e solicita análise.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type NivelAutoridade = "gestor" | "diretoria_rt" | "cliente";
+// `tecnico` é o nível de NINGUÉM: existe para que "não há liberação possível"
+// seja um estado do modelo, e não só um texto na matriz. Ver control-tower.ts.
+export type NivelAutoridade = "tecnico" | "gestor" | "diretoria_rt" | "cliente";
 
 export type Excecao = {
   id: string;
@@ -707,10 +709,38 @@ export type Excecao = {
 };
 
 export const NIVEL_LABEL: Record<NivelAutoridade, string> = {
+  tecnico: "Bloqueio técnico — sem liberação por autoridade",
   gestor: "Gestor GMP+/Qualidade",
   diretoria_rt: "Diretoria + Resp. Técnico + Qualidade",
   cliente: "Cliente/Embarcador (só escopo comercial)",
 };
+
+/** Rótulo curto para chip/badge, onde o nome completo não cabe. */
+export const NIVEL_CURTO: Record<NivelAutoridade, string> = {
+  tecnico: "Ninguém libera",
+  gestor: "Gestor GMP+",
+  diretoria_rt: "Diretoria + RT",
+  cliente: "Cliente",
+};
+
+/**
+ * Escopo de cada nível — fonte única da matriz de autoridade exibida em
+ * /excecoes. Antes a matriz era um array solto na página com 4 cartões contra
+ * 3 níveis no tipo; agora tipo e tela não podem divergir.
+ */
+export const NIVEL_ESCOPO: Record<NivelAutoridade, string> = {
+  tecnico:
+    "Carga anterior proibida sem procedimento, compartimento com resíduo/odor/praga, certificado GMP+ vencido, limpeza exigida não evidenciada, T-3 ausente. Nenhuma assinatura desfaz o fato — só a regularização derruba o bloqueio.",
+  gestor:
+    "Divergência documental corrigível, foto reenviada, limpeza feita com comprovante pendente, troca de veículo pré-carregamento, checklist reprovado e corrigido.",
+  diretoria_rt:
+    "Exceções com impacto contratual, uso emergencial de terceiro, pendência documental temporária, risco residual formalmente aceito.",
+  cliente:
+    "Pode aceitar atraso ou troca de veículo. Nunca reduz exigência de segurança de feed nem perdoa contaminação.",
+};
+
+/** Ordem de exibição da matriz: do mais duro ao mais frouxo. */
+export const NIVEIS_AUTORIDADE: NivelAutoridade[] = ["tecnico", "gestor", "diretoria_rt", "cliente"];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Papéis (RBAC) — Fase I usa: gestor/qualidade, despachante, motorista, inspetor,
@@ -744,6 +774,9 @@ export const isPapelCampo = (p: Papel): boolean => p === "motorista" || p === "i
 
 /** Quem pode aprovar uma exceção do nível exigido. Motorista/inspetor/despachante NUNCA. */
 export function podeAprovarExcecao(papel: Papel, nivel: NivelAutoridade): boolean {
+  // Bloqueio técnico não escala: nem diretoria, nem master, nem ninguém. O que
+  // libera é regularizar o fato (limpar, renovar o certificado, registrar o T-3).
+  if (nivel === "tecnico") return false;
   if (nivel === "gestor") return papel === "gestor" || papel === "diretoria_rt";
   if (nivel === "diretoria_rt") return papel === "diretoria_rt";
   // "cliente" = escopo comercial (atraso/troca), nunca contaminação — fora do gate interno.
@@ -938,13 +971,15 @@ export const excecoes: Excecao[] = [
     codigoViagem: "TX-2026-08472",
     motivoBloqueio: "Carga anterior proibida (defensivo agrícola líquido) sem limpeza Regime D evidenciada.",
     regra: "Carga anterior proibida",
-    nivelRequerido: "diretoria_rt",
+    // Técnico, não diretoria: enquanto a limpeza D não existir, não há assinatura
+    // que torne o compartimento apto. A hierarquia entra depois da regularização.
+    nivelRequerido: "tecnico",
     solicitante: "Mauricio Lima · motorista (registrou ocorrência)",
     solicitadoEm: "2026-05-25T14:40:00",
     status: "pendente",
     evidencias: ["Foto do compartimento", "Solicitação de análise"],
     observacao:
-      "Contaminação não é liberável por tráfego nem 'perdoada' pelo cliente. Exige procedimento de liberação: limpeza D, inspeção qualificada e aprovação formal.",
+      "Contaminação não é liberável por tráfego, por diretoria nem 'perdoada' pelo cliente. O bloqueio cai quando a limpeza Regime D for executada e evidenciada e o motor reavaliar — não por aprovação.",
   },
   {
     id: "exc-002",

@@ -20,37 +20,22 @@ import { PageHeader } from "@/components/shell/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { excecoes, NIVEL_LABEL, PAPEL_LABEL, podeAprovarExcecao, type Excecao, type Papel } from "@/lib/domain/model";
+import {
+  excecoes, NIVEL_LABEL, NIVEL_ESCOPO, NIVEIS_AUTORIDADE, PAPEL_LABEL, podeAprovarExcecao,
+  type Excecao, type Papel, type NivelAutoridade,
+} from "@/lib/domain/model";
 import { useSession } from "@/lib/store/session";
 import { useToast } from "@/components/ui/toast";
 import { formatDateTime, cn } from "@/lib/utils";
 
-const MATRIZ = [
-  {
-    icon: <ShieldAlert className="size-4" />,
-    tone: "danger" as const,
-    nivel: "Crítico — sem liberação operacional",
-    casos: "Carga anterior proibida sem procedimento, compartimento com resíduo/odor/praga, certificado GMP+ vencido, produto não classificado no IDTF, T-3 ausente.",
-  },
-  {
-    icon: <UserCog className="size-4" />,
-    tone: "brand" as const,
-    nivel: "Gestor GMP+/Qualidade",
-    casos: "Divergência documental corrigível, foto reenviada, limpeza feita com comprovante pendente, troca de veículo pré-carregamento, checklist reprovado e corrigido.",
-  },
-  {
-    icon: <Building className="size-4" />,
-    tone: "warning" as const,
-    nivel: "Diretoria + Resp. Técnico + Qualidade",
-    casos: "Exceções com impacto contratual, uso emergencial de terceiro, pendência documental temporária, risco residual formalmente aceito.",
-  },
-  {
-    icon: <Handshake className="size-4" />,
-    tone: "info" as const,
-    nivel: "Cliente/Embarcador (só escopo comercial)",
-    casos: "Pode aceitar atraso ou troca de veículo. NUNCA reduz exigência de segurança de feed nem 'perdoa' contaminação.",
-  },
-];
+// A matriz é derivada de NIVEIS_AUTORIDADE/NIVEL_ESCOPO: tela e modelo não podem
+// divergir. Aqui só mora a apresentação (ícone e tom) de cada nível.
+const NIVEL_UI: Record<NivelAutoridade, { icon: React.ReactNode; tone: "danger" | "brand" | "warning" | "info" }> = {
+  tecnico: { icon: <ShieldAlert className="size-4" />, tone: "danger" },
+  gestor: { icon: <UserCog className="size-4" />, tone: "brand" },
+  diretoria_rt: { icon: <Building className="size-4" />, tone: "warning" },
+  cliente: { icon: <Handshake className="size-4" />, tone: "info" },
+};
 
 export default function ExcecoesPage() {
   const { version, papel, decidirExcecao } = useSession();
@@ -97,34 +82,37 @@ export default function ExcecoesPage() {
           <CardDescription>Quem pode liberar o quê. A severidade define o nível — nunca o tráfego.</CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {MATRIZ.map((m) => (
-            <div
-              key={m.nivel}
-              className={cn(
-                "rounded-lg border p-3 flex gap-3",
-                m.tone === "danger" && "border-[hsl(0_72%_82%)] bg-[hsl(0_72%_98%)]",
-                m.tone === "brand" && "border-[hsl(176_60%_78%)] bg-[hsl(174_64%_98%)]",
-                m.tone === "warning" && "border-[hsl(28_92%_82%)] bg-[hsl(36_95%_98%)]",
-                m.tone === "info" && "border-[hsl(200_60%_82%)] bg-[hsl(200_60%_98%)]"
-              )}
-            >
+          {NIVEIS_AUTORIDADE.map((n) => {
+            const ui = NIVEL_UI[n];
+            return (
               <div
+                key={n}
                 className={cn(
-                  "size-8 rounded-md flex items-center justify-center shrink-0 text-white",
-                  m.tone === "danger" && "bg-[hsl(0_78%_50%)]",
-                  m.tone === "brand" && "bg-[hsl(176_84%_25%)]",
-                  m.tone === "warning" && "bg-[hsl(28_92%_48%)]",
-                  m.tone === "info" && "bg-[hsl(200_90%_36%)]"
+                  "rounded-lg border p-3 flex gap-3",
+                  ui.tone === "danger" && "border-[hsl(0_72%_82%)] bg-[hsl(0_72%_98%)]",
+                  ui.tone === "brand" && "border-[hsl(176_60%_78%)] bg-[hsl(174_64%_98%)]",
+                  ui.tone === "warning" && "border-[hsl(28_92%_82%)] bg-[hsl(36_95%_98%)]",
+                  ui.tone === "info" && "border-[hsl(200_60%_82%)] bg-[hsl(200_60%_98%)]"
                 )}
               >
-                {m.icon}
+                <div
+                  className={cn(
+                    "size-8 rounded-md flex items-center justify-center shrink-0 text-white",
+                    ui.tone === "danger" && "bg-[hsl(0_78%_50%)]",
+                    ui.tone === "brand" && "bg-[hsl(176_84%_25%)]",
+                    ui.tone === "warning" && "bg-[hsl(28_92%_48%)]",
+                    ui.tone === "info" && "bg-[hsl(200_90%_36%)]"
+                  )}
+                >
+                  {ui.icon}
+                </div>
+                <div>
+                  <p className="text-[12px] font-semibold text-fg">{NIVEL_LABEL[n]}</p>
+                  <p className="text-[11px] text-fg-muted mt-0.5 leading-relaxed">{NIVEL_ESCOPO[n]}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-[12px] font-semibold text-fg">{m.nivel}</p>
-                <p className="text-[11px] text-fg-muted mt-0.5 leading-relaxed">{m.casos}</p>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </CardContent>
       </Card>
 
@@ -165,7 +153,8 @@ export default function ExcecoesPage() {
 }
 
 function ExcecaoCard({ e, papel, onDecidir }: { e: Excecao; papel: Papel; onDecidir: (e: Excecao, s: "aprovada" | "negada") => void }) {
-  const critico = e.nivelRequerido === "diretoria_rt";
+  const tecnico = e.nivelRequerido === "tecnico";
+  const critico = tecnico || e.nivelRequerido === "diretoria_rt";
   const podeDecidir = podeAprovarExcecao(papel, e.nivelRequerido);
   return (
     <Card className={cn(e.status === "pendente" && critico && "border-[hsl(0_72%_82%)]")}>
@@ -221,7 +210,17 @@ function ExcecaoCard({ e, papel, onDecidir }: { e: Excecao; papel: Papel; onDeci
           </div>
 
           {e.status === "pendente" && (
-            podeDecidir ? (
+            tecnico ? (
+              // Nenhum botão de aprovar — nem escondido por papel. Não existe
+              // autoridade que derrube este bloqueio; o caminho é regularizar.
+              <div className="shrink-0 max-w-[190px] text-[10px] text-[hsl(0_70%_38%)] flex items-start gap-1.5 bg-[hsl(0_72%_98%)] border border-[hsl(0_72%_88%)] rounded-md p-2">
+                <ShieldAlert className="size-3.5 mt-0.5 shrink-0" />
+                <span>
+                  <strong>Bloqueio técnico.</strong> Nenhuma autoridade libera — nem diretoria, nem cliente. Só a
+                  regularização do fato derruba, com nova avaliação do motor.
+                </span>
+              </div>
+            ) : podeDecidir ? (
               <div className="flex flex-col gap-2 shrink-0">
                 <Button variant="outline" size="sm" onClick={() => onDecidir(e, "aprovada")}>
                   <Check className="size-4" /> Aprovar liberação

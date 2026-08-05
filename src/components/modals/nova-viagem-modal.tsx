@@ -13,9 +13,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { RegimeBadge } from "@/components/shell/status-badge";
 import {
-  produtosIDTF, cavalos, implementos, compartimentos, findImplemento, HOJE, podeExecutar,
+  produtosIDTF, cavalos, implementos, compartimentos, findImplemento, HOJE, podeExecutar, NIVEL_CURTO,
 } from "@/lib/domain/model";
 import { getT3, avaliarNovoCarregamento, type Tier } from "@/lib/domain/rules-engine";
+import { autoridadeDaRegra } from "@/lib/domain/control-tower";
 import { motoristas, viagens } from "@/lib/mock-data";
 import { useSession } from "@/lib/store/session";
 import { useToast } from "@/components/ui/toast";
@@ -78,21 +79,27 @@ export function NovaViagemModal() {
       // O motor não deixa nascer uma viagem liberada sobre compartimento sujo: nasce
       // Bloqueada E já abre uma exceção pendente roteada ao nível de autoridade correto.
       const v = viagens.find((x) => x.id === id);
-      const proibida = /proibida/i.test(decisao.motivo);
+      const nivel = autoridadeDaRegra(decisao.regra);
+      const tecnico = nivel === "tecnico";
       addExcecao({
         viagemId: id,
         codigoViagem: v?.codigo ?? id,
         motivoBloqueio: decisao.motivo,
-        regra: proibida ? "Carga anterior proibida" : "Bloqueio do motor no despacho",
-        nivelRequerido: proibida ? "diretoria_rt" : "gestor",
+        regra: decisao.regra,
+        nivelRequerido: nivel,
         solicitante: `${motorista} · motorista (registrou ocorrência)`,
         solicitadoEm: `${HOJE}T10:00:00`,
         evidencias: [],
-        observacao: proibida
-          ? "Contaminação não é liberável por tráfego nem 'perdoada' pelo cliente. Exige limpeza D, inspeção qualificada e aprovação formal."
+        observacao: tecnico
+          ? "Bloqueio técnico: não há autoridade que libere. O registro serve para rastrear a ocorrência — o que derruba o bloqueio é regularizar o fato e reavaliar."
           : undefined,
       });
-      toast("Viagem criada como BLOQUEADA", { type: "error", desc: "Exceção aberta e roteada à autoridade. Trate em Exceções." });
+      toast("Viagem criada como BLOQUEADA", {
+        type: "error",
+        desc: tecnico
+          ? "Bloqueio técnico registrado. Nenhuma aprovação libera — regularize e reavalie."
+          : `Exceção aberta e roteada a ${NIVEL_CURTO[nivel]}. Trate em Exceções.`,
+      });
     } else if (decisao.tier === "ALERTA") {
       toast("Viagem criada com alerta justificado", { type: "info", desc: `${id} · justificativa registrada.` });
     } else {

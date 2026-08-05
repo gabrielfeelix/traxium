@@ -16,6 +16,7 @@ import {
   Camera,
   ScanSearch,
   Fingerprint,
+  Gavel,
 } from "lucide-react";
 import { PageHeader } from "@/components/shell/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -36,8 +37,10 @@ import {
   findSubcontratado,
   findProduto,
   inspecaoDaViagem,
+  NIVEL_LABEL,
 } from "@/lib/domain/model";
 import { avaliarCarregamento, getT3, type Tier } from "@/lib/domain/rules-engine";
+import { triarViagem, type ItemTriagem } from "@/lib/domain/control-tower";
 import { useToast } from "@/components/ui/toast";
 import { downloadCSV, downloadJSON, printPDF } from "@/lib/export";
 import { formatDate, formatDateTime, cn, hash32 } from "@/lib/utils";
@@ -248,11 +251,65 @@ export default function DossiePage() {
   );
 }
 
+function AutoridadeDaLiberacao({ t }: { t: ItemTriagem }) {
+  if (t.liberadaPor === "motor") {
+    return (
+      <>
+        <p className="text-[12px] leading-snug">
+          Liberação <strong>automática</strong>. Nenhuma pessoa decidiu — o motor avaliou as{" "}
+          <span className="num">{t.decisao.checagens.length}</span> checagens contra a base IDTF e todas passaram.
+        </p>
+        <p className="text-[10px] text-fg-soft mt-1 font-mono">
+          motor · base {t.decisao.versaoBaseIDTF} · {formatDateTime(t.decisao.avaliadoEm)}
+        </p>
+      </>
+    );
+  }
+
+  if (t.liberadaPor === "autoridade" && t.excecao) {
+    return (
+      <>
+        <p className="text-[12px] leading-snug">
+          Liberação <strong>humana sobre bloqueio do motor</strong>. O fato que motivou o bloqueio não foi desfeito —
+          alguém com autoridade assumiu o risco residual.
+        </p>
+        <p className="text-[11px] text-fg-muted mt-1">
+          {t.excecao.aprovador} · nível {NIVEL_LABEL[t.excecao.nivelRequerido]}
+          {t.excecao.decididoEm && ` · ${formatDateTime(t.excecao.decididoEm)}`}
+        </p>
+        <p className="text-[10px] text-fg-soft mt-1 font-mono">motivo original: {t.excecao.motivoBloqueio}</p>
+      </>
+    );
+  }
+
+  if (t.autoridade === "tecnico") {
+    return (
+      <>
+        <p className="text-[12px] leading-snug text-danger-700">
+          Não liberada. <strong>Bloqueio técnico</strong> — não há nível de autoridade que libere. Derruba-se
+          regularizando o fato e reavaliando.
+        </p>
+        <p className="text-[10px] text-fg-soft mt-1 font-mono">regra: {t.decisao.regra}</p>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <p className="text-[12px] leading-snug">
+        Não liberada. Aguarda decisão de <strong>{NIVEL_LABEL[t.autoridade]}</strong>.
+      </p>
+      <p className="text-[10px] text-fg-soft mt-1 font-mono">regra: {t.decisao.regra}</p>
+    </>
+  );
+}
+
 function Reconstrucao({ viagemId }: { viagemId: string }) {
   const v = viagens.find((x) => x.id === viagemId);
   if (!v) return <p className="text-[12px] text-fg-muted">Selecione uma viagem para reconstruir.</p>;
 
   const d = avaliarCarregamento(v.id);
+  const triagem = triarViagem(v);
   const compId = compartimentoPorViagem[v.id] ?? "";
   const comp = findCompartimento(compId);
   const imp = comp ? findImplemento(comp.implementoId) : undefined;
@@ -272,8 +329,29 @@ function Reconstrucao({ viagemId }: { viagemId: string }) {
         <>
           <p className="text-[12px] leading-snug">{d.mensagem}</p>
           <p className="text-[10px] text-fg-soft mt-1 font-mono">regra: {d.regra} · base {d.versaoBaseIDTF}</p>
+          {d.checagens.length > 0 && (
+            <ul className="mt-1.5 space-y-0.5">
+              {d.checagens.map((c) => (
+                <li key={c.nome} className="flex items-start gap-1.5 text-[10.5px]">
+                  <span className={cn("mt-[3px] size-1.5 shrink-0 rounded-full", c.ok ? "bg-success-500" : "bg-danger-500")} />
+                  <span className="text-fg-muted">
+                    <span className="font-medium text-fg">{c.nome}</span> — {c.detalhe}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
         </>
       ),
+    },
+    {
+      // O auditor não pergunta só "foi liberado?", pergunta "por quem". Máquina e
+      // pessoa deixam rastros diferentes: uma cita regra e versão da base, a outra
+      // cita nome e nível de autoridade. Separar as duas é o ponto da seção.
+      titulo: "Autoridade da liberação",
+      icon: <Gavel className="size-3.5" />,
+      conteudo: `${triagem.liberadaPor ?? "pendente"}|${triagem.autoridade}|${triagem.excecao?.aprovador ?? "-"}`,
+      jsx: <AutoridadeDaLiberacao t={triagem} />,
     },
     {
       titulo: "Compartimento",
@@ -385,7 +463,7 @@ function Reconstrucao({ viagemId }: { viagemId: string }) {
           <Carimbo tier={d.tier} />
         </div>
         <p className="font-mono text-[9px] text-fg-soft mt-2 num">
-          emitido {formatDate(EMISSAO)} · base IDTF {d.versaoBaseIDTF} · {secoes.length} seções
+          emitido {formatDate(EMISSAO)} · base {d.versaoBaseIDTF} · {secoes.length} seções
         </p>
       </div>
 
