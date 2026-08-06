@@ -1,101 +1,167 @@
-# HANDOFF — Traxium (modo MVP / 5 pilares)
+# HANDOFF — Traxium
 
-Protótipo Next.js 16.2.6 (App Router, Turbopack), TS, Tailwind v4, shadcn-style. Sem backend: dados em `src/lib/mock-data.ts` + `src/lib/domain/`, store muta arrays in-place e faz `bump()` pra re-render. Recarregar zera (esperado).
+Para quem chega sem contexto. Leia as seções 1 a 4 antes de tocar em qualquer arquivo; elas custam cinco minutos e evitam os erros que já custaram caro.
 
-Branch de trabalho: **`fix/ux-fase-1-3`**. Prod: `traxium-three.vercel.app` (intocada). Deploys de fase são **preview** (`vercel deploy --yes`).
+---
 
-## Fontes de verdade (ler antes de mexer)
-- **`Traxium - 5 Pilares prioritários.pdf`** (raiz) — diretriz do MVP: 5 pilares + requisitos transversais + correções §5. É o norte atual. **Atenção: PDF é gitignored** (`.env*`/binários fora do repo) — não veio no clone. Pedir a Gabriel se a sessão precisar dele.
-- `PLANO-PRODUTO.md`, `PESQUISA-UX.md`, `DESIGN.md` (design system — seguir à risca).
-- `AGENTS.md`: **ler `node_modules/next/dist/docs/` antes de codar** (Next fora do padrão).
+## 1. O que é isto
 
-## Regras não negociáveis
-- **Honestidade de dado**: nenhum toast/número/estado fake. Se não há dado → empty state. Tudo puxa do store real.
-- **DESIGN.md**: sombras brand-tinted, bordas HSL-200, tabular-nums (`.num`), **sem emoji decorativo**, PT formal-direto, gradiente 135° só em momento-chave. Nada de "card genérico com cara de IA".
-- Fim de cada fase: **commit + push + deploy** (Gabriel pediu). Commit em PT, conventional; rodar `npx tsc --noEmit` e `npm run build` antes.
+Protótipo Next.js 16.2.6 (App Router, Turbopack), TS estrito, Tailwind v4, Radix. **Sem backend**: os dados vivem em `src/lib/mock-data.ts` e `src/lib/domain/`; o store (`src/lib/store/session.tsx`) muta os arrays exportados **in-place** e chama `bump()` para re-render. Recarregar a página zera tudo — é o comportamento esperado.
 
-## O eixo do MVP (mecânica)
-- Store `src/lib/store/session.tsx`: eixo `produto: 'mvp' | 'completa'` (default mvp, localStorage, hydration-safe), ortogonal a accountType/papel/surface.
-- Toggle no header: `src/components/shell/produto-toggle.tsx` (usado no `topbar.tsx`).
-- Nav: `src/components/shell/sidebar.tsx` — cada item tem `pilar` + `mvp`; modo mvp reagrupa nos 5 pilares (`gruposPorPilar`), completa usa agrupamento funcional. `rotaVisivelNoMvp()` alimenta o soft-gate.
-- Soft-gate rota fora do escopo: `src/components/shell/escopo-gate.tsx`, ligado em `surface-shell.tsx`.
+O produto é a camada operacional que decide se uma carga pode seguir sob a cadeia GMP+ FSA: **qualifica, verifica, bloqueia, libera e comprova cada transporte**. Não é um gestor de documentos.
 
-## Feito
+**Branch de trabalho: `fix/ux-fase-1-3`.** `main` **não tem** o modo MVP — quando for abrir PR, é este branch que vai por cima.
 
-### Fase 1 (commit `70aeef8`)
-Toggle MVP⇄Completa · sidebar reagrupada nos 5 pilares · soft-gate on-brand · **Torre de Controle** (home do MVP, `src/components/shell/torre-de-controle.tsx`: 3 níveis semafóricos + fila de decisões unificada + certificados a vencer + entrada nos pilares, tudo real) · **correções §5** (cert GMP+ é da empresa/subcontratado, não da carreta; MOPP fora do GMP+; "Inspeção pré-carregamento" no lugar de LCI). **Já aplicadas — não refazer.**
+## 2. Comandos
 
-### Fase 2 (commit `8e562c7`) — Gatekeeper
-- `src/lib/domain/model.ts`: `TipoVinculo`, `AcordoQA`, `EstadoQualificacao` + `ESTADO_QUALIFICACAO` (metadata tone/opera) + `estadoQualificacao(sub)` (9 estados **derivados**). Campos opcionais `tipoVinculo`/`acordo` no `Subcontratado`. Mock ampliado p/ 4 subcontratados.
-- `src/components/modals/passaporte-modal.tsx` — **Passaporte Feed Safety** (credencial viva + export CSV).
-- `src/components/modals/onboarding-link-modal.tsx` — convite por link/WhatsApp.
-- `src/app/(app)/subcontratados/page.tsx` — badge de estado, tipo de vínculo, banner por motivo, botão Passaporte, StatTiles por estado.
-- Toast do `qualificar-subcontratado-modal.tsx` agora reflete o estado real derivado.
+```bash
+pnpm install          # pnpm, NÃO npm — ver armadilha #1
+pnpm dev              # localhost:3000
+pnpm test             # vitest, só o domínio (src/lib/**)
+npx tsc --noEmit      # antes de todo commit
+npm run build         # antes de todo commit
+```
 
-### Merge de `main` (commit `057e112`)
-O branch saiu de `b73836e` e ficou 8 commits atrás de `main`. Merge feito, 4 conflitos resolvidos a favor do dado real (recomendações derivadas em /conformidade, `NavItem` exportado como fonte da matriz de permissões, hooks antes do early return em `/page.tsx`, estados de qualificação + `ExpiryHorizon` convivendo em /subcontratados). **`main` continua sem o modo MVP** — quando fizer o PR, é este branch que vai por cima.
+## 3. Armadilhas — leia antes de debugar
 
-### Fase 3 (commit `21b54d5`) — Control Tower automation
-- **`src/lib/domain/control-tower.ts`** (novo): `triarViagem()` classifica viagem ativa em verde/amarelo/vermelho e separa **quem liberou** (`liberadaPor: "motor" | "autoridade" | null`). Exceção aprovada sobre bloqueio → verde, mas o motor segue reprovando (o fato não mudou) — os dois ficam registrados. `automacao()` mede sobre o **total em rota, pendentes incluídos**: fila cheia tem que derrubar a taxa. `autoridadeDaRegra()` roteia regra do motor → nível.
-- **Nível `tecnico`** em `NivelAutoridade` (o nível de ninguém): `podeAprovarExcecao()` nega para todos, inclusive diretoria/master. Caem nele carga proibida, cert vencido, T-3 ausente, limpeza não evidenciada. `exc-001` migrada de `diretoria_rt` → `tecnico` (era o "aprovar mesmo assim" literal). `/excecoes` não renderiza botão, renderiza o caminho da regularização; a matriz da tela agora **deriva** de `NIVEIS_AUTORIDADE`/`NIVEL_ESCOPO` (antes eram 4 cartões hardcoded contra 3 níveis no tipo).
-- `avaliarNovoCarregamento()` devolve `regra` — o modal de nova viagem roteia por ela em vez de regex na mensagem.
-- Torre: faixa de triagem com taxa de automação (barra proporcional ao real), fila **deduplicada** (exceção é escalonamento da viagem, não item separado), registro "Liberadas pelo motor" com checagens/base IDTF/data, e cada item diz quem libera — ou que ninguém libera.
-- Dossiê: checagens item a item na §Decisão + nova **§Autoridade da liberação** (motor vs. pessoa deixam rastros diferentes).
-- Verificado no app rodando: 60% resolvido sem humano (3 de 5 em rota), técnico sem botão, dossiê nos dois ramos.
+**1. O repo é pnpm.** Existe `pnpm-lock.yaml`. `npm install` quebra com `Cannot read properties of null (reading 'matches')`. Se o `node_modules` parecer corrompido, foi isso.
 
-### Revisão de UI/UX (commit `3fa2c2e`) — ver `REVISAO-UI-UX.md`
-- **Shell responsivo**: sidebar fixa só em `lg`; abaixo disso a mesma nav vai para drawer (`SidebarDrawer`), acionado pelo botão da topbar. `Sheet` ganhou `side="left"`. Copilot e nome do usuário só em `xl` (em `lg` a sidebar já come 260px).
-- **Contraste**: `fg-soft` foi para `210 14% 46%` (4,72:1); brancos da sidebar para `white/55`. `success-500`/`warning-500` **ficam como estão** — são usados em ícone, onde o critério é 3:1.
-- **Movimento**: `prefers-reduced-motion` global (não existia). `.animate-list-in` na fila/legenda/registro; `.skeleton` nos dois `dynamic()` de Leaflet. `animate-slide-in` e `.animate-shimmer` foram removidos: eram declarados e nunca usados.
-- **Torre**: fila agrupada por severidade com espinha contínua + **tempo em fila** (contado contra `HOJE`, não `Date.now()`). "Pilares do MVP" virou "Onde a pendência está".
+**2. A taxa de automação da Torre é 40%, e isso está certo.** Já foi 60%. A regra antiga de checklist só bloqueava inspeção explicitamente *reprovada*, então viagem **sem inspeção nenhuma** era liberada automaticamente. A Fase 5 corrigiu. **Não "conserte" o 40% de volta para 60%.**
 
-### Fase 0 + Fase 4 (commits `25c168c`…`e1a0bf2`) — Academy
-- **Vitest no domínio** (`pnpm test`). O repo usa **pnpm**, não npm. Testes só de `src/lib/**`; telas continuam verificadas rodando o app. `rules-engine.test.ts` é caracterização: trava o motor antes de a Fase 5 reescrevê-lo.
-- **`src/lib/domain/academy.ts`**: as 10 trilhas da diretriz, `Conclusao` (nota, tentativas, aceite, versão do conteúdo, certificado), `competenciaMotorista()` derivando elegibilidade, `estadoTrilha()`, `trilhasJustInTime()`, `orientacaoDoRegime()`. **Junção por `motorista.id`** — os CPFs no mock estão mascarados por LGPD.
-- **Elegibilidade no despacho**: `nova-viagem-modal` desabilita o motorista inelegível com o motivo (não esconde), e `podeCriar` trava se trocar o compartimento tornar o escolhido inelegível.
-- **`/academy`**: matriz motorista × trilha, catálogo com as regras de liberação, export CSV para auditoria, modal de registro de conclusão. `registrarConclusao` recusa nota abaixo do mínimo, tentativas esgotadas ou falta de aceite.
-- **Anel de competência** no crachá: um arco por trilha obrigatória. Substituiu o gauge de conformidade média.
-- **Micro-treino just-in-time** em `/mobile`, separando trilha pendente (requisito) de orientação do regime (revisão).
+**3. Os testes de `rules-engine.test.ts` são de caracterização.** Existem para segurar refatorações do motor. Se um quebrar num refactor, o padrão é: investigar o que mudou de comportamento, **não** ajustar a asserção para passar.
 
-### Fase 5 (commit `50427c7`) — motor completo e configurável
-- **`src/lib/domain/motor-config.ts`**: `ClasseRegra` (bloqueio/alerta/registro/informação), `RegraId` (12 regras), `CLASSE_MINIMA` (**piso por regra**) e `setClasseRegra` que recusa rebaixamento. 7 regras travadas em bloqueio — senão a trava da Fase 3 seria contornável pelas Configurações.
-- **`avaliarCarregamento` reescrito**: avalia as 12 e decide pela classe mais severa entre as falhas, com desempate pela ordem de `ORDEM_REGRAS`. **A ordem das 5 primeiras é histórica de propósito** — mudá-la trocaria a `regra` reportada, que outras telas já leem. `Decisao.checagens` agora traz `regra`, `classe` e as 12 sempre.
-- **Condições novas**: cadastro do subcontratado, acordo vigente, competência do motorista, produto reconhecido, fotos mínimas. `InspectionEvent.fotos` foi modelado (`FOTOS_MINIMAS = 6`); as duas telas que criam inspeção passam a contagem real.
-- **Aba "Motor de regras"** em `/configuracoes`.
-- ⚠️ **A automação caiu de 60% para 40% e isso está certo**: a regra antiga de checklist só bloqueava inspeção "reprovada", então viagem **sem inspeção nenhuma** era liberada automaticamente. Não reverta achando que é regressão.
+**4. A ordem de `ORDEM_REGRAS` em `motor-config.ts` é deliberada.** As cinco primeiras mantêm a precedência histórica do motor. Reordenar troca a `regra` reportada em `Decisao`, que `control-tower.ts`, `/excecoes` e o mock de exceções já leem por string.
 
-### Fase 6 — Gatekeeper completo
-- **`src/app/convite/[token]/page.tsx`** — onboarding público, **fora de `(app)`** (rota sem shell por construção). Seis passos, um assunto por tela. Cria via `addSubcontratadoPreCadastro`, sempre `Pré-cadastrado`.
-- **`qrcode-generator`** (dependência nova, ~10KB, zero deps) → `components/gatekeeper/qr-convite.tsx`, SVG inline. O link aponta para `window.location.origin`, então o QR funciona em preview e local.
-- **`components/gatekeeper/assinatura-canvas.tsx`** — extraído do `AssinaturaScreen` do `/mobile`. Usar este, não duplicar o traço.
-- **`assinar-acordo-modal.tsx` + `assinarAcordo` no store** — fecha o ciclo que a Fase 5 abriu: `acordo_vigente` bloqueava sem oferecer saída.
-- **Checklist**: `CONDICOES_POR_TIPO` por `Implemento["tipo"]` e flag `critico`. Item crítico negativo reprova sozinho; não crítico → pendente.
-- **Passaporte**: blocos de inspeções e "apto para". O regime máximo sai de `cleaningEvents` reais.
+**5. Os CPFs em `mock-data.ts` estão mascarados** (`***.456.789-**`) por LGPD. Não servem de chave. Junção de motorista é sempre por `motorista.id`.
 
-## Mapa MVP: pilar → telas
-Torre de Controle (home + /viagens + /excecoes + /bloqueios + /dossie) · Gatekeeper (/subcontratados + /checklists) · Academy (/motoristas) · IDTF Brasil (/idtf + /limpezas) · Network (/frota) · App do motorista (/mobile). Escondido no MVP: /fazendas /lotes /traces /auditoria /conformidade /documentos /atividade + superfícies Console/Portal/Auditor.
+**6. Datas contam contra `HOJE` (`2026-07-08`), não `Date.now()`.** `tempoEmFila()`, `competenciaMotorista()` e `nivelVencimento()` usam a data de referência do protótipo. Usar o relógio real faz as idades crescerem sozinhas e os números mentirem.
 
-## Próximo — ver `PLANO-COBERTURA-PDF.md`
-O roadmap completo (fases 5 a 10) fechando todas as lacunas de `PAREAMENTO-PDF.md` está lá, com decisões de UX fixadas e critério de aceite por fase.
+**7. O PDF da diretriz é gitignored.** `Traxium - 5 Pilares prioritários.pdf` não vem no clone. Peça ao Gabriel se precisar. O conteúdo dele já está destrinchado em `PAREAMENTO-PDF.md`.
 
-**Fases 0, 4, 5 e 6 entregues.** A próxima é a **Fase 7 — Control Tower completo**: motivo padronizado na liberação manual (hoje é texto livre e não sobrevive a auditoria), os 9 campos do registro de liberação, hierarquia com os 6 níveis e dossiê com os 16 itens. Fases 7 e 8 são paralelizáveis.
+**8. `vercel deploy` está não autorizado nesta máquina.** `vercel whoami` → *Not authorized*; o `.vercel/project.json` está correto. Precisa de um `vercel login` do Gabriel. **Nada foi publicado em preview desde a Fase 3** — todas as fases estão commitadas e pushadas, nenhuma está no ar.
 
-## Ainda faltando no Gatekeeper (deixado de propósito na Fase 2)
-Página pública de onboarding (fluxo do transportador), assinatura eletrônica real do acordo, "Pendente de inspeção" derivado, QR real. Ver §Gatekeeper do PDF.
+## 4. O princípio que sustenta o código
 
-## Ainda faltando no Control Tower (deixado de propósito na Fase 3)
-- **Reavaliação após regularização**: hoje o bloqueio técnico só cai porque o motor recalcula a cada render. Falta a ação explícita ("registrar limpeza → reavaliar") fechando o ciclo na tela, com o antes/depois visível.
-- **Trilha temporal da decisão automática**: `avaliadoEm` usa `viagem.iniciadaEm`. Um ledger real (append-only, com a versão da base vigente em cada avaliação) é o que sustenta "o motor decidiu às 14:22 com a base 2026.05".
-- **Regras novas não mapeadas** caem no fallback `gestor` em `autoridadeDaRegra()`. Ao acrescentar regra ao motor, mapear a autoridade junto — senão vira aprovável por descuido.
+**Estado nunca é campo editável. Estado é derivado do fato.**
 
-## Dívida de UI/UX ainda aberta (ver `REVISAO-UI-UX.md`)
-- **PageHeaders longos** em quase todas as páginas (Subcontratados tem ~50 palavras antes do primeiro dado). Só a Torre foi enxugada.
-- **`transition-all` em ~43 lugares** — anima layout junto com cor. Só `input.tsx` e três telas foram estreitados.
-- **`emFilaDesde` só existe em `ProdutoIDTF`.** Subcontratado pendente não guarda desde quando espera, então não mostra tempo em fila. Para cobertura total do §Control Tower, o estado de qualificação precisa carregar carimbo.
-- **Telas fora do MVP não foram revisadas** em 375/768 (só o shell foi corrigido, o que já resolve o overflow; o conteúdo interno de /traces, /lotes, /fazendas não foi olhado).
+Quatro funções são o coração do produto e todas seguem isso:
 
-## Pendência operacional
-`vercel deploy` está **não autorizado** nesta máquina (`vercel whoami` → Not authorized); `.vercel/project.json` está correto. Gabriel precisa rodar `vercel login` uma vez — a Fase 3 está commitada e pushada, mas **sem preview publicado**.
+| Função | Onde | Deriva |
+| --- | --- | --- |
+| `estadoQualificacao(sub)` | `model.ts` | 9 estados da empresa, de cert + base pública + acordo + treinamento |
+| `competenciaMotorista(id, hoje?, ctx?)` | `academy.ts` | elegibilidade do motorista, das trilhas concluídas |
+| `avaliarCarregamento(viagemId)` | `rules-engine.ts` | 12 condições → decisão, pela classe mais severa entre as falhas |
+| `triarViagem(viagem)` | `control-tower.ts` | verde/amarelo/vermelho + **quem liberou** (motor ou autoridade) |
 
-## Notion
-Ecossistema do projeto em Notion ("Traxium HQ") — ver memória do Claude `notion-traxium-hq.md`. Docs/pesquisa/decisões moram lá; repo é fonte de verdade técnica.
+Ao acrescentar qualquer regra ou estado, derive. Um campo `status` editável à mão é regressão arquitetural, mesmo que a tela fique igual.
+
+Corolários que já foram testados na prática e devem se manter:
+- Assinar o acordo de uma empresa **não** a torna apta se a base pública ainda diz Suspenso.
+- Reprovar numa trilha **não** gera competência.
+- Exceção aprovada libera a viagem, mas o motor **continua reprovando** — o fato não mudou, e os dois ficam registrados.
+
+## 5. Regras não negociáveis
+
+- **Honestidade de dado.** Nenhum toast, número ou estado que não venha do store. Sem dado → empty state, nunca um valor plausível. Se uma métrica não é medível, escreva "não medido"; não invente.
+- **`DESIGN.md` prevalece** sobre o código. Sombras brand-tinted, bordas HSL-200, `.num` em números, **sem emoji decorativo**, PT formal-direto, gradiente 135° só em momento-chave.
+- **Contraste mínimo 4,5:1** para texto (§14). Ícone responde a 3:1.
+- **`AGENTS.md`**: ler `node_modules/next/dist/docs/` antes de usar API do Next que você não conhece neste repo.
+- Fim de cada fase: **commit + push + deploy**, commit em PT conventional, com `tsc` e `build` limpos antes.
+
+## 6. Como verificar de verdade
+
+`tsc` e `build` não provam que a tela funciona. O ciclo usado até aqui:
+
+```bash
+pnpm dev &
+# screenshot simples:
+~/.cache/ms-playwright/chromium-1234/chrome-linux64/chrome \
+  --headless --disable-gpu --no-sandbox --hide-scrollbars \
+  --window-size=1280,1000 --virtual-time-budget=7000 \
+  --screenshot=/tmp/x.png http://localhost:3000/
+```
+
+Para fluxos com clique (modais, drawer, formulários), há `playwright-core` disponível em `/mnt/d/solar-buy-side-v2/node_modules/playwright-core` — importar de lá num `.mjs` e dirigir a página. Foi assim que se verificou o gate de reprovação da Academy, o drawer mobile e a assinatura do acordo. **Olhe o screenshot.** Frame em branco é falha de carregamento.
+
+Sempre conferir 375 / 768 / 1280.
+
+## 7. Onde o projeto está
+
+Diretriz do P.O.: 5 pilares. Estado por pilar (detalhe item a item em **`PAREAMENTO-PDF.md`**):
+
+| Pilar | Estado |
+| --- | --- |
+| 1 · Gatekeeper | ✓ fechado (Fase 6) |
+| 2 · Academy | ✓ fechado no essencial (Fase 4) |
+| 3 · IDTF Brasil | ~ 2/3 — falta cadastro de 18 campos e governança da base |
+| 4 · Control Tower | ✓ fechado (Fases 3 e 5) |
+| 5 · Network | ~ 1/4 — falta m:n, importação, operação em massa |
+| Transversais | ~ 3/4 — falta LGPD (retenção, inativação, consentimentos) |
+| §8 Indicadores | ✗ 1 de 15 |
+
+## 8. O que vem agora
+
+O roadmap completo está em **`PLANO-COBERTURA-PDF.md`**, com decisões de UX já fixadas e critério de aceite por fase. Fases 0, 4, 5 e 6 estão entregues.
+
+**Próxima: Fase 7 — Control Tower completo.** As fases 7 e 8 são paralelizáveis.
+
+1. **Motivo padronizado na liberação manual.** Hoje é texto livre, e texto livre não sobrevive a auditoria. Vira lista fechada por regra (`MOTIVOS_POR_REGRA: Record<RegraId, string[]>`), com a justificativa livre continuando como complemento, nunca no lugar.
+2. **Os 9 campos do registro de liberação** (§Control Tower): motivo padronizado, justificativa, evidência, responsável, data/hora, **situação anterior**, **situação posterior**, **impacto**, **validade da decisão**. Anterior/posterior saem automaticamente do estado da viagem.
+3. **Hierarquia com os 6 níveis.** `NivelAutoridade` tem 4; faltam `trafego` (pendências simples) e `inspetor` (condição física do compartimento).
+4. **Dossiê com os 16 itens.** Hoje são 9 seções; faltam transportador, cavalo mecânico, assinaturas, acordo vigente, treinamentos e documentos da viagem. **Cada bloco novo entra na cadeia de hash.**
+
+## 9. Dívida conhecida (deixada de propósito)
+
+**Control Tower**
+- Reavaliação após regularização só acontece porque o motor recalcula a cada render. Falta a ação explícita ("registrar limpeza → reavaliar") com o antes/depois visível.
+- `avaliadoEm` usa `viagem.iniciadaEm`. Um ledger append-only, com a versão da base vigente em cada avaliação, é o que sustentaria "o motor decidiu às 14:22 com a base 2026.05".
+- Regra nova não mapeada cai no fallback `gestor` em `autoridadeDaRegra()`. **Ao acrescentar regra ao motor, mapeie a autoridade junto** — senão vira aprovável por descuido.
+
+**Academy**
+- Não existe conteúdo (vídeo/PDF), só o registro da avaliação.
+- Regras de liberação por cliente, produto ou filial não existem — só por trilha.
+- Dois dos cinco gatilhos just-in-time faltam: produto sensível e item de checklist reprovado.
+
+**UI/UX** (ver `REVISAO-UI-UX.md`)
+- PageHeaders longos em quase todas as páginas; só a Torre foi enxugada.
+- `transition-all` em ~43 lugares.
+- `emFilaDesde` só existe em `ProdutoIDTF`; subcontratado pendente não mostra tempo em fila.
+- Telas fora do MVP (`/traces`, `/lotes`, `/fazendas`) não foram olhadas em 375/768 — o shell já resolve o overflow, mas o conteúdo interno não foi revisado.
+
+**Indicadores (§8)** — vários dependem de telemetria que um protótipo sem backend não tem (tempo médio de cadastro, tempo de checklist, % de fotos rejeitadas). A Fase 10 os marca como **"não medido"** em vez de fabricar número. Se o P.O. quiser esses de verdade, é decisão de arquitetura, não de tela.
+
+## 10. Mapa de arquivos
+
+```
+src/lib/domain/
+  model.ts           # entidades, estadoQualificacao, tipos de vínculo, acordo
+  rules-engine.ts    # avaliarCarregamento (12 condições) + CAPA + T-3
+  motor-config.ts    # 4 classes, 12 RegraId, piso por regra
+  academy.ts         # trilhas, conclusões, competenciaMotorista
+  control-tower.ts   # triagem, automação, autoridadeDaRegra, tempoEmFila
+  __tests__/         # vitest (30 testes)
+src/lib/store/session.tsx   # todas as ações de escrita
+src/components/shell/       # sidebar (+drawer), topbar, torre-de-controle
+src/app/(app)/              # back-office (tem shell)
+src/app/convite/[token]/    # onboarding público (SEM shell, de propósito)
+```
+
+**Documentos:** `PAREAMENTO-PDF.md` (diretriz × entregue, item a item) · `PLANO-COBERTURA-PDF.md` (roadmap fases 7–10) · `REVISAO-UI-UX.md` (revisão visual com medições de contraste) · `DESIGN.md` (design system) · `PLANO-PRODUTO.md`, `PESQUISA-UX.md`.
+
+## 11. Log das fases
+
+| Fase | Commit | Entrega |
+| --- | --- | --- |
+| 1 | `70aeef8` | Modo MVP, sidebar por pilar, Torre de Controle, correções §5 do PDF |
+| 2 | `8e562c7` | Gatekeeper: 9 estados derivados, Passaporte, convite por link |
+| — | `057e112` | Merge de `main` (o branch estava 8 commits atrás) |
+| 3 | `21b54d5` | Control Tower: triagem, nível `tecnico` (sem "aprovar mesmo assim"), dossiê com autoridade |
+| — | `3fa2c2e` | Revisão de UI/UX: shell responsivo, contraste AA, reduced-motion, fila com espinha e tempo em fila |
+| 0 | `25c168c` | Vitest no domínio + caracterização do motor |
+| 4 | `a76cf16`…`e1a0bf2` | Academy: competência derivada, elegibilidade no despacho, `/academy`, anel no crachá, just-in-time |
+| 5 | `50427c7` | Motor: 12 condições avaliadas antes de decidir, 4 classes configuráveis com piso |
+| 6 | `9110cd3` | Gatekeeper: onboarding público, QR real, acordo assinável, checklist dinâmico, passaporte completo |
+
+## 12. Notion
+
+Ecossistema do projeto em Notion ("Traxium HQ") — ver memória `notion-traxium-hq.md`. Docs, pesquisa e decisões moram lá; o repo é a fonte de verdade técnica.
