@@ -166,7 +166,7 @@ src/app/(app)/              # back-office (tem shell)
 src/app/convite/[token]/    # onboarding público (SEM shell, de propósito)
 ```
 
-**Documentos:** `PAREAMENTO-PDF.md` (diretriz × entregue, item a item) · `PLANO-COBERTURA-PDF.md` (roadmap fases 7–10) · `REVISAO-UI-UX.md` (revisão visual com medições de contraste) · `DESIGN.md` (design system) · `PLANO-PRODUTO.md`, `PESQUISA-UX.md`.
+**Documentos:** `PAREAMENTO-PDF.md` (diretriz × entregue, item a item) · `PLANO-COBERTURA-PDF.md` (roadmap fases 7–10) · `BRIEFING-DESIGN.md` (**briefing funcional para redesenho: telas, objetivos, dados e fluxos, sem interface**) · `REVISAO-UI-UX.md` (revisão visual com medições de contraste) · `DESIGN.md` (design system atual) · `PLANO-PRODUTO.md`, `PLANO-PERFIS.md`, `PESQUISA-UX.md`.
 
 ## 11. Log das fases
 
