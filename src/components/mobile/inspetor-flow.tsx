@@ -82,6 +82,7 @@ export function InspetorFlow() {
       inspetor: inspetorNome,
       dataHora: `${HOJE}T10:00:00`,
       geo: { lat: -16.47, lng: -54.63 },
+      fotos,
       offline: false,
     });
     if (resultado === "reprovado") {

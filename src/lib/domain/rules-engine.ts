@@ -22,10 +22,18 @@ import {
   compartimentoPorViagem,
   produtoAtualPorViagem,
   nivelVencimento,
+  estadoQualificacao,
+  ESTADO_QUALIFICACAO,
+  FOTOS_MINIMAS,
   HOJE,
   type CleaningEvent,
 } from "./model";
-import { viagens } from "@/lib/mock-data";
+import { competenciaMotorista } from "./academy";
+import {
+  classeDe, ORDEM_CLASSE, ORDEM_REGRAS, REGRA_LABEL, REGRA_CHECAGEM,
+  type ClasseRegra, type RegraId,
+} from "./motor-config";
+import { viagens, motoristas } from "@/lib/mock-data";
 
 export type Tier = "BLOQUEIO" | "ALERTA" | "LIBERADO";
 
@@ -61,6 +69,8 @@ export function cavalosDistintosNoT3(compartimentoId: string): string[] {
 export type Decisao = {
   tier: Tier;
   regra: string;
+  /** Classe configurada da regra que decidiu. `null` quando nada falhou. */
+  classe: ClasseRegra | null;
   mensagem: string;
   acaoSugerida: string;
   regimeExigido?: Regime;
@@ -68,9 +78,16 @@ export type Decisao = {
   versaoBaseIDTF: string;
   compartimentoId: string;
   avaliadoEm: string;
-  /** Sub-checagens que compõem o score de conformidade. */
-  checagens: { nome: string; ok: boolean; detalhe: string }[];
+  /**
+   * TODAS as condições avaliadas, sempre na mesma ordem — não só as que
+   * couberam antes da primeira falha. É o que o dossiê mostra e o que permite
+   * ao verde exigir as oito condições da diretriz.
+   */
+  checagens: { regra: RegraId; nome: string; ok: boolean; detalhe: string; classe: ClasseRegra }[];
 };
+
+/** Avaliação bruta de uma regra, antes de virar decisão. */
+type Avaliacao = { regra: RegraId; ok: boolean; detalhe: string; mensagem: string; acao: string };
 
 const DIA_MS = 86_400_000;
 
@@ -99,7 +116,7 @@ export function avaliarCarregamento(viagemId: string, refISO?: string): Decisao 
 
   if (!compartimentoId) {
     return {
-      ...base, tier: "BLOQUEIO", regra: "Compartimento não vinculado",
+      ...base, tier: "BLOQUEIO", regra: "Compartimento não vinculado", classe: "bloqueio",
       mensagem: "Viagem sem compartimento vinculado. Impossível validar T-3.",
       acaoSugerida: "Vincule o compartimento que tocará o produto antes de liberar.",
       checagens: [],
@@ -112,139 +129,211 @@ export function avaliarCarregamento(viagemId: string, refISO?: string): Decisao 
   const imp = comp ? findImplemento(comp.implementoId) : undefined;
   const sub = findSubcontratado(imp?.subcontratadoId);
   const inspecao = inspecaoDaViagem(viagemId);
+  const motorista = motoristas.find((m) => m.nome === viagem?.motorista);
 
-  const checagens: Decisao["checagens"] = [];
-
-  // ── Regra 1: T-3 completo ────────────────────────────────────────────────
   const t3Completo = t3.length >= 3;
-  checagens.push({
-    nome: "Histórico T-3",
-    ok: t3Completo,
-    detalhe: t3Completo ? "3 cargas anteriores registradas" : `Apenas ${t3.length} carga(s) registrada(s)`,
-  });
-  if (!t3Completo) {
-    return {
-      ...base, tier: "BLOQUEIO", regra: "T-3 ausente/incompleto",
-      mensagem: `Histórico das 3 últimas cargas incompleto para o compartimento ${comp?.identificador ?? compartimentoId}.`,
-      acaoSugerida: "Registre as cargas anteriores do compartimento antes de liberar o carregamento.",
-      checagens,
-    };
-  }
-
   const determinante = t3[0];
-  const prodAnterior = determinante.produto;
+  const prodAnterior = determinante?.produto;
   const regimeExigido = prodAnterior?.regimeAntesDeFeed;
+  const limpezas = limpezasApos(compartimentoId, determinante?.load.data ?? "1970-01-01");
+  const regimeAplicado = t3Completo ? limpezas[0]?.regime ?? null : null;
 
-  // ── Regra 2: carga anterior proibida ─────────────────────────────────────
-  if (prodAnterior?.bloqueiaFeed) {
-    checagens.push({ nome: "Carga anterior", ok: false, detalhe: `${prodAnterior.nomeCanonico} — proibida antes de feed` });
-    return {
-      ...base, tier: "BLOQUEIO", regra: "Carga anterior proibida",
-      regimeExigido: "D",
-      mensagem: `A última carga do compartimento ${comp?.identificador ?? ""} (${imp?.placa}) foi ${prodAnterior.nomeCanonico} em ${fmt(determinante.load.data)}. A IDTF ${VERSAO_BASE_IDTF} exige procedimento de liberação e regime D (desinfecção) antes de carregar ${atual?.nomeCanonico ?? "feed"}. Limpeza correspondente não foi evidenciada.`,
-      acaoSugerida: "Executar limpeza Regime D com evidência e solicitar liberação do Gestor GMP+.",
-      regimeAplicado: null,
-      checagens,
-    };
-  }
-  checagens.push({ nome: "Carga anterior", ok: true, detalhe: `${prodAnterior?.nomeCanonico} — não proibida` });
+  // Uma regra que não pode ser avaliada não é "conforme": sem T-3 não há como
+  // afirmar nada sobre a carga anterior ou a limpeza. Marca falha com o motivo
+  // explícito, em vez de passar por omissão.
+  const semT3 = "Não avaliável sem o histórico T-3.";
 
-  // ── Regra 3: limpeza compatível com o regime exigido ─────────────────────
-  const limpezas = limpezasApos(compartimentoId, determinante.load.data);
-  const regimeAplicado = limpezas[0]?.regime ?? null;
-  const limpezaOk =
-    regimeExigido != null && regimeAplicado != null &&
-    ORDEM_REGIME[regimeAplicado] >= ORDEM_REGIME[regimeExigido];
-  checagens.push({
-    nome: "Limpeza vs. IDTF",
-    ok: limpezaOk,
-    detalhe: regimeAplicado
-      ? `Aplicado ${regimeAplicado}, exigido ${regimeExigido}`
-      : `Nenhuma limpeza após a última carga (exigido ${regimeExigido})`,
-  });
-  if (!limpezaOk) {
-    return {
-      ...base, tier: "BLOQUEIO", regra: "Limpeza incompatível",
-      regimeExigido, regimeAplicado,
+  const av: Avaliacao[] = [
+    {
+      regra: "t3_completo",
+      ok: t3Completo,
+      detalhe: t3Completo ? "3 cargas anteriores registradas" : `Apenas ${t3.length} carga(s) registrada(s)`,
+      mensagem: `Histórico das 3 últimas cargas incompleto para o compartimento ${comp?.identificador ?? compartimentoId}.`,
+      acao: "Registre as cargas anteriores do compartimento antes de liberar o carregamento.",
+    },
+    {
+      regra: "carga_anterior",
+      ok: t3Completo && !prodAnterior?.bloqueiaFeed,
+      detalhe: !t3Completo
+        ? semT3
+        : prodAnterior?.bloqueiaFeed
+        ? `${prodAnterior.nomeCanonico} — proibida antes de feed`
+        : `${prodAnterior?.nomeCanonico} — não proibida`,
+      mensagem: prodAnterior
+        ? `A última carga do compartimento ${comp?.identificador ?? ""} (${imp?.placa}) foi ${prodAnterior.nomeCanonico} em ${fmt(determinante.load.data)}. A IDTF ${VERSAO_BASE_IDTF} exige procedimento de liberação e regime D (desinfecção) antes de carregar ${atual?.nomeCanonico ?? "feed"}. Limpeza correspondente não foi evidenciada.`
+        : "Carga anterior desconhecida — sem T-3 não há como avaliar contaminação cruzada.",
+      acao: "Executar limpeza Regime D com evidência e solicitar liberação do Gestor GMP+.",
+    },
+    {
+      regra: "limpeza_compativel",
+      ok:
+        t3Completo &&
+        regimeExigido != null &&
+        regimeAplicado != null &&
+        ORDEM_REGIME[regimeAplicado] >= ORDEM_REGIME[regimeExigido],
+      detalhe: !t3Completo
+        ? semT3
+        : regimeAplicado
+        ? `Aplicado ${regimeAplicado}, exigido ${regimeExigido}`
+        : `Nenhuma limpeza após a última carga (exigido ${regimeExigido})`,
       mensagem: regimeAplicado
         ? `Limpeza aplicada (Regime ${regimeAplicado}) é insuficiente. A última carga (${prodAnterior?.nomeCanonico}) exige Regime ${regimeExigido} pela IDTF.`
         : `Nenhuma limpeza evidenciada após ${prodAnterior?.nomeCanonico}. A IDTF exige Regime ${regimeExigido} antes de ${atual?.nomeCanonico ?? "feed"}.`,
-      acaoSugerida: `Executar limpeza Regime ${regimeExigido} com evidência fotográfica e reenviar.`,
-      checagens,
-    };
-  }
+      acao: `Executar limpeza Regime ${regimeExigido} com evidência fotográfica e reenviar.`,
+    },
+    {
+      regra: "checklist_aprovado",
+      ok: inspecao?.resultado === "aprovado",
+      detalhe: inspecao ? `${inspecao.resultado} (${inspecao.itensOk}/${inspecao.itensTotal})` : "Sem inspeção registrada",
+      mensagem: inspecao
+        ? `Checklist do compartimento ${inspecao.resultado} (${inspecao.itensOk}/${inspecao.itensTotal} itens). Carregamento impedido.`
+        : "Nenhuma inspeção pré-carregamento registrada para esta viagem.",
+      acao: "Corrigir os itens reprovados e realizar nova inspeção.",
+    },
+    {
+      regra: "certificado_valido",
+      ok: !(imp?.certGMP.status === "Vencida") && !(sub ? diasAte(sub.certGMP.validade, ref) < 0 : false),
+      detalhe:
+        imp?.certGMP.status === "Vencida"
+          ? `Cert. do implemento ${imp?.placa} vencida`
+          : sub && diasAte(sub.certGMP.validade, ref) < 0
+          ? `Cert. do subcontratado ${sub.razaoSocial} vencida`
+          : "Certificados válidos",
+      mensagem:
+        imp?.certGMP.status === "Vencida"
+          ? `Certificação GMP+ do implemento ${imp.placa} vencida em ${fmt(imp.certGMP.validade)}.`
+          : `Certificado GMP+ do subcontratado ${sub?.razaoSocial} vencido em ${sub ? fmt(sub.certGMP.validade) : "—"} (status base pública: ${sub?.certGMP.statusBasePublica}).`,
+      acao: "Renovar/validar a certificação GMP+ antes de operar sob cadeia certificada.",
+    },
+    {
+      regra: "cadastro_valido",
+      // Frota própria não tem subcontratado: a condição não se aplica, e não se
+      // aplica é diferente de reprovado.
+      ok: !sub || ESTADO_QUALIFICACAO[estadoQualificacao(sub).estado].opera,
+      detalhe: !sub
+        ? "Frota própria — não se aplica"
+        : `${estadoQualificacao(sub).estado}`,
+      mensagem: sub ? `${sub.razaoSocial}: ${estadoQualificacao(sub).motivo}` : "",
+      acao: "Regularize a qualificação do subcontratado em Gatekeeper.",
+    },
+    {
+      regra: "acordo_vigente",
+      ok: !sub || Boolean(sub.acordo?.assinadoEm && diasAte(sub.acordo.vigenciaFim, ref) >= 0),
+      detalhe: !sub
+        ? "Frota própria — não se aplica"
+        : !sub.acordo?.assinadoEm
+        ? "Acordo não assinado"
+        : diasAte(sub.acordo.vigenciaFim, ref) < 0
+        ? `Vencido em ${fmt(sub.acordo.vigenciaFim)}`
+        : `${sub.acordo.versao} vigente até ${fmt(sub.acordo.vigenciaFim)}`,
+      mensagem: sub
+        ? `Acordo de Garantia da Qualidade de ${sub.razaoSocial} não está vigente na data do carregamento.`
+        : "",
+      acao: "Colher assinatura do acordo vigente antes de operar sob a cadeia certificada.",
+    },
+    {
+      regra: "competencia_motorista",
+      ok: motorista ? competenciaMotorista(motorista.id, undefined, { regime: regimeExigido }).elegivel : false,
+      detalhe: motorista
+        ? competenciaMotorista(motorista.id, undefined, { regime: regimeExigido }).motivo
+        : "Motorista não identificado no cadastro",
+      mensagem: motorista
+        ? `${motorista.nome} não tem competência comprovada para esta operação: ${competenciaMotorista(motorista.id, undefined, { regime: regimeExigido }).motivo}`
+        : "Motorista da viagem não encontrado no cadastro.",
+      acao: "Registre a conclusão da trilha pendente na Academy e reavalie.",
+    },
+    {
+      regra: "produto_reconhecido",
+      ok: Boolean(atual) && atual?.statusClassificacao !== "em_fila",
+      detalhe: !atual
+        ? "Produto da viagem não vinculado à base"
+        : atual.statusClassificacao === "em_fila"
+        ? "Aguardando classificação da Qualidade"
+        : `${atual.nomeCanonico} · ${atual.idtfCode ?? "sem código IDTF"}`,
+      mensagem: "Produto não classificado na base IDTF. Uso travado até definição formal da Qualidade.",
+      acao: "Classificar o produto na fila do Motor IDTF.",
+    },
+    {
+      regra: "fotos_minimas",
+      ok: (inspecao?.fotos ?? 0) >= FOTOS_MINIMAS,
+      detalhe: inspecao
+        ? `${inspecao.fotos} de ${FOTOS_MINIMAS} ângulos`
+        : "Sem inspeção — nenhuma foto",
+      mensagem: `Evidência fotográfica incompleta: ${inspecao?.fotos ?? 0} de ${FOTOS_MINIMAS} ângulos obrigatórios.`,
+      acao: "Completar as fotos guiadas do compartimento antes de concluir.",
+    },
+    {
+      regra: "cert_a_vencer",
+      ok: !certificadoAVencer(sub, imp, ref),
+      detalhe: certificadoAVencer(sub, imp, ref) ?? "Nenhum certificado a vencer em 60 dias",
+      mensagem: certificadoAVencer(sub, imp, ref) ?? "",
+      acao: "Liberação exige justificativa registrada do despachante/gestor.",
+    },
+    {
+      regra: "sync_pendente",
+      ok: !inspecao?.offline,
+      detalhe: inspecao?.offline ? "Inspeção feita offline" : "Evidência sincronizada",
+      mensagem: "Inspeção realizada offline — validar carimbo de sincronização.",
+      acao: "Confirmar a sincronização da evidência antes de encerrar a viagem.",
+    },
+  ];
 
-  // ── Regra 4: inspeção pré-carregamento aprovada ──────────────────────────
-  const inspecaoOk = inspecao?.resultado === "aprovado";
-  checagens.push({
-    nome: "Inspeção LCI",
-    ok: inspecaoOk,
-    detalhe: inspecao ? `${inspecao.resultado} (${inspecao.itensOk}/${inspecao.itensTotal})` : "Sem inspeção registrada",
+  const checagens: Decisao["checagens"] = ORDEM_REGRAS.map((id) => {
+    const a = av.find((x) => x.regra === id)!;
+    return { regra: id, nome: REGRA_CHECAGEM[id], ok: a.ok, detalhe: a.detalhe, classe: classeDe(id) };
   });
-  if (inspecao && inspecao.resultado === "reprovado") {
+
+  // Decide DEPOIS de avaliar tudo: a decisão é a classe mais severa entre as
+  // falhas, e a regra reportada é a primeira falha dessa classe na ordem de
+  // precedência. Sair na primeira falha, como antes, escondia do dossiê tudo
+  // que vinha depois — e impedia o verde de exigir as condições da diretriz.
+  const falhas = ORDEM_REGRAS.map((id) => av.find((x) => x.regra === id)!).filter((a) => !a.ok);
+
+  if (falhas.length === 0) {
     return {
-      ...base, tier: "BLOQUEIO", regra: "Checklist reprovado",
+      ...base, tier: "LIBERADO", regra: "Conforme", classe: null,
       regimeExigido, regimeAplicado,
-      mensagem: `Checklist LCI do compartimento reprovado (${inspecao.itensOk}/${inspecao.itensTotal} itens). Carregamento impedido.`,
-      acaoSugerida: "Corrigir os itens reprovados e realizar nova inspeção.",
+      mensagem: `Compartimento apto. Regime ${regimeExigido} aplicado e evidenciado; T-3, certificações, acordo, competência e inspeção conformes.`,
+      acaoSugerida: "Liberar carregamento.",
       checagens,
     };
   }
 
-  // ── Regra 5: certificado GMP+ (implemento / subcontratado) ────────────────
-  const certImpVencida = imp?.certGMP.status === "Vencida";
-  const subVencido = sub ? diasAte(sub.certGMP.validade, ref) < 0 : false;
-  checagens.push({
-    nome: "Certificação GMP+",
-    ok: !certImpVencida && !subVencido,
-    detalhe: certImpVencida
-      ? `Cert. do implemento ${imp?.placa} vencida`
-      : subVencido
-      ? `Cert. do subcontratado ${sub?.razaoSocial} vencida`
-      : "Certificados válidos",
-  });
-  if (certImpVencida || subVencido) {
-    return {
-      ...base, tier: "BLOQUEIO", regra: "Certificado vencido/incompatível",
-      regimeExigido, regimeAplicado,
-      mensagem: certImpVencida
-        ? `Certificação GMP+ do implemento ${imp?.placa} vencida em ${fmt(imp!.certGMP.validade)}.`
-        : `Certificado GMP+ do subcontratado ${sub?.razaoSocial} vencido em ${fmt(sub!.certGMP.validade)} (status base pública: ${sub?.certGMP.statusBasePublica}).`,
-      acaoSugerida: "Renovar/validar a certificação GMP+ antes de operar sob cadeia certificada.",
-      checagens,
-    };
-  }
+  const pior = falhas.reduce((a, b) =>
+    ORDEM_CLASSE[classeDe(b.regra)] > ORDEM_CLASSE[classeDe(a.regra)] ? b : a
+  );
+  const classe = classeDe(pior.regra);
+  const tier: Tier = classe === "bloqueio" ? "BLOQUEIO" : classe === "alerta" ? "ALERTA" : "LIBERADO";
 
-  // ── Alertas (não bloqueiam, exigem justificativa) ─────────────────────────
-  const alertas: string[] = [];
+  return {
+    ...base,
+    tier,
+    classe,
+    regra: REGRA_LABEL[pior.regra],
+    regimeExigido,
+    regimeAplicado,
+    mensagem: pior.mensagem,
+    acaoSugerida: pior.acao,
+    checagens,
+  };
+}
+
+/** Descreve o certificado mais próximo do vencimento dentro da janela de 60 dias. */
+function certificadoAVencer(
+  sub: ReturnType<typeof findSubcontratado>,
+  imp: ReturnType<typeof findImplemento>,
+  ref: string
+): string | null {
+  const avisos: string[] = [];
   if (sub) {
     const d = diasAte(sub.certGMP.validade, ref);
-    if (d >= 0 && d <= 60) alertas.push(`Certificado do subcontratado vence em ${d} dias.`);
+    if (d >= 0 && d <= 60) avisos.push(`Certificado do subcontratado vence em ${d} dias.`);
   }
   if (imp) {
     const d = diasAte(imp.certGMP.validade, ref);
-    if (d >= 0 && d <= 60) alertas.push(`Certificação do implemento ${imp.placa} vence em ${d} dias.`);
+    if (d >= 0 && d <= 60) avisos.push(`Certificação do implemento ${imp.placa} vence em ${d} dias.`);
   }
-  if (inspecao?.offline) alertas.push("Inspeção realizada offline — validar carimbo de sincronização.");
-
-  if (alertas.length) {
-    return {
-      ...base, tier: "ALERTA", regra: "Pendência sem risco direto",
-      regimeExigido, regimeAplicado,
-      mensagem: alertas.join(" "),
-      acaoSugerida: "Liberação exige justificativa registrada do despachante/gestor.",
-      checagens,
-    };
-  }
-
-  // ── Liberado ──────────────────────────────────────────────────────────────
-  return {
-    ...base, tier: "LIBERADO", regra: "Conforme",
-    regimeExigido, regimeAplicado,
-    mensagem: `Compartimento apto. Regime ${regimeExigido} aplicado e evidenciado; T-3, certificações e inspeção conformes.`,
-    acaoSugerida: "Liberar carregamento.",
-    checagens,
-  };
+  return avisos.length ? avisos.join(" ") : null;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

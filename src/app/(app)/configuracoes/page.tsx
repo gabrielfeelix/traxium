@@ -5,6 +5,7 @@ import {
   Users,
   Bell,
   Shield,
+  SlidersHorizontal,
   CreditCard,
   Webhook,
   KeyRound,
@@ -14,6 +15,7 @@ import {
 import { PageHeader } from "@/components/shell/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MotorRegras } from "@/components/configuracoes/motor-regras";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -211,6 +213,9 @@ export default function ConfiguracoesPage() {
             <TabsTrigger value="notificacoes" className="justify-start">
               <Bell className="size-4" /> Notificações
             </TabsTrigger>
+            <TabsTrigger value="motor" className="justify-start">
+              <SlidersHorizontal className="size-4" /> Motor de regras
+            </TabsTrigger>
             <TabsTrigger value="seguranca" className="justify-start">
               <Shield className="size-4" /> Segurança
             </TabsTrigger>
@@ -226,6 +231,10 @@ export default function ConfiguracoesPage() {
           </TabsList>
 
           <div className="flex-1 min-w-0">
+            <TabsContent value="motor">
+              <MotorRegras />
+            </TabsContent>
+
             <TabsContent value="organizacao">
               <Card>
                 <CardHeader>

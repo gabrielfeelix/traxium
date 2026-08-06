@@ -48,10 +48,20 @@ const AUTORIDADE_POR_REGRA: Record<string, NivelAutoridade> = {
   "Carga anterior proibida": "tecnico",
   "Limpeza incompatível": "tecnico",
   "Certificado vencido/incompatível": "tecnico",
+  // Acrescentadas na Fase 5, junto com as condições que faltavam no verde.
+  // Cadastro e acordo são fato documental: nenhuma autoridade os substitui.
+  "Subcontratado não apto": "tecnico",
+  "Acordo de qualidade não vigente": "tecnico",
+  // Competência resolve-se registrando a trilha — quem pode fazer isso é a
+  // Qualidade, não uma assinatura de exceção.
+  "Competência do motorista": "gestor",
+  "Produto não reconhecido": "gestor",
   // Corrigível com evidência: o gestor valida a correção e libera.
   "Checklist reprovado": "gestor",
+  "Fotos mínimas ausentes": "gestor",
   // Alerta: opera, mas alguém assina o risco residual.
   "Pendência sem risco direto": "gestor",
+  "Inspeção pendente de sincronização": "gestor",
 };
 
 /** Nível exigido para liberar um bloqueio/alerta do motor. Desconhecido → gestor. */

@@ -27,6 +27,7 @@ import {
   type Tenant,
 } from "@/lib/mock-data";
 import { conclusoes, findTrilha } from "@/lib/domain/academy";
+import { setClasseRegra, type RegraId, type ClasseRegra } from "@/lib/domain/motor-config";
 import {
   cavalos,
   implementos,
@@ -215,6 +216,8 @@ type SessionCtx = {
     tentativas: number;
     aceiteCiencia: boolean;
   }) => { ok: boolean; motivo: string };
+  /** Altera a classe de uma regra do motor. Retorna false se ficar abaixo do piso. */
+  setClasseRegraMotor: (regra: RegraId, classe: ClasseRegra) => boolean;
   addAuditoria: (i: NovaAuditoriaInput) => string;
   renovarCertificadoMotorista: (motoristaId: string, certNome: string, novaValidade: string) => void;
   renovarCertificadoImplemento: (implementoId: string, novaValidade: string) => void;
@@ -508,6 +511,12 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     return { ok: true, motivo: `${t.codigo} concluída com nota ${i.nota}. Válida por ${t.validadeMeses} meses.` };
   }, [bump]);
 
+  const setClasseRegraMotor = useCallback<SessionCtx["setClasseRegraMotor"]>((regra, classe) => {
+    const ok = setClasseRegra(regra, classe);
+    if (ok) bump(); // a decisão de toda viagem é derivada — muda tudo de uma vez
+    return ok;
+  }, [bump]);
+
   const addLote = useCallback<SessionCtx["addLote"]>((i) => {
     const id = nextId("l");
     const codigo = `LOT-2026-0${150 + (seq % 800)}`;
@@ -648,6 +657,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     addExcecao,
     decidirExcecao,
     registrarConclusao,
+    setClasseRegraMotor,
     addLote,
     updateLoteStatus,
     addFazenda,

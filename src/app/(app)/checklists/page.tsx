@@ -132,6 +132,7 @@ export default function ChecklistsPage() {
       itensTotal: CONDICOES.length,
       inspetor: "Inspetor de pátio",
       dataHora: "2026-07-08T10:00:00",
+      fotos: fotosCount,
       offline: false,
     });
     const codViagem = vinc ? viagens.find((v) => v.id === vinc)?.codigo : undefined;

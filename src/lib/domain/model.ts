@@ -467,13 +467,18 @@ export type InspectionEvent = {
   inspetor: string;
   dataHora: string;
   geo?: { lat: number; lng: number };
+  /** Fotos guiadas enviadas. O mínimo é `FOTOS_MINIMAS` (um ângulo por face). */
+  fotos: number;
   offline: boolean;
 };
 
+/** Ângulos obrigatórios da inspeção pré-carregamento — o piso de evidência. */
+export const FOTOS_MINIMAS = 6;
+
 export const inspectionEvents: InspectionEvent[] = [
-  { id: "insp-001", compartimentoId: "comp-001", viagemId: "v-001", resultado: "aprovado", itensOk: 14, itensTotal: 14, inspetor: "Edivaldo Souza", dataHora: "2026-05-24T08:14:00", geo: { lat: -12.5447, lng: -55.7211 }, offline: false },
-  { id: "insp-002", compartimentoId: "comp-002", viagemId: "v-002", resultado: "reprovado", itensOk: 4, itensTotal: 18, inspetor: "Mauricio Lima", dataHora: "2026-05-25T14:22:00", offline: true },
-  { id: "insp-003", compartimentoId: "comp-003", viagemId: "v-003", resultado: "aprovado", itensOk: 14, itensTotal: 14, inspetor: "Carlos Aparecido", dataHora: "2026-05-26T06:30:00", geo: { lat: -13.06, lng: -55.9 }, offline: false },
+  { id: "insp-001", compartimentoId: "comp-001", viagemId: "v-001", resultado: "aprovado", itensOk: 14, itensTotal: 14, inspetor: "Edivaldo Souza", dataHora: "2026-05-24T08:14:00", geo: { lat: -12.5447, lng: -55.7211 }, fotos: 6, offline: false },
+  { id: "insp-002", compartimentoId: "comp-002", viagemId: "v-002", resultado: "reprovado", itensOk: 4, itensTotal: 18, inspetor: "Mauricio Lima", dataHora: "2026-05-25T14:22:00", fotos: 2, offline: true },
+  { id: "insp-003", compartimentoId: "comp-003", viagemId: "v-003", resultado: "aprovado", itensOk: 14, itensTotal: 14, inspetor: "Carlos Aparecido", dataHora: "2026-05-26T06:30:00", geo: { lat: -13.06, lng: -55.9 }, fotos: 6, offline: false },
 ];
 
 export function inspecaoDaViagem(viagemId: string): InspectionEvent | undefined {
