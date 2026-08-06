@@ -29,6 +29,13 @@ import {
 import { conclusoes, findTrilha } from "@/lib/domain/academy";
 import { setClasseRegra, type RegraId, type ClasseRegra } from "@/lib/domain/motor-config";
 import {
+  registrarLiberacao,
+  situacaoDaViagem,
+  motivosDaRegra,
+  type ImpactoId,
+  type ValidadeId,
+} from "@/lib/domain/liberacao";
+import {
   cavalos,
   implementos,
   compartimentos,
@@ -140,6 +147,16 @@ export type NovaAuditoriaInput = {
 
 export type NovaExcecaoInput = Omit<Excecao, "id" | "status" | "aprovador" | "decididoEm">;
 
+/** O que o operador escolhe na liberação manual. Os demais campos dos nove são
+ *  derivados pelo store: responsável, data/hora e as situações anterior/posterior. */
+export type LiberacaoFormInput = {
+  motivoPadronizado: string;
+  justificativa: string;
+  evidencias: string[];
+  impacto: ImpactoId;
+  validade: ValidadeId;
+};
+
 export type TrocaVeiculoInput = {
   cavaloPlaca?: string;
   implementoId?: string;
@@ -200,8 +217,19 @@ type SessionCtx = {
    *  travado alterado gera uma retificação (imutabilidade, pergunta 20). */
   trocarVeiculo: (viagemId: string, changes: TrocaVeiculoInput) => void;
   addExcecao: (i: NovaExcecaoInput) => string;
-  /** Decide uma exceção. Retorna false se o papel atual não pode aprovar (gate de autoridade). */
-  decidirExcecao: (id: string, status: "aprovada" | "negada") => boolean;
+  /**
+   * Decide uma exceção. Retorna o motivo da recusa quando não grava.
+   *
+   * Aprovar EXIGE o registro padronizado (Fase 7): motivo de lista fechada,
+   * justificativa e evidência. Sem isso a liberação não acontece — a trava é do
+   * store, não da tela, senão bastaria outro botão para contorná-la. Negar
+   * mantém o bloqueio e não gera registro de liberação: não houve liberação.
+   */
+  decidirExcecao: (
+    id: string,
+    status: "aprovada" | "negada",
+    registro?: LiberacaoFormInput
+  ) => { ok: boolean; motivo: string };
   addLote: (i: NovoLoteInput) => string;
   updateLoteStatus: (id: string, status: Lote["statusDDS"]) => void;
   addFazenda: (i: NovaFazendaInput) => string;
@@ -487,22 +515,67 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     return id;
   }, [bump]);
 
-  const decidirExcecao = useCallback<SessionCtx["decidirExcecao"]>((id, status) => {
+  const decidirExcecao = useCallback<SessionCtx["decidirExcecao"]>((id, status, registro) => {
     const e = excecoes.find((x) => x.id === id);
-    if (!e) return false;
+    if (!e) return { ok: false, motivo: "Exceção não encontrada." };
     // Gate de autoridade (pergunta 04): quem não pode aprovar, não decide. Defesa no
     // store além de esconder o botão — impede persistir uma liberação por papel errado.
-    if (!podeAprovarExcecao(papel, e.nivelRequerido)) return false;
+    if (!podeAprovarExcecao(papel, e.nivelRequerido))
+      return { ok: false, motivo: `${PAPEL_LABEL[papel]} não decide exceção deste nível.` };
+
+    if (status === "aprovada") {
+      if (!motivosDaRegra(e.regra).length)
+        return {
+          ok: false,
+          motivo: `Não há motivo padronizado que libere “${e.regra}”. O caminho é regularizar o fato.`,
+        };
+      if (!registro) return { ok: false, motivo: "Liberação exige o registro padronizado." };
+    }
+
+    // Situação ANTES da decisão — depois de mudar o status, esse estado não
+    // existe mais em lugar nenhum.
+    const anterior = situacaoDaViagem(e.viagemId);
+    const dataHora = `${HOJE}T10:00:00`;
+    const statusOriginal = e.status;
+
     e.status = status;
     e.aprovador = `${PAPEL_LABEL[papel]} · aprovação simulada`;
-    e.decididoEm = `${HOJE}T10:00:00`;
+    e.decididoEm = dataHora;
     // Aprovada → destrava a viagem bloqueada (Bloqueada → Agendada).
     if (status === "aprovada" && e.viagemId) {
       const v = viagens.find((x) => x.id === e.viagemId);
       if (v && v.status === "Bloqueada") { v.status = "Agendada"; v.alertas = 0; }
     }
+
+    if (status === "aprovada" && registro) {
+      const gravado = registrarLiberacao({
+        excecao: e,
+        ...registro,
+        responsavel: `${PAPEL_LABEL[papel]} · aprovação simulada`,
+        situacaoAnterior: anterior,
+        // Depois de mutar: a situação posterior é lida do mesmo derivador, não
+        // descrita à mão. Se a liberação não mudou nada, o registro mostra isso.
+        situacaoPosterior: situacaoDaViagem(e.viagemId),
+        dataHora,
+      });
+      if (!gravado) {
+        // Registro recusado pelo domínio → a liberação inteira é desfeita. Não
+        // existe viagem liberada sem os nove campos.
+        e.status = statusOriginal;
+        e.aprovador = undefined;
+        e.decididoEm = undefined;
+        const v = viagens.find((x) => x.id === e.viagemId);
+        if (v && anterior.statusViagem === "Bloqueada") { v.status = "Bloqueada"; v.alertas = 1; }
+        bump();
+        return { ok: false, motivo: "Registro incompleto: motivo padronizado, justificativa e evidência são obrigatórios." };
+      }
+    }
+
     bump();
-    return true;
+    return {
+      ok: true,
+      motivo: status === "aprovada" ? "Liberação registrada com os nove campos." : "Bloqueio mantido.",
+    };
   }, [papel, bump]);
 
   const registrarConclusao = useCallback<SessionCtx["registrarConclusao"]>((i) => {

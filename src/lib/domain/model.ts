@@ -470,15 +470,21 @@ export type InspectionEvent = {
   /** Fotos guiadas enviadas. O mínimo é `FOTOS_MINIMAS` (um ângulo por face). */
   fotos: number;
   offline: boolean;
+  /**
+   * Assinatura de quem fechou o checklist. O fluxo de campo já pede a assinatura
+   * antes de enviar; guardá-la no evento é o que permite o dossiê responder
+   * "quem assinou isto, em que aparelho e quando" sem depender de memória.
+   */
+  assinatura?: { nome: string; papel: string; assinadoEm: string; dispositivo: string };
 };
 
 /** Ângulos obrigatórios da inspeção pré-carregamento — o piso de evidência. */
 export const FOTOS_MINIMAS = 6;
 
 export const inspectionEvents: InspectionEvent[] = [
-  { id: "insp-001", compartimentoId: "comp-001", viagemId: "v-001", resultado: "aprovado", itensOk: 14, itensTotal: 14, inspetor: "Edivaldo Souza", dataHora: "2026-05-24T08:14:00", geo: { lat: -12.5447, lng: -55.7211 }, fotos: 6, offline: false },
-  { id: "insp-002", compartimentoId: "comp-002", viagemId: "v-002", resultado: "reprovado", itensOk: 4, itensTotal: 18, inspetor: "Mauricio Lima", dataHora: "2026-05-25T14:22:00", fotos: 2, offline: true },
-  { id: "insp-003", compartimentoId: "comp-003", viagemId: "v-003", resultado: "aprovado", itensOk: 14, itensTotal: 14, inspetor: "Carlos Aparecido", dataHora: "2026-05-26T06:30:00", geo: { lat: -13.06, lng: -55.9 }, fotos: 6, offline: false },
+  { id: "insp-001", compartimentoId: "comp-001", viagemId: "v-001", resultado: "aprovado", itensOk: 14, itensTotal: 14, inspetor: "Edivaldo Souza", dataHora: "2026-05-24T08:14:00", geo: { lat: -12.5447, lng: -55.7211 }, fotos: 6, offline: false, assinatura: { nome: "Edivaldo Souza", papel: "Motorista", assinadoEm: "2026-05-24T08:19:00", dispositivo: "Android · app de campo" } },
+  { id: "insp-002", compartimentoId: "comp-002", viagemId: "v-002", resultado: "reprovado", itensOk: 4, itensTotal: 18, inspetor: "Mauricio Lima", dataHora: "2026-05-25T14:22:00", fotos: 2, offline: true, assinatura: { nome: "Mauricio Lima", papel: "Motorista", assinadoEm: "2026-05-25T14:31:00", dispositivo: "Android · app de campo (offline)" } },
+  { id: "insp-003", compartimentoId: "comp-003", viagemId: "v-003", resultado: "aprovado", itensOk: 14, itensTotal: 14, inspetor: "Carlos Aparecido", dataHora: "2026-05-26T06:30:00", geo: { lat: -13.06, lng: -55.9 }, fotos: 6, offline: false, assinatura: { nome: "Carlos Aparecido", papel: "Motorista", assinadoEm: "2026-05-26T06:37:00", dispositivo: "Android · app de campo" } },
 ];
 
 export function inspecaoDaViagem(viagemId: string): InspectionEvent | undefined {
@@ -726,7 +732,14 @@ export function estadoQualificacao(s: Subcontratado): { estado: EstadoQualificac
 
 // `tecnico` é o nível de NINGUÉM: existe para que "não há liberação possível"
 // seja um estado do modelo, e não só um texto na matriz. Ver control-tower.ts.
-export type NivelAutoridade = "tecnico" | "gestor" | "diretoria_rt" | "cliente";
+//
+// Fase 7: `trafego` e `inspetor` fecham os seis níveis da diretriz. Não são
+// enfeite hierárquico — são os dois níveis em que a decisão depende de quem
+// está no lugar certo: o tráfego resolve pendência de agenda e documento sem
+// risco de feed; o inspetor é o único que pode atestar a condição FÍSICA do
+// compartimento, porque é quem tem olho no aço. Escalar para cima continua
+// valendo (gestor decide o que o inspetor decidiria); para baixo, nunca.
+export type NivelAutoridade = "tecnico" | "diretoria_rt" | "gestor" | "inspetor" | "trafego" | "cliente";
 
 export type Excecao = {
   id: string;
@@ -746,16 +759,20 @@ export type Excecao = {
 
 export const NIVEL_LABEL: Record<NivelAutoridade, string> = {
   tecnico: "Bloqueio técnico — sem liberação por autoridade",
-  gestor: "Gestor GMP+/Qualidade",
   diretoria_rt: "Diretoria + Resp. Técnico + Qualidade",
+  gestor: "Gestor GMP+/Qualidade",
+  inspetor: "Inspetor de pátio (condição física)",
+  trafego: "Operador de tráfego (pendência simples)",
   cliente: "Cliente/Embarcador (só escopo comercial)",
 };
 
 /** Rótulo curto para chip/badge, onde o nome completo não cabe. */
 export const NIVEL_CURTO: Record<NivelAutoridade, string> = {
   tecnico: "Ninguém libera",
-  gestor: "Gestor GMP+",
   diretoria_rt: "Diretoria + RT",
+  gestor: "Gestor GMP+",
+  inspetor: "Inspetor de pátio",
+  trafego: "Tráfego",
   cliente: "Cliente",
 };
 
@@ -767,16 +784,27 @@ export const NIVEL_CURTO: Record<NivelAutoridade, string> = {
 export const NIVEL_ESCOPO: Record<NivelAutoridade, string> = {
   tecnico:
     "Carga anterior proibida sem procedimento, compartimento com resíduo/odor/praga, certificado GMP+ vencido, limpeza exigida não evidenciada, T-3 ausente. Nenhuma assinatura desfaz o fato — só a regularização derruba o bloqueio.",
-  gestor:
-    "Divergência documental corrigível, foto reenviada, limpeza feita com comprovante pendente, troca de veículo pré-carregamento, checklist reprovado e corrigido.",
   diretoria_rt:
     "Exceções com impacto contratual, uso emergencial de terceiro, pendência documental temporária, risco residual formalmente aceito.",
+  gestor:
+    "Divergência documental corrigível, foto reenviada, limpeza feita com comprovante pendente, troca de veículo pré-carregamento, competência do motorista regularizada na Academy.",
+  inspetor:
+    "Condição física do compartimento verificada no pátio: reprovação de checklist já corrigida, ângulo de foto refeito, avaria sanada. Atesta o que viu — não decide documento nem contrato.",
+  trafego:
+    "Pendência simples sem risco de feed: janela de carregamento, protocolo de renovação em curso, sincronização de evidência atrasada. Nunca toca contaminação, limpeza ou certificação vencida.",
   cliente:
     "Pode aceitar atraso ou troca de veículo. Nunca reduz exigência de segurança de feed nem perdoa contaminação.",
 };
 
 /** Ordem de exibição da matriz: do mais duro ao mais frouxo. */
-export const NIVEIS_AUTORIDADE: NivelAutoridade[] = ["tecnico", "gestor", "diretoria_rt", "cliente"];
+export const NIVEIS_AUTORIDADE: NivelAutoridade[] = [
+  "tecnico",
+  "diretoria_rt",
+  "gestor",
+  "inspetor",
+  "trafego",
+  "cliente",
+];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Papéis (RBAC) — Fase I usa: gestor/qualidade, despachante, motorista, inspetor,
@@ -808,13 +836,25 @@ export const PAPEL_LABEL: Record<Papel, string> = {
 export const PAPEIS_CAMPO: Papel[] = ["motorista", "inspetor"];
 export const isPapelCampo = (p: Papel): boolean => p === "motorista" || p === "inspetor";
 
-/** Quem pode aprovar uma exceção do nível exigido. Motorista/inspetor/despachante NUNCA. */
+/**
+ * Quem pode aprovar uma exceção do nível exigido. O MOTORISTA nunca aprova, em
+ * nível nenhum: registra ocorrência e solicita análise.
+ *
+ * Autoridade escala para cima, nunca para baixo — quem decide o mais severo
+ * decide o menos severo. Por isso o gestor cobre `inspetor` e `trafego`: se
+ * pode liberar divergência documental, pode liberar pendência de agenda.
+ */
 export function podeAprovarExcecao(papel: Papel, nivel: NivelAutoridade): boolean {
   // Bloqueio técnico não escala: nem diretoria, nem master, nem ninguém. O que
   // libera é regularizar o fato (limpar, renovar o certificado, registrar o T-3).
   if (nivel === "tecnico") return false;
-  if (nivel === "gestor") return papel === "gestor" || papel === "diretoria_rt";
   if (nivel === "diretoria_rt") return papel === "diretoria_rt";
+  if (nivel === "gestor") return papel === "gestor" || papel === "diretoria_rt";
+  // Condição física do compartimento: quem viu decide, e a Qualidade cobre.
+  if (nivel === "inspetor") return papel === "inspetor" || papel === "gestor" || papel === "diretoria_rt";
+  // Pendência simples: o tráfego resolve o que é de agenda e documento em curso.
+  if (nivel === "trafego")
+    return papel === "despachante" || papel === "gestor" || papel === "diretoria_rt";
   // "cliente" = escopo comercial (atraso/troca), nunca contaminação — fora do gate interno.
   return false;
 }
@@ -1023,7 +1063,9 @@ export const excecoes: Excecao[] = [
     codigoViagem: "TX-2026-08474",
     motivoBloqueio: "Certificação GMP+ do implemento vence em 2 dias — pendência sem risco direto.",
     regra: "Pendência sem risco direto",
-    nivelRequerido: "gestor",
+    // Tráfego (Fase 7): protocolo de renovação em curso é pendência de agenda,
+    // não de segurança de feed. Gestor e diretoria continuam podendo decidir.
+    nivelRequerido: "trafego",
     solicitante: "Joana Almeida · despachante",
     solicitadoEm: "2026-07-06T09:12:00",
     status: "pendente",
@@ -1058,6 +1100,52 @@ export const compartimentoPorViagem: Record<string, string> = {
   "v-005": "comp-005",
   "v-006": "comp-006",
 };
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Documentos da viagem (Fase 7 — item do dossiê).
+//
+// Documento fiscal e operacional é evidência de auditoria como qualquer outra:
+// o auditor pergunta qual CT-e amparava a carga que o motor liberou. Viagem sem
+// documento emitido mostra vazio — a ausência é informação, não motivo para
+// inventar um número plausível.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type DocumentoViagem = {
+  tipo: "CT-e" | "MDF-e" | "NF-e" | "Ordem de carregamento" | "Ticket de balança";
+  numero: string;
+  emitidoEm: string;
+  situacao: "Autorizado" | "Emitido" | "Pendente" | "Cancelado";
+};
+
+const DOCS_POR_VIAGEM: Record<string, DocumentoViagem[]> = {
+  "v-001": [
+    { tipo: "CT-e", numero: "351260-00842177", emitidoEm: "2026-05-24T08:41:00", situacao: "Autorizado" },
+    { tipo: "MDF-e", numero: "351260-00019044", emitidoEm: "2026-05-24T08:47:00", situacao: "Autorizado" },
+    { tipo: "Ordem de carregamento", numero: "OC-2026-4471", emitidoEm: "2026-05-24T07:55:00", situacao: "Emitido" },
+    { tipo: "Ticket de balança", numero: "BAL-88213", emitidoEm: "2026-05-24T09:12:00", situacao: "Emitido" },
+  ],
+  // v-002 está bloqueada: a ordem saiu, o fiscal não. É exatamente o que se
+  // espera de uma carga que nunca deveria ter sido carregada.
+  "v-002": [
+    { tipo: "Ordem de carregamento", numero: "OC-2026-4472", emitidoEm: "2026-05-25T13:50:00", situacao: "Emitido" },
+    { tipo: "CT-e", numero: "—", emitidoEm: "2026-05-25T14:40:00", situacao: "Pendente" },
+  ],
+  "v-003": [
+    { tipo: "CT-e", numero: "351260-00842190", emitidoEm: "2026-05-26T07:02:00", situacao: "Autorizado" },
+    { tipo: "MDF-e", numero: "351260-00019051", emitidoEm: "2026-05-26T07:08:00", situacao: "Autorizado" },
+    { tipo: "Ordem de carregamento", numero: "OC-2026-4473", emitidoEm: "2026-05-26T06:20:00", situacao: "Emitido" },
+  ],
+  "v-004": [
+    { tipo: "Ordem de carregamento", numero: "OC-2026-4474", emitidoEm: "2026-07-06T08:30:00", situacao: "Emitido" },
+  ],
+};
+
+/** Documentos emitidos para a viagem, mais recentes primeiro. Vazio = nenhum. */
+export function documentosDaViagem(viagemId: string): DocumentoViagem[] {
+  return [...(DOCS_POR_VIAGEM[viagemId] ?? [])].sort(
+    (a, b) => new Date(b.emitidoEm).getTime() - new Date(a.emitidoEm).getTime()
+  );
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Retificação — imutabilidade (pergunta 20). Depois de enviado/sincronizado, um

@@ -7,7 +7,8 @@ import {
   UserCog,
   Building,
   Handshake,
-  Check,
+  ScanEye,
+  Route,
   X,
   Paperclip,
   Clock,
@@ -24,6 +25,8 @@ import {
   excecoes, NIVEL_LABEL, NIVEL_ESCOPO, NIVEIS_AUTORIDADE, PAPEL_LABEL, podeAprovarExcecao,
   type Excecao, type Papel, type NivelAutoridade,
 } from "@/lib/domain/model";
+import { registroDaExcecao } from "@/lib/domain/liberacao";
+import { LiberacaoModal, RegistroLiberacaoCard } from "@/components/modals/liberacao-modal";
 import { useSession } from "@/lib/store/session";
 import { useToast } from "@/components/ui/toast";
 import { formatDateTime, cn } from "@/lib/utils";
@@ -32,8 +35,10 @@ import { formatDateTime, cn } from "@/lib/utils";
 // divergir. Aqui só mora a apresentação (ícone e tom) de cada nível.
 const NIVEL_UI: Record<NivelAutoridade, { icon: React.ReactNode; tone: "danger" | "brand" | "warning" | "info" }> = {
   tecnico: { icon: <ShieldAlert className="size-4" />, tone: "danger" },
-  gestor: { icon: <UserCog className="size-4" />, tone: "brand" },
   diretoria_rt: { icon: <Building className="size-4" />, tone: "warning" },
+  gestor: { icon: <UserCog className="size-4" />, tone: "brand" },
+  inspetor: { icon: <ScanEye className="size-4" />, tone: "brand" },
+  trafego: { icon: <Route className="size-4" />, tone: "info" },
   cliente: { icon: <Handshake className="size-4" />, tone: "info" },
 };
 
@@ -42,19 +47,18 @@ export default function ExcecoesPage() {
   const { toast } = useToast();
   void version;
 
-  const decidir = (e: Excecao, status: "aprovada" | "negada") => {
-    const ok = decidirExcecao(e.id, status);
-    if (!ok) {
+  // Só "manter bloqueio" passa por aqui. Aprovar exige o registro dos nove
+  // campos e vive no LiberacaoModal — não há caminho de liberação em um clique.
+  const manterBloqueio = (e: Excecao) => {
+    const r = decidirExcecao(e.id, "negada");
+    if (!r.ok) {
       toast("Sem autoridade para decidir", {
         type: "error",
-        desc: `Seu papel (${PAPEL_LABEL[papel]}) não libera exceção que exige ${NIVEL_LABEL[e.nivelRequerido]}.`,
+        desc: `Seu papel (${PAPEL_LABEL[papel]}) não decide exceção que exige ${NIVEL_LABEL[e.nivelRequerido]}.`,
       });
       return;
     }
-    toast(status === "aprovada" ? "Exceção aprovada — viagem liberada" : "Bloqueio mantido", {
-      type: status === "aprovada" ? "success" : "info",
-      desc: status === "aprovada" ? "Trilha de autoridade registrada; viagem destravada." : "Registro na trilha de auditoria.",
-    });
+    toast("Bloqueio mantido", { type: "info", desc: "Registro na trilha de auditoria." });
   };
 
   const pendentes = excecoes.filter((e) => e.status === "pendente");
@@ -64,7 +68,7 @@ export default function ExcecoesPage() {
     <div className="space-y-6">
       <PageHeader
         title="Exceções e liberações"
-        description="Quando o motor bloqueia, a liberação segue matriz de autoridade. O motorista nunca libera sozinho — apenas registra ocorrência, anexa evidência e solicita análise. Cada decisão fica na trilha de auditoria."
+        description="Quando o motor bloqueia, a liberação segue matriz de autoridade e registro padronizado: motivo de lista fechada por regra, justificativa como complemento, impacto e validade. O motorista nunca libera sozinho — registra ocorrência e solicita análise."
         accessory={
           <Badge variant="outline" className="text-[10px]">
             <UserCog className="size-3" /> Você: {PAPEL_LABEL[papel]}
@@ -79,7 +83,10 @@ export default function ExcecoesPage() {
             <Gavel className="size-4 text-[hsl(176_84%_25%)]" />
             <CardTitle>Matriz de autoridade</CardTitle>
           </div>
-          <CardDescription>Quem pode liberar o quê. A severidade define o nível — nunca o tráfego.</CardDescription>
+          <CardDescription>
+            Os seis níveis. A severidade define quem decide — nunca a pressa. Autoridade escala para cima: quem libera
+            o mais severo cobre o menos severo.
+          </CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {NIVEIS_AUTORIDADE.map((n) => {
@@ -124,7 +131,7 @@ export default function ExcecoesPage() {
         </h2>
         <div className="space-y-3">
           {pendentes.map((e) => (
-            <ExcecaoCard key={e.id} e={e} papel={papel} onDecidir={decidir} />
+            <ExcecaoCard key={e.id} e={e} papel={papel} onManterBloqueio={manterBloqueio} />
           ))}
           {!pendentes.length && (
             <Card>
@@ -143,7 +150,7 @@ export default function ExcecoesPage() {
           <h2 className="text-[13px] font-semibold text-fg mb-2">Histórico de decisões</h2>
           <div className="space-y-3">
             {decididas.map((e) => (
-              <ExcecaoCard key={e.id} e={e} papel={papel} onDecidir={decidir} />
+              <ExcecaoCard key={e.id} e={e} papel={papel} onManterBloqueio={manterBloqueio} />
             ))}
           </div>
         </div>
@@ -152,14 +159,17 @@ export default function ExcecoesPage() {
   );
 }
 
-function ExcecaoCard({ e, papel, onDecidir }: { e: Excecao; papel: Papel; onDecidir: (e: Excecao, s: "aprovada" | "negada") => void }) {
+function ExcecaoCard({ e, papel, onManterBloqueio }: { e: Excecao; papel: Papel; onManterBloqueio: (e: Excecao) => void }) {
   const tecnico = e.nivelRequerido === "tecnico";
   const critico = tecnico || e.nivelRequerido === "diretoria_rt";
   const podeDecidir = podeAprovarExcecao(papel, e.nivelRequerido);
+  const registro = registroDaExcecao(e.id);
   return (
     <Card className={cn(e.status === "pendente" && critico && "border-[hsl(0_72%_82%)]")}>
       <CardContent className="p-4">
-        <div className="flex items-start justify-between gap-3 flex-wrap">
+        {/* Em 375 a coluna de ação desce inteira: espremer o motivo do bloqueio
+            em duas palavras por linha é pior do que rolar mais um pouco. */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 flex-wrap mb-1">
               <Link href={`/viagens/${e.viagemId}`} className="font-mono text-[12px] font-semibold text-[hsl(176_84%_25%)] hover:underline">
@@ -207,13 +217,22 @@ function ExcecaoCard({ e, papel, onDecidir }: { e: Excecao; papel: Papel; onDeci
                 {e.status === "aprovada" ? "Aprovada" : "Negada"} por {e.aprovador} · {e.decididoEm && formatDateTime(e.decididoEm)}
               </p>
             )}
+
+            {/* Os nove campos, quando a liberação passou pelo registro padronizado. */}
+            {registro && <div className="mt-2"><RegistroLiberacaoCard r={registro} /></div>}
+            {e.status === "aprovada" && !registro && (
+              <p className="mt-2 text-[11px] text-fg-muted bg-bg border border-dashed border-border rounded-md p-2">
+                Liberação anterior ao registro padronizado — sem os nove campos da diretriz. Registros novos passam a
+                exigir motivo de lista fechada, impacto e validade.
+              </p>
+            )}
           </div>
 
           {e.status === "pendente" && (
             tecnico ? (
               // Nenhum botão de aprovar — nem escondido por papel. Não existe
               // autoridade que derrube este bloqueio; o caminho é regularizar.
-              <div className="shrink-0 max-w-[190px] text-[10px] text-[hsl(0_70%_38%)] flex items-start gap-1.5 bg-[hsl(0_72%_98%)] border border-[hsl(0_72%_88%)] rounded-md p-2">
+              <div className="shrink-0 sm:max-w-[190px] text-[10px] text-[hsl(0_70%_38%)] flex items-start gap-1.5 bg-[hsl(0_72%_98%)] border border-[hsl(0_72%_88%)] rounded-md p-2">
                 <ShieldAlert className="size-3.5 mt-0.5 shrink-0" />
                 <span>
                   <strong>Bloqueio técnico.</strong> Nenhuma autoridade libera — nem diretoria, nem cliente. Só a
@@ -222,15 +241,13 @@ function ExcecaoCard({ e, papel, onDecidir }: { e: Excecao; papel: Papel; onDeci
               </div>
             ) : podeDecidir ? (
               <div className="flex flex-col gap-2 shrink-0">
-                <Button variant="outline" size="sm" onClick={() => onDecidir(e, "aprovada")}>
-                  <Check className="size-4" /> Aprovar liberação
-                </Button>
-                <Button variant="destructive" size="sm" onClick={() => onDecidir(e, "negada")}>
+                <LiberacaoModal excecao={e} />
+                <Button variant="destructive" size="sm" onClick={() => onManterBloqueio(e)}>
                   <X className="size-4" /> Manter bloqueio
                 </Button>
               </div>
             ) : (
-              <div className="shrink-0 max-w-[170px] text-[10px] text-fg-muted flex items-start gap-1.5 bg-bg rounded-md p-2">
+              <div className="shrink-0 sm:max-w-[170px] text-[10px] text-fg-muted flex items-start gap-1.5 bg-bg rounded-md p-2">
                 <Lock className="size-3.5 mt-0.5 shrink-0" />
                 <span>Requer <strong>{NIVEL_LABEL[e.nivelRequerido]}</strong>. Seu papel não decide esta exceção.</span>
               </div>

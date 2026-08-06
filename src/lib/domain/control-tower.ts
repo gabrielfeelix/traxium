@@ -56,12 +56,15 @@ const AUTORIDADE_POR_REGRA: Record<string, NivelAutoridade> = {
   // Qualidade, não uma assinatura de exceção.
   "Competência do motorista": "gestor",
   "Produto não reconhecido": "gestor",
-  // Corrigível com evidência: o gestor valida a correção e libera.
-  "Checklist reprovado": "gestor",
-  "Fotos mínimas ausentes": "gestor",
-  // Alerta: opera, mas alguém assina o risco residual.
-  "Pendência sem risco direto": "gestor",
-  "Inspeção pendente de sincronização": "gestor",
+  // Condição física do compartimento (Fase 7): quem esteve no pátio atesta o
+  // que viu. Gestor e diretoria continuam cobrindo, porque autoridade escala
+  // para cima — o que não existe é decidir sem ter olhado.
+  "Checklist reprovado": "inspetor",
+  "Fotos mínimas ausentes": "inspetor",
+  // Pendência simples, sem risco de feed: é do tráfego (Fase 7). Certificado
+  // que VENCEU é outra coisa e continua em `tecnico`, logo acima.
+  "Pendência sem risco direto": "trafego",
+  "Inspeção pendente de sincronização": "trafego",
 };
 
 /** Nível exigido para liberar um bloqueio/alerta do motor. Desconhecido → gestor. */

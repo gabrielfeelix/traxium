@@ -17,6 +17,14 @@ import {
   ScanSearch,
   Fingerprint,
   Gavel,
+  Container,
+  Handshake,
+  IdCard,
+  GraduationCap,
+  PenLine,
+  Files,
+  ShieldCheck,
+  Leaf,
 } from "lucide-react";
 import { PageHeader } from "@/components/shell/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -28,7 +36,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { StatusBadge, RegimeBadge } from "@/components/shell/status-badge";
-import { viagens } from "@/lib/mock-data";
+import { viagens, motoristas } from "@/lib/mock-data";
 import {
   compartimentoPorViagem,
   produtoAtualPorViagem,
@@ -37,10 +45,19 @@ import {
   findSubcontratado,
   findProduto,
   inspecaoDaViagem,
+  cavaloPorPlaca,
+  limpezasApos,
+  documentosDaViagem,
+  estadoQualificacao,
+  FOTOS_MINIMAS,
   NIVEL_LABEL,
+  HOJE,
 } from "@/lib/domain/model";
+import { competenciaMotorista, trilhasExigidas, conclusoes, findTrilha } from "@/lib/domain/academy";
 import { avaliarCarregamento, getT3, type Tier } from "@/lib/domain/rules-engine";
 import { triarViagem, type ItemTriagem } from "@/lib/domain/control-tower";
+import { registrosDaViagem } from "@/lib/domain/liberacao";
+import { RegistroLiberacaoCard } from "@/components/modals/liberacao-modal";
 import { useToast } from "@/components/ui/toast";
 import { downloadCSV, downloadJSON, printPDF } from "@/lib/export";
 import { formatDate, formatDateTime, cn, hash32 } from "@/lib/utils";
@@ -201,7 +218,9 @@ export default function DossiePage() {
                 <span className="num">{sel.size}</span> viagem(ns) selecionada(s)
               </p>
               <p className="text-[10px] text-fg-muted">
-                Inclui: decisão do motor, T-3, limpezas, inspeções, certificados válidos no momento, fotos com geo/hash e trilha de aprovação.
+                Inclui os 16 blocos: decisão e checagens, autoridade e registro da liberação, transportador, acordo,
+                motorista, treinamentos, cavalo, implemento, produto, T-3, limpeza, inspeção, fotos, assinaturas e
+                documentos.
               </p>
             </div>
             <Button
@@ -318,6 +337,65 @@ function Reconstrucao({ viagemId }: { viagemId: string }) {
   const cronologico = [...t3].reverse(); // T-3 mais antiga → T-1 determinante
   const inspecao = inspecaoDaViagem(v.id);
   const produto = findProduto(produtoAtualPorViagem[v.id] ?? "");
+  // Fase 7 — os itens que faltavam para o dossiê responder sozinho.
+  const cavalo = cavaloPorPlaca(v.cavalo);
+  const motorista = motoristas.find((m) => m.nome === v.motorista);
+  const competencia = motorista
+    ? competenciaMotorista(motorista.id, HOJE, { regime: d.regimeExigido })
+    : undefined;
+  const limpeza = limpezasApos(compId, t3[0]?.load.data ?? "1970-01-01")[0];
+  const acordo = sub?.acordo;
+  const docs = documentosDaViagem(v.id);
+  const registro = registrosDaViagem(v.id)[0];
+  const qualificacao = sub ? estadoQualificacao(sub) : undefined;
+
+  // Assinaturas reunidas do que EXISTE no registro. Passo executado não implica
+  // assinatura colhida: limpeza sem `assinatura` não entra na lista.
+  const assinaturas: { ato: string; quem: string; quando: string; onde?: string }[] = [];
+  if (inspecao?.assinatura) {
+    assinaturas.push({
+      ato: "Checklist LCI",
+      quem: `${inspecao.assinatura.nome} · ${inspecao.assinatura.papel}`,
+      quando: formatDateTime(inspecao.assinatura.assinadoEm),
+      onde: inspecao.assinatura.dispositivo,
+    });
+  }
+  if (limpeza?.assinatura) {
+    assinaturas.push({
+      ato: `Limpeza Regime ${limpeza.regime}`,
+      quem: limpeza.executor,
+      quando: formatDate(limpeza.data),
+      onde: limpeza.local,
+    });
+  }
+  if (acordo?.assinadoEm) {
+    assinaturas.push({
+      ato: `Acordo de qualidade ${acordo.versao}`,
+      quem: acordo.assinante ?? "assinante não identificado",
+      quando: formatDateTime(acordo.assinadoEm),
+      onde: acordo.dispositivo,
+    });
+  }
+  if (acordo?.cienciaMotorista) {
+    const m = motoristas.find((x) => x.id === acordo.cienciaMotorista!.motoristaId);
+    assinaturas.push({
+      ato: "Ciência do motorista no acordo",
+      quem: m?.nome ?? acordo.cienciaMotorista.motoristaId,
+      quando: formatDate(acordo.cienciaMotorista.aceitoEm),
+    });
+  }
+  if (motorista) {
+    const aceites = conclusoes.filter((c) => c.motoristaId === motorista.id && c.aceiteCiencia);
+    if (aceites.length) {
+      const ultima = aceites.reduce((a, b) => (a.concluidoEm > b.concluidoEm ? a : b));
+      assinaturas.push({
+        ato: "Aceite de ciência das trilhas",
+        quem: `${motorista.nome} · ${aceites.length} trilha(s)`,
+        quando: `última em ${formatDate(ultima.concluidoEm)}`,
+        onde: findTrilha(ultima.trilhaId)?.codigo,
+      });
+    }
+  }
 
   // Hash-chain: cada seção sela o próprio conteúdo + o selo da anterior.
   const secoes: { titulo: string; icon: React.ReactNode; conteudo: string; jsx: React.ReactNode }[] = [
@@ -354,16 +432,198 @@ function Reconstrucao({ viagemId }: { viagemId: string }) {
       jsx: <AutoridadeDaLiberacao t={triagem} />,
     },
     {
-      titulo: "Compartimento",
+      // O registro que a diretriz exige de toda liberação manual. Ausente não é
+      // buraco: viagem liberada pelo motor não tem liberação manual nenhuma, e
+      // dizer isso é mais informativo do que esconder o bloco.
+      titulo: "Registro da liberação",
+      icon: <ShieldCheck className="size-3.5" />,
+      conteudo: registro
+        ? `${registro.motivoPadronizado}|${registro.impacto}|${registro.validade}|${registro.responsavel}|${registro.dataHora}`
+        : "sem-liberacao-manual",
+      jsx: registro ? (
+        <RegistroLiberacaoCard r={registro} compacto />
+      ) : triagem.liberadaPor === "autoridade" ? (
+        <p className="text-[12px] text-fg-muted leading-snug">
+          Liberada por autoridade antes do registro padronizado — os nove campos não existem para esta decisão.
+        </p>
+      ) : (
+        <p className="text-[12px] text-fg-muted leading-snug">
+          Sem liberação manual. {triagem.liberadaPor === "motor" ? "A carga passou pelas checagens do motor." : "A viagem segue pendente de decisão."}
+        </p>
+      ),
+    },
+    {
+      titulo: "Transportador",
+      icon: <Building2 className="size-3.5" />,
+      conteudo: sub
+        ? `${sub.razaoSocial}|${sub.cnpj}|${sub.tipoVinculo ?? "-"}|${qualificacao?.estado}`
+        : `frota-propria|${imp?.placa ?? "-"}`,
+      jsx: sub ? (
+        <>
+          <p className="text-[12px] font-medium">{sub.razaoSocial}</p>
+          <p className="text-[10px] text-fg-soft font-mono">{sub.cnpj} · {sub.tipoVinculo ?? "vínculo não informado"}</p>
+          <p className="text-[10px] text-fg-soft">
+            Cert {sub.certGMP.numero} · {sub.certGMP.certificadora} · válido até {formatDate(sub.certGMP.validade)} ·
+            base pública: {sub.certGMP.statusBasePublica}
+          </p>
+          <p className="text-[11px] mt-1">
+            <span className={cn("font-semibold", qualificacao && ["Apto", "Apto com restrição"].includes(qualificacao.estado) ? "text-success-700" : "text-danger-700")}>
+              {qualificacao?.estado}
+            </span>
+            <span className="text-fg-muted"> — {qualificacao?.motivo}</span>
+          </p>
+        </>
+      ) : (
+        <p className="text-[12px] text-fg-muted">
+          Frota própria. O implemento {imp?.placa} não pertence a subcontratado — não há empresa terceira na cadeia
+          desta carga.
+        </p>
+      ),
+    },
+    {
+      titulo: "Acordo de qualidade vigente",
+      icon: <Handshake className="size-3.5" />,
+      conteudo: acordo
+        ? `${acordo.versao}|${acordo.vigenciaInicio}>${acordo.vigenciaFim}|${acordo.assinadoEm ?? "nao-assinado"}`
+        : sub
+        ? "sem-acordo"
+        : "nao-se-aplica",
+      jsx: acordo ? (
+        <>
+          <p className="text-[12px]">
+            {acordo.versao} · vigência {formatDate(acordo.vigenciaInicio)} a {formatDate(acordo.vigenciaFim)}
+          </p>
+          <p className="text-[10px] text-fg-soft mt-0.5">
+            {acordo.assinadoEm
+              ? `Assinado por ${acordo.assinante ?? "—"} em ${formatDateTime(acordo.assinadoEm)} · ${acordo.dispositivo ?? "dispositivo não registrado"}`
+              : "Não assinado."}
+          </p>
+          {acordo.representantes?.length ? (
+            <p className="text-[10px] text-fg-soft">Representantes: {acordo.representantes.join(", ")}</p>
+          ) : null}
+          {new Date(acordo.vigenciaFim) < new Date(v.iniciadaEm) && (
+            <p className="text-[11px] text-danger-700 font-semibold mt-1">
+              Vencido na data do carregamento.
+            </p>
+          )}
+        </>
+      ) : sub ? (
+        <p className="text-[12px] text-danger-700">Nenhum acordo firmado com {sub.razaoSocial}.</p>
+      ) : (
+        <p className="text-[12px] text-fg-muted">Frota própria — o acordo de qualidade não se aplica.</p>
+      ),
+    },
+    {
+      titulo: "Motorista",
+      icon: <IdCard className="size-3.5" />,
+      conteudo: motorista
+        ? `${motorista.nome}|${motorista.cpf}|${motorista.tipo}|CNH:${motorista.cnh.vencimento}`
+        : `${v.motorista}|nao-cadastrado`,
+      jsx: motorista ? (
+        <>
+          <p className="text-[12px] font-medium">{motorista.nome}</p>
+          <p className="text-[10px] text-fg-soft font-mono">
+            {motorista.cpf} · {motorista.tipo} · CNH {motorista.cnh.categoria} até {formatDate(motorista.cnh.vencimento)}
+          </p>
+          <p className="text-[10px] text-fg-soft">{motorista.cidade}/{motorista.uf} · {motorista.telefone}</p>
+        </>
+      ) : (
+        <p className="text-[12px] text-danger-700">
+          {v.motorista} não está no cadastro de motoristas — a viagem não tem motorista identificável.
+        </p>
+      ),
+    },
+    {
+      titulo: "Treinamentos",
+      icon: <GraduationCap className="size-3.5" />,
+      conteudo: motorista && competencia
+        ? `${competencia.situacao}|${competencia.motivo}`
+        : "motorista-nao-identificado",
+      jsx: motorista && competencia ? (
+        <>
+          <p className="text-[12px] leading-snug">
+            <span className={cn("font-semibold", competencia.elegivel ? "text-success-700" : "text-danger-700")}>
+              {competencia.elegivel ? "Competência comprovada" : "Sem competência para esta operação"}
+            </span>{" "}
+            <span className="text-fg-muted">— {competencia.motivo}</span>
+          </p>
+          <ul className="mt-1.5 space-y-0.5">
+            {trilhasExigidas({ regime: d.regimeExigido }).map((t) => {
+              const c = conclusoes.find((x) => x.motoristaId === motorista.id && x.trilhaId === t.id);
+              const pendente = competencia.trilhasPendentes.some((p) => p.id === t.id);
+              return (
+                <li key={t.id} className="flex items-start gap-1.5 text-[10.5px]">
+                  <span className={cn("mt-[3px] size-1.5 shrink-0 rounded-full", pendente ? "bg-danger-500" : c ? "bg-success-500" : "bg-border")} />
+                  <span className="text-fg-muted">
+                    <span className="font-medium text-fg">{t.codigo}</span> {t.titulo}
+                    {c ? ` — nota ${c.nota}, ${formatDate(c.concluidoEm)}, ${c.versaoConteudo}` : " — nunca concluída"}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </>
+      ) : (
+        <p className="text-[12px] text-fg-muted">Motorista não identificado no cadastro — sem trilhas a comprovar.</p>
+      ),
+    },
+    {
+      titulo: "Cavalo mecânico",
       icon: <Truck className="size-3.5" />,
-      conteudo: `${imp?.placa}|${comp?.identificador}`,
+      conteudo: cavalo ? `${cavalo.placa}|${cavalo.modelo}|${cavalo.ano}` : `${v.cavalo}|nao-cadastrado`,
+      jsx: cavalo ? (
+        <>
+          <p className="text-[12px] font-mono">{cavalo.placa}</p>
+          <p className="text-[10px] text-fg-soft">
+            {cavalo.modelo} · {cavalo.ano} · documentação {cavalo.documentacaoOk ? "regular" : "pendente"}
+          </p>
+          <p className="text-[10px] text-fg-muted mt-1 leading-snug">
+            Não toca a carga: o histórico T-3 é do compartimento, não desta placa.
+          </p>
+        </>
+      ) : (
+        <p className="text-[12px] text-fg-muted">Cavalo {v.cavalo} não consta no cadastro de ativos.</p>
+      ),
+    },
+    {
+      titulo: "Implemento e compartimento",
+      icon: <Container className="size-3.5" />,
+      conteudo: `${imp?.placa}|${comp?.identificador}|${imp?.certGMP.validade}`,
       jsx: (
         <>
           <Link href={`/frota/compartimento/${compId}`} className="text-[12px] font-mono text-brand-600 hover:underline">
             {imp?.placa} · {comp?.identificador}
           </Link>
-          <p className="text-[10px] text-fg-soft">{imp?.tipo} · {produto?.nomeCanonico}</p>
+          <p className="text-[10px] text-fg-soft">
+            {imp?.tipo} · {comp?.material} · <span className="num">{comp?.capacidadeT}</span> t · conservação {comp?.estadoConservacao}
+          </p>
+          <p className="text-[10px] text-fg-soft">
+            Cert. GMP+ {imp?.certGMP.status} até {imp ? formatDate(imp.certGMP.validade) : "—"} · escopo {imp?.certGMP.escopo}
+          </p>
         </>
+      ),
+    },
+    {
+      titulo: "Produto e base IDTF",
+      icon: <Leaf className="size-3.5" />,
+      conteudo: produto
+        ? `${produto.nomeCanonico}|${produto.idtfCode ?? "-"}|${produto.statusClassificacao}|${d.versaoBaseIDTF}`
+        : `${v.produto}|nao-resolvido`,
+      jsx: produto ? (
+        <>
+          <p className="text-[12px] font-medium">{produto.nomeCanonico}</p>
+          <p className="text-[10px] text-fg-soft font-mono">
+            {produto.idtfCode ?? "sem código IDTF"} · base {d.versaoBaseIDTF} · {produto.statusClassificacao === "em_fila" ? "aguardando classificação" : "classificado"}
+          </p>
+          <p className="text-[10px] text-fg-soft">
+            Declarado na viagem como “{v.produto}” · regime exigido antes de feed: {produto.regimeAntesDeFeed}
+            {produto.bloqueiaFeed && " · proibido antes de feed"}
+          </p>
+        </>
+      ) : (
+        <p className="text-[12px] text-danger-700">
+          “{v.produto}” não resolveu para nenhum item da base IDTF {d.versaoBaseIDTF}.
+        </p>
       ),
     },
     {
@@ -393,14 +653,22 @@ function Reconstrucao({ viagemId }: { viagemId: string }) {
     {
       titulo: "Limpeza",
       icon: <Droplets className="size-3.5" />,
-      conteudo: `exigido:${d.regimeExigido ?? "-"}|aplicado:${d.regimeAplicado ?? "-"}`,
+      conteudo: `exigido:${d.regimeExigido ?? "-"}|aplicado:${d.regimeAplicado ?? "-"}|${limpeza?.id ?? "sem-evento"}`,
       jsx: (
-        <div className="flex items-center gap-2 text-[12px]">
-          <span className="text-fg-muted">Exigido</span>
-          {d.regimeExigido ? <RegimeBadge regime={d.regimeExigido} size="sm" /> : "—"}
-          <span className="text-fg-muted">· Aplicado</span>
-          {d.regimeAplicado ? <RegimeBadge regime={d.regimeAplicado} size="sm" /> : <span className="text-danger-700 text-[11px] font-semibold">não evidenciada</span>}
-        </div>
+        <>
+          <div className="flex items-center gap-2 text-[12px]">
+            <span className="text-fg-muted">Exigido</span>
+            {d.regimeExigido ? <RegimeBadge regime={d.regimeExigido} size="sm" /> : "—"}
+            <span className="text-fg-muted">· Aplicado</span>
+            {d.regimeAplicado ? <RegimeBadge regime={d.regimeAplicado} size="sm" /> : <span className="text-danger-700 text-[11px] font-semibold">não evidenciada</span>}
+          </div>
+          {limpeza && (
+            <p className="text-[10px] text-fg-soft mt-1">
+              {formatDate(limpeza.data)} · {limpeza.metodo} · {limpeza.local} · executor {limpeza.executor} ·{" "}
+              <span className="num">{limpeza.fotos}</span> foto(s)
+            </p>
+          )}
+        </>
       ),
     },
     {
@@ -416,30 +684,79 @@ function Reconstrucao({ viagemId }: { viagemId: string }) {
         <p className="text-[12px] text-fg-muted">Sem inspeção registrada.</p>
       ),
     },
-    ...(sub
-      ? [{
-          titulo: "Subcontratado no momento",
-          icon: <Building2 className="size-3.5" />,
-          conteudo: `${sub.razaoSocial}|${sub.certGMP.numero}|${sub.certGMP.validade}`,
-          jsx: (
-            <>
-              <p className="text-[12px]">{sub.razaoSocial}</p>
-              <p className="text-[10px] text-fg-soft">
-                Cert {sub.certGMP.numero} · válido até {formatDate(sub.certGMP.validade)} · base pública: {sub.certGMP.statusBasePublica}
-              </p>
-            </>
-          ),
-        }]
-      : []),
     {
-      titulo: "Evidências",
+      titulo: "Evidências fotográficas",
       icon: <Camera className="size-3.5" />,
-      conteudo: `evidencias@${v.iniciadaEm}`,
-      jsx: (
+      conteudo: inspecao
+        ? `fotos:${inspecao.fotos}/${FOTOS_MINIMAS}|geo:${inspecao.geo ? `${inspecao.geo.lat},${inspecao.geo.lng}` : "-"}|offline:${inspecao.offline}`
+        : `sem-evidencia@${v.iniciadaEm}`,
+      jsx: inspecao ? (
         <>
-          <p className="text-[12px] text-fg-muted leading-snug">Fotos com geo, timestamp e hash · vinculadas ao compartimento · imutáveis após sincronização.</p>
-          <p className="text-[10px] text-fg-soft mt-1 num">Trilha registrada em {formatDateTime(v.iniciadaEm)}.</p>
+          <p className="text-[12px]">
+            <span className={cn("num font-semibold", inspecao.fotos >= FOTOS_MINIMAS ? "text-success-700" : "text-danger-700")}>
+              {inspecao.fotos}/{FOTOS_MINIMAS}
+            </span>{" "}
+            ângulos obrigatórios · {inspecao.geo ? "com geo" : "sem geo registrada"}
+            {inspecao.offline && <span className="text-warning-700"> · capturadas offline</span>}
+          </p>
+          <p className="text-[10px] text-fg-soft mt-1 num">
+            Vinculadas ao compartimento {comp?.identificador} · carimbo {formatDateTime(inspecao.dataHora)} · imutáveis
+            após sincronização.
+          </p>
         </>
+      ) : (
+        <p className="text-[12px] text-fg-muted">
+          Nenhuma evidência fotográfica: a viagem não tem inspeção registrada.
+        </p>
+      ),
+    },
+    {
+      // Assinatura é o que liga um ato a uma pessoa. O dossiê reúne as que
+      // existem no registro — nenhuma é presumida por o passo ter acontecido.
+      titulo: "Assinaturas",
+      icon: <PenLine className="size-3.5" />,
+      conteudo: assinaturas.map((a) => `${a.ato}:${a.quem}@${a.quando}`).join(">") || "sem-assinatura",
+      jsx: assinaturas.length ? (
+        <ul className="space-y-1">
+          {assinaturas.map((a) => (
+            <li key={a.ato} className="text-[11px]">
+              <span className="font-medium text-fg">{a.ato}</span>{" "}
+              <span className="text-fg-muted">— {a.quem}</span>
+              <span className="block text-[10px] text-fg-soft font-mono">
+                {a.quando} {a.onde && `· ${a.onde}`}
+              </span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-[12px] text-fg-muted">Nenhuma assinatura registrada para esta viagem.</p>
+      ),
+    },
+    {
+      titulo: "Documentos da viagem",
+      icon: <Files className="size-3.5" />,
+      conteudo: docs.map((doc) => `${doc.tipo}:${doc.numero}@${doc.situacao}`).join(">") || "sem-documento",
+      jsx: docs.length ? (
+        <ul className="space-y-1">
+          {docs.map((doc) => (
+            <li key={`${doc.tipo}-${doc.numero}`} className="text-[11px]">
+              <span className="text-[8px] font-bold uppercase tracking-[0.12em] text-brand-700 border border-brand-500/50 rounded-sm px-1 py-px mr-1.5">
+                {doc.tipo}
+              </span>
+              <span className="font-mono num">{doc.numero === "—" ? "sem número" : doc.numero}</span>
+              <span
+                className={cn(
+                  "block text-[10px]",
+                  doc.situacao === "Autorizado" || doc.situacao === "Emitido" ? "text-fg-soft" : "text-warning-700"
+                )}
+              >
+                {doc.situacao} · {formatDate(doc.emitidoEm)}
+              </span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-[12px] text-fg-muted">Nenhum documento emitido para esta viagem.</p>
       ),
     },
   ];
@@ -563,6 +880,10 @@ function reconstrucaoDe(v: (typeof viagens)[number]) {
   const sub = findSubcontratado(imp?.subcontratadoId);
   const inspecao = inspecaoDaViagem(v.id);
   const produto = findProduto(produtoAtualPorViagem[v.id] ?? "");
+  const cavalo = cavaloPorPlaca(v.cavalo);
+  const motorista = motoristas.find((m) => m.nome === v.motorista);
+  const competencia = motorista ? competenciaMotorista(motorista.id, HOJE, { regime: d.regimeExigido }) : undefined;
+  const registro = registrosDaViagem(v.id)[0];
   const pacote = {
     codigo: v.codigo,
     status: v.status,
@@ -570,9 +891,56 @@ function reconstrucaoDe(v: (typeof viagens)[number]) {
     rota: `${v.origem} -> ${v.destino}`,
     compartimento: `${imp?.placa ?? ""} · ${comp?.identificador ?? ""}`,
     decisao: { tier: d.tier, regra: d.regra, mensagem: d.mensagem, regimeExigido: d.regimeExigido ?? null, regimeAplicado: d.regimeAplicado ?? null, versaoBaseIDTF: d.versaoBaseIDTF },
+    checagens: d.checagens.map((c) => ({ regra: c.regra, ok: c.ok, detalhe: c.detalhe, classe: c.classe })),
+    // Liberação manual: presente só quando existiu. Nulo é resposta, não lacuna.
+    liberacao: registro
+      ? {
+          motivoPadronizado: registro.motivoPadronizado,
+          justificativa: registro.justificativa,
+          evidencias: registro.evidencias,
+          responsavel: registro.responsavel,
+          dataHora: registro.dataHora,
+          situacaoAnterior: registro.situacaoAnterior.resumo,
+          situacaoPosterior: registro.situacaoPosterior.resumo,
+          impacto: registro.impacto,
+          validade: registro.validade,
+          expiraEm: registro.expiraEm,
+        }
+      : null,
     t3: getT3(compId).map((e) => ({ ordem: e.ordem, produto: e.produto?.nomeCanonico ?? "", data: e.load.data, cavalo: e.load.cavaloPlaca })),
-    inspecao: inspecao ? { resultado: inspecao.resultado, itens: `${inspecao.itensOk}/${inspecao.itensTotal}`, inspetor: inspecao.inspetor } : null,
-    subcontratado: sub ? { razaoSocial: sub.razaoSocial, cert: sub.certGMP.numero, validade: sub.certGMP.validade } : null,
+    inspecao: inspecao ? { resultado: inspecao.resultado, itens: `${inspecao.itensOk}/${inspecao.itensTotal}`, inspetor: inspecao.inspetor, fotos: `${inspecao.fotos}/${FOTOS_MINIMAS}`, assinatura: inspecao.assinatura ?? null } : null,
+    transportador: sub
+      ? {
+          razaoSocial: sub.razaoSocial,
+          cnpj: sub.cnpj,
+          tipoVinculo: sub.tipoVinculo ?? null,
+          qualificacao: estadoQualificacao(sub).estado,
+          cert: sub.certGMP.numero,
+          validade: sub.certGMP.validade,
+          basePublica: sub.certGMP.statusBasePublica,
+        }
+      : { proprietario: "Frota própria" },
+    acordo: sub?.acordo
+      ? {
+          versao: sub.acordo.versao,
+          vigencia: `${sub.acordo.vigenciaInicio} -> ${sub.acordo.vigenciaFim}`,
+          assinadoEm: sub.acordo.assinadoEm ?? null,
+          assinante: sub.acordo.assinante ?? null,
+        }
+      : null,
+    motorista: motorista
+      ? { nome: motorista.nome, cpf: motorista.cpf, tipo: motorista.tipo, cnhVencimento: motorista.cnh.vencimento }
+      : null,
+    treinamentos: competencia
+      ? {
+          situacao: competencia.situacao,
+          elegivel: competencia.elegivel,
+          motivo: competencia.motivo,
+          pendentes: competencia.trilhasPendentes.map((t) => t.codigo),
+        }
+      : null,
+    cavalo: cavalo ? { placa: cavalo.placa, modelo: cavalo.modelo, ano: cavalo.ano } : null,
+    documentos: documentosDaViagem(v.id),
   };
   // Selo de integridade do pacote — mesmo conteúdo, mesmo hash, sempre.
   return { ...pacote, selo: { hash: hash32(JSON.stringify(pacote)), algoritmo: "djb2-32" } };
