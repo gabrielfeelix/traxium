@@ -26,6 +26,7 @@ import {
   type AuditoriaEvento,
   type Tenant,
 } from "@/lib/mock-data";
+import { conclusoes, findTrilha } from "@/lib/domain/academy";
 import {
   cavalos,
   implementos,
@@ -202,6 +203,18 @@ type SessionCtx = {
   updateLoteStatus: (id: string, status: Lote["statusDDS"]) => void;
   addFazenda: (i: NovaFazendaInput) => string;
   addMotorista: (i: NovoMotoristaInput) => string;
+  /**
+   * Registra conclusão de trilha da Academy. Retorna `false` quando a avaliação
+   * reprova (nota abaixo do mínimo ou tentativas esgotadas) — reprovado NÃO vira
+   * competência, e a regra de liberação da trilha é gate de verdade, não rótulo.
+   */
+  registrarConclusao: (i: {
+    motoristaId: string;
+    trilhaId: string;
+    nota: number;
+    tentativas: number;
+    aceiteCiencia: boolean;
+  }) => { ok: boolean; motivo: string };
   addAuditoria: (i: NovaAuditoriaInput) => string;
   renovarCertificadoMotorista: (motoristaId: string, certNome: string, novaValidade: string) => void;
   renovarCertificadoImplemento: (implementoId: string, novaValidade: string) => void;
@@ -467,6 +480,34 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     return true;
   }, [papel, bump]);
 
+  const registrarConclusao = useCallback<SessionCtx["registrarConclusao"]>((i) => {
+    const t = findTrilha(i.trilhaId);
+    if (!t) return { ok: false, motivo: "Trilha inexistente." };
+    if (!i.aceiteCiencia) return { ok: false, motivo: "Sem aceite de ciência — a evidência não vale para auditoria." };
+    if (i.tentativas > t.tentativasMax)
+      return { ok: false, motivo: `Tentativas esgotadas: ${i.tentativas} de ${t.tentativasMax} permitidas.` };
+    if (i.nota < t.notaMinima)
+      return { ok: false, motivo: `Reprovado — nota ${i.nota}, mínimo ${t.notaMinima}. Tentativa ${i.tentativas} de ${t.tentativasMax}.` };
+
+    // Reciclagem substitui a conclusão anterior da mesma trilha; o histórico de
+    // uma trilha é a conclusão vigente, não a pilha.
+    const idx = conclusoes.findIndex((c) => c.motoristaId === i.motoristaId && c.trilhaId === i.trilhaId);
+    const nova = {
+      motoristaId: i.motoristaId,
+      trilhaId: i.trilhaId,
+      concluidoEm: HOJE,
+      nota: i.nota,
+      tentativas: i.tentativas,
+      aceiteCiencia: true,
+      versaoConteudo: t.versaoConteudo,
+      certificadoId: nextId("CERT").toUpperCase(),
+    };
+    if (idx >= 0) conclusoes[idx] = nova;
+    else conclusoes.unshift(nova);
+    bump();
+    return { ok: true, motivo: `${t.codigo} concluída com nota ${i.nota}. Válida por ${t.validadeMeses} meses.` };
+  }, [bump]);
+
   const addLote = useCallback<SessionCtx["addLote"]>((i) => {
     const id = nextId("l");
     const codigo = `LOT-2026-0${150 + (seq % 800)}`;
@@ -606,6 +647,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     trocarVeiculo,
     addExcecao,
     decidirExcecao,
+    registrarConclusao,
     addLote,
     updateLoteStatus,
     addFazenda,

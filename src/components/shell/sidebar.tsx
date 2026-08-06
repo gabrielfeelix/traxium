@@ -24,6 +24,7 @@ import {
   Database,
   BadgeCheck,
   Activity,
+  GraduationCap,
   Eye,
   LogOut,
 } from "lucide-react";
@@ -96,6 +97,7 @@ export const navigation: NavGroup[] = [
     items: [
       { href: "/frota", label: "Ativos e frota", icon: Container, pilar: "Network", mvp: true, access: { gestor: "read", despachante: "read", admin_subcontratados: "full", auditor_interno: "read" } },
       { href: "/motoristas", label: "Motoristas", icon: IdCard, pilar: "Academy", mvp: true, access: { gestor: "read", despachante: "read", admin_subcontratados: "full", auditor_interno: "read" } },
+      { href: "/academy", label: "Academy", icon: GraduationCap, pilar: "Academy", mvp: true, access: { gestor: "full", despachante: "read", diretoria_rt: "read", admin_subcontratados: "full", auditor_interno: "read" } },
       { href: "/subcontratados", label: "Subcontratados", icon: Building2, badgeTone: "danger", pilar: "Gatekeeper", mvp: true, access: { gestor: "read", despachante: "read", admin_subcontratados: "full", auditor_interno: "read" } },
       { href: "/fazendas", label: "Fazendas e polígonos", icon: Trees, pilar: "Network", mvp: false, access: { gestor: "full", auditor_interno: "read" } },
     ],
