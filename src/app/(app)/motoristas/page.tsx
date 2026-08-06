@@ -113,7 +113,7 @@ export default function MotoristasPage() {
           <div>
             <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-fg">Credenciais de qualificação</h2>
             <p className="text-[12px] text-fg-muted leading-snug mt-0.5 max-w-2xl">
-              O crachá de cada motorista: anel de conformidade, CNH e certificações com validade.
+              O crachá de cada motorista: um arco do anel por trilha obrigatória da Academy, CNH e certificações com validade.
               Quem precisa de atenção aparece primeiro. Clique para focar na tabela.
             </p>
           </div>

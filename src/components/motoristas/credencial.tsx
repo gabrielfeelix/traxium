@@ -6,16 +6,18 @@ import { StatusBadge } from "@/components/shell/status-badge";
 import { nivelVencimento } from "@/lib/domain/model";
 import type { Motorista } from "@/lib/mock-data";
 import { cn, formatDate } from "@/lib/utils";
+import { AnelCompetencia } from "@/components/academy/anel-competencia";
 
 /**
  * Momento-assinatura de Motoristas: a credencial de qualificação — crachá com
- * banda, furo, anel de conformidade ao redor do avatar (medidor), CNH e
- * certificações com validade lida do motor (nivelVencimento). O card É o
+ * banda, furo, anel de COMPETÊNCIA ao redor do avatar (um arco por trilha
+ * obrigatória), CNH e certificações com validade lida do motor. O card É o
  * documento que diz se o motorista pode rodar sob a cadeia certificada.
+ *
+ * O anel deixou de medir conformidade média e passou a medir competência: a
+ * média continua no card como número, mas quem decide se a pessoa carrega é a
+ * trilha vigente, não a média histórica.
  */
-
-const anelCor = (pct: number) =>
-  pct >= 95 ? "stroke-success-500" : pct >= 80 ? "stroke-warning-500" : "stroke-danger-500";
 
 const confCor = (pct: number) =>
   pct >= 95 ? "text-success-700" : pct >= 80 ? "text-warning-700" : "text-danger-700";
@@ -27,27 +29,6 @@ const NIVEL_CHIP: Record<string, string> = {
   alerta: "bg-warning-50/60 text-warning-700",
   ok: "bg-success-50 text-success-700",
 };
-
-/** Anel de conformidade — gauge SVG em volta do avatar. */
-function AnelConformidade({ pct, iniciais }: { pct: number; iniciais: string }) {
-  const r = 24;
-  const c = 2 * Math.PI * r;
-  return (
-    <div className="relative size-14 shrink-0" role="img" aria-label={`Conformidade ${pct.toFixed(1)}%`}>
-      <svg viewBox="0 0 56 56" className="absolute inset-0 -rotate-90">
-        <circle cx="28" cy="28" r={r} strokeWidth="3.5" className="fill-none stroke-border-soft" />
-        <circle
-          cx="28" cy="28" r={r} strokeWidth="3.5" strokeLinecap="round"
-          className={cn("fill-none", anelCor(pct))}
-          strokeDasharray={`${(pct / 100) * c} ${c}`}
-        />
-      </svg>
-      <div className="absolute inset-[7px] rounded-full bg-gradient-to-br from-brand-600 to-sky-600 text-white flex items-center justify-center text-[13px] font-bold">
-        {iniciais}
-      </div>
-    </div>
-  );
-}
 
 export function Credencial({
   m,
@@ -96,7 +77,7 @@ export function Credencial({
 
       <div className="p-3.5 space-y-3">
         <div className="flex items-center gap-3">
-          <AnelConformidade pct={m.conformidadeMedia} iniciais={iniciais} />
+          <AnelCompetencia motoristaId={m.id} iniciais={iniciais} />
           <div className="min-w-0 flex-1">
             <p className="text-[13px] font-bold text-fg leading-tight truncate">{m.nome}</p>
             <p className="font-mono text-[10px] text-fg-soft">{m.cpf}</p>

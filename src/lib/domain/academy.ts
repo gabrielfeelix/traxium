@@ -240,6 +240,18 @@ export function competenciaMotorista(
   };
 }
 
+export type EstadoTrilha = "vigente" | "a_vencer" | "vencida" | "nunca";
+
+/** Estado de UMA trilha para um motorista — alimenta o anel segmentado do crachá. */
+export function estadoTrilha(motoristaId: string, trilha: Trilha, hoje = HOJE): EstadoTrilha {
+  const c = conclusoes.find((x) => x.motoristaId === motoristaId && x.trilhaId === trilha.id);
+  if (!c) return "nunca";
+  const dias = diasEntre(hoje, venceEm(c, trilha));
+  if (dias < 0) return "vencida";
+  if (dias <= 30) return "a_vencer";
+  return "vigente";
+}
+
 /**
  * Treino just-in-time: a trilha que o RISCO desta operação aciona e que o
  * motorista ainda não tem. A base obrigatória fica de fora — ela não é
