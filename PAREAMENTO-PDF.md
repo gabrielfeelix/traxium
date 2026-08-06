@@ -11,7 +11,7 @@ Legenda: **✓ entregue** · **~ parcial** · **✗ não iniciado**
 | 1 · Gatekeeper | ✓ 9/10 ✅ | **Fase 6 entregue.** Onboarding público, QR real, acordo assinável, checklist dinâmico com item crítico, passaporte completo. |
 | 2 · Academy | ~ 2/3 ✅ | **Fase 4 entregue.** Competência derivada, elegibilidade no despacho, sala virtual, just-in-time. Falta o conteúdo em si (vídeo/PDF) e as regras por cliente/filial. |
 | 3 · IDTF Brasil | ~ 2/3 | Motor e camada brasileira de busca existem. Falta cadastro completo e governança. |
-| 4 · Control Tower | ~ 4/5 ✅ | **Fase 5 entregue.** Verde com as 8 condições, motor configurável com piso. Falta liberação padronizada e dossiê com os 16 itens. |
+| 4 · Control Tower | ✓ 5/5 ✅ | **Fases 5 e 7 entregues.** Verde com as 8 condições, motor configurável com piso, liberação padronizada com 9 campos, 6 níveis de autoridade e dossiê com os 16 blocos. Falta só o painel da fila (risco GMP+, miniaturas, notificações). |
 | 5 · Network | ~ 1/4 | O modelo de ativos está certo. A operação em massa não existe. |
 | Transversais | ~ 3/4 ✅ | Offline, imutabilidade, RBAC e **motor configurável com 4 classes** ok. LGPD incompleto. |
 | §5 Ajustes no protótipo | ✓ 4/4 | Todos aplicados. |
@@ -23,7 +23,9 @@ Legenda: **✓ entregue** · **~ parcial** · **✗ não iniciado**
 
 > **Atualização — Fase 6 entregue.** Pilar 1 fechado: onboarding público em `/convite/[token]`, QR real, acordo assinável com renovação, checklist dinâmico por tipo com item crítico, passaporte com os 8 blocos.
 
-**A resposta curta para "implementamos tudo?": ainda não, mas os pilares 1, 2 e 4 estão fechados.** Restam: **Control Tower** (Fase 7: liberação padronizada, dossiê com os 16 itens), **IDTF** (Fase 8: cadastro de 18 campos e governança), **Network** (Fase 9: m:n, importação, operação em massa) e os **indicadores** (Fase 10).
+> **Atualização — Fase 7 entregue (commit `e204d58`).** Pilar 4 fechado no essencial. O motivo da liberação manual virou lista fechada por regra (`MOTIVOS_POR_REGRA`), com justificativa livre como complemento; o registro passou a ter os nove campos, e situação anterior/posterior são capturadas do estado da viagem, não digitadas. A hierarquia ganhou `trafego` e `inspetor`, fechando os seis níveis — checklist reprovado e fotos mínimas passaram ao inspetor, certificação a vencer e sincronização pendente ao tráfego. O dossiê foi de 8 para 16 blocos, todos na cadeia de hash. **Sobrou a tarefa 7.5** (risco GMP+ e miniaturas na fila).
+
+**A resposta curta para "implementamos tudo?": ainda não, mas os pilares 1, 2 e 4 estão fechados.** Restam: **IDTF** (Fase 8: cadastro de 18 campos e governança), **Network** (Fase 9: m:n, importação, operação em massa), os **indicadores** (Fase 10) e o painel da fila do Control Tower (tarefa 7.5).
 
 ---
 
@@ -83,13 +85,13 @@ O pilar mais coberto — foi o alvo da Fase 3.
 | Modelo de decisão em 3 níveis | ✓ | `control-tower.ts`: verde/amarelo/vermelho, com o verde separando "motor" de "autoridade". |
 | **Sem botão genérico de "aprovar mesmo assim"** | ✓ | Nível `tecnico` = ninguém libera, nem diretoria nem master. `podeAprovarExcecao()` nega. |
 | Tempo em fila | ✓ | Contado contra o `HOJE` do protótipo. Só aparece onde há carimbo real. |
-| Dossiê automático reconstruindo a decisão | ✓ | 8 seções encadeadas por hash, exportável em CSV/PDF/JSON. |
+| Dossiê automático reconstruindo a decisão | ✓ | 16 blocos encadeados por hash, exportável em CSV/PDF/JSON. |
 | Motivo da pendência · responsável pela análise · prazo de carregamento | ✓ | Cada item da fila traz os três. |
 | **Verde exige 8 condições** | ✓ | As 8 estão no motor, mais 4 de apoio (12 no total). `avaliarCarregamento` avalia todas e decide pela classe mais severa entre as falhas. |
-| Hierarquia de autoridade (6 papéis) | ~ | 4 níveis: técnico, gestor, diretoria+RT, cliente. Faltam **operador de tráfego** (pendências simples) e **inspetor** (condição física do compartimento) como níveis de decisão. |
-| Registro da liberação manual (9 campos) | ~ | Tem responsável, data/hora, evidência, justificativa. Faltam: **motivo padronizado** (hoje é texto livre), situação anterior, situação posterior, impacto, validade da decisão. |
-| Dossiê com os 16 itens | ~ | 8 seções cobrem viagem, compartimento, T-3, limpeza, inspeção, subcontratado, evidências, autoridade. Faltam como bloco próprio: transportador, cavalo mecânico, assinaturas, acordo vigente, treinamentos, documentos da viagem. |
-| Painel: fotos e documentos essenciais · risco GMP+ · notificações pendentes | ✗ | Não aparecem na fila. |
+| Hierarquia de autoridade (6 papéis) | ✓ | Os 6: técnico, diretoria+RT, gestor, **inspetor** (condição física), **tráfego** (pendência simples) e cliente. Autoridade escala para cima; `tecnico` segue sem ninguém que libere. |
+| Registro da liberação manual (9 campos) | ✓ | Os 9 em `liberacao.ts`. Motivo vem de lista fechada por regra; situação anterior/posterior são derivadas de `situacaoDaViagem()` antes e depois da decisão; impacto e validade são listas fechadas. O store desfaz a liberação se o registro não fechar. |
+| Dossiê com os 16 itens | ✓ | Os 16: decisão, autoridade, registro da liberação, transportador, acordo, motorista, treinamentos, cavalo, implemento/compartimento, produto/IDTF, T-3, limpeza, inspeção, fotos, assinaturas e documentos. Bloco sem dado mostra a ausência em vez de sumir. |
+| Painel: fotos e documentos essenciais · risco GMP+ · notificações pendentes | ✗ | Não aparecem na fila. **Único item aberto do pilar** (tarefa 7.5). |
 
 ## Pilar 5 · TRAXIUM NETWORK
 

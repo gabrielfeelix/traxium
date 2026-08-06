@@ -38,7 +38,9 @@ npm run build         # antes de todo commit
 
 **7. O PDF da diretriz é gitignored.** `Traxium - 5 Pilares prioritários.pdf` não vem no clone. Peça ao Gabriel se precisar. O conteúdo dele já está destrinchado em `PAREAMENTO-PDF.md`.
 
-**8. `vercel deploy` está não autorizado nesta máquina.** `vercel whoami` → *Not authorized*; o `.vercel/project.json` está correto. Precisa de um `vercel login` do Gabriel. **Nada foi publicado em preview desde a Fase 3** — todas as fases estão commitadas e pushadas, nenhuma está no ar.
+**8. Lista vazia em `MOTIVOS_POR_REGRA` é afirmação, não esquecimento.** Regra cuja autoridade é `tecnico` tem `[]` porque não existe motivo que a libere; a tela mostra "não há motivo padronizado" e some com o botão. O teste `liberacao.test.ts` trava a equivalência: **há motivo exatamente onde há autoridade**. Ao acrescentar regra ao motor, mapeie autoridade **e** motivos — sem os dois, ela fica sem caminho de liberação.
+
+**9. `vercel deploy` está não autorizado nesta máquina.** `vercel whoami` → *Not authorized*; o `.vercel/project.json` está correto. Precisa de um `vercel login` do Gabriel. **Nada foi publicado em preview desde a Fase 3** — todas as fases estão commitadas e pushadas, nenhuma está no ar.
 
 ## 4. O princípio que sustenta o código
 
@@ -94,25 +96,25 @@ Diretriz do P.O.: 5 pilares. Estado por pilar (detalhe item a item em **`PAREAME
 | 1 · Gatekeeper | ✓ fechado (Fase 6) |
 | 2 · Academy | ✓ fechado no essencial (Fase 4) |
 | 3 · IDTF Brasil | ~ 2/3 — falta cadastro de 18 campos e governança da base |
-| 4 · Control Tower | ✓ fechado (Fases 3 e 5) |
+| 4 · Control Tower | ✓ fechado (Fases 3, 5 e 7) — falta só o painel da fila (7.5) |
 | 5 · Network | ~ 1/4 — falta m:n, importação, operação em massa |
 | Transversais | ~ 3/4 — falta LGPD (retenção, inativação, consentimentos) |
 | §8 Indicadores | ✗ 1 de 15 |
 
 ## 8. O que vem agora
 
-O roadmap completo está em **`PLANO-COBERTURA-PDF.md`**, com decisões de UX já fixadas e critério de aceite por fase. Fases 0, 4, 5 e 6 estão entregues.
+O roadmap completo está em **`PLANO-COBERTURA-PDF.md`**, com decisões de UX já fixadas e critério de aceite por fase. Fases 0, 4, 5, 6 e 7 estão entregues.
 
-**Próxima: Fase 7 — Control Tower completo.** As fases 7 e 8 são paralelizáveis.
+**Próxima: Fase 8 — IDTF completo** (cadastro de 18 campos, 9 rótulos operacionais, governança da base). Depois: 9 (Network) e 10 (transversais). A Fase 8 já podia ter sido feita em paralelo com a 7.
 
-1. **Motivo padronizado na liberação manual.** Hoje é texto livre, e texto livre não sobrevive a auditoria. Vira lista fechada por regra (`MOTIVOS_POR_REGRA: Record<RegraId, string[]>`), com a justificativa livre continuando como complemento, nunca no lugar.
-2. **Os 9 campos do registro de liberação** (§Control Tower): motivo padronizado, justificativa, evidência, responsável, data/hora, **situação anterior**, **situação posterior**, **impacto**, **validade da decisão**. Anterior/posterior saem automaticamente do estado da viagem.
-3. **Hierarquia com os 6 níveis.** `NivelAutoridade` tem 4; faltam `trafego` (pendências simples) e `inspetor` (condição física do compartimento).
-4. **Dossiê com os 16 itens.** Hoje são 9 seções; faltam transportador, cavalo mecânico, assinaturas, acordo vigente, treinamentos e documentos da viagem. **Cada bloco novo entra na cadeia de hash.**
+**Sobrou da Fase 7:** a tarefa **7.5** (fila com risco GMP+, miniatura das evidências essenciais e notificações pendentes por item). As quatro primeiras entregas estão fechadas — ver §11 e a dívida em §9.
 
 ## 9. Dívida conhecida (deixada de propósito)
 
 **Control Tower**
+- **Exceção aprovada libera a viagem inteira, mesmo quando a regra que decidiu é outra.** `triarViagem` pinta de verde qualquer viagem com exceção aprovada, sem conferir se a regra da exceção é a mesma que o motor reportou. Em `v-004` isso é visível: a exceção é de "Pendência sem risco direto", mas o motor reprova por "Checklist reprovado". O registro da liberação expõe o descompasso nos campos 6 e 7 (situação anterior/posterior continuam dizendo `regra: Checklist reprovado`), o que é honesto, mas o certo seria a liberação valer só para a regra citada e o motor seguir bloqueando pelas outras.
+- Tarefa **7.5** não entregue: a fila não mostra risco GMP+, miniatura das evidências essenciais nem notificações pendentes por item.
+- `/viagens/[id]` ainda lista "Documentos gerados" por array fixo na tela. O dossiê já lê `documentosDaViagem()` em `model.ts`; a tela de viagem não foi migrada.
 - Reavaliação após regularização só acontece porque o motor recalcula a cada render. Falta a ação explícita ("registrar limpeza → reavaliar") com o antes/depois visível.
 - `avaliadoEm` usa `viagem.iniciadaEm`. Um ledger append-only, com a versão da base vigente em cada avaliação, é o que sustentaria "o motor decidiu às 14:22 com a base 2026.05".
 - Regra nova não mapeada cai no fallback `gestor` em `autoridadeDaRegra()`. **Ao acrescentar regra ao motor, mapeie a autoridade junto** — senão vira aprovável por descuido.
@@ -139,7 +141,8 @@ src/lib/domain/
   motor-config.ts    # 4 classes, 12 RegraId, piso por regra
   academy.ts         # trilhas, conclusões, competenciaMotorista
   control-tower.ts   # triagem, automação, autoridadeDaRegra, tempoEmFila
-  __tests__/         # vitest (30 testes)
+  liberacao.ts       # motivos por regra, registro de 9 campos, situacaoDaViagem
+  __tests__/         # vitest (50 testes)
 src/lib/store/session.tsx   # todas as ações de escrita
 src/components/shell/       # sidebar (+drawer), topbar, torre-de-controle
 src/app/(app)/              # back-office (tem shell)
@@ -161,6 +164,8 @@ src/app/convite/[token]/    # onboarding público (SEM shell, de propósito)
 | 4 | `a76cf16`…`e1a0bf2` | Academy: competência derivada, elegibilidade no despacho, `/academy`, anel no crachá, just-in-time |
 | 5 | `50427c7` | Motor: 12 condições avaliadas antes de decidir, 4 classes configuráveis com piso |
 | 6 | `9110cd3` | Gatekeeper: onboarding público, QR real, acordo assinável, checklist dinâmico, passaporte completo |
+| — | `a61fa2e` | Correção: data sem hora recuava um dia no fuso local (UTC vs. UTC-3) |
+| 7 | `e204d58` | Control Tower: motivo padronizado, registro de 9 campos, 6 níveis de autoridade, dossiê com 16 blocos |
 
 ## 12. Notion
 
