@@ -24,8 +24,18 @@ export function formatNumber(value: number) {
   return new Intl.NumberFormat("pt-BR").format(value);
 }
 
+/**
+ * `new Date("2026-07-08")` é meia-noite UTC — em UTC-3 vira 07/07 às 21h, e a
+ * tela mostra o dia anterior. Datas sem hora são datas civis: interpretá-las no
+ * fuso local é o único jeito de "vence em 08/07" não virar "07/07" no dossiê.
+ */
+function paraData(date: Date | string): Date {
+  if (typeof date !== "string") return date;
+  return /^\d{4}-\d{2}-\d{2}$/.test(date) ? new Date(`${date}T00:00:00`) : new Date(date);
+}
+
 export function formatDate(date: Date | string) {
-  const d = typeof date === "string" ? new Date(date) : date;
+  const d = paraData(date);
   return new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
     month: "2-digit",
@@ -34,7 +44,7 @@ export function formatDate(date: Date | string) {
 }
 
 export function formatDateTime(date: Date | string) {
-  const d = typeof date === "string" ? new Date(date) : date;
+  const d = paraData(date);
   return new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
     month: "2-digit",
