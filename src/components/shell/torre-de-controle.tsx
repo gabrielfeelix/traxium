@@ -12,6 +12,7 @@ import Link from "next/link";
 import {
   AlertOctagon, CircleCheck, ChevronRight, ShieldAlert, ShieldOff,
   Gavel, Boxes, Building2, GraduationCap, Container, FileClock, Truck, Cpu,
+  Droplets, ClipboardCheck, Camera, PenLine, FileText, BellDot,
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/shell/page-header";
@@ -22,7 +23,10 @@ import {
   excecoes, produtosIDTF, subcontratados, nivelVencimento, NIVEL_LABEL, NIVEL_CURTO,
   estadoQualificacao, ESTADO_QUALIFICACAO, type NivelAutoridade,
 } from "@/lib/domain/model";
-import { triarViagens, automacao, tempoEmFila, type ItemTriagem } from "@/lib/domain/control-tower";
+import {
+  triarViagens, automacao, tempoEmFila, riscoGMP, evidenciasEssenciais, pendenciasDeResposta,
+  type ItemTriagem, type RiscoGMP, type EvidenciaEssencial, type PendenciaResposta,
+} from "@/lib/domain/control-tower";
 import { formatDate, formatDateTime, cn } from "@/lib/utils";
 
 type Tier = "bloqueio" | "analise";
@@ -38,6 +42,11 @@ type ItemFila = {
   /** Desde quando espera. Ausente = a entidade não guarda esse carimbo. */
   desde?: string;
   href: string;
+  // ── Painel da fila (Fase 7.5). Só itens de carregamento têm os três: risco de
+  // feed, evidência e pendência de resposta são propriedades de uma viagem.
+  risco?: RiscoGMP;
+  evidencias?: EvidenciaEssencial[];
+  pendencias?: PendenciaResposta[];
 };
 
 export function TorreDeControle() {
@@ -82,6 +91,9 @@ export function TorreDeControle() {
         : `Entrega prev. ${formatDateTime(t.viagem.previsaoEntrega).split(",")[0]}`,
       desde: t.excecao?.solicitadoEm ?? t.viagem.iniciadaEm,
       href: t.excecao ? "/excecoes" : `/viagens/${t.viagem.id}`,
+      risco: riscoGMP(t.decisao),
+      evidencias: evidenciasEssenciais(t.viagem.id),
+      pendencias: pendenciasDeResposta(t.viagem.id),
     })),
     ...subPendentes.map(({ s, q }): ItemFila => ({
       id: `s-${s.id}`,
@@ -216,8 +228,11 @@ export function TorreDeControle() {
                               <p className="mt-1 text-[12px] leading-snug text-fg-muted line-clamp-2">{it.motivo}</p>
                               <div className="mt-1.5 flex items-center gap-x-2.5 gap-y-1 flex-wrap text-[11px]">
                                 <QuemLibera nivel={it.autoridade} />
+                                {it.risco && <RiscoChip risco={it.risco} />}
                                 {it.meta && <span className="text-fg-soft">{it.meta}</span>}
                               </div>
+                              {it.evidencias && <MiniaturaEvidencias itens={it.evidencias} />}
+                              {it.pendencias?.length ? <Pendencias itens={it.pendencias} /> : null}
                             </div>
                             <div className="flex shrink-0 items-center gap-1 pt-0.5">
                               <TempoEmFila desde={it.desde} />
@@ -441,6 +456,85 @@ function FaixaTriagem({ auto, triagem }: { auto: ReturnType<typeof automacao>; t
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+/** Risco de feed do carregamento. Derivado da decisão — nunca um rótulo à mão. */
+function RiscoChip({ risco }: { risco: RiscoGMP }) {
+  if (risco.nivel === "nenhum") return null;
+  return (
+    <span
+      title={risco.motivo}
+      className={cn(
+        "inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10.5px] font-semibold",
+        risco.nivel === "critico" && "bg-danger-50 text-danger-700",
+        risco.nivel === "alto" && "bg-danger-50/60 text-danger-700",
+        risco.nivel === "medio" && "bg-warning-50 text-warning-700",
+        risco.nivel === "baixo" && "bg-bg text-fg-muted"
+      )}
+    >
+      <ShieldAlert className="size-3" /> {risco.rotulo}{" "}
+      <span className="num">· {risco.falhas} {risco.falhas === 1 ? "falha" : "falhas"}</span>
+    </span>
+  );
+}
+
+const EVIDENCIA_ICON: Record<EvidenciaEssencial["chave"], typeof Boxes> = {
+  t3: Boxes,
+  limpeza: Droplets,
+  inspecao: ClipboardCheck,
+  fotos: Camera,
+  assinatura: PenLine,
+  documentos: FileText,
+};
+
+/**
+ * Miniatura das evidências essenciais: seis marcas, presente ou ausente. Serve
+ * para ler antes de abrir a viagem o que falta — e o que falta aparece apagado,
+ * não some.
+ */
+function MiniaturaEvidencias({ itens }: { itens: EvidenciaEssencial[] }) {
+  const ok = itens.filter((e) => e.ok).length;
+  return (
+    <div className="mt-1.5 flex items-center gap-1" aria-label={`Evidências essenciais: ${ok} de ${itens.length}`}>
+      {itens.map((e) => {
+        const Icon = EVIDENCIA_ICON[e.chave];
+        return (
+          <span
+            key={e.chave}
+            title={`${e.rotulo} — ${e.detalhe}`}
+            className={cn(
+              "flex size-5 items-center justify-center rounded border",
+              e.ok
+                ? "border-success-500/40 bg-success-50 text-success-700"
+                : "border-border bg-bg text-fg-soft"
+            )}
+          >
+            <Icon className="size-3" aria-hidden />
+          </span>
+        );
+      })}
+      <span className="ml-0.5 text-[10.5px] text-fg-soft num">
+        {ok}/{itens.length}
+      </span>
+    </div>
+  );
+}
+
+/** O que está pendente de resposta de alguém. Cada linha é um fato do store. */
+function Pendencias({ itens }: { itens: PendenciaResposta[] }) {
+  return (
+    <ul className="mt-1 space-y-0.5">
+      {itens.map((p) => (
+        <li key={p.rotulo} className="flex items-start gap-1.5 text-[10.5px] text-fg-muted">
+          <BellDot className="mt-[2px] size-3 shrink-0 text-warning-700" aria-hidden />
+          <span>
+            {p.rotulo}
+            {p.desde && <span className="text-fg-soft num"> · há {tempoEmFila(p.desde).dias}d</span>}
+          </span>
+        </li>
+      ))}
+    </ul>
   );
 }
 

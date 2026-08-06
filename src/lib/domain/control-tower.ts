@@ -10,8 +10,20 @@
 //      um certificado vencido ou uma limpeza que não aconteceu. O que derruba
 //      um bloqueio técnico é a regularização do fato, não a hierarquia.
 
-import { excecoes, HOJE, type Excecao, type NivelAutoridade } from "./model";
-import { avaliarCarregamento, type Decisao } from "./rules-engine";
+import {
+  excecoes,
+  HOJE,
+  FOTOS_MINIMAS,
+  compartimentoPorViagem,
+  inspecaoDaViagem,
+  documentosDaViagem,
+  limpezasApos,
+  NIVEL_CURTO,
+  type Excecao,
+  type NivelAutoridade,
+} from "./model";
+import { avaliarCarregamento, getT3, type Decisao } from "./rules-engine";
+import { ORDEM_CLASSE, REGRA_LABEL, type RegraId } from "./motor-config";
 import type { Viagem } from "@/lib/mock-data";
 
 export type Faixa = "verde" | "amarelo" | "vermelho";
@@ -134,6 +146,166 @@ export function triarViagem(viagem: Viagem): ItemTriagem {
 /** Triagem de uma lista de viagens. Concluídas ficam de fora: nada a decidir. */
 export function triarViagens(lista: Viagem[]): ItemTriagem[] {
   return lista.filter((v) => v.status !== "Concluída").map(triarViagem);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Painel da fila (Fase 7.5) — risco, evidência e o que se espera de alguém
+//
+// Três perguntas que a diretriz pede na fila e que a tela não respondia: qual o
+// risco de feed deste item, quais evidências essenciais existem, e o que está
+// pendente de resposta. As três se derivam do que já está no store — nada aqui
+// é campo novo nem número plausível.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type NivelRisco = "critico" | "alto" | "medio" | "baixo" | "nenhum";
+
+export type RiscoGMP = {
+  nivel: NivelRisco;
+  rotulo: string;
+  motivo: string;
+  /** Quantas condições do motor falharam. */
+  falhas: number;
+};
+
+const RISCO_ROTULO: Record<NivelRisco, string> = {
+  critico: "Risco crítico",
+  alto: "Risco alto",
+  medio: "Risco médio",
+  baixo: "Risco baixo",
+  nenhum: "Sem risco aberto",
+};
+
+/**
+ * Risco GMP+ do carregamento, derivado da decisão do motor.
+ *
+ * Crítico não é "muitas falhas": é falha que ninguém libera — contaminação,
+ * limpeza ausente, certificado vencido. Uma viagem com seis pendências
+ * corrigíveis é menos perigosa para o feed do que uma com uma carga proibida.
+ */
+export function riscoGMP(decisao: Decisao): RiscoGMP {
+  const falhas = decisao.checagens.filter((c) => !c.ok);
+  if (!falhas.length) {
+    return { nivel: "nenhum", rotulo: RISCO_ROTULO.nenhum, motivo: "Todas as condições avaliadas passaram.", falhas: 0 };
+  }
+
+  const tecnicas = falhas.filter((c) => ehBloqueioTecnico(REGRA_LABEL[c.regra]));
+  if (tecnicas.length) {
+    return {
+      nivel: "critico",
+      rotulo: RISCO_ROTULO.critico,
+      motivo: `${tecnicas.length} condição(ões) que nenhuma autoridade libera: ${tecnicas.map((c) => c.nome).join(", ")}.`,
+      falhas: falhas.length,
+    };
+  }
+
+  const pior = falhas.reduce((a, b) => (ORDEM_CLASSE[b.classe] > ORDEM_CLASSE[a.classe] ? b : a));
+  const nivel: NivelRisco = pior.classe === "bloqueio" ? "alto" : pior.classe === "alerta" ? "medio" : "baixo";
+  return {
+    nivel,
+    rotulo: RISCO_ROTULO[nivel],
+    motivo: `${falhas.length} condição(ões) pendente(s); a mais severa é ${pior.nome}.`,
+    falhas: falhas.length,
+  };
+}
+
+export type ChaveEvidencia = "t3" | "limpeza" | "inspecao" | "fotos" | "assinatura" | "documentos";
+
+export type EvidenciaEssencial = {
+  chave: ChaveEvidencia;
+  rotulo: string;
+  ok: boolean;
+  detalhe: string;
+};
+
+/**
+ * As seis evidências essenciais de um carregamento, na ordem em que a operação
+ * as produz. Ausente aparece como ausente: a miniatura serve justamente para
+ * ler de relance o que falta antes de abrir a viagem.
+ */
+export function evidenciasEssenciais(viagemId: string): EvidenciaEssencial[] {
+  const compartimentoId = compartimentoPorViagem[viagemId];
+  const t3 = compartimentoId ? getT3(compartimentoId) : [];
+  const insp = inspecaoDaViagem(viagemId);
+  const limpezas = compartimentoId ? limpezasApos(compartimentoId, t3[0]?.load.data ?? "1970-01-01") : [];
+  const docs = documentosDaViagem(viagemId);
+
+  return [
+    {
+      chave: "t3",
+      rotulo: "Histórico T-3",
+      ok: t3.length >= 3,
+      detalhe: `${t3.length} de 3 cargas anteriores`,
+    },
+    {
+      chave: "limpeza",
+      rotulo: "Limpeza evidenciada",
+      ok: limpezas.length > 0,
+      detalhe: limpezas[0] ? `Regime ${limpezas[0].regime} em ${limpezas[0].data}` : "Nenhuma após a última carga",
+    },
+    {
+      chave: "inspecao",
+      rotulo: "Inspeção pré-carregamento",
+      ok: insp?.resultado === "aprovado",
+      detalhe: insp ? `${insp.resultado} (${insp.itensOk}/${insp.itensTotal})` : "Sem inspeção registrada",
+    },
+    {
+      chave: "fotos",
+      rotulo: "Fotos guiadas",
+      ok: (insp?.fotos ?? 0) >= FOTOS_MINIMAS,
+      detalhe: `${insp?.fotos ?? 0} de ${FOTOS_MINIMAS} ângulos`,
+    },
+    {
+      chave: "assinatura",
+      rotulo: "Assinatura do checklist",
+      ok: Boolean(insp?.assinatura),
+      detalhe: insp?.assinatura ? `${insp.assinatura.nome} · ${insp.assinatura.dispositivo}` : "Não assinado",
+    },
+    {
+      chave: "documentos",
+      rotulo: "Documentos da viagem",
+      ok: docs.some((doc) => doc.situacao === "Autorizado"),
+      detalhe: docs.length ? `${docs.length} documento(s), ${docs.filter((doc) => doc.situacao === "Autorizado").length} autorizado(s)` : "Nenhum emitido",
+    },
+  ];
+}
+
+export type PendenciaResposta = {
+  rotulo: string;
+  /** Desde quando espera. Ausente = a entidade não guarda carimbo — não se inventa. */
+  desde?: string;
+};
+
+/**
+ * O que está pendente de resposta de alguém nesta viagem.
+ *
+ * Não existe entidade de notificação no protótipo, e fabricar "enviado em" seria
+ * inventar. Cada linha aqui é um fato do store que só sai do lugar quando
+ * alguém age: exceção sem decisão, evidência offline sem sincronizar,
+ * competência sem registro, acordo sem assinatura.
+ */
+export function pendenciasDeResposta(viagemId: string): PendenciaResposta[] {
+  const pend: PendenciaResposta[] = [];
+  const exc = excecaoDaViagem(viagemId);
+  if (exc?.status === "pendente") {
+    pend.push({
+      rotulo:
+        exc.nivelRequerido === "tecnico"
+          ? "Exceção sem caminho de aprovação — espera regularização, não decisão"
+          : `Exceção aguardando decisão de ${NIVEL_CURTO[exc.nivelRequerido]}`,
+      desde: exc.solicitadoEm,
+    });
+  }
+
+  const insp = inspecaoDaViagem(viagemId);
+  if (insp?.offline) pend.push({ rotulo: "Evidência offline aguardando sincronização", desde: insp.dataHora });
+
+  const d = avaliarCarregamento(viagemId);
+  const falhou = (r: RegraId) => d.checagens.some((c) => c.regra === r && !c.ok);
+  if (falhou("competencia_motorista")) pend.push({ rotulo: "Trilha pendente de registro na Academy" });
+  if (falhou("acordo_vigente")) pend.push({ rotulo: "Acordo de qualidade aguardando assinatura" });
+  if (falhou("produto_reconhecido")) pend.push({ rotulo: "Produto aguardando classificação da Qualidade" });
+
+  return pend;
 }
 
 export type Automacao = {
