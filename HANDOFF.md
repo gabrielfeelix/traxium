@@ -49,13 +49,23 @@ O branch saiu de `b73836e` e ficou 8 commits atrás de `main`. Merge feito, 4 co
 - **Movimento**: `prefers-reduced-motion` global (não existia). `.animate-list-in` na fila/legenda/registro; `.skeleton` nos dois `dynamic()` de Leaflet. `animate-slide-in` e `.animate-shimmer` foram removidos: eram declarados e nunca usados.
 - **Torre**: fila agrupada por severidade com espinha contínua + **tempo em fila** (contado contra `HOJE`, não `Date.now()`). "Pilares do MVP" virou "Onde a pendência está".
 
+### Fase 0 + Fase 4 (commits `25c168c`…`e1a0bf2`) — Academy
+- **Vitest no domínio** (`pnpm test`). O repo usa **pnpm**, não npm. Testes só de `src/lib/**`; telas continuam verificadas rodando o app. `rules-engine.test.ts` é caracterização: trava o motor antes de a Fase 5 reescrevê-lo.
+- **`src/lib/domain/academy.ts`**: as 10 trilhas da diretriz, `Conclusao` (nota, tentativas, aceite, versão do conteúdo, certificado), `competenciaMotorista()` derivando elegibilidade, `estadoTrilha()`, `trilhasJustInTime()`, `orientacaoDoRegime()`. **Junção por `motorista.id`** — os CPFs no mock estão mascarados por LGPD.
+- **Elegibilidade no despacho**: `nova-viagem-modal` desabilita o motorista inelegível com o motivo (não esconde), e `podeCriar` trava se trocar o compartimento tornar o escolhido inelegível.
+- **`/academy`**: matriz motorista × trilha, catálogo com as regras de liberação, export CSV para auditoria, modal de registro de conclusão. `registrarConclusao` recusa nota abaixo do mínimo, tentativas esgotadas ou falta de aceite.
+- **Anel de competência** no crachá: um arco por trilha obrigatória. Substituiu o gauge de conformidade média.
+- **Micro-treino just-in-time** em `/mobile`, separando trilha pendente (requisito) de orientação do regime (revisão).
+
 ## Mapa MVP: pilar → telas
 Torre de Controle (home + /viagens + /excecoes + /bloqueios + /dossie) · Gatekeeper (/subcontratados + /checklists) · Academy (/motoristas) · IDTF Brasil (/idtf + /limpezas) · Network (/frota) · App do motorista (/mobile). Escondido no MVP: /fazendas /lotes /traces /auditoria /conformidade /documentos /atividade + superfícies Console/Portal/Auditor.
 
-## Próximo (roadmap faseado)
-- **Fase 4 — Academy**: sala virtual (trilhas, avaliação, certificado, validade) + treino just-in-time por risco. Regra: motorista sem competência não aparece elegível.
-- **Fase 5 — Network**: cadastro em massa, import planilha, relações m:n, consulta rápida por CPF/CNPJ/placa.
-- **Fase 6 — Trilhos EUDR**: só modelo de dados (lote/origem/CAR/polígono), sem telas avançadas (2ª onda).
+## Próximo — ver `PLANO-COBERTURA-PDF.md`
+O roadmap completo (fases 5 a 10) fechando todas as lacunas de `PAREAMENTO-PDF.md` está lá, com decisões de UX fixadas e critério de aceite por fase.
+
+**A próxima é a Fase 5 — motor completo e configurável.** Duas coisas:
+1. O verde passa a exigir as **8 condições** da diretriz; hoje checa 5. Falta acordo vigente, **competência do motorista** (já existe em `academy.ts`, só não é consultada pelo motor), fotos mínimas e produto reconhecido.
+2. `avaliarCarregamento` passa a **avaliar tudo e depois decidir**, em vez de sair na primeira falha — é o que permite o verde exigir as 8 e melhora o dossiê de graça. Os testes de caracterização da Fase 0 devem continuar passando.
 
 ## Ainda faltando no Gatekeeper (deixado de propósito na Fase 2)
 Página pública de onboarding (fluxo do transportador), assinatura eletrônica real do acordo, "Pendente de inspeção" derivado, QR real. Ver §Gatekeeper do PDF.

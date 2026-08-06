@@ -9,7 +9,7 @@ Legenda: **✓ entregue** · **~ parcial** · **✗ não iniciado**
 | Pilar | Situação | Leitura curta |
 | --- | --- | --- |
 | 1 · Gatekeeper | ~ 2/3 | Estados, acordo e passaporte existem. Falta o fluxo público do transportador. |
-| 2 · Academy | ✗ quase zero | Só há lista de certificações. O princípio central do pilar não está no motor. |
+| 2 · Academy | ~ 2/3 ✅ | **Fase 4 entregue.** Competência derivada, elegibilidade no despacho, sala virtual, just-in-time. Falta o conteúdo em si (vídeo/PDF) e as regras por cliente/filial. |
 | 3 · IDTF Brasil | ~ 2/3 | Motor e camada brasileira de busca existem. Falta cadastro completo e governança. |
 | 4 · Control Tower | ~ 3/4 | O mais completo. Falta o verde checar tudo que o PDF exige. |
 | 5 · Network | ~ 1/4 | O modelo de ativos está certo. A operação em massa não existe. |
@@ -17,7 +17,9 @@ Legenda: **✓ entregue** · **~ parcial** · **✗ não iniciado**
 | §5 Ajustes no protótipo | ✓ 4/4 | Todos aplicados. |
 | §8 Indicadores | ✗ 1/15 | Só "% liberadas automaticamente". |
 
-**A resposta curta para "implementamos tudo?": não, e o buraco maior é o Pilar 2.** O PDF ordena os pilares por prioridade e o Academy é o nº 2 — hoje é o menos implementado dos cinco. Mais grave que a ausência das telas: o princípio central declarado no PDF ("motorista sem competência comprovada não aparece como elegível para a operação") **não está no motor de regras**. `avaliarCarregamento()` não consulta treinamento de motorista em nenhum ponto.
+> **Atualização — Fase 4 entregue (commits `a76cf16`…`e1a0bf2`).** O princípio central do Pilar 2 saiu do PDF e entrou no código: `competenciaMotorista()` deriva elegibilidade das trilhas concluídas, e motorista sem competência não é selecionável no despacho. As linhas do Pilar 2 abaixo estão marcadas com o estado atual. **O que segue pendente e é o buraco maior agora: `avaliarCarregamento()` ainda não consulta competência** — a trava existe no despacho, mas não como uma das oito condições do verde. É a Fase 5.
+
+**A resposta curta para "implementamos tudo?": ainda não.** O PDF ordena os pilares por prioridade; o Academy era o nº 2 e o menos implementado, e agora está coberto no essencial. O maior gap remanescente passou a ser o motor — verde com 5 das 8 condições (Fase 5) — e o Network (Fase 9).
 
 ---
 
@@ -43,15 +45,15 @@ Legenda: **✓ entregue** · **~ parcial** · **✗ não iniciado**
 
 | O PDF pede | | Onde está / o que falta |
 | --- | --- | --- |
-| **Motorista sem competência não aparece elegível** | ✗ | **Este é o item mais importante do pilar e não existe.** O motor de regras não consulta treinamento de motorista; o select de motorista em `nova-viagem-modal` oferece todos, inclusive vencidos. |
-| Sala virtual: vídeos, PDF, avaliação objetiva | ✗ | Não existe. |
-| Nota obtida, número de tentativas, aceite de ciência | ✗ | Não existe. |
-| Certificado interno, versão do conteúdo assistido | ✗ | Não existe. |
-| Validade / periodicidade do treinamento | ~ | `motorista.certificacoes[]` tem `{nome, status, vencimento}` — é registro de validade, não trilha. |
-| As 10 trilhas recomendadas | ✗ | Não existem. `agendar-treinamento-modal` tem 4 tipos como rótulo, sem conteúdo. |
-| Treinamento acionado por risco (5 gatilhos) | ✗ | Não existe nenhum dos cinco. |
-| Regras de liberação (nota mínima, tentativas, reciclagem, bloqueio após reprovação, por cliente/produto/filial) | ✗ | Não existe. |
-| Relatório exportável para auditoria | ✗ | Não existe para treinamento. |
+| **Motorista sem competência não aparece elegível** | ✓ | `competenciaMotorista()` em `academy.ts`; o select do despacho desabilita com o motivo, e `podeCriar` trava se a troca de compartimento tornar o escolhido inelegível. **Falta entrar no motor** como condição do verde — Fase 5. |
+| Sala virtual: vídeos, PDF, avaliação objetiva | ~ | `/academy` com matriz de competência, catálogo de trilhas e registro de avaliação. O **conteúdo** (vídeo/PDF) não existe — só o registro da avaliação. |
+| Nota obtida, número de tentativas, aceite de ciência | ✓ | `Conclusao` guarda os três; `registrarConclusao` recusa abaixo da nota mínima, acima das tentativas ou sem aceite. |
+| Certificado interno, versão do conteúdo assistido | ✓ | `certificadoId` e `versaoConteudo` gravados na conclusão. |
+| Validade / periodicidade do treinamento | ✓ | `validadeMeses` por trilha; `estadoTrilha()` deriva vigente/a vencer/vencida. |
+| As 10 trilhas recomendadas | ✓ | `TRILHAS` em `academy.ts`, na ordem da diretriz, com gatilho por regime/gatekeeper/reincidência. |
+| Treinamento acionado por risco (5 gatilhos) | ~ | 3 dos 5 modelados (regime, gatekeeper, reincidência em fotos) e o cartão just-in-time aparece em `/mobile`. Faltam os gatilhos de produto sensível e de item de checklist reprovado. |
+| Regras de liberação (nota mínima, tentativas, reciclagem, bloqueio após reprovação, por cliente/produto/filial) | ~ | Nota mínima, tentativas, reciclagem e bloqueio após reprovação existem por trilha. **Por cliente, produto ou filial, não** — é configuração, fica para a Fase 5. |
+| Relatório exportável para auditoria | ✓ | "Exportar para auditoria" em `/academy` gera CSV com situação, motivo, pendências e próximo vencimento. |
 
 ## Pilar 3 · TRAXIUM IDTF BRASIL
 
