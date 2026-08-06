@@ -57,15 +57,20 @@ O branch saiu de `b73836e` e ficou 8 commits atrás de `main`. Merge feito, 4 co
 - **Anel de competência** no crachá: um arco por trilha obrigatória. Substituiu o gauge de conformidade média.
 - **Micro-treino just-in-time** em `/mobile`, separando trilha pendente (requisito) de orientação do regime (revisão).
 
+### Fase 5 (commit `50427c7`) — motor completo e configurável
+- **`src/lib/domain/motor-config.ts`**: `ClasseRegra` (bloqueio/alerta/registro/informação), `RegraId` (12 regras), `CLASSE_MINIMA` (**piso por regra**) e `setClasseRegra` que recusa rebaixamento. 7 regras travadas em bloqueio — senão a trava da Fase 3 seria contornável pelas Configurações.
+- **`avaliarCarregamento` reescrito**: avalia as 12 e decide pela classe mais severa entre as falhas, com desempate pela ordem de `ORDEM_REGRAS`. **A ordem das 5 primeiras é histórica de propósito** — mudá-la trocaria a `regra` reportada, que outras telas já leem. `Decisao.checagens` agora traz `regra`, `classe` e as 12 sempre.
+- **Condições novas**: cadastro do subcontratado, acordo vigente, competência do motorista, produto reconhecido, fotos mínimas. `InspectionEvent.fotos` foi modelado (`FOTOS_MINIMAS = 6`); as duas telas que criam inspeção passam a contagem real.
+- **Aba "Motor de regras"** em `/configuracoes`.
+- ⚠️ **A automação caiu de 60% para 40% e isso está certo**: a regra antiga de checklist só bloqueava inspeção "reprovada", então viagem **sem inspeção nenhuma** era liberada automaticamente. Não reverta achando que é regressão.
+
 ## Mapa MVP: pilar → telas
 Torre de Controle (home + /viagens + /excecoes + /bloqueios + /dossie) · Gatekeeper (/subcontratados + /checklists) · Academy (/motoristas) · IDTF Brasil (/idtf + /limpezas) · Network (/frota) · App do motorista (/mobile). Escondido no MVP: /fazendas /lotes /traces /auditoria /conformidade /documentos /atividade + superfícies Console/Portal/Auditor.
 
 ## Próximo — ver `PLANO-COBERTURA-PDF.md`
 O roadmap completo (fases 5 a 10) fechando todas as lacunas de `PAREAMENTO-PDF.md` está lá, com decisões de UX fixadas e critério de aceite por fase.
 
-**A próxima é a Fase 5 — motor completo e configurável.** Duas coisas:
-1. O verde passa a exigir as **8 condições** da diretriz; hoje checa 5. Falta acordo vigente, **competência do motorista** (já existe em `academy.ts`, só não é consultada pelo motor), fotos mínimas e produto reconhecido.
-2. `avaliarCarregamento` passa a **avaliar tudo e depois decidir**, em vez de sair na primeira falha — é o que permite o verde exigir as 8 e melhora o dossiê de graça. Os testes de caracterização da Fase 0 devem continuar passando.
+**Fases 0, 4 e 5 estão entregues.** A próxima é a **Fase 6 — Gatekeeper completo** (onboarding público em `/convite/[token]`, assinatura do acordo, checklist dinâmico por tipo de implemento, item crítico reprovando sozinho). Fases 6, 7 e 8 são paralelizáveis entre si.
 
 ## Ainda faltando no Gatekeeper (deixado de propósito na Fase 2)
 Página pública de onboarding (fluxo do transportador), assinatura eletrônica real do acordo, "Pendente de inspeção" derivado, QR real. Ver §Gatekeeper do PDF.

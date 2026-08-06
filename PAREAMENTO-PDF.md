@@ -11,15 +11,17 @@ Legenda: **✓ entregue** · **~ parcial** · **✗ não iniciado**
 | 1 · Gatekeeper | ~ 2/3 | Estados, acordo e passaporte existem. Falta o fluxo público do transportador. |
 | 2 · Academy | ~ 2/3 ✅ | **Fase 4 entregue.** Competência derivada, elegibilidade no despacho, sala virtual, just-in-time. Falta o conteúdo em si (vídeo/PDF) e as regras por cliente/filial. |
 | 3 · IDTF Brasil | ~ 2/3 | Motor e camada brasileira de busca existem. Falta cadastro completo e governança. |
-| 4 · Control Tower | ~ 3/4 | O mais completo. Falta o verde checar tudo que o PDF exige. |
+| 4 · Control Tower | ~ 4/5 ✅ | **Fase 5 entregue.** Verde com as 8 condições, motor configurável com piso. Falta liberação padronizada e dossiê com os 16 itens. |
 | 5 · Network | ~ 1/4 | O modelo de ativos está certo. A operação em massa não existe. |
-| Transversais | ~ 2/3 | Offline, imutabilidade e RBAC ok. Motor não é configurável; LGPD incompleto. |
+| Transversais | ~ 3/4 ✅ | Offline, imutabilidade, RBAC e **motor configurável com 4 classes** ok. LGPD incompleto. |
 | §5 Ajustes no protótipo | ✓ 4/4 | Todos aplicados. |
 | §8 Indicadores | ✗ 1/15 | Só "% liberadas automaticamente". |
 
 > **Atualização — Fase 4 entregue (commits `a76cf16`…`e1a0bf2`).** O princípio central do Pilar 2 saiu do PDF e entrou no código: `competenciaMotorista()` deriva elegibilidade das trilhas concluídas, e motorista sem competência não é selecionável no despacho. As linhas do Pilar 2 abaixo estão marcadas com o estado atual. **O que segue pendente e é o buraco maior agora: `avaliarCarregamento()` ainda não consulta competência** — a trava existe no despacho, mas não como uma das oito condições do verde. É a Fase 5.
 
-**A resposta curta para "implementamos tudo?": ainda não.** O PDF ordena os pilares por prioridade; o Academy era o nº 2 e o menos implementado, e agora está coberto no essencial. O maior gap remanescente passou a ser o motor — verde com 5 das 8 condições (Fase 5) — e o Network (Fase 9).
+> **Atualização — Fase 5 entregue (commit `50427c7`).** O motor avalia as 12 condições e decide pela classe mais severa; as 8 do verde estão cobertas. Ganhou as 4 classes da diretriz e configuração com piso por regra. **Efeito medido: a automação caiu de 60% para 40%** — duas viagens sem nenhuma inspeção registrada eram liberadas porque a regra antiga só bloqueava inspeção explicitamente reprovada. O 60% superestimava.
+
+**A resposta curta para "implementamos tudo?": ainda não.** Fecharam os pilares 2 e 4 no essencial. Os maiores gaps agora são o **Network** (Fase 9: importação, m:n, operação em massa), o **onboarding público do Gatekeeper** (Fase 6) e os **indicadores** (Fase 10).
 
 ---
 
@@ -45,7 +47,7 @@ Legenda: **✓ entregue** · **~ parcial** · **✗ não iniciado**
 
 | O PDF pede | | Onde está / o que falta |
 | --- | --- | --- |
-| **Motorista sem competência não aparece elegível** | ✓ | `competenciaMotorista()` em `academy.ts`; o select do despacho desabilita com o motivo, e `podeCriar` trava se a troca de compartimento tornar o escolhido inelegível. **Falta entrar no motor** como condição do verde — Fase 5. |
+| **Motorista sem competência não aparece elegível** | ✓ | `competenciaMotorista()` em `academy.ts`; o select do despacho desabilita com o motivo, e desde a Fase 5 é também uma das condições do motor (`competencia_motorista`, piso bloqueio). |
 | Sala virtual: vídeos, PDF, avaliação objetiva | ~ | `/academy` com matriz de competência, catálogo de trilhas e registro de avaliação. O **conteúdo** (vídeo/PDF) não existe — só o registro da avaliação. |
 | Nota obtida, número de tentativas, aceite de ciência | ✓ | `Conclusao` guarda os três; `registrarConclusao` recusa abaixo da nota mínima, acima das tentativas ou sem aceite. |
 | Certificado interno, versão do conteúdo assistido | ✓ | `certificadoId` e `versaoConteudo` gravados na conclusão. |
@@ -81,7 +83,7 @@ O pilar mais coberto — foi o alvo da Fase 3.
 | Tempo em fila | ✓ | Contado contra o `HOJE` do protótipo. Só aparece onde há carimbo real. |
 | Dossiê automático reconstruindo a decisão | ✓ | 8 seções encadeadas por hash, exportável em CSV/PDF/JSON. |
 | Motivo da pendência · responsável pela análise · prazo de carregamento | ✓ | Cada item da fila traz os três. |
-| **Verde exige 8 condições** | ~ | O motor checa 5: T-3, carga anterior, limpeza, inspeção, certificado. **Não checa: acordo vigente, treinamento concluído, fotos mínimas recebidas, produto reconhecido.** |
+| **Verde exige 8 condições** | ✓ | As 8 estão no motor, mais 4 de apoio (12 no total). `avaliarCarregamento` avalia todas e decide pela classe mais severa entre as falhas. |
 | Hierarquia de autoridade (6 papéis) | ~ | 4 níveis: técnico, gestor, diretoria+RT, cliente. Faltam **operador de tráfego** (pendências simples) e **inspetor** (condição física do compartimento) como níveis de decisão. |
 | Registro da liberação manual (9 campos) | ~ | Tem responsável, data/hora, evidência, justificativa. Faltam: **motivo padronizado** (hoje é texto livre), situação anterior, situação posterior, impacto, validade da decisão. |
 | Dossiê com os 16 itens | ~ | 8 seções cobrem viagem, compartimento, T-3, limpeza, inspeção, subcontratado, evidências, autoridade. Faltam como bloco próprio: transportador, cavalo mecânico, assinaturas, acordo vigente, treinamentos, documentos da viagem. |
@@ -112,8 +114,8 @@ O pilar mais coberto — foi o alvo da Fase 3.
 | Evidência imutável, correção gera nova versão | ✓ | Hash-chain no dossiê; retificação em vez de sobrescrita. |
 | Alterações de regra não mudam decisões históricas | ✓ | A decisão grava a versão da base e é avaliada na data da viagem, não "hoje". |
 | Baixa fricção (botões grandes, poucos campos, fotos guiadas) | ✓ | `/mobile` segue o padrão. |
-| Motor de regras com **4 classes** | ~ | `Tier` tem 3: BLOQUEIO, ALERTA, LIBERADO. Faltam **"registro obrigatório"** e **"informação complementar"**. |
-| Motor **configurável** | ✗ | As regras são código, não configuração. |
+| Motor de regras com **4 classes** | ✓ | `ClasseRegra` em `motor-config.ts`: bloqueio, alerta, registro, informação. |
+| Motor **configurável** | ✓ | Aba "Motor de regras" em `/configuracoes`, com **piso por regra**: as 7 de bloqueio técnico aparecem travadas com o motivo. Configurável não é negociável. |
 | LGPD: acesso por função · logs · ocultação de documentos sensíveis | ✓ | RBAC por papel, `/atividade` com ator e payload, CPF mascarado. |
 | LGPD: prazo de retenção · política de inativação · consentimentos e bases legais | ✗ | Não existem. |
 
