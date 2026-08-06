@@ -14,15 +14,29 @@ import {
   XCircle,
   AlertTriangle,
   Globe,
+  Archive,
+  ArchiveRestore,
+  History,
+  Bell,
 } from "lucide-react";
 import { PageHeader } from "@/components/shell/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { StatTile } from "@/components/kit/stat-tile";
 import { ExpiryHorizon } from "@/components/kit/expiry-horizon";
-import { subcontratados, nivelVencimento, estadoQualificacao, ESTADO_QUALIFICACAO, type Subcontratado } from "@/lib/domain/model";
+import {
+  subcontratados, nivelVencimento, estadoQualificacao, ESTADO_QUALIFICACAO,
+  veiculosDoSubcontratado, motoristasDoSubcontratado, vinculosDoSubcontratado,
+  notificacoesDoSubcontratado, TIPOS_VINCULO, type Subcontratado,
+} from "@/lib/domain/model";
+import { motoristas } from "@/lib/mock-data";
+import { ImportarPlanilhaModal } from "@/components/modals/importar-planilha-modal";
+import { AcoesMassaModal } from "@/components/modals/acoes-massa-modal";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { QualificarSubcontratadoModal } from "@/components/modals/qualificar-subcontratado-modal";
 import { PassaporteFeedSafetyModal } from "@/components/modals/passaporte-modal";
 import { AssinarAcordoModal } from "@/components/modals/assinar-acordo-modal";
@@ -35,22 +49,57 @@ import { downloadCSV } from "@/lib/export";
 import { formatDate, cn } from "@/lib/utils";
 
 export default function SubcontratadosPage() {
-  const { version } = useSession();
+  const { version, arquivarSubcontratado, desarquivarSubcontratado } = useSession();
   const { toast } = useToast();
   const [search, setSearch] = useState("");
   // Herói conectado ao detalhe: clicar numa linha do horizonte foca o card.
   const [foco, setFoco] = useState<string | null>(null);
-  const q = search.trim().toLowerCase();
-  const lista = subcontratados.filter((s) =>
-    foco ? s.id === foco : s.razaoSocial.toLowerCase().includes(q) || s.cnpj.includes(q)
-  );
+  // Filtros (Fase 9.5). Arquivadas ficam FORA por padrão e continuam existindo.
+  const [vinculoFiltro, setVinculoFiltro] = useState("todos");
+  const [de, setDe] = useState("");
+  const [ate, setAte] = useState("");
+  const [verArquivadas, setVerArquivadas] = useState(false);
+  const [sel, setSel] = useState<Set<string>>(new Set());
 
-  const estados = subcontratados.map((s) => estadoQualificacao(s).estado);
+  const q = search.trim().toLowerCase();
+  // A busca cobre razão social, CNPJ, placa vinculada, motorista e telefone —
+  // o mesmo alcance da busca global (Fase 9.3).
+  const casa = (s: Subcontratado) => {
+    if (!q) return true;
+    const placas = veiculosDoSubcontratado(s.id).join(" ").toLowerCase();
+    const nomes = motoristasDoSubcontratado(s.id)
+      .map((id) => motoristas.find((m) => m.id === id))
+      .map((m) => `${m?.nome ?? ""} ${m?.telefone ?? ""} ${m?.cpf ?? ""}`)
+      .join(" ")
+      .toLowerCase();
+    return (
+      s.razaoSocial.toLowerCase().includes(q) ||
+      s.cnpj.replace(/\D/g, "").includes(q.replace(/\D/g, "")) ||
+      s.cnpj.includes(q) ||
+      placas.includes(q) ||
+      nomes.includes(q)
+    );
+  };
+
+  const lista = subcontratados.filter((s) => {
+    if (foco) return s.id === foco;
+    if (Boolean(s.arquivadoEm) !== verArquivadas) return false;
+    if (vinculoFiltro !== "todos" && s.tipoVinculo !== vinculoFiltro) return false;
+    // Período = janela de vigência do certificado, que é o que faz a empresa
+    // entrar e sair da operação.
+    if (de && s.certGMP.validade < de) return false;
+    if (ate && s.certGMP.validade > ate) return false;
+    return casa(s);
+  });
+
+  const ativas = subcontratados.filter((s) => !s.arquivadoEm);
+  const arquivadas = subcontratados.filter((s) => s.arquivadoEm);
+  const estados = ativas.map((s) => estadoQualificacao(s).estado);
   const aptos = estados.filter((e) => ESTADO_QUALIFICACAO[e].opera).length;
   const pendentes = estados.filter((e) => e.startsWith("Pendente") || e === "Pré-cadastrado").length;
   const bloqueados = estados.filter((e) => e === "Bloqueado" || e === "Suspenso").length;
 
-  const horizonItems = subcontratados.map((s) => {
+  const horizonItems = ativas.map((s) => {
     const v = nivelVencimento(s.certGMP.validade);
     return {
       id: s.id,
@@ -77,17 +126,18 @@ export default function SubcontratadosPage() {
                 downloadCSV(
                   "traxium-subcontratados",
                   ["Razão social", "CNPJ", "Escopo", "Validade cert.", "Base pública", "Veículos", "Motoristas"],
-                  subcontratados.map((s) => [
+                  lista.map((s) => [
                     s.razaoSocial, s.cnpj, s.certGMP.escopo.join(" | "),
                     s.certGMP.validade, s.certGMP.statusBasePublica,
-                    s.veiculosAutorizados.length, s.motoristasAutorizados.length,
+                    veiculosDoSubcontratado(s.id).length, motoristasDoSubcontratado(s.id).length,
                   ])
                 );
-                toast("CSV exportado", { desc: `${subcontratados.length} subcontratados.` });
+                toast("CSV exportado", { desc: `${lista.length} subcontratado(s) do filtro atual.` });
               }}
             >
               <Download className="size-4" /> Exportar
             </Button>
+            <ImportarPlanilhaModal />
             <OnboardingLinkModal />
             <QualificarSubcontratadoModal />
           </>
@@ -95,7 +145,7 @@ export default function SubcontratadosPage() {
       />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatTile icon={Building2} label="Cadastrados" value={subcontratados.length} />
+        <StatTile icon={Building2} label="Cadastradas ativas" value={ativas.length} />
         <StatTile icon={ShieldCheck} label="Aptos a operar" value={aptos} tone="success" />
         <StatTile icon={AlertTriangle} label="Pendentes" value={pendentes} tone="warning" />
         <StatTile icon={ShieldAlert} label="Bloqueados / suspensos" value={bloqueados} tone="danger" />
@@ -110,16 +160,39 @@ export default function SubcontratadosPage() {
         onSelect={setFoco}
       />
 
-      <div className="flex items-center gap-2 flex-wrap">
-        <div className="relative max-w-md flex-1">
+      <div className="flex items-end gap-2 flex-wrap">
+        <div className="relative min-w-[220px] flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-fg-muted" />
           <Input
-            placeholder="Buscar razão social ou CNPJ…"
+            placeholder="Razão social, CNPJ, placa, motorista ou telefone…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9 h-9"
           />
         </div>
+        <div className="w-[190px]">
+          <Select value={vinculoFiltro} onValueChange={setVinculoFiltro}>
+            <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todo tipo de vínculo</SelectItem>
+              {TIPOS_VINCULO.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label className="text-[10px] text-fg-muted">Certificado vence entre</Label>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <Input type="date" value={de} onChange={(e) => setDe(e.target.value)} className="h-9 w-[145px]" />
+            <Input type="date" value={ate} onChange={(e) => setAte(e.target.value)} className="h-9 w-[145px]" />
+          </div>
+        </div>
+        <Button
+          variant={verArquivadas ? "gradient" : "outline"}
+          size="sm"
+          onClick={() => { setVerArquivadas((v) => !v); setSel(new Set()); setFoco(null); }}
+        >
+          <Archive className="size-3.5" /> Arquivadas <span className="num">{arquivadas.length}</span>
+        </Button>
         {foco && (
           <Button variant="outline" size="sm" onClick={() => setFoco(null)}>
             <XCircle className="size-3.5" /> Limpar foco
@@ -127,25 +200,113 @@ export default function SubcontratadosPage() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-        {lista.map((s) => (
-          <SubcontratadoCard key={s.id} s={s} />
-        ))}
-      </div>
+      {/* Seleção + operação em massa (Fase 9.4) */}
+      {!verArquivadas && lista.length > 0 && (
+        <div className="flex items-center gap-3 flex-wrap rounded-xl border border-border bg-bg-elev p-3">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <Checkbox
+              checked={lista.length > 0 && lista.every((s) => sel.has(s.id))}
+              onCheckedChange={() =>
+                setSel((atual) =>
+                  lista.every((s) => atual.has(s.id)) ? new Set() : new Set(lista.map((s) => s.id))
+                )
+              }
+              aria-label="Selecionar todas as empresas do filtro"
+            />
+            <span className="text-[12px] font-medium text-fg">
+              <span className="num">{sel.size}</span> selecionada(s)
+            </span>
+          </label>
+          <p className="text-[11px] text-fg-muted flex-1 min-w-[200px]">
+            Renovação de acordo, atribuição de trilha e alerta — cada uma diz quantas empresas realmente atinge antes
+            de executar.
+          </p>
+          <AcoesMassaModal ids={[...sel]} />
+        </div>
+      )}
+
+      {lista.length === 0 ? (
+        <Card>
+          <CardContent className="p-10 flex flex-col items-center gap-2 text-center">
+            <Building2 className="size-8 text-fg-soft" />
+            <p className="text-[13px] text-fg-muted">
+              {verArquivadas ? "Nenhuma empresa arquivada." : "Nenhuma empresa para este filtro."}
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+          {lista.map((s) => (
+            <SubcontratadoCard
+              key={s.id}
+              s={s}
+              selecionada={sel.has(s.id)}
+              onSelecionar={() =>
+                setSel((atual) => {
+                  const n = new Set(atual);
+                  n.has(s.id) ? n.delete(s.id) : n.add(s.id);
+                  return n;
+                })
+              }
+              onArquivar={() => {
+                const ok = arquivarSubcontratado(s.id, "Encerramento de contrato de transporte.");
+                toast(ok ? "Empresa arquivada" : "Não foi possível arquivar", {
+                  type: ok ? "info" : "error",
+                  desc: ok
+                    ? "Sai das listas ativas e os vínculos vigentes são encerrados. Nada é apagado: viagens e dossiês continuam apontando para ela."
+                    : "A empresa já estava arquivada.",
+                });
+                setSel(new Set());
+              }}
+              onDesarquivar={() => {
+                desarquivarSubcontratado(s.id);
+                toast("Empresa reativada", {
+                  type: "info",
+                  desc: "Vínculos encerrados continuam encerrados — o estado volta a ser derivado dos fatos atuais.",
+                });
+              }}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
-function SubcontratadoCard({ s }: { s: Subcontratado }) {
+function SubcontratadoCard({
+  s,
+  selecionada,
+  onSelecionar,
+  onArquivar,
+  onDesarquivar,
+}: {
+  s: Subcontratado;
+  selecionada?: boolean;
+  onSelecionar?: () => void;
+  onArquivar?: () => void;
+  onDesarquivar?: () => void;
+}) {
   const venc = nivelVencimento(s.certGMP.validade);
   const { estado, motivo } = estadoQualificacao(s);
   const meta = ESTADO_QUALIFICACAO[estado];
+  // Vínculo m:n (Fase 9.1): vigentes e encerrados, os dois visíveis.
+  const placas = veiculosDoSubcontratado(s.id);
+  const condutores = motoristasDoSubcontratado(s.id);
+  const encerrados = vinculosDoSubcontratado(s.id, { incluirEncerrados: true }).filter((v) => v.fim);
+  const alertas = notificacoesDoSubcontratado(s.id);
 
   return (
-    <Card className={cn(meta.tone === "danger" && "border-danger-500/40")}>
+    <Card className={cn(meta.tone === "danger" && "border-danger-500/40", selecionada && "ring-2 ring-brand-500/40")}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-0">
+            {onSelecionar && (
+              <Checkbox
+                checked={selecionada}
+                onCheckedChange={onSelecionar}
+                aria-label={`Selecionar ${s.razaoSocial}`}
+              />
+            )}
             <div className="size-9 rounded-md bg-gradient-to-br from-brand-600 to-sky-600 text-white flex items-center justify-center shrink-0">
               <Building2 className="size-4" />
             </div>
@@ -200,11 +361,27 @@ function SubcontratadoCard({ s }: { s: Subcontratado }) {
           <div className="text-fg-muted truncate">Sites: {s.certGMP.sitesCobertos.join(", ")}</div>
         </div>
 
-        {/* Autorizados */}
-        <div className="flex items-center gap-4 text-[11px] text-fg-muted">
-          <span className="inline-flex items-center gap-1"><Truck className="size-3.5" /> {s.veiculosAutorizados.length} veículos</span>
-          <span className="inline-flex items-center gap-1"><IdCard className="size-3.5" /> {s.motoristasAutorizados.length} motoristas</span>
+        {/* Vínculos vigentes — e o passado que não some */}
+        <div className="flex items-center gap-4 text-[11px] text-fg-muted flex-wrap">
+          <span className="inline-flex items-center gap-1"><Truck className="size-3.5" /> <span className="num">{placas.length}</span> implemento(s)</span>
+          <span className="inline-flex items-center gap-1"><IdCard className="size-3.5" /> <span className="num">{condutores.length}</span> motorista(s)</span>
+          {encerrados.length > 0 && (
+            <span className="inline-flex items-center gap-1 text-fg-soft" title={encerrados.map((v) => `${v.entidadeId}: ${v.inicio} a ${v.fim} — ${v.motivoFim}`).join("\n")}>
+              <History className="size-3.5" /> <span className="num">{encerrados.length}</span> encerrado(s)
+            </span>
+          )}
+          {alertas.length > 0 && (
+            <span className="inline-flex items-center gap-1 text-warning-700">
+              <Bell className="size-3.5" /> <span className="num">{alertas.length}</span> alerta(s) enviado(s)
+            </span>
+          )}
         </div>
+        {s.arquivadoEm && (
+          <p className="text-[11px] text-fg-muted rounded-md border border-dashed border-border bg-bg p-2">
+            Arquivada em {formatDate(s.arquivadoEm)}. {s.motivoArquivo} O histórico continua: viagens, dossiês e
+            vínculos encerrados seguem apontando para esta empresa.
+          </p>
+        )}
 
         {/* Treinamento */}
         <div>
@@ -233,6 +410,17 @@ function SubcontratadoCard({ s }: { s: Subcontratado }) {
         <div className="space-y-2 pt-0.5">
           <AssinarAcordoModal s={s} />
           <PassaporteFeedSafetyModal s={s} />
+          {s.arquivadoEm ? (
+            <Button variant="outline" size="sm" className="w-full" onClick={onDesarquivar}>
+              <ArchiveRestore className="size-4" /> Reativar cadastro
+            </Button>
+          ) : (
+            onArquivar && (
+              <Button variant="ghost" size="sm" className="w-full text-fg-muted" onClick={onArquivar}>
+                <Archive className="size-4" /> Arquivar sem apagar histórico
+              </Button>
+            )
+          )}
         </div>
       </CardContent>
     </Card>

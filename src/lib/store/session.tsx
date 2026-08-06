@@ -26,7 +26,8 @@ import {
   type AuditoriaEvento,
   type Tenant,
 } from "@/lib/mock-data";
-import { conclusoes, findTrilha } from "@/lib/domain/academy";
+import { conclusoes, findTrilha, estadoTrilha, atribuirTrilha } from "@/lib/domain/academy";
+import { anexarRegistro, podeConcluir } from "@/lib/domain/registro";
 import { setClasseRegra, type RegraId, type ClasseRegra } from "@/lib/domain/motor-config";
 import {
   registrarLiberacao,
@@ -48,6 +49,11 @@ import {
   retificacoes,
   compartimentoPorViagem,
   produtoAtualPorViagem,
+  vinculos,
+  vinculoVigente,
+  motoristasDoSubcontratado,
+  notificacoes,
+  diasEntre,
   findImplemento,
   VERSAO_BASE_IDTF,
   HOJE,
@@ -67,6 +73,8 @@ import {
   type ProdutoIDTF,
   type Papel,
   type Excecao,
+  type TipoEntidadeVinculo,
+  type TipoNotificacao,
   type AccountType,
   type Surface,
   type PerfilDemoId,
@@ -157,6 +165,24 @@ export type LiberacaoFormInput = {
   validade: ValidadeId;
 };
 
+/**
+ * Uma linha da planilha colada, já parseada. `duplicada` é decidido ANTES de
+ * gravar: importação que cria o mesmo CNPJ duas vezes é como o cadastro
+ * apodrece, e o PDF pede detecção de duplicidade, não deduplicação depois.
+ */
+export type LinhaImportacao = {
+  linha: number;
+  razaoSocial: string;
+  cnpj: string;
+  tipoVinculo?: TipoVinculo;
+  responsavel?: string;
+  telefone?: string;
+  implementoPlaca?: string;
+  /** Motivo do descarte, quando houver. */
+  problema?: string;
+  duplicada?: boolean;
+};
+
 export type TrocaVeiculoInput = {
   cavaloPlaca?: string;
   implementoId?: string;
@@ -216,6 +242,26 @@ type SessionCtx = {
    *  compartimento); trocar implemento/compartimento re-roda o motor. Cada campo
    *  travado alterado gera uma retificação (imutabilidade, pergunta 20). */
   trocarVeiculo: (viagemId: string, changes: TrocaVeiculoInput) => void;
+  // ── Network (Fase 9) ────────────────────────────────────────────────────
+  /** Cria vínculo com vigência. Recusa duplicata vigente do mesmo par. */
+  vincular: (i: { subcontratadoId: string; tipo: TipoEntidadeVinculo; entidadeId: string; inicio?: string }) => string | null;
+  /** Encerra o vínculo com data e motivo. O registro fica — é o histórico. */
+  encerrarVinculo: (id: string, motivo: string) => boolean;
+  /** Arquiva sem apagar: o cadastro sai das listas ativas e o passado permanece. */
+  arquivarSubcontratado: (id: string, motivo: string) => boolean;
+  desarquivarSubcontratado: (id: string) => boolean;
+  /** Grava as linhas já conferidas da importação. Duplicadas não entram. */
+  importarSubcontratados: (linhas: LinhaImportacao[]) => { criados: number; ignorados: number };
+  /** Renovação coletiva de acordo. Só renova quem tem acordo a vencer ou vencido. */
+  renovarAcordos: (subIds: string[]) => { renovados: number; ignorados: number };
+  /** Atribui uma trilha aos motoristas vinculados às empresas escolhidas. */
+  atribuirTrilhaEmMassa: (subIds: string[], trilhaId: string) => { atribuidas: number; jaVigentes: number };
+  /** Registra o disparo de alerta. Não simula entrega — registra o envio. */
+  enviarAlerta: (subIds: string[], tipo: TipoNotificacao, mensagem: string) => number;
+  /** Anexa a evidência de uma regra classe `registro` (Fase 10.1). */
+  anexarRegistroViagem: (i: { viagemId: string; regra: RegraId; descricao: string }) => boolean;
+  /** Conclui a viagem, se o motor e os registros obrigatórios deixarem. */
+  concluirViagem: (viagemId: string) => { ok: boolean; motivo: string };
   addExcecao: (i: NovaExcecaoInput) => string;
   /**
    * Decide uma exceção. Retorna o motivo da recusa quando não grava.
@@ -508,6 +554,158 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     bump();
   }, [papel, bump]);
 
+  // ── Network (Fase 9) ──────────────────────────────────────────────────────
+
+  const vincular = useCallback<SessionCtx["vincular"]>((i) => {
+    const jaVigente = vinculos.some(
+      (v) => v.subcontratadoId === i.subcontratadoId && v.tipo === i.tipo && v.entidadeId === i.entidadeId && vinculoVigente(v)
+    );
+    if (jaVigente) return null;
+    const id = nextId("vin");
+    vinculos.push({ id, subcontratadoId: i.subcontratadoId, tipo: i.tipo, entidadeId: i.entidadeId, inicio: i.inicio ?? HOJE });
+    bump();
+    return id;
+  }, [bump]);
+
+  const encerrarVinculo = useCallback<SessionCtx["encerrarVinculo"]>((id, motivo) => {
+    const v = vinculos.find((x) => x.id === id);
+    if (!v || v.fim) return false;
+    // Não apaga: carimba o fim. O dossiê de uma viagem antiga continua achando
+    // o vínculo que valia naquele dia.
+    v.fim = HOJE;
+    v.motivoFim = motivo;
+    bump();
+    return true;
+  }, [bump]);
+
+  const arquivarSubcontratado = useCallback<SessionCtx["arquivarSubcontratado"]>((id, motivo) => {
+    const s = subcontratados.find((x) => x.id === id);
+    if (!s || s.arquivadoEm) return false;
+    s.arquivadoEm = HOJE;
+    s.motivoArquivo = motivo;
+    // Arquivar a empresa encerra os vínculos vigentes: ativo de empresa
+    // arquivada não pode continuar "autorizado" por omissão.
+    for (const v of vinculos.filter((x) => x.subcontratadoId === id && vinculoVigente(x))) {
+      v.fim = HOJE;
+      v.motivoFim = `Empresa arquivada: ${motivo}`;
+    }
+    bump();
+    return true;
+  }, [bump]);
+
+  const desarquivarSubcontratado = useCallback<SessionCtx["desarquivarSubcontratado"]>((id) => {
+    const s = subcontratados.find((x) => x.id === id);
+    if (!s?.arquivadoEm) return false;
+    // Reativar não ressuscita vínculo: o que foi encerrado ficou encerrado, e a
+    // empresa volta com o estado que os fatos derivarem — não com o antigo.
+    s.arquivadoEm = undefined;
+    s.motivoArquivo = undefined;
+    bump();
+    return true;
+  }, [bump]);
+
+  const importarSubcontratados = useCallback<SessionCtx["importarSubcontratados"]>((linhas) => {
+    let criados = 0;
+    let ignorados = 0;
+    for (const l of linhas) {
+      if (l.problema || l.duplicada) { ignorados++; continue; }
+      const id = nextId("sub");
+      subcontratados.unshift({
+        id,
+        cnpj: l.cnpj,
+        razaoSocial: l.razaoSocial,
+        tipoVinculo: l.tipoVinculo,
+        // Importar é trazer o cadastro, não atestar conformidade: o certificado
+        // continua não comprovado até alguém consultar a base pública.
+        certGMP: {
+          numero: "—", certificadora: "—", escopo: [], validade: HOJE,
+          statusBasePublica: "Não localizado", sitesCobertos: [],
+        },
+        treinamento: { comprovante: false, quiz: false, aceiteRegras: false },
+      });
+      if (l.implementoPlaca)
+        vinculos.push({ id: nextId("vin"), subcontratadoId: id, tipo: "implemento", entidadeId: l.implementoPlaca, inicio: HOJE });
+      criados++;
+    }
+    if (criados) bump();
+    return { criados, ignorados };
+  }, [bump]);
+
+  const renovarAcordos = useCallback<SessionCtx["renovarAcordos"]>((subIds) => {
+    let renovados = 0;
+    let ignorados = 0;
+    for (const id of subIds) {
+      const s = subcontratados.find((x) => x.id === id);
+      if (!s?.acordo) { ignorados++; continue; }
+      // Renovação coletiva não renova o que ainda tem folga: acordo com mais de
+      // 60 dias de vigência não precisa, e renovar cedo demais só reinicia o
+      // relógio sem ninguém reler o termo.
+      if (diasEntre(HOJE, s.acordo.vigenciaFim) > 60) { ignorados++; continue; }
+      const fim = new Date(`${HOJE}T00:00:00`);
+      fim.setFullYear(fim.getFullYear() + 1);
+      const vigenciaFim = fim.toISOString().slice(0, 10);
+      const ren = new Date(`${vigenciaFim}T00:00:00`);
+      ren.setDate(ren.getDate() - 60);
+      s.acordo = {
+        ...s.acordo,
+        versao: s.acordo.versao,
+        vigenciaInicio: HOJE,
+        vigenciaFim,
+        renovacaoEm: ren.toISOString().slice(0, 10),
+        assinadoEm: undefined,
+        assinante: undefined,
+        dispositivo: undefined,
+      };
+      renovados++;
+    }
+    if (renovados) bump();
+    return { renovados, ignorados };
+  }, [bump]);
+
+  const atribuirTrilhaEmMassa = useCallback<SessionCtx["atribuirTrilhaEmMassa"]>((subIds, trilhaId) => {
+    let atribuidas = 0;
+    let jaVigentes = 0;
+    for (const subId of subIds) {
+      for (const motoristaId of motoristasDoSubcontratado(subId)) {
+        if (estadoTrilha(motoristaId, findTrilha(trilhaId)!) === "vigente") { jaVigentes++; continue; }
+        if (atribuirTrilha(motoristaId, trilhaId, `${PAPEL_LABEL[papel]} · envio coletivo`)) atribuidas++;
+      }
+    }
+    if (atribuidas) bump();
+    return { atribuidas, jaVigentes };
+  }, [papel, bump]);
+
+  const enviarAlerta = useCallback<SessionCtx["enviarAlerta"]>((subIds, tipo, mensagem) => {
+    for (const subcontratadoId of subIds) {
+      notificacoes.unshift({
+        id: nextId("not"),
+        subcontratadoId,
+        tipo,
+        mensagem,
+        enviadaEm: `${HOJE}T10:00:00`,
+        canal: "WhatsApp",
+        remetente: PAPEL_LABEL[papel],
+      });
+    }
+    bump();
+    return subIds.length;
+  }, [papel, bump]);
+
+  const anexarRegistroViagem = useCallback<SessionCtx["anexarRegistroViagem"]>((i) => {
+    const ok = Boolean(anexarRegistro({ ...i, anexadoPor: PAPEL_LABEL[papel] }));
+    if (ok) bump();
+    return ok;
+  }, [papel, bump]);
+
+  const concluirViagem = useCallback<SessionCtx["concluirViagem"]>((viagemId) => {
+    const veredicto = podeConcluir(viagemId);
+    if (!veredicto.ok) return veredicto;
+    const v = viagens.find((x) => x.id === viagemId);
+    if (v) v.status = "Concluída";
+    bump();
+    return veredicto;
+  }, [bump]);
+
   const addExcecao = useCallback<SessionCtx["addExcecao"]>((i) => {
     const id = nextId("exc");
     excecoes.unshift({ ...i, id, status: "pendente" });
@@ -629,11 +827,36 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         statusBasePublica: "Não localizado",
         sitesCobertos: [],
       },
-      veiculosAutorizados: [i.implementoPlaca, i.cavaloPlaca].filter(Boolean),
-      motoristasAutorizados: [i.responsavel],
       // Aceitou as regras no convite, mas não fez trilha nem enviou comprovante.
       treinamento: { comprovante: false, quiz: false, aceiteRegras: i.assinouAceite },
     });
+    // Vínculo com vigência a partir de hoje (Fase 9.1). O implemento entra pela
+    // placa; o responsável entra como motorista do cadastro, para que exista
+    // alguém com id — e não um nome solto que ninguém consegue consultar.
+    if (i.implementoPlaca)
+      vinculos.push({ id: nextId("vin"), subcontratadoId: id, tipo: "implemento", entidadeId: i.implementoPlaca, inicio: HOJE });
+    if (i.cavaloPlaca)
+      vinculos.push({ id: nextId("vin"), subcontratadoId: id, tipo: "cavalo", entidadeId: i.cavaloPlaca, inicio: HOJE });
+    if (i.responsavel) {
+      const motoristaId = nextId("m");
+      motoristas.unshift({
+        id: motoristaId,
+        nome: i.responsavel,
+        cpf: "***.***.***-**",
+        tipo: "Subcontratado",
+        telefone: i.telefone,
+        cnh: { numero: "********", categoria: "E", vencimento: HOJE },
+        certificacoes: [],
+        totalViagens: 0,
+        conformidadeMedia: 0,
+        ultimaViagem: "—",
+        cidade: "—",
+        uf: "—",
+        status: "Ativo",
+        letramentoDigital: "Básico",
+      });
+      vinculos.push({ id: nextId("vin"), subcontratadoId: id, tipo: "motorista", entidadeId: motoristaId, inicio: HOJE });
+    }
     bump();
     return id;
   }, [bump]);
@@ -801,6 +1024,16 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     addInspectionEvent,
     updateViagemStatus,
     trocarVeiculo,
+    anexarRegistroViagem,
+    concluirViagem,
+    vincular,
+    encerrarVinculo,
+    arquivarSubcontratado,
+    desarquivarSubcontratado,
+    importarSubcontratados,
+    renovarAcordos,
+    atribuirTrilhaEmMassa,
+    enviarAlerta,
     addExcecao,
     decidirExcecao,
     registrarConclusao,

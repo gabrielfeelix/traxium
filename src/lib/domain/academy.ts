@@ -253,6 +253,52 @@ export function orientacaoDoRegime(regime?: Regime): Trilha | undefined {
   return regime === "D" ? findTrilha("t04") : findTrilha("t05");
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Atribuição de trilha (Fase 9.4)
+//
+// Atribuir não é concluir. O envio coletivo de treinamento cria uma pendência
+// nominal — quem, qual trilha, quando e por ordem de quem — e só isso. A
+// competência continua saindo da conclusão avaliada, nunca do envio.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type AtribuicaoTrilha = {
+  id: string;
+  motoristaId: string;
+  trilhaId: string;
+  atribuidaEm: string;
+  atribuidaPor: string;
+};
+
+export const atribuicoes: AtribuicaoTrilha[] = [];
+
+/** Cria a pendência. Recusa se já existe pendência aberta da mesma trilha. */
+export function atribuirTrilha(motoristaId: string, trilhaId: string, atribuidaPor: string, hoje = HOJE): boolean {
+  const aberta = atribuicoes.some(
+    (a) =>
+      a.motoristaId === motoristaId &&
+      a.trilhaId === trilhaId &&
+      !conclusoes.some((c) => c.motoristaId === motoristaId && c.trilhaId === trilhaId && c.concluidoEm >= a.atribuidaEm)
+  );
+  if (aberta) return false;
+  atribuicoes.push({
+    id: `atr-${atribuicoes.length + 1}`,
+    motoristaId,
+    trilhaId,
+    atribuidaEm: hoje,
+    atribuidaPor,
+  });
+  return true;
+}
+
+/** Atribuições ainda não cumpridas — pendência real, não histórico de envio. */
+export function atribuicoesPendentes(motoristaId: string): AtribuicaoTrilha[] {
+  return atribuicoes.filter(
+    (a) =>
+      a.motoristaId === motoristaId &&
+      !conclusoes.some((c) => c.motoristaId === motoristaId && c.trilhaId === a.trilhaId && c.concluidoEm >= a.atribuidaEm)
+  );
+}
+
 export type EstadoTrilha = "vigente" | "a_vencer" | "vencida" | "nunca";
 
 /** Estado de UMA trilha para um motorista — alimenta o anel segmentado do crachá. */

@@ -18,8 +18,9 @@ import { Badge } from "@/components/ui/badge";
 import {
   type Subcontratado, estadoQualificacao, ESTADO_QUALIFICACAO, nivelVencimento,
   implementos, compartimentos, inspectionEvents, cleaningEvents, findCompartimento, ORDEM_REGIME, type Regime,
+  veiculosDoSubcontratado, motoristasDoSubcontratado, vinculosDoSubcontratado,
 } from "@/lib/domain/model";
-import { naoConformidades } from "@/lib/mock-data";
+import { naoConformidades, motoristas } from "@/lib/mock-data";
 import { downloadCSV } from "@/lib/export";
 import { useToast } from "@/components/ui/toast";
 import { formatDate, formatDateTime, cn } from "@/lib/utils";
@@ -51,10 +52,17 @@ export function PassaporteFeedSafetyModal({ s }: { s: Subcontratado }) {
     ? limpezasDaEmpresa.reduce<Regime>((a, c) => (ORDEM_REGIME[c.regime] > ORDEM_REGIME[a] ? c.regime : a), "A")
     : null;
 
+  // Vínculo vigente (Fase 9.1): a lista não mora mais dentro da empresa.
+  const placas = veiculosDoSubcontratado(s.id);
+  const motoristasVinculados = motoristasDoSubcontratado(s.id)
+    .map((id) => motoristas.find((m) => m.id === id))
+    .filter((m): m is (typeof motoristas)[number] => Boolean(m));
+  const encerrados = vinculosDoSubcontratado(s.id, { incluirEncerrados: true }).filter((v) => v.fim);
+
   const ocorrencias = naoConformidades.filter(
     (nc) =>
-      (nc.veiculo && s.veiculosAutorizados.some((v) => nc.veiculo!.includes(v))) ||
-      (nc.motorista && s.motoristasAutorizados.includes(nc.motorista))
+      (nc.veiculo && placas.some((v) => nc.veiculo!.includes(v))) ||
+      (nc.motorista && motoristasVinculados.some((m) => m.nome === nc.motorista))
   );
 
   return (
@@ -151,13 +159,20 @@ export function PassaporteFeedSafetyModal({ s }: { s: Subcontratado }) {
           <Bloco icon={Truck} titulo="Ativos e motoristas vinculados">
             <p className="text-[10px] uppercase tracking-[0.1em] text-[hsl(210_14%_48%)] font-semibold">Veículos / implementos</p>
             <div className="mb-1.5 flex flex-wrap gap-1">
-              {s.veiculosAutorizados.map((v) => (
+              {placas.length === 0 && <span className="text-[11px] text-[hsl(210_14%_48%)]">Nenhum implemento vinculado.</span>}
+              {placas.map((v) => (
                 <span key={v} className="rounded bg-[hsl(200_18%_95%)] px-1.5 py-0.5 font-mono text-[10.5px] text-[hsl(200_25%_28%)]">{v}</span>
               ))}
             </div>
             <p className="flex items-center gap-1 text-[11px] text-[hsl(210_14%_44%)]">
-              <IdCard className="size-3.5" /> {s.motoristasAutorizados.join(", ") || "—"}
+              <IdCard className="size-3.5" /> {motoristasVinculados.map((m) => m.nome).join(", ") || "—"}
             </p>
+            {encerrados.length > 0 && (
+              <p className="mt-1.5 text-[10.5px] text-[hsl(210_14%_48%)]">
+                <span className="num">{encerrados.length}</span> vínculo(s) encerrado(s) preservado(s) no histórico —
+                o passado das viagens continua atribuído a quem o fez.
+              </p>
+            )}
           </Bloco>
         </div>
 
@@ -272,8 +287,9 @@ export function PassaporteFeedSafetyModal({ s }: { s: Subcontratado }) {
                   ["Base pública", s.certGMP.statusBasePublica],
                   ["Escopo", s.certGMP.escopo.join(" | ")],
                   ["Acordo QA", s.acordo ? `${s.acordo.versao} (${s.acordo.vigenciaInicio}–${s.acordo.vigenciaFim})` : "não firmado"],
-                  ["Veículos", s.veiculosAutorizados.join(" | ")],
-                  ["Motoristas", s.motoristasAutorizados.join(" | ")],
+                  ["Veículos vinculados", placas.join(" | ")],
+                  ["Motoristas vinculados", motoristasVinculados.map((m) => m.nome).join(" | ")],
+                  ["Vínculos encerrados", encerrados.map((v) => `${v.entidadeId} (${v.inicio}–${v.fim})`).join(" | ")],
                   ["Ocorrências vinculadas", String(ocorrencias.length)],
                 ]
               );

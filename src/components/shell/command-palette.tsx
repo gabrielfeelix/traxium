@@ -10,7 +10,7 @@ import {
 import {
   viagens, motoristas, fazendas, lotes, documentos, naoConformidades,
 } from "@/lib/mock-data";
-import { subcontratados } from "@/lib/domain/model";
+import { subcontratados, implementos, cavalos, subcontratadoNaData } from "@/lib/domain/model";
 import { cn } from "@/lib/utils";
 
 /**
@@ -56,6 +56,27 @@ const ACOES: { label: string; href: string }[] = [
 
 const LIMITE = 4; // por grupo — a busca refina, não pagina
 
+/**
+ * Consulta rápida por documento (Fase 9.3).
+ *
+ * No pátio ninguém digita razão social: digita a placa que está na frente, o
+ * telefone que ligou ou o CPF do papel. Comparar só dígitos resolve as três
+ * grafias de CNPJ e os quatro formatos de telefone que chegam.
+ *
+ * O CPF do protótipo está mascarado por LGPD (`***.456.789-**`), então a busca
+ * casa pelos dígitos que sobraram — é o que um mascarado permite, e é honesto
+ * dizer que é isso.
+ */
+function digitos(s?: string): string {
+  return (s ?? "").replace(/\D/g, "");
+}
+
+function casaDocumento(q: string, ...campos: (string | undefined)[]): boolean {
+  const alvo = digitos(q);
+  if (alvo.length < 3) return false;
+  return campos.some((c) => digitos(c).includes(alvo));
+}
+
 function buscar(q: string): Resultado[] {
   const hit = (...campos: (string | undefined)[]) =>
     campos.some((c) => c?.toLowerCase().includes(q));
@@ -63,14 +84,58 @@ function buscar(q: string): Resultado[] {
 
   viagens.filter((v) => hit(v.codigo, v.motorista, v.produto, v.cavalo, v.carreta)).slice(0, LIMITE)
     .forEach((v) => r.push({ key: v.id, grupo: "Viagens", label: v.codigo, sub: `${v.motorista} · ${v.produto}`, href: `/viagens/${v.id}`, icon: Truck }));
-  motoristas.filter((m) => hit(m.nome, m.cpf, m.cidade)).slice(0, LIMITE)
-    .forEach((m) => r.push({ key: m.id, grupo: "Motoristas", label: m.nome, sub: `${m.tipo} · ${m.cidade}/${m.uf}`, href: "/motoristas", icon: IdCard }));
+  motoristas
+    .filter((m) => hit(m.nome, m.cpf, m.cidade, m.telefone) || casaDocumento(q, m.cpf, m.telefone))
+    .slice(0, LIMITE)
+    .forEach((m) => {
+      const subId = subcontratadoNaData("motorista", m.id);
+      const empresa = subId ? subcontratados.find((s) => s.id === subId)?.razaoSocial : undefined;
+      r.push({
+        key: m.id,
+        grupo: "Motoristas",
+        label: m.nome,
+        sub: `${m.telefone} · ${empresa ?? m.tipo} · ${m.cidade}/${m.uf}`,
+        href: "/motoristas",
+        icon: IdCard,
+      });
+    });
+  // Placa é identidade de ativo — e a consulta responde de quem ele é hoje.
+  implementos
+    .filter((i) => hit(i.placa, i.tipo) || casaDocumento(q, i.placa))
+    .slice(0, LIMITE)
+    .forEach((i) => {
+      const subId = subcontratadoNaData("implemento", i.placa);
+      const empresa = subId ? subcontratados.find((s) => s.id === subId)?.razaoSocial : undefined;
+      r.push({
+        key: i.id,
+        grupo: "Implementos",
+        label: i.placa,
+        sub: `${i.tipo} · ${empresa ?? i.proprietario}`,
+        href: "/frota",
+        icon: Container,
+      });
+    });
+  cavalos
+    .filter((c) => hit(c.placa, c.modelo) || casaDocumento(q, c.placa))
+    .slice(0, LIMITE)
+    .forEach((c) => r.push({ key: c.id, grupo: "Cavalos", label: c.placa, sub: `${c.modelo} · ${c.ano}`, href: "/frota", icon: Truck }));
   fazendas.filter((f) => hit(f.nome, f.produtor, f.cidade, f.car)).slice(0, LIMITE)
     .forEach((f) => r.push({ key: f.id, grupo: "Fazendas", label: f.nome, sub: `${f.produtor} · ${f.cidade}/${f.uf}`, href: "/fazendas", icon: Trees }));
   lotes.filter((l) => hit(l.codigo, l.destinatarioFinal, l.produto)).slice(0, LIMITE)
     .forEach((l) => r.push({ key: l.id, grupo: "Lotes e DDS", label: l.codigo, sub: `${l.produto} · ${l.destinatarioFinal}`, href: "/lotes", icon: PackageCheck }));
-  subcontratados.filter((s) => hit(s.razaoSocial, s.cnpj)).slice(0, LIMITE)
-    .forEach((s) => r.push({ key: s.id, grupo: "Subcontratados", label: s.razaoSocial, sub: s.cnpj, href: "/subcontratados", icon: Building2 }));
+  subcontratados
+    .filter((s) => hit(s.razaoSocial, s.cnpj) || casaDocumento(q, s.cnpj))
+    .slice(0, LIMITE)
+    .forEach((s) =>
+      r.push({
+        key: s.id,
+        grupo: "Subcontratados",
+        label: s.razaoSocial,
+        sub: `${s.cnpj}${s.arquivadoEm ? " · arquivada" : ""}`,
+        href: "/subcontratados",
+        icon: Building2,
+      })
+    );
   documentos.filter((d) => hit(d.nome, d.tipo, d.autor)).slice(0, LIMITE)
     .forEach((d) => r.push({ key: d.id, grupo: "Documentos", label: d.nome, sub: d.tipo, href: "/documentos", icon: FileText }));
   naoConformidades.filter((n) => hit(n.codigo, n.descricao, n.motorista)).slice(0, LIMITE)
@@ -166,7 +231,7 @@ export function CommandPalette() {
           role="combobox"
           aria-expanded={open}
           aria-label="Buscar no Traxium"
-          placeholder="Buscar viagens, motoristas, fazendas, lotes…"
+          placeholder="Buscar por CPF, CNPJ, placa, telefone, código…"
           className="ml-2 flex-1 bg-transparent outline-none text-[13px] placeholder:text-fg-muted min-w-0"
         />
         <kbd className="ml-2 hidden sm:inline-flex h-[18px] items-center rounded border border-border-soft bg-bg-elev px-1.5 text-[10px] font-semibold text-fg-muted num shrink-0">⌘K</kbd>

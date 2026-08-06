@@ -23,8 +23,11 @@ import { TraxiumLogo } from "@/components/logo";
 import { SurfacePerfilMenu } from "@/components/shell/surface-perfil-menu";
 import { useToast } from "@/components/ui/toast";
 import { useSession } from "@/lib/store/session";
-import { findSubcontratado, implementos, nivelVencimento } from "@/lib/domain/model";
-import { viagens } from "@/lib/mock-data";
+import {
+  findSubcontratado, implementos, nivelVencimento,
+  veiculosDoSubcontratado, motoristasDoSubcontratado,
+} from "@/lib/domain/model";
+import { viagens, motoristas } from "@/lib/mock-data";
 import { formatDate, cn } from "@/lib/utils";
 
 const SOUZA_ID = "sub-001";
@@ -54,9 +57,13 @@ export function PortalD() {
 
   const souza = findSubcontratado(SOUZA_ID);
   const meusImplementos = implementos.filter((i) => i.subcontratadoId === SOUZA_ID);
-  const minhasViagens = souza
-    ? viagens.filter((v) => souza.veiculosAutorizados.includes(v.carreta))
+  const minhasPlacas = souza ? veiculosDoSubcontratado(souza.id) : [];
+  const meusMotoristas = souza
+    ? motoristasDoSubcontratado(souza.id)
+        .map((id) => motoristas.find((m) => m.id === id))
+        .filter((m): m is (typeof motoristas)[number] => Boolean(m))
     : [];
+  const minhasViagens = souza ? viagens.filter((v) => minhasPlacas.includes(v.carreta)) : [];
 
   // Pendências derivadas honestamente do estado da própria empresa.
   const pendencias: string[] = [];
@@ -155,10 +162,10 @@ export function PortalD() {
               <h1 className="text-[20px] font-bold tracking-[-0.01em]">Meus motoristas autorizados</h1>
               <p className="text-[13px] text-[hsl(210_14%_42%)] -mt-3">Escopo validado pela qualificação da sua empresa. Eles operam pelo App do motorista.</p>
               <div className="grid gap-2.5 sm:grid-cols-2">
-                {souza.motoristasAutorizados.map((m) => (
-                  <div key={m} className="flex items-center gap-3 rounded-xl border border-[hsl(200_18%_88%)] bg-white p-3.5">
+                {meusMotoristas.map((m) => (
+                  <div key={m.id} className="flex items-center gap-3 rounded-xl border border-[hsl(200_18%_88%)] bg-white p-3.5">
                     <div className="flex size-9 items-center justify-center rounded-lg bg-[hsl(174_64%_94%)] text-[hsl(180_80%_20%)]"><IdCard className="size-4" /></div>
-                    <p className="text-[14px] font-medium">{m}</p>
+                    <p className="text-[14px] font-medium">{m.nome}</p>
                     <span className="ml-auto rounded-full bg-[hsl(142_65%_94%)] px-2 py-0.5 text-[10px] font-bold uppercase text-[hsl(142_71%_28%)]">Autorizado</span>
                   </div>
                 ))}

@@ -367,6 +367,141 @@ export function resolveProdutoPorNome(nome: string): ProdutoIDTF | undefined {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Vínculo m:n com vigência (Fase 9.1)
+//
+// Antes, `veiculosAutorizados: string[]` e `motoristasAutorizados: string[]`
+// moravam dentro do subcontratado. Isso responde "quem opera hoje" e nada mais:
+// não diz desde quando, não diz até quando, e some com o passado no instante em
+// que alguém edita a lista. O dossiê de uma viagem de maio precisa saber que
+// AQUELE motorista estava vinculado AQUELE dia.
+//
+// Um ativo pode passar por várias empresas ao longo do tempo, e uma empresa tem
+// vários ativos — daí a tabela própria. A chave do motorista é `motorista.id`,
+// nunca o CPF: os CPFs do protótipo estão mascarados por LGPD e não identificam
+// ninguém.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type TipoEntidadeVinculo = "motorista" | "implemento" | "cavalo";
+
+export type Vinculo = {
+  id: string;
+  subcontratadoId: string;
+  tipo: TipoEntidadeVinculo;
+  /** `motorista.id` para motorista; a placa para implemento e cavalo. */
+  entidadeId: string;
+  inicio: string;
+  /** Ausente = vigente. Presente = encerrado, e o registro fica. */
+  fim?: string;
+  motivoFim?: string;
+};
+
+export const vinculos: Vinculo[] = [
+  // Souza Transportes
+  { id: "vin-001", subcontratadoId: "sub-001", tipo: "implemento", entidadeId: "PHC-2B17", inicio: "2025-06-01" },
+  { id: "vin-002", subcontratadoId: "sub-001", tipo: "implemento", entidadeId: "UHB-9I02", inicio: "2026-02-10" },
+  { id: "vin-003", subcontratadoId: "sub-001", tipo: "motorista", entidadeId: "m-001", inicio: "2025-06-01" },
+  { id: "vin-004", subcontratadoId: "sub-001", tipo: "motorista", entidadeId: "m-006", inicio: "2025-09-15" },
+  // Encerrado: o histórico é o ponto da tabela — a viagem de novembro continua
+  // apontando para o vínculo que existia naquele dia.
+  {
+    id: "vin-005", subcontratadoId: "sub-001", tipo: "motorista", entidadeId: "m-004",
+    inicio: "2025-03-01", fim: "2025-11-30", motivoFim: "Fim do contrato de agregação.",
+  },
+  // Lima Logística
+  { id: "vin-006", subcontratadoId: "sub-002", tipo: "implemento", entidadeId: "MNB-7D29", inicio: "2025-01-20" },
+  { id: "vin-007", subcontratadoId: "sub-002", tipo: "motorista", entidadeId: "m-002", inicio: "2025-01-20" },
+  // Rondon Fretes (TAC): a pessoa é a empresa, e o vínculo diz isso.
+  { id: "vin-008", subcontratadoId: "sub-003", tipo: "implemento", entidadeId: "RDN-5A18", inicio: "2025-08-04" },
+  { id: "vin-009", subcontratadoId: "sub-003", tipo: "motorista", entidadeId: "m-007", inicio: "2025-08-04" },
+  // Agro Sul
+  { id: "vin-010", subcontratadoId: "sub-004", tipo: "implemento", entidadeId: "ASL-3C55", inicio: "2026-04-02" },
+  { id: "vin-011", subcontratadoId: "sub-004", tipo: "implemento", entidadeId: "ASL-7D19", inicio: "2026-04-02" },
+  { id: "vin-012", subcontratadoId: "sub-004", tipo: "motorista", entidadeId: "m-008", inicio: "2026-04-02" },
+  { id: "vin-013", subcontratadoId: "sub-004", tipo: "motorista", entidadeId: "m-009", inicio: "2026-05-11" },
+  {
+    id: "vin-014", subcontratadoId: "sub-004", tipo: "implemento", entidadeId: "ASL-1B22",
+    inicio: "2025-05-02", fim: "2026-03-28", motivoFim: "Implemento vendido; baixa no cadastro do proprietário.",
+  },
+];
+
+// ── Notificações enviadas (Fase 9.4) ─────────────────────────────────────────
+//
+// Começa VAZIO. O protótipo não tem histórico de envio porque nada foi enviado
+// ainda; inventar "alertas enviados em maio" seria fabricar. O que entra aqui é
+// o que a operação disparou nesta sessão, com destinatário, canal e quem mandou.
+
+export type TipoNotificacao = "acordo" | "certificado" | "treinamento" | "documento";
+
+export const TIPO_NOTIFICACAO_LABEL: Record<TipoNotificacao, string> = {
+  acordo: "Renovação de acordo",
+  certificado: "Certificado a vencer",
+  treinamento: "Treinamento pendente",
+  documento: "Documento pendente",
+};
+
+export type Notificacao = {
+  id: string;
+  subcontratadoId: string;
+  tipo: TipoNotificacao;
+  mensagem: string;
+  enviadaEm: string;
+  canal: "WhatsApp" | "E-mail";
+  remetente: string;
+};
+
+export const notificacoes: Notificacao[] = [];
+
+export function notificacoesDoSubcontratado(subcontratadoId: string): Notificacao[] {
+  return notificacoes.filter((n) => n.subcontratadoId === subcontratadoId);
+}
+
+/** Vigente na data de referência: começou e não terminou. */
+export function vinculoVigente(v: Vinculo, hoje = HOJE): boolean {
+  return v.inicio <= hoje && (!v.fim || v.fim >= hoje);
+}
+
+export function vinculosDoSubcontratado(
+  subcontratadoId: string,
+  opts: { tipo?: TipoEntidadeVinculo; incluirEncerrados?: boolean; hoje?: string } = {}
+): Vinculo[] {
+  const hoje = opts.hoje ?? HOJE;
+  return vinculos
+    .filter((v) => v.subcontratadoId === subcontratadoId)
+    .filter((v) => (opts.tipo ? v.tipo === opts.tipo : true))
+    .filter((v) => (opts.incluirEncerrados ? true : vinculoVigente(v, hoje)))
+    .sort((a, b) => b.inicio.localeCompare(a.inicio));
+}
+
+/** Placas de implemento vigentes da empresa. */
+export function veiculosDoSubcontratado(subcontratadoId: string, hoje = HOJE): string[] {
+  return vinculosDoSubcontratado(subcontratadoId, { tipo: "implemento", hoje }).map((v) => v.entidadeId);
+}
+
+/** Ids de motorista vigentes da empresa. */
+export function motoristasDoSubcontratado(subcontratadoId: string, hoje = HOJE): string[] {
+  return vinculosDoSubcontratado(subcontratadoId, { tipo: "motorista", hoje }).map((v) => v.entidadeId);
+}
+
+/** Toda a vida de um ativo ou motorista, mais recente primeiro. */
+export function historicoVinculos(tipo: TipoEntidadeVinculo, entidadeId: string): Vinculo[] {
+  return vinculos
+    .filter((v) => v.tipo === tipo && v.entidadeId === entidadeId)
+    .sort((a, b) => b.inicio.localeCompare(a.inicio));
+}
+
+/**
+ * A quem o ativo/motorista respondia NA DATA. É esta função — e não a lista de
+ * hoje — que o dossiê precisa para não reescrever o passado.
+ */
+export function subcontratadoNaData(
+  tipo: TipoEntidadeVinculo,
+  entidadeId: string,
+  data = HOJE
+): string | undefined {
+  return historicoVinculos(tipo, entidadeId).find((v) => vinculoVigente(v, data))?.subcontratadoId;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Governança da base IDTF (Fase 8)
 //
 // A base é uma norma traduzida e operada, não uma planilha. Sem histórico de
@@ -841,10 +976,15 @@ export type Subcontratado = {
     sitesCobertos: string[];
     statusBasePublica: "Ativo" | "Suspenso" | "Não localizado";
   };
-  veiculosAutorizados: string[];
-  motoristasAutorizados: string[];
   treinamento: { comprovante: boolean; quiz: boolean; aceiteRegras: boolean };
   acordo?: AcordoQA;
+  /**
+   * Arquivamento (Fase 9.5). Guardar a data em vez de apagar o registro é o que
+   * mantém o histórico: viagem antiga continua apontando para a empresa que a
+   * fez, e o dossiê de 2026 não fica órfão porque alguém "limpou o cadastro".
+   */
+  arquivadoEm?: string;
+  motivoArquivo?: string;
 };
 
 // Estados de qualificação do transportador (Gatekeeper §3). Derivados do estado
@@ -889,8 +1029,6 @@ export const subcontratados: Subcontratado[] = [
       sitesCobertos: ["Sorriso/MT"],
       statusBasePublica: "Ativo",
     },
-    veiculosAutorizados: ["PHC-2B17", "UHB-9I02"],
-    motoristasAutorizados: ["Edivaldo Souza", "Antonio Marcos"],
     treinamento: { comprovante: true, quiz: true, aceiteRegras: true },
     acordo: {
       versao: "v3.0",
@@ -914,8 +1052,6 @@ export const subcontratados: Subcontratado[] = [
       sitesCobertos: ["Campo Mourão/PR"],
       statusBasePublica: "Suspenso",
     },
-    veiculosAutorizados: ["MNB-7D29"],
-    motoristasAutorizados: ["Mauricio Lima"],
     treinamento: { comprovante: true, quiz: false, aceiteRegras: true },
     acordo: {
       versao: "v2.0",
@@ -939,8 +1075,6 @@ export const subcontratados: Subcontratado[] = [
       sitesCobertos: ["Rondonópolis/MT"],
       statusBasePublica: "Ativo",
     },
-    veiculosAutorizados: ["RDN-5A18"],
-    motoristasAutorizados: ["José A. Ferreira"],
     treinamento: { comprovante: true, quiz: true, aceiteRegras: true },
     acordo: {
       versao: "v3.0",
@@ -964,8 +1098,6 @@ export const subcontratados: Subcontratado[] = [
       sitesCobertos: ["Rondonópolis/MT", "Sorriso/MT"],
       statusBasePublica: "Ativo",
     },
-    veiculosAutorizados: ["ASL-3C55", "ASL-7D19"],
-    motoristasAutorizados: ["Reginaldo Alves", "Cleber Matos"],
     treinamento: { comprovante: true, quiz: false, aceiteRegras: false },
     acordo: {
       versao: "v3.0",
@@ -985,6 +1117,13 @@ export function findSubcontratado(id?: string): Subcontratado | undefined {
 /** Estado de qualificação derivado do estado real (cert, base pública, acordo,
  *  treinamento). Ordem = prioridade do que impede operar. Retorna estado + motivo. */
 export function estadoQualificacao(s: Subcontratado): { estado: EstadoQualificacao; motivo: string } {
+  // Arquivada não opera, e isso vem antes de qualquer análise de certificado:
+  // o estado continua derivado de fato — o fato aqui é a data do arquivamento.
+  if (s.arquivadoEm)
+    return {
+      estado: "Inativo",
+      motivo: `Arquivada em ${s.arquivadoEm.slice(0, 10)}. ${s.motivoArquivo ?? ""}`.trim(),
+    };
   const venc = nivelVencimento(s.certGMP.validade);
   if (s.certGMP.statusBasePublica === "Suspenso")
     return { estado: "Suspenso", motivo: "Status “Suspenso” na base pública GMP+ International." };

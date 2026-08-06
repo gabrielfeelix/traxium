@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { type Subcontratado, estadoQualificacao, ESTADO_QUALIFICACAO, podeExecutar } from "@/lib/domain/model";
+import { motoristas } from "@/lib/mock-data";
 import { useSession } from "@/lib/store/session";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
@@ -18,7 +19,7 @@ import { cn } from "@/lib/utils";
 type Escopo = "Road Transport of Feed" | "Affreightment of Road Transport";
 
 export function QualificarSubcontratadoModal() {
-  const { addSubcontratado, papel } = useSession();
+  const { addSubcontratado, vincular, papel } = useSession();
   const { toast } = useToast();
   const bloqueado = !podeExecutar(papel, "qualificarSubcontratado");
   const [open, setOpen] = useState(false);
@@ -46,6 +47,7 @@ export function QualificarSubcontratadoModal() {
   const valido = cnpj && razao && numero && validade && escopos.length > 0;
 
   function salvar() {
+    const naoCadastrados: string[] = [];
     const novo = {
       cnpj, razaoSocial: razao,
       certGMP: {
@@ -53,17 +55,29 @@ export function QualificarSubcontratadoModal() {
         sitesCobertos: sites.split(",").map((s) => s.trim()).filter(Boolean),
         statusBasePublica: statusBase,
       },
-      veiculosAutorizados: veiculos.split(",").map((s) => s.trim()).filter(Boolean),
-      motoristasAutorizados: mot.split(",").map((s) => s.trim()).filter(Boolean),
       treinamento: { comprovante: tComprovante, quiz: tQuiz, aceiteRegras: tAceite },
     };
-    addSubcontratado(novo);
+    const id = addSubcontratado(novo);
+    // Vínculo é registro com vigência (Fase 9.1): as placas digitadas entram
+    // como vínculo a partir de hoje, não como lista dentro da empresa.
+    for (const placa of veiculos.split(",").map((v) => v.trim()).filter(Boolean)) {
+      vincular({ subcontratadoId: id, tipo: "implemento", entidadeId: placa });
+    }
+    for (const nome of mot.split(",").map((v) => v.trim()).filter(Boolean)) {
+      const m = motoristas.find((x) => x.nome.toLowerCase() === nome.toLowerCase());
+      // Motorista sem cadastro não vira vínculo: vínculo aponta para id, e um
+      // nome digitado não é identidade. A tela avisa em vez de gravar fantasma.
+      if (m) vincular({ subcontratadoId: id, tipo: "motorista", entidadeId: m.id });
+      else naoCadastrados.push(nome);
+    }
     // Estado real derivado (novo cadastro sem acordo firmado → Pendente documental).
     const { estado, motivo } = estadoQualificacao(novo as Subcontratado);
     const meta = ESTADO_QUALIFICACAO[estado];
     toast(`${razao} · ${estado}`, {
       type: meta.opera ? "success" : meta.tone === "danger" ? "error" : "info",
-      desc: motivo,
+      desc: naoCadastrados.length
+        ? `${motivo} Sem vínculo para ${naoCadastrados.join(", ")}: motorista precisa existir no cadastro.`
+        : motivo,
     });
     setOpen(false); reset();
   }
