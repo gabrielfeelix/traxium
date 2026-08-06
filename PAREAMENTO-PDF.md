@@ -8,7 +8,7 @@ Legenda: **✓ entregue** · **~ parcial** · **✗ não iniciado**
 
 | Pilar | Situação | Leitura curta |
 | --- | --- | --- |
-| 1 · Gatekeeper | ~ 2/3 | Estados, acordo e passaporte existem. Falta o fluxo público do transportador. |
+| 1 · Gatekeeper | ✓ 9/10 ✅ | **Fase 6 entregue.** Onboarding público, QR real, acordo assinável, checklist dinâmico com item crítico, passaporte completo. |
 | 2 · Academy | ~ 2/3 ✅ | **Fase 4 entregue.** Competência derivada, elegibilidade no despacho, sala virtual, just-in-time. Falta o conteúdo em si (vídeo/PDF) e as regras por cliente/filial. |
 | 3 · IDTF Brasil | ~ 2/3 | Motor e camada brasileira de busca existem. Falta cadastro completo e governança. |
 | 4 · Control Tower | ~ 4/5 ✅ | **Fase 5 entregue.** Verde com as 8 condições, motor configurável com piso. Falta liberação padronizada e dossiê com os 16 itens. |
@@ -21,7 +21,9 @@ Legenda: **✓ entregue** · **~ parcial** · **✗ não iniciado**
 
 > **Atualização — Fase 5 entregue (commit `50427c7`).** O motor avalia as 12 condições e decide pela classe mais severa; as 8 do verde estão cobertas. Ganhou as 4 classes da diretriz e configuração com piso por regra. **Efeito medido: a automação caiu de 60% para 40%** — duas viagens sem nenhuma inspeção registrada eram liberadas porque a regra antiga só bloqueava inspeção explicitamente reprovada. O 60% superestimava.
 
-**A resposta curta para "implementamos tudo?": ainda não.** Fecharam os pilares 2 e 4 no essencial. Os maiores gaps agora são o **Network** (Fase 9: importação, m:n, operação em massa), o **onboarding público do Gatekeeper** (Fase 6) e os **indicadores** (Fase 10).
+> **Atualização — Fase 6 entregue.** Pilar 1 fechado: onboarding público em `/convite/[token]`, QR real, acordo assinável com renovação, checklist dinâmico por tipo com item crítico, passaporte com os 8 blocos.
+
+**A resposta curta para "implementamos tudo?": ainda não, mas os pilares 1, 2 e 4 estão fechados.** Restam: **Control Tower** (Fase 7: liberação padronizada, dossiê com os 16 itens), **IDTF** (Fase 8: cadastro de 18 campos e governança), **Network** (Fase 9: m:n, importação, operação em massa) e os **indicadores** (Fase 10).
 
 ---
 
@@ -31,15 +33,15 @@ Legenda: **✓ entregue** · **~ parcial** · **✗ não iniciado**
 | --- | --- | --- |
 | Estados de qualificação (9) | ✓ | `EstadoQualificacao` tem os 9, **derivados** de fato real (cert, base pública, acordo, treinamento) — não é campo editável. `model.ts:535` |
 | Bloqueio automático quando o acordo expira | ✓ | `estadoQualificacao()` verifica `vigenciaFim` antes de liberar. `model.ts:678` |
-| Acordo de GQ como registro controlado | ~ | `AcordoQA` tem versão, vigência, assinante, dispositivo, data. Falta: renovação, associação com representantes, termo específico de ciência do motorista. |
-| Assinatura eletrônica | ✗ | O acordo registra `assinadoEm`/`assinante`, mas não existe fluxo de assinatura. |
-| Onboarding por link / WhatsApp / QR | ~ | `onboarding-link-modal.tsx` gera link e envia por WhatsApp. **QR é só menção em texto** — não há QR gerado. |
-| Os 11 campos do onboarding (CPF/CNPJ, CNH, RNTRC, placas, vínculo, T-3, limpezas, aceite…) | ✗ | Não existe a página pública. O modal atual só coleta o celular para enviar o convite. |
-| Distinguir os 7 tipos de vínculo | ~ | `TipoVinculo` tem 5. Faltam **"motorista empregado"** e **"motorista vinculado a empresa terceira"**. `model.ts:496` |
+| Acordo de GQ como registro controlado | ✓ | Versão, vigência, assinante, dispositivo, **renovação (60 dias antes), representantes e ciência do motorista**. |
+| Assinatura eletrônica | ✓ | `AssinaturaCanvas` (extraído do fluxo do motorista) no acordo e no convite público. |
+| Onboarding por link / WhatsApp / QR | ✓ | QR real em SVG apontando para `/convite/[token]`, a rota que de fato existe. |
+| Os 11 campos do onboarding (CPF/CNPJ, CNH, RNTRC, placas, vínculo, T-3, limpezas, aceite…) | ✓ | `/convite/[token]`, fora do shell, seis passos mobile-first. Nasce `Pré-cadastrado`. |
+| Distinguir os 7 tipos de vínculo | ✓ | `TIPOS_VINCULO` com os 7, oferecidos no onboarding público. |
 | Checklist: imutável, assinado, vinculado, offline, fotos guiadas | ✓ | `/checklists` + `/mobile`: registro imutável com geo/hash, assinatura, retificação em vez de sobrescrita. |
-| Checklist **dinâmico por tipo de implemento** | ✗ | O formulário é único; não muda entre carreta, tanque e caçamba. |
-| Reprovação automática por item crítico negativo | ✗ | A reprovação é manual; nenhum item é marcado como crítico. |
-| Passaporte Feed Safety (8 blocos) | ~ | 6 de 8: situação cadastral, acordo, treinamento, veículos, ocorrências/reincidências, validade. Faltam **inspeções realizadas** e **produtos/operações para os quais está apto**. |
+| Checklist **dinâmico por tipo de implemento** | ✓ | `CONDICOES_POR_TIPO`: tanque pergunta sobre válvula e mangote; graneleiro, sobre lona e bica. |
+| Reprovação automática por item crítico negativo | ✓ | Item `critico` negativo reprova sozinho; não crítico deixa pendente, que é corrigível. |
+| Passaporte Feed Safety (8 blocos) | ✓ | Os 8. "Apto para" deriva o regime máximo das limpezas efetivamente executadas — capacidade não se presume. |
 
 ## Pilar 2 · TRAXIUM ACADEMY
 

@@ -64,13 +64,21 @@ O branch saiu de `b73836e` e ficou 8 commits atrás de `main`. Merge feito, 4 co
 - **Aba "Motor de regras"** em `/configuracoes`.
 - ⚠️ **A automação caiu de 60% para 40% e isso está certo**: a regra antiga de checklist só bloqueava inspeção "reprovada", então viagem **sem inspeção nenhuma** era liberada automaticamente. Não reverta achando que é regressão.
 
+### Fase 6 — Gatekeeper completo
+- **`src/app/convite/[token]/page.tsx`** — onboarding público, **fora de `(app)`** (rota sem shell por construção). Seis passos, um assunto por tela. Cria via `addSubcontratadoPreCadastro`, sempre `Pré-cadastrado`.
+- **`qrcode-generator`** (dependência nova, ~10KB, zero deps) → `components/gatekeeper/qr-convite.tsx`, SVG inline. O link aponta para `window.location.origin`, então o QR funciona em preview e local.
+- **`components/gatekeeper/assinatura-canvas.tsx`** — extraído do `AssinaturaScreen` do `/mobile`. Usar este, não duplicar o traço.
+- **`assinar-acordo-modal.tsx` + `assinarAcordo` no store** — fecha o ciclo que a Fase 5 abriu: `acordo_vigente` bloqueava sem oferecer saída.
+- **Checklist**: `CONDICOES_POR_TIPO` por `Implemento["tipo"]` e flag `critico`. Item crítico negativo reprova sozinho; não crítico → pendente.
+- **Passaporte**: blocos de inspeções e "apto para". O regime máximo sai de `cleaningEvents` reais.
+
 ## Mapa MVP: pilar → telas
 Torre de Controle (home + /viagens + /excecoes + /bloqueios + /dossie) · Gatekeeper (/subcontratados + /checklists) · Academy (/motoristas) · IDTF Brasil (/idtf + /limpezas) · Network (/frota) · App do motorista (/mobile). Escondido no MVP: /fazendas /lotes /traces /auditoria /conformidade /documentos /atividade + superfícies Console/Portal/Auditor.
 
 ## Próximo — ver `PLANO-COBERTURA-PDF.md`
 O roadmap completo (fases 5 a 10) fechando todas as lacunas de `PAREAMENTO-PDF.md` está lá, com decisões de UX fixadas e critério de aceite por fase.
 
-**Fases 0, 4 e 5 estão entregues.** A próxima é a **Fase 6 — Gatekeeper completo** (onboarding público em `/convite/[token]`, assinatura do acordo, checklist dinâmico por tipo de implemento, item crítico reprovando sozinho). Fases 6, 7 e 8 são paralelizáveis entre si.
+**Fases 0, 4, 5 e 6 entregues.** A próxima é a **Fase 7 — Control Tower completo**: motivo padronizado na liberação manual (hoje é texto livre e não sobrevive a auditoria), os 9 campos do registro de liberação, hierarquia com os 6 níveis e dossiê com os 16 itens. Fases 7 e 8 são paralelizáveis.
 
 ## Ainda faltando no Gatekeeper (deixado de propósito na Fase 2)
 Página pública de onboarding (fluxo do transportador), assinatura eletrônica real do acordo, "Pendente de inspeção" derivado, QR real. Ver §Gatekeeper do PDF.
