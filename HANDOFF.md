@@ -42,7 +42,11 @@ npm run build         # antes de todo commit
 
 **9. Lista vazia em `MOTIVOS_POR_REGRA` é afirmação, não esquecimento.** Regra cuja autoridade é `tecnico` tem `[]` porque não existe motivo que a libere; a tela mostra "não há motivo padronizado" e some com o botão. O teste `liberacao.test.ts` trava a equivalência: **há motivo exatamente onde há autoridade**. Ao acrescentar regra ao motor, mapeie autoridade **e** motivos — sem os dois, ela fica sem caminho de liberação.
 
-**10. `vercel deploy` está não autorizado nesta máquina.** `vercel whoami` → *Not authorized*; o `.vercel/project.json` está correto. Precisa de um `vercel login` do Gabriel. **Nada foi publicado em preview desde a Fase 3** — todas as fases estão commitadas e pushadas, nenhuma está no ar.
+**10. Vínculo de motorista é por `motorista.id`, e a empresa de um ativo depende da DATA.** `veiculosAutorizados[]`/`motoristasAutorizados[]` não existem mais — use `veiculosDoSubcontratado()`, `motoristasDoSubcontratado()` e, para qualquer coisa histórica, `subcontratadoNaData(tipo, id, data)`. Ler o vínculo de hoje para explicar uma viagem de maio reescreve o passado.
+
+**11. Indicador sem telemetria fica `valor: null` com `porqueNaoMedido`.** Não preencha com estimativa: `transversais.test.ts` trava que os quatro não medidos continuem declarados como lacuna, e a tela os mostra separados de propósito.
+
+**12. `vercel deploy` está não autorizado nesta máquina.** `vercel whoami` → *Not authorized*; o `.vercel/project.json` está correto. Precisa de um `vercel login` do Gabriel. **Nada foi publicado em preview desde a Fase 3** — todas as fases estão commitadas e pushadas, nenhuma está no ar.
 
 ## 4. O princípio que sustenta o código
 
@@ -99,23 +103,27 @@ Diretriz do P.O.: 5 pilares. Estado por pilar (detalhe item a item em **`PAREAME
 | 2 · Academy | ✓ fechado no essencial (Fase 4) |
 | 3 · IDTF Brasil | ✓ fechado (Fase 8) |
 | 4 · Control Tower | ✓ fechado (Fases 3, 5 e 7) |
-| 5 · Network | ~ 1/4 — falta m:n, importação, operação em massa |
-| Transversais | ~ 3/4 — falta LGPD (retenção, inativação, consentimentos) |
-| §8 Indicadores | ✗ 1 de 15 |
+| 5 · Network | ✓ fechado (Fase 9) |
+| Transversais | ✓ fechado (Fase 10) |
+| §8 Indicadores | ✓ 15 de 15 — 11 medidos, 4 declarados como não medidos |
 
 ## 8. O que vem agora
 
-O roadmap completo está em **`PLANO-COBERTURA-PDF.md`**, com decisões de UX já fixadas e critério de aceite por fase. Fases 0, 4, 5, 6, 7 e 8 estão entregues — os pilares 1 a 4 estão fechados.
+**O roadmap de `PLANO-COBERTURA-PDF.md` está inteiro entregue** — fases 0 e 4 a 10. Os cinco pilares e os transversais estão fechados; o que sobra é dívida conhecida (§9), não fase.
 
-**Próxima: Fase 9 — Network.** É a maior lacuna que sobrou: vínculo m:n com vigência (hoje `veiculosAutorizados[]` é lista de string dentro do subcontratado), importação por planilha com detecção de duplicidade, consulta rápida por CPF/CNPJ/placa/telefone, ações em massa e arquivamento sem apagar histórico.
+O que faria sentido atacar a seguir, em ordem de retorno:
 
-**Depois: Fase 10 — transversais.** LGPD (retenção, inativação, consentimentos) e os 14 indicadores do §8 que faltam. Os que dependem de telemetria inexistente entram como "não medido"; ver §9.
+1. **Backend.** É o que destrava os quatro indicadores não medidos, a persistência entre sessões e o teste de escala (3–5× o volume) que a diretriz pede e um protótipo em memória não consegue.
+2. **A dívida da triagem** (§9, primeiro item): exceção aprovada libera a viagem inteira, mesmo quando a regra que decidiu é outra.
+3. **Conteúdo da Academy** (vídeo/PDF) e os dois gatilhos just-in-time que faltam.
+4. **§6 EUDR** — o próprio PDF manda deixar para a 2ª onda; `/lotes` e `/fazendas` já têm o modelo de dados.
 
 ## 9. Dívida conhecida (deixada de propósito)
 
 **Control Tower**
 - **Exceção aprovada libera a viagem inteira, mesmo quando a regra que decidiu é outra.** `triarViagem` pinta de verde qualquer viagem com exceção aprovada, sem conferir se a regra da exceção é a mesma que o motor reportou. Em `v-004` isso é visível: a exceção é de "Pendência sem risco direto", mas o motor reprova por "Checklist reprovado". O registro da liberação expõe o descompasso nos campos 6 e 7 (situação anterior/posterior continuam dizendo `regra: Checklist reprovado`), o que é honesto, mas o certo seria a liberação valer só para a regra citada e o motor seguir bloqueando pelas outras.
 - `/viagens/[id]` ainda lista "Documentos gerados" por array fixo na tela. O dossiê já lê `documentosDaViagem()` em `model.ts`; a tela de viagem não foi migrada.
+- Nenhuma viagem do mock fica no estado "não bloqueada com registro obrigatório pendente", então o destravamento da conclusão (Fase 10.1) só se vê forçando a classe de uma regra em `/configuracoes`. O gate está coberto por teste.
 - Reavaliação após regularização só acontece porque o motor recalcula a cada render. Falta a ação explícita ("registrar limpeza → reavaliar") com o antes/depois visível.
 - `avaliadoEm` usa `viagem.iniciadaEm`. Um ledger append-only, com a versão da base vigente em cada avaliação, é o que sustentaria "o motor decidiu às 14:22 com a base 2026.05".
 - Regra nova não mapeada cai no fallback `gestor` em `autoridadeDaRegra()`. **Ao acrescentar regra ao motor, mapeie a autoridade junto** — senão vira aprovável por descuido.
@@ -131,7 +139,11 @@ O roadmap completo está em **`PLANO-COBERTURA-PDF.md`**, com decisões de UX j�
 - `emFilaDesde` só existe em `ProdutoIDTF`; subcontratado pendente não mostra tempo em fila.
 - Telas fora do MVP (`/traces`, `/lotes`, `/fazendas`) não foram olhadas em 375/768 — o shell já resolve o overflow, mas o conteúdo interno não foi revisado.
 
-**Indicadores (§8)** — vários dependem de telemetria que um protótipo sem backend não tem (tempo médio de cadastro, tempo de checklist, % de fotos rejeitadas). A Fase 10 os marca como **"não medido"** em vez de fabricar número. Se o P.O. quiser esses de verdade, é decisão de arquitetura, não de tela.
+**Network**
+- Não há teste de escala. A diretriz pede 3–5× o volume típico; o protótipo tem 6 viagens e 6 empresas. Medir isso exige backend.
+- Acesso temporário por código (além de link e WhatsApp) continua fora.
+
+**Indicadores (§8)** — quatro dependem de telemetria que um protótipo sem backend não tem (tempo de cadastro de TAC, tempo de checklist, % de fotos rejeitadas, tempo para gerar dossiê). A Fase 10 os marca como **"não medido"**, com o que precisaria ser instrumentado em cada um, em vez de fabricar número. Se o P.O. quiser esses de verdade, é decisão de arquitetura, não de tela.
 
 ## 10. Mapa de arquivos
 
@@ -144,7 +156,10 @@ src/lib/domain/
   control-tower.ts   # triagem, automação, autoridadeDaRegra, tempoEmFila
   liberacao.ts       # motivos por regra, registro de 9 campos, situacaoDaViagem
   idtf.ts            # resultadoIDTF: os 9 rótulos operacionais
-  __tests__/         # vitest (87 testes)
+  registro.ts        # classes registro/informacao com efeito; podeConcluir
+  lgpd.ts            # retenção, inativação, consentimentos e bases legais
+  indicadores.ts     # os 15 do §8, com "não medido" explícito
+  __tests__/         # vitest (113 testes)
 src/lib/store/session.tsx   # todas as ações de escrita
 src/components/shell/       # sidebar (+drawer), topbar, torre-de-controle
 src/app/(app)/              # back-office (tem shell)
@@ -170,6 +185,8 @@ src/app/convite/[token]/    # onboarding público (SEM shell, de propósito)
 | 7 | `e204d58` | Control Tower: motivo padronizado, registro de 9 campos, 6 níveis de autoridade, dossiê com 16 blocos |
 | 7.5 | `976ffb6` | Fila da Torre: risco GMP+, miniatura das 6 evidências essenciais, pendências de resposta |
 | 8 | `6c572b8` | IDTF: cadastro de 18 campos, resolução por todo o vocabulário, 9 rótulos operacionais, consulta de sequenciamento, governança da base |
+| 9 | `fd3f849` | Network: vínculo m:n com vigência, importação com duplicidade, busca por documento, operação em massa, arquivamento |
+| 10 | `1fab7a9` | Transversais: classes `registro`/`informacao` com efeito, LGPD (retenção, inativação, consentimentos), 15 indicadores do §8 |
 
 ## 12. Notion
 

@@ -12,10 +12,10 @@ Legenda: **✓ entregue** · **~ parcial** · **✗ não iniciado**
 | 2 · Academy | ~ 2/3 ✅ | **Fase 4 entregue.** Competência derivada, elegibilidade no despacho, sala virtual, just-in-time. Falta o conteúdo em si (vídeo/PDF) e as regras por cliente/filial. |
 | 3 · IDTF Brasil | ✓ 3/3 ✅ | **Fase 8 entregue.** Cadastro de 18 campos, resolução por todo o vocabulário, 9 rótulos operacionais e governança da base com histórico. |
 | 4 · Control Tower | ✓ 5/5 ✅ | **Fases 5 e 7 entregues.** Verde com as 8 condições, motor configurável com piso, liberação padronizada com 9 campos, 6 níveis de autoridade, dossiê com os 16 blocos e a fila com risco GMP+, evidências e pendências. |
-| 5 · Network | ~ 1/4 | O modelo de ativos está certo. A operação em massa não existe. |
-| Transversais | ~ 3/4 ✅ | Offline, imutabilidade, RBAC e **motor configurável com 4 classes** ok. LGPD incompleto. |
+| 5 · Network | ✓ 4/4 ✅ | **Fase 9 entregue.** Vínculo m:n com vigência e histórico, importação com detecção de duplicidade, consulta por documento, operação em massa e arquivamento sem apagar. |
+| Transversais | ✓ 4/4 ✅ | **Fase 10 entregue.** As 4 classes com efeito na tela e LGPD com retenção, inativação, consentimentos e bases legais. |
 | §5 Ajustes no protótipo | ✓ 4/4 | Todos aplicados. |
-| §8 Indicadores | ✗ 1/15 | Só "% liberadas automaticamente". |
+| §8 Indicadores | ✓ 15/15 ✅ | **Fase 10 entregue.** 11 derivados do store; 4 marcados como não medidos, com o que precisaria ser instrumentado. |
 
 > **Atualização — Fase 4 entregue (commits `a76cf16`…`e1a0bf2`).** O princípio central do Pilar 2 saiu do PDF e entrou no código: `competenciaMotorista()` deriva elegibilidade das trilhas concluídas, e motorista sem competência não é selecionável no despacho. As linhas do Pilar 2 abaixo estão marcadas com o estado atual. **O que segue pendente e é o buraco maior agora: `avaliarCarregamento()` ainda não consulta competência** — a trava existe no despacho, mas não como uma das oito condições do verde. É a Fase 5.
 
@@ -23,11 +23,13 @@ Legenda: **✓ entregue** · **~ parcial** · **✗ não iniciado**
 
 > **Atualização — Fase 6 entregue.** Pilar 1 fechado: onboarding público em `/convite/[token]`, QR real, acordo assinável com renovação, checklist dinâmico por tipo com item crítico, passaporte com os 8 blocos.
 
+> **Atualização — Fases 9 e 10 entregues (commits `fd3f849` e `1fab7a9`).** O roadmap acabou. Network ganhou tabela de vínculo com vigência (as listas de string dentro do subcontratado deixaram de existir), importação por planilha com duplicidade detectada antes de gravar, busca por CPF/CNPJ/placa/telefone e arquivamento que encerra vínculos em vez de apagar. Transversais: `registro` e `informacao` deixaram de ser decoração — registro obrigatório trava a conclusão da viagem —, e a LGPD ganhou retenção por tipo de dado, política de inativação e consentimentos com base legal. Os 15 indicadores do §8 existem, **11 medidos e 4 declarados como não medidos**. Efeito medido: a competência caiu para 44% porque três motoristas de subcontratados, que antes eram só texto, viraram cadastro — e cadastro sem trilha é inelegível, que é o certo.
+
 > **Atualização — Fase 8 entregue (commit `6c572b8`).** Pilar 3 fechado. O cadastro tem os 18 campos, e `resolveProdutoPorNome` varre sinônimo regional, nome comercial, inglês e erro de digitação, sem acento nem caixa. Os 9 rótulos operacionais existem como saída (`resultadoIDTF`) e são alcançáveis por combinação real da base — a página do Motor IDTF agora cruza carga anterior × produto de verdade, o que ela prometia na descrição e não fazia. Governança com fonte, periodicidade, aprovação de sinônimo, licenciamento e histórico datado. **Um teste de colisão pegou "casquinha" reivindicada por dois produtos com regimes diferentes**; a recusa está registrada no histórico da base.
 
 > **Atualização — Fase 7 entregue (commits `e204d58` e `976ffb6`).** Pilar 4 fechado no essencial. O motivo da liberação manual virou lista fechada por regra (`MOTIVOS_POR_REGRA`), com justificativa livre como complemento; o registro passou a ter os nove campos, e situação anterior/posterior são capturadas do estado da viagem, não digitadas. A hierarquia ganhou `trafego` e `inspetor`, fechando os seis níveis — checklist reprovado e fotos mínimas passaram ao inspetor, certificação a vencer e sincronização pendente ao tráfego. O dossiê foi de 8 para 16 blocos, todos na cadeia de hash. **Sobrou a tarefa 7.5** (risco GMP+ e miniaturas na fila).
 
-**A resposta curta para "implementamos tudo?": os pilares 1 a 4 estão fechados.** Restam: **Network** (Fase 9: m:n, importação, operação em massa), **LGPD** e os **indicadores** (Fase 10).
+**A resposta curta para "implementamos tudo?": sim, o que a diretriz define como MVP está entregue** — os cinco pilares, os transversais, os §5 e os 15 indicadores do §8 (11 medidos, 4 declarados como não medidos). O que falta agora não é fase: é backend (persistência, telemetria dos 4 indicadores, teste de escala), o §6 EUDR que o próprio PDF adia para a 2ª onda, e a dívida listada em `HANDOFF.md` §9.
 
 ---
 
@@ -101,14 +103,14 @@ O pilar mais coberto — foi o alvo da Fase 3.
 | --- | --- | --- |
 | **T-3 no implemento/compartimento, não na placa do cavalo** | ✓ | É o princípio nº 1 do modelo de domínio. `loadHistory` mora no compartimento. |
 | Separar cavalo, implemento, compartimento, motorista, proprietário | ✓ | `Cavalo` / `Implemento` / `Compartimento` distintos, com `/frota` mostrando a cadeia. |
-| Relações m:n com datas de início/fim e histórico | ~ | `veiculosAutorizados[]` e `motoristasAutorizados[]` são listas de string dentro do subcontratado — não há tabela de vínculo nem vigência. |
+| Relações m:n com datas de início/fim e histórico | ✓ | `vinculos` com início, fim e motivo. `subcontratadoNaData()` responde de quem era o ativo em qualquer data — é o que impede o dossiê de reescrever o passado. |
 | Cadastro sem atrito (link, WhatsApp, código temporário, CPF/CNPJ como referência) | ~ | Link e WhatsApp existem. Falta acesso temporário por código. |
-| Importação por planilha · cadastro em lote | ✗ | Não existe. |
-| Detecção de duplicidades | ✗ | Não existe. |
-| Consulta rápida por CPF, CNPJ, placa ou telefone | ~ | A busca global cobre nome/placa/código, mas não CPF nem telefone. |
-| Renovação coletiva de acordos · envio coletivo de treinamentos · alertas em massa | ✗ | Não existe. |
-| Arquivamento sem apagar histórico | ✗ | Só em `/documentos`, não em cadastros. |
-| Filtros por filial, contratante e período | ~ | Filial existe no shell. Contratante e período, não. |
+| Importação por planilha · cadastro em lote | ✓ | Planilha colada, separador detectado, pré-visualização linha a linha. Importada nasce sem certificado comprovado. |
+| Detecção de duplicidades | ✓ | Por dígitos do CNPJ, contra a base e dentro do próprio lote, **antes** de gravar. |
+| Consulta rápida por CPF, CNPJ, placa ou telefone | ✓ | Busca global compara só dígitos e responde de quem é o ativo hoje. CPF mascarado casa pelos dígitos visíveis. |
+| Renovação coletiva de acordos · envio coletivo de treinamentos · alertas em massa | ✓ | As três, cada uma declarando quantas empresas realmente atinge. Acordo renovado volta não assinado; trilha atribuída não vira competência; alerta registra o disparo, não a entrega. |
+| Arquivamento sem apagar histórico | ✓ | `arquivadoEm` + encerramento dos vínculos vigentes; `estadoQualificacao` deriva "Inativo". Viagens e dossiês continuam apontando para a empresa. |
+| Filtros por filial, contratante e período | ~ | Filial no shell; tipo de vínculo e período de vigência em `/subcontratados`. "Contratante" continua sem modelo próprio — o protótipo tem um tenant só. |
 | Teste de escala (3–5× o volume típico) | ✗ | Protótipo com 4 subcontratados e 6 viagens. |
 
 ## Requisitos transversais (§4)
@@ -120,10 +122,10 @@ O pilar mais coberto — foi o alvo da Fase 3.
 | Evidência imutável, correção gera nova versão | ✓ | Hash-chain no dossiê; retificação em vez de sobrescrita. |
 | Alterações de regra não mudam decisões históricas | ✓ | A decisão grava a versão da base e é avaliada na data da viagem, não "hoje". |
 | Baixa fricção (botões grandes, poucos campos, fotos guiadas) | ✓ | `/mobile` segue o padrão. |
-| Motor de regras com **4 classes** | ✓ | `ClasseRegra` em `motor-config.ts`: bloqueio, alerta, registro, informação. |
+| Motor de regras com **4 classes** | ✓ | As quatro com efeito: `registro` trava a conclusão da viagem até a evidência ser anexada; `informacao` registra sem interferir (Fase 10.1). |
 | Motor **configurável** | ✓ | Aba "Motor de regras" em `/configuracoes`, com **piso por regra**: as 7 de bloqueio técnico aparecem travadas com o motivo. Configurável não é negociável. |
 | LGPD: acesso por função · logs · ocultação de documentos sensíveis | ✓ | RBAC por papel, `/atividade` com ator e payload, CPF mascarado. |
-| LGPD: prazo de retenção · política de inativação · consentimentos e bases legais | ✗ | Não existem. |
+| LGPD: prazo de retenção · política de inativação · consentimentos e bases legais | ✓ | Aba LGPD em `/configuracoes`: 7 tipos de dado com prazo, base legal e destino no fim do prazo; a conta de expurgo é feita contra a data do fato. Revogar consentimento não derruba o que se apoia em obrigação regulatória — e a tela diz isso. |
 
 ## §5 · Ajustes pedidos no protótipo
 
@@ -142,9 +144,9 @@ Situação: `/lotes` e `/fazendas` já têm lote, fazenda, CAR, polígono e DDS.
 
 ## §8 · Indicadores do MVP
 
-**1 de 15.** Só "percentual de operações liberadas automaticamente" existe (os 60% da Torre, entregues na Fase 3).
+**15 de 15, sendo 11 medidos** (`/indicadores`, Fase 10.3). Cada um declara a fonte do número; nenhum é estimado.
 
-Os outros 14 — tempo médio de cadastro de TAC, tempo de checklist, % de T-3 completos, tempo de análise das amarelas, % de motoristas com treinamento vigente, tempo para gerar dossiê, reincidência por subcontratado, % de cadastros duplicados etc. — não são medidos. Vários dependem de telemetria que o protótipo não tem.
+Os quatro restantes — tempo de cadastro de TAC, tempo de checklist, % de fotos rejeitadas e tempo para gerar dossiê — aparecem como **não medidos**, com o que precisaria ser instrumentado em cada caso. É a diferença entre uma lacuna declarada e um número que ninguém confere.
 
 ### Metas funcionais do MVP (8)
 
