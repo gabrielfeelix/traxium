@@ -28,14 +28,21 @@ import {
   Clock,
   PenLine,
   Eraser,
+  GraduationCap,
 } from "lucide-react";
 import { PageHeader } from "@/components/shell/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/toast";
+import { trilhasJustInTime, orientacaoDoRegime } from "@/lib/domain/academy";
 import { cn } from "@/lib/utils";
 
 type Screen = "login" | "home" | "viagem" | "checklist" | "foto" | "assinatura" | "bloqueio" | "sync" | "lavagem";
+
+// A prévia do app é fixada na viagem TX-2026-08471: motorista Edivaldo Souza
+// (m-001) e regime C exigido pela carga anterior de NPK.
+const PREVIEW_MOTORISTA = "m-001";
+const PREVIEW_REGIME = "C" as const;
 
 const CHECK_ITENS = [
   "Compartimento varrido e seco",
@@ -417,6 +424,8 @@ function ViagemScreen({ onBack, onChecklist }: { onBack: () => void; onChecklist
           </button>
         </div>
 
+        <MicroTreino />
+
         <InfoRow label="Cavalo · Carreta" value="OZE-4A82 · PHC-2B17" mono />
         <InfoRow
           label="Origem"
@@ -435,6 +444,50 @@ function ViagemScreen({ onBack, onChecklist }: { onBack: () => void; onChecklist
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Treino just-in-time (diretriz §Pilar 2). O conteúdo aparece no momento em que
+ * o conhecimento é necessário, e o cartão só existe quando há trilha a mostrar —
+ * sem trilha pendente nem orientação, não há placeholder.
+ *
+ * A prévia está fixada na viagem TX-2026-08471 (v-001, Edivaldo Souza, regime C
+ * exigido pelo NPK anterior); o conteúdo do cartão sai do modelo real.
+ */
+function MicroTreino() {
+  const pendentes = trilhasJustInTime(PREVIEW_MOTORISTA, { regime: PREVIEW_REGIME });
+  const orientacao = orientacaoDoRegime(PREVIEW_REGIME);
+  const trilha = pendentes[0] ?? orientacao;
+  if (!trilha) return null;
+  const pendente = pendentes.length > 0;
+
+  return (
+    <div
+      className={cn(
+        "rounded-xl border p-3.5",
+        pendente ? "border-[hsl(0_72%_80%)] bg-[hsl(0_72%_98%)]" : "border-[hsl(176_60%_78%)] bg-[hsl(174_64%_98%)]"
+      )}
+    >
+      <div className="flex items-center gap-2">
+        <GraduationCap className={cn("size-4", pendente ? "text-[hsl(0_70%_45%)]" : "text-[hsl(176_84%_25%)]")} />
+        <p className={cn("text-[12px] font-bold", pendente ? "text-[hsl(0_70%_38%)]" : "text-[hsl(180_80%_18%)]")}>
+          {pendente ? "Trilha obrigatória pendente" : "Revise antes de executar"}
+        </p>
+      </div>
+      <p className="mt-1.5 text-[13px] font-bold leading-tight">{trilha.titulo}</p>
+      <p className="mt-0.5 text-[11px] text-[hsl(210_14%_42%)] num">
+        {trilha.duracaoMin} min · regime {PREVIEW_REGIME} exigido nesta carga
+      </p>
+      <button
+        className={cn(
+          "w-full mt-3 font-bold py-3 rounded-lg text-[13px] shadow-md active:scale-[0.98] transition-transform text-white",
+          pendente ? "bg-[hsl(0_78%_50%)]" : "bg-[hsl(176_84%_25%)]"
+        )}
+      >
+        Fazer agora · {trilha.duracaoMin} min
+      </button>
     </div>
   );
 }

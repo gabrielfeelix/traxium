@@ -240,6 +240,19 @@ export function competenciaMotorista(
   };
 }
 
+/**
+ * Orientação de conteúdo para o regime desta operação — o "carga que exige
+ * limpeza C aciona uma orientação específica" da diretriz. Diferente de
+ * `trilhasJustInTime`: aqui a trilha pode já estar vigente; é revisão no
+ * momento de executar, não requisito pendente.
+ */
+export function orientacaoDoRegime(regime?: Regime): Trilha | undefined {
+  if (!regime) return undefined;
+  // Regime D é o caso de carga proibida/incompatível; os demais são procedimento
+  // de limpeza propriamente dito.
+  return regime === "D" ? findTrilha("t04") : findTrilha("t05");
+}
+
 export type EstadoTrilha = "vigente" | "a_vencer" | "vencida" | "nunca";
 
 /** Estado de UMA trilha para um motorista — alimenta o anel segmentado do crachá. */
