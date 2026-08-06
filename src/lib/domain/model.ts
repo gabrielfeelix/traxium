@@ -42,6 +42,9 @@ export const ORDEM_REGIME: Record<Regime, number> = { A: 1, B: 2, C: 3, D: 4 };
 // Produtos / IDTF — motor de regra, não PDF anexado (PLANO §1.2, perguntas 17/19)
 // ─────────────────────────────────────────────────────────────────────────────
 
+/** Estado físico do produto — muda o que resta no compartimento (§IDTF, cadastro). */
+export type EstadoFisico = "Granel sólido" | "Granel líquido" | "Pó" | "Peletizado" | "Pastoso";
+
 export type ProdutoIDTF = {
   id: string;
   nomeCanonico: string;
@@ -50,6 +53,31 @@ export type ProdutoIDTF = {
   hsCode?: string;
   categoria: "feed" | "feed_material" | "risco" | "proibido";
   idtfCode?: string;
+  // ── Cadastro completo (Fase 8). Opcionais de propósito: produto em fila de
+  // classificação não tem responsável nem fonte de decisão, e fingir que tem
+  // seria pior do que a lacuna. A ficha mostra "não informado".
+  /** Nome oficial na fonte (IDTF em inglês), quando existe correspondência. */
+  nomeOficialFonte?: string;
+  /**
+   * Como o produto é chamado por região. A região fica em campo próprio: se
+   * entrasse no nome ("casquinha (MT)"), duas grafias do mesmo apelido
+   * resolveriam para produtos diferentes — foi o que um teste pegou.
+   */
+  sinonimosRegionais?: { nome: string; regiao: string }[];
+  /** Nomes de mercado/marca que chegam na ordem de carregamento. */
+  nomesComerciais?: string[];
+  nomesIngles?: string[];
+  /** Erros de digitação que já apareceram — o motor resolve sem criar produto novo. */
+  errosComuns?: string[];
+  estadoFisico?: EstadoFisico;
+  /** O que a IDTF exige além da limpeza. Não vazio = procedimento especial. */
+  restricoes?: string[];
+  /** Esquemas sob os quais a classificação vale. */
+  esquemaCertificacao?: string[];
+  atualizadoEm?: string;
+  responsavelValidacao?: string;
+  /** De onde veio a decisão de classificação — o que o auditor pede primeiro. */
+  fonteDecisao?: string;
   /**
    * Se este produto foi a carga ANTERIOR, qual o regime mínimo de limpeza exigido
    * antes de carregar feed no mesmo compartimento.
@@ -73,6 +101,17 @@ export const produtosIDTF: ProdutoIDTF[] = [
     categoria: "feed_material",
     idtfCode: "IDTF-0101",
     regimeAntesDeFeed: "A",
+    nomeOficialFonte: "Soya beans",
+    sinonimosRegionais: [{ nome: "soja em caroço", regiao: "MT" }, { nome: "soja bruta", regiao: "PR" }],
+    nomesComerciais: ["Soja Padrão 86", "Soja tipo exportação"],
+    nomesIngles: ["soybean", "soya bean", "whole soybeans"],
+    errosComuns: ["soija", "soja em grao", "soya"],
+    estadoFisico: "Granel sólido",
+    restricoes: [],
+    esquemaCertificacao: ["GMP+ FSA", "GMP+ B4 Transporte"],
+    atualizadoEm: "2026-05-04",
+    responsavelValidacao: "Thiago Yamashida · Gestor Qualidade",
+    fonteDecisao: "IDTF EN 2026.05, item 1201 — tradução conferida com a base oficial.",
     bloqueiaFeed: false,
     riscoEUDR: "Alto",
     statusClassificacao: "classificado",
@@ -86,6 +125,17 @@ export const produtosIDTF: ProdutoIDTF[] = [
     categoria: "feed_material",
     idtfCode: "IDTF-0102",
     regimeAntesDeFeed: "A",
+    nomeOficialFonte: "Maize",
+    sinonimosRegionais: [{ nome: "milho safrinha", regiao: "Centro-Oeste" }, { nome: "milho de segunda", regiao: "GO" }],
+    nomesComerciais: ["Milho amarelo tipo 1"],
+    nomesIngles: ["corn", "maize", "yellow corn"],
+    errosComuns: ["mihlo", "milho graos"],
+    estadoFisico: "Granel sólido",
+    restricoes: [],
+    esquemaCertificacao: ["GMP+ FSA", "GMP+ B4 Transporte"],
+    atualizadoEm: "2026-05-04",
+    responsavelValidacao: "Thiago Yamashida · Gestor Qualidade",
+    fonteDecisao: "IDTF EN 2026.05, item 1005.",
     bloqueiaFeed: false,
     riscoEUDR: "N/A",
     statusClassificacao: "classificado",
@@ -99,6 +149,17 @@ export const produtosIDTF: ProdutoIDTF[] = [
     categoria: "feed",
     idtfCode: "IDTF-0201",
     regimeAntesDeFeed: "A",
+    nomeOficialFonte: "Soya bean meal",
+    sinonimosRegionais: [{ nome: "farelinho", regiao: "PR" }, { nome: "farelo branco", regiao: "MT" }],
+    nomesComerciais: ["Farelo 46% PB", "Farelo hipro"],
+    nomesIngles: ["soybean meal", "soya bean meal", "SBM"],
+    errosComuns: ["farelo soija", "farelo d soja"],
+    estadoFisico: "Granel sólido",
+    restricoes: [],
+    esquemaCertificacao: ["GMP+ FSA", "GMP+ B4 Transporte"],
+    atualizadoEm: "2026-05-04",
+    responsavelValidacao: "Thiago Yamashida · Gestor Qualidade",
+    fonteDecisao: "IDTF EN 2026.05, item 2304.",
     bloqueiaFeed: false,
     riscoEUDR: "Alto",
     statusClassificacao: "classificado",
@@ -111,6 +172,17 @@ export const produtosIDTF: ProdutoIDTF[] = [
     categoria: "risco",
     idtfCode: "IDTF-0710",
     regimeAntesDeFeed: "C",
+    nomeOficialFonte: "Fertiliser, NPK",
+    sinonimosRegionais: [{ nome: "adubo formulado", regiao: "Nacional" }, { nome: "granulado", regiao: "MT" }],
+    nomesComerciais: ["NPK 04-14-08", "NPK 20-05-20"],
+    nomesIngles: ["NPK fertiliser", "compound fertilizer"],
+    errosComuns: ["n p k", "fertilizanti"],
+    estadoFisico: "Granel sólido",
+    restricoes: ["Exige laudo de ausência de resíduo após a limpeza C, antes de feed."],
+    esquemaCertificacao: ["GMP+ B4 Transporte"],
+    atualizadoEm: "2026-03-18",
+    responsavelValidacao: "Thiago Yamashida · Gestor Qualidade",
+    fonteDecisao: "IDTF EN 2026.05, anexo de cargas de risco.",
     bloqueiaFeed: false,
     riscoEUDR: "N/A",
     statusClassificacao: "classificado",
@@ -123,6 +195,20 @@ export const produtosIDTF: ProdutoIDTF[] = [
     categoria: "proibido",
     idtfCode: "IDTF-0901",
     regimeAntesDeFeed: "D",
+    nomeOficialFonte: "Crop protection products, liquid",
+    sinonimosRegionais: [{ nome: "veneno", regiao: "MT" }, { nome: "remédio de lavoura", regiao: "Nacional" }],
+    nomesComerciais: ["Glifosato 480", "Herbicida líquido a granel"],
+    nomesIngles: ["pesticide", "crop protection liquid", "agrochemical"],
+    errosComuns: ["defensivo liquido", "agrotoxico"],
+    estadoFisico: "Granel líquido",
+    restricoes: [
+      "Carga proibida antes de feed: exige procedimento formal de liberação, não apenas limpeza.",
+      "Laudo de eficácia da desinfecção assinado pelo responsável técnico.",
+    ],
+    esquemaCertificacao: ["GMP+ B4 Transporte"],
+    atualizadoEm: "2026-05-04",
+    responsavelValidacao: "Rafael Duarte · Responsável Técnico",
+    fonteDecisao: "IDTF EN 2026.05, lista de produtos proibidos antes de feed.",
     bloqueiaFeed: true, // exige procedimento de liberação formal antes de qualquer feed
     riscoEUDR: "N/A",
     statusClassificacao: "proibido",
@@ -135,6 +221,17 @@ export const produtosIDTF: ProdutoIDTF[] = [
     categoria: "feed_material",
     idtfCode: "IDTF-0103",
     regimeAntesDeFeed: "B",
+    nomeOficialFonte: "Sorghum",
+    sinonimosRegionais: [{ nome: "sorgo granífero", regiao: "Nacional" }, { nome: "milho miúdo", regiao: "BA" }],
+    nomesComerciais: ["Sorgo grão tipo 1"],
+    nomesIngles: ["sorghum", "milo"],
+    errosComuns: ["sorgho"],
+    estadoFisico: "Granel sólido",
+    restricoes: [],
+    esquemaCertificacao: ["GMP+ FSA"],
+    atualizadoEm: "2026-02-11",
+    responsavelValidacao: "Thiago Yamashida · Gestor Qualidade",
+    fonteDecisao: "IDTF EN 2026.05, item 1007.",
     bloqueiaFeed: false,
     riscoEUDR: "N/A",
     statusClassificacao: "classificado",
@@ -148,6 +245,44 @@ export const produtosIDTF: ProdutoIDTF[] = [
     categoria: "feed_material",
     idtfCode: "IDTF-0104",
     regimeAntesDeFeed: "B",
+    nomeOficialFonte: "Wheat",
+    sinonimosRegionais: [{ nome: "trigo pão", regiao: "Nacional" }, { nome: "trigo mole", regiao: "RS" }],
+    nomesComerciais: ["Trigo PH 78"],
+    nomesIngles: ["wheat", "soft wheat"],
+    errosComuns: ["trigu"],
+    estadoFisico: "Granel sólido",
+    restricoes: [],
+    esquemaCertificacao: ["GMP+ FSA"],
+    atualizadoEm: "2026-02-11",
+    responsavelValidacao: "Thiago Yamashida · Gestor Qualidade",
+    fonteDecisao: "IDTF EN 2026.05, item 1001.",
+    bloqueiaFeed: false,
+    riscoEUDR: "N/A",
+    statusClassificacao: "classificado",
+    versaoBase: VERSAO_BASE_IDTF,
+  },
+  // Exige desinfecção sem ser proibida: é a diferença entre "liberado após
+  // limpeza D" e "carga anterior proibida". Sem um produto assim na base, a
+  // distinção entre os dois rótulos existiria só no código.
+  {
+    id: "p-farinha-peixe",
+    nomeCanonico: "Farinha de peixe",
+    alias: ["farinha de peixe", "fishmeal", "farinha marinha"],
+    hsCode: "2301.20",
+    categoria: "risco",
+    idtfCode: "IDTF-0605",
+    nomeOficialFonte: "Fish meal",
+    sinonimosRegionais: [{ nome: "farinha de pescado", regiao: "Nacional" }],
+    nomesComerciais: ["Fishmeal 65% PB"],
+    nomesIngles: ["fish meal", "marine protein meal"],
+    errosComuns: ["farinha peixe", "fish meal br"],
+    estadoFisico: "Pó",
+    restricoes: [],
+    esquemaCertificacao: ["GMP+ FSA", "GMP+ B4 Transporte"],
+    atualizadoEm: "2026-05-04",
+    responsavelValidacao: "Rafael Duarte · Responsável Técnico",
+    fonteDecisao: "IDTF EN 2026.05, item 2301 — proteína animal processada exige desinfecção antes de feed.",
+    regimeAntesDeFeed: "D",
     bloqueiaFeed: false,
     riscoEUDR: "N/A",
     statusClassificacao: "classificado",
@@ -162,6 +297,10 @@ export const produtosIDTF: ProdutoIDTF[] = [
     hsCode: "2308.00",
     categoria: "feed_material",
     regimeAntesDeFeed: "A",
+    sinonimosRegionais: [{ nome: "casquinha", regiao: "MT" }, { nome: "casquinha de soja", regiao: "Centro-Oeste" }],
+    nomesIngles: ["soybean hulls", "soya hulls"],
+    errosComuns: ["caska de soja"],
+    estadoFisico: "Granel sólido",
     bloqueiaFeed: false,
     riscoEUDR: "Médio",
     statusClassificacao: "em_fila",
@@ -174,6 +313,9 @@ export const produtosIDTF: ProdutoIDTF[] = [
     alias: ["sal mineral", "núcleo mineral", "premix mineral"],
     categoria: "risco",
     regimeAntesDeFeed: "C",
+    sinonimosRegionais: [{ nome: "sal proteinado", regiao: "Nacional" }, { nome: "mistura mineral", regiao: "Nacional" }],
+    nomesIngles: ["mineral salt", "mineral premix"],
+    estadoFisico: "Pó",
     bloqueiaFeed: false,
     riscoEUDR: "N/A",
     statusClassificacao: "em_fila",
@@ -186,13 +328,150 @@ export function findProduto(id: string): ProdutoIDTF | undefined {
   return produtosIDTF.find((p) => p.id === id);
 }
 
-/** Resolve um nome comercial (ou alias) para o produto IDTF canônico. */
-export function resolveProdutoPorNome(nome: string): ProdutoIDTF | undefined {
-  const n = nome.trim().toLowerCase();
-  return produtosIDTF.find(
-    (p) => p.nomeCanonico.toLowerCase() === n || p.alias.some((a) => a.toLowerCase() === n)
-  );
+/** Comparação de nome: sem acento, sem caixa, sem espaço sobrando. "agrotóxico"
+ *  digitado como "agrotoxico" tem que resolver — quem digita está no pátio. */
+function normalizar(s: string): string {
+  return s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
 }
+
+/** Todos os nomes pelos quais um produto pode chegar, do canônico ao erro de digitação. */
+export function nomesDoProduto(p: ProdutoIDTF): string[] {
+  return [
+    p.nomeCanonico,
+    ...(p.nomeOficialFonte ? [p.nomeOficialFonte] : []),
+    ...p.alias,
+    ...(p.sinonimosRegionais ?? []).map((x) => x.nome),
+    ...(p.nomesComerciais ?? []),
+    ...(p.nomesIngles ?? []),
+    ...(p.errosComuns ?? []),
+  ];
+}
+
+/**
+ * Resolve um nome para o produto IDTF canônico varrendo TODAS as listas de
+ * sinônimo — regional, comercial, inglês e erro comum de digitação.
+ *
+ * O ponto do Pilar 3 é este: "casquinha" não vira produto novo na base, vira
+ * casca de soja. Produto novo de verdade entra pela fila de classificação, não
+ * por divergência de vocabulário.
+ */
+export function resolveProdutoPorNome(nome: string): ProdutoIDTF | undefined {
+  const n = normalizar(nome);
+  if (!n) return undefined;
+  return produtosIDTF.find((p) => nomesDoProduto(p).some((x) => normalizar(x) === n));
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Governança da base IDTF (Fase 8)
+//
+// A base é uma norma traduzida e operada, não uma planilha. Sem histórico de
+// alteração, responsável e fonte, "a IDTF diz que sim" é opinião: o auditor
+// pergunta quem decidiu, quando, com base em quê, e quem aprovou o sinônimo.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type TipoAlteracaoBase =
+  | "inclusao"
+  | "reclassificacao"
+  | "sinonimo"
+  | "regime"
+  | "revisao";
+
+export const TIPO_ALTERACAO_LABEL: Record<TipoAlteracaoBase, string> = {
+  inclusao: "Inclusão de produto",
+  reclassificacao: "Reclassificação",
+  sinonimo: "Sinônimo aprovado",
+  regime: "Mudança de regime",
+  revisao: "Revisão da base",
+};
+
+export type AlteracaoBase = {
+  id: string;
+  data: string;
+  versao: string;
+  tipo: TipoAlteracaoBase;
+  produtoId?: string;
+  descricao: string;
+  responsavel: string;
+  /** De onde veio: item da IDTF oficial, parecer técnico, consulta ao esquema. */
+  fonte: string;
+  /** Aprovação técnica — sinônimo entra na base assinado, não por sugestão solta. */
+  aprovadoPor?: string;
+};
+
+export const historicoBase: AlteracaoBase[] = [
+  {
+    id: "hb-006", data: "2026-05-04", versao: "IDTF-BR 2026.05", tipo: "revisao",
+    descricao: "Revisão trimestral da base contra a IDTF EN 2026.05: 7 produtos conferidos, 2 traduções ajustadas.",
+    responsavel: "Thiago Yamashida · Gestor Qualidade",
+    fonte: "GMP+ International — IDTF EN, edição 2026.05",
+    aprovadoPor: "Rafael Duarte · Responsável Técnico",
+  },
+  {
+    id: "hb-005", data: "2026-05-04", versao: "IDTF-BR 2026.05", tipo: "sinonimo", produtoId: "p-farelo-soja",
+    descricao: "“farelinho” aprovado como sinônimo regional de Farelo de soja no Paraná. “casquinha” foi recusado no mesmo parecer: no campo é casca de soja, produto diferente.",
+    responsavel: "Joana Almeida · Despachante (sugestão de campo)",
+    fonte: "Ocorrência de ordem de carregamento em 28/04/2026 · Cooperativa Coamo",
+    aprovadoPor: "Thiago Yamashida · Gestor Qualidade",
+  },
+  {
+    id: "hb-004", data: "2026-03-18", versao: "IDTF-BR 2026.03", tipo: "regime", produtoId: "p-fert-npk",
+    descricao: "Fertilizante NPK passa a exigir Regime C e laudo de ausência de resíduo antes de feed.",
+    responsavel: "Rafael Duarte · Responsável Técnico",
+    fonte: "IDTF EN 2026.03, anexo de cargas de risco",
+    aprovadoPor: "Rafael Duarte · Responsável Técnico",
+  },
+  {
+    id: "hb-003", data: "2026-02-11", versao: "IDTF-BR 2026.02", tipo: "inclusao", produtoId: "p-trigo",
+    descricao: "Trigo incluído na base brasileira com regime B como carga anterior.",
+    responsavel: "Thiago Yamashida · Gestor Qualidade",
+    fonte: "IDTF EN 2026.02, item 1001",
+    aprovadoPor: "Rafael Duarte · Responsável Técnico",
+  },
+  {
+    id: "hb-002", data: "2026-01-22", versao: "IDTF-BR 2026.01", tipo: "reclassificacao", produtoId: "p-defensivo",
+    descricao: "Defensivo agrícola líquido confirmado como proibido antes de feed; exige liberação formal, não só limpeza.",
+    responsavel: "Rafael Duarte · Responsável Técnico",
+    fonte: "IDTF EN 2026.01, lista de produtos proibidos",
+    aprovadoPor: "Rafael Duarte · Responsável Técnico",
+  },
+  {
+    id: "hb-001", data: "2026-01-08", versao: "IDTF-BR 2026.01", tipo: "revisao",
+    descricao: "Carga inicial da base brasileira a partir da IDTF EN, com vocabulário regional mapeado.",
+    responsavel: "Thiago Yamashida · Gestor Qualidade",
+    fonte: "GMP+ International — IDTF EN, edição 2026.01",
+    aprovadoPor: "Rafael Duarte · Responsável Técnico",
+  },
+];
+
+/** Histórico de um produto, mais recente primeiro. Vazio = nunca alterado. */
+export function historicoDoProduto(produtoId: string): AlteracaoBase[] {
+  return historicoBase.filter((h) => h.produtoId === produtoId);
+}
+
+/**
+ * Governança vigente da base. Os itens que a diretriz cobra em §Pilar 3, cada um
+ * com um valor verificável — não "processo definido" genérico.
+ */
+export const GOVERNANCA_BASE = {
+  versao: VERSAO_BASE_IDTF,
+  vigenteDesde: "2026-05-04",
+  fonteOficial: "GMP+ International — IDTF (EN), edição 2026.05",
+  periodicidadeRevisao: "Trimestral, ou imediata quando a fonte publica errata",
+  proximaRevisao: "2026-08-04",
+  responsavelTecnico: "Rafael Duarte · Responsável Técnico",
+  responsavelManutencao: "Thiago Yamashida · Gestor Qualidade",
+  aprovacaoSinonimo:
+    "Sinônimo sugerido no campo entra como proposta; só passa a resolver depois de aprovação técnica registrada no histórico.",
+  licenciamento:
+    "A IDTF é conteúdo da GMP+ International. A base brasileira é tradução operacional de uso interno, sem redistribuição — cada decisão grava a versão usada.",
+  politicaDivergencia:
+    "Divergência entre a tradução e a fonte prevalece a fonte. Produto não reconhecido vai para a fila e trava o uso até classificação formal.",
+} as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Ativos: Cavalo · Implemento · Compartimento

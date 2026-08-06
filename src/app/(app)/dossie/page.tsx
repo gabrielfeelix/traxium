@@ -57,6 +57,8 @@ import { competenciaMotorista, trilhasExigidas, conclusoes, findTrilha } from "@
 import { avaliarCarregamento, getT3, type Tier } from "@/lib/domain/rules-engine";
 import { triarViagem, type ItemTriagem } from "@/lib/domain/control-tower";
 import { registrosDaViagem } from "@/lib/domain/liberacao";
+import { rotuloOperacional } from "@/lib/domain/idtf";
+import { RotuloOperacional } from "@/components/idtf/rotulo-operacional";
 import { RegistroLiberacaoCard } from "@/components/modals/liberacao-modal";
 import { useToast } from "@/components/ui/toast";
 import { downloadCSV, downloadJSON, printPDF } from "@/lib/export";
@@ -348,6 +350,8 @@ function Reconstrucao({ viagemId }: { viagemId: string }) {
   const docs = documentosDaViagem(v.id);
   const registro = registrosDaViagem(v.id)[0];
   const qualificacao = sub ? estadoQualificacao(sub) : undefined;
+  // Rótulo operacional da IDTF (Fase 8.2) — entra no selo da seção do produto.
+  const resultadoIDTF = rotuloOperacional(v.id);
 
   // Assinaturas reunidas do que EXISTE no registro. Passo executado não implica
   // assinatura colhida: limpeza sem `assinatura` não entra na lista.
@@ -607,10 +611,11 @@ function Reconstrucao({ viagemId }: { viagemId: string }) {
       titulo: "Produto e base IDTF",
       icon: <Leaf className="size-3.5" />,
       conteudo: produto
-        ? `${produto.nomeCanonico}|${produto.idtfCode ?? "-"}|${produto.statusClassificacao}|${d.versaoBaseIDTF}`
-        : `${v.produto}|nao-resolvido`,
+        ? `${produto.nomeCanonico}|${produto.idtfCode ?? "-"}|${produto.statusClassificacao}|${d.versaoBaseIDTF}|${resultadoIDTF.rotulo}`
+        : `${v.produto}|nao-resolvido|${resultadoIDTF.rotulo}`,
       jsx: produto ? (
         <>
+          <div className="mb-1.5"><RotuloOperacional viagemId={v.id} compacto /></div>
           <p className="text-[12px] font-medium">{produto.nomeCanonico}</p>
           <p className="text-[10px] text-fg-soft font-mono">
             {produto.idtfCode ?? "sem código IDTF"} · base {d.versaoBaseIDTF} · {produto.statusClassificacao === "em_fila" ? "aguardando classificação" : "classificado"}
@@ -941,6 +946,7 @@ function reconstrucaoDe(v: (typeof viagens)[number]) {
       : null,
     cavalo: cavalo ? { placa: cavalo.placa, modelo: cavalo.modelo, ano: cavalo.ano } : null,
     documentos: documentosDaViagem(v.id),
+    resultadoIDTF: rotuloOperacional(v.id),
   };
   // Selo de integridade do pacote — mesmo conteúdo, mesmo hash, sempre.
   return { ...pacote, selo: { hash: hash32(JSON.stringify(pacote)), algoritmo: "djb2-32" } };

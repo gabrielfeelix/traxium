@@ -30,6 +30,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { StatusBadge, RegimeBadge } from "@/components/shell/status-badge";
 import { RastreioMap } from "@/components/map/rastreio-map-dynamic";
+import { RotuloOperacional } from "@/components/idtf/rotulo-operacional";
 import { viagens, fazendas, type Viagem } from "@/lib/mock-data";
 import {
   compartimentoPorViagem,
@@ -157,6 +158,10 @@ export default function ViagemDetailPage({ params }: { params: Promise<{ id: str
           </Button>
         </div>
       </div>
+
+      {/* O que a IDTF diz desta carga, no vocabulário de quem carrega (Fase 8.2).
+          Aparece sempre — inclusive no verde, onde o rótulo é a confirmação. */}
+      <RotuloOperacional viagemId={viagem.id} />
 
       {blocked && (
         <div className="rounded-xl border border-[hsl(0_72%_70%)] bg-[hsl(0_72%_98%)] p-4 flex items-start gap-3 relative overflow-hidden">

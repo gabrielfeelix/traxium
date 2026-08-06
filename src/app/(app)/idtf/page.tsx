@@ -10,7 +10,14 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { RegimeBadge } from "@/components/shell/status-badge";
 import { RegimeMatrix } from "@/components/idtf/regime-matrix";
-import { produtosIDTF, VERSAO_BASE_IDTF, type ProdutoIDTF, type Regime } from "@/lib/domain/model";
+import { ConsultaIDTF } from "@/components/idtf/consulta-idtf";
+import { FichaProduto } from "@/components/idtf/ficha-produto";
+import { GovernancaBase } from "@/components/idtf/governanca-base";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  produtosIDTF, VERSAO_BASE_IDTF, nomesDoProduto,
+  type ProdutoIDTF, type Regime,
+} from "@/lib/domain/model";
 import { ClassificarIDTFModal } from "@/components/modals/classificar-idtf-modal";
 import { NovoProdutoModal } from "@/components/modals/novo-produto-modal";
 import { useSession } from "@/lib/store/session";
@@ -44,9 +51,11 @@ export default function IDTFPage() {
   const emFila = produtosIDTF.filter((p) => p.statusClassificacao === "em_fila");
 
   const baseFiltrada = classificados.filter((p) => {
+    // A busca varre o mesmo vocabulário que o motor resolve — inclusive nome
+    // comercial, inglês e erro de digitação. Achar na tela e resolver no motor
+    // não podem divergir.
     const matchQ =
-      p.nomeCanonico.toLowerCase().includes(q) ||
-      p.alias.some((a) => a.toLowerCase().includes(q)) ||
+      nomesDoProduto(p).some((n) => n.toLowerCase().includes(q)) ||
       (p.idtfCode?.toLowerCase().includes(q) ?? false);
     const matchR = regimeFiltro === null || p.regimeAntesDeFeed === regimeFiltro;
     return matchQ && matchR;
@@ -66,15 +75,28 @@ export default function IDTFPage() {
               onClick={() => {
                 downloadCSV(
                   "traxium-base-idtf",
-                  ["Produto", "Alias", "HS", "Categoria", "Regime antes de feed", "Proibido", "Status", "Versão"],
+                  [
+                    "Produto", "Nome oficial na fonte", "Sinônimos", "Nomes comerciais", "Nomes em inglês",
+                    "HS", "Categoria", "Estado físico", "Regime antes de feed", "Proibido", "Restrições",
+                    "Esquema", "Status", "Atualizado em", "Responsável", "Fonte da decisão", "Versão",
+                  ],
                   produtosIDTF.map((p) => [
                     p.nomeCanonico,
-                    p.alias.join(" | "),
+                    p.nomeOficialFonte ?? "",
+                    [...p.alias, ...(p.sinonimosRegionais ?? []).map((x) => `${x.nome} (${x.regiao})`)].join(" | "),
+                    (p.nomesComerciais ?? []).join(" | "),
+                    (p.nomesIngles ?? []).join(" | "),
                     p.hsCode ?? "",
                     p.categoria,
+                    p.estadoFisico ?? "",
                     p.regimeAntesDeFeed,
                     p.bloqueiaFeed ? "sim" : "não",
+                    (p.restricoes ?? []).join(" | "),
+                    (p.esquemaCertificacao ?? []).join(" | "),
                     p.statusClassificacao,
+                    p.atualizadoEm ?? "",
+                    p.responsavelValidacao ?? "",
+                    p.fonteDecisao ?? "",
                     p.versaoBase,
                   ])
                 );
@@ -88,8 +110,18 @@ export default function IDTFPage() {
         }
       />
 
+      <Tabs defaultValue="base">
+        <TabsList>
+          <TabsTrigger value="base">Base e sequenciamento</TabsTrigger>
+          <TabsTrigger value="governanca">Governança da base</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="base" className="space-y-6">
       {/* Momento-assinatura — a matriz de sequenciamento é o herói da página */}
       <RegimeMatrix produtos={classificados} selected={regimeFiltro} onSelect={setRegimeFiltro} />
+
+      {/* O cruzamento que a descrição da página promete, com os nove rótulos */}
+      <ConsultaIDTF />
 
       {/* Fila de classificação — bloqueia uso até análise da qualidade */}
       {emFila.length > 0 && (
@@ -115,7 +147,11 @@ export default function IDTFPage() {
               >
                 <div className="flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-[13px] font-semibold">{p.nomeCanonico}</p>
+                    <FichaProduto produto={p}>
+                      <button type="button" className="text-left text-[13px] font-semibold text-brand-700 hover:underline">
+                        {p.nomeCanonico}
+                      </button>
+                    </FichaProduto>
                     <Badge variant="warning" className="text-[9px]">aguardando análise</Badge>
                     <Badge variant="outline" className="text-[9px]">{categoriaLabel[p.categoria]}</Badge>
                   </div>
@@ -185,7 +221,11 @@ export default function IDTFPage() {
                 baseFiltrada.map((p) => (
                   <TableRow key={p.id}>
                     <TableCell>
-                      <p className="text-[13px] font-semibold">{p.nomeCanonico}</p>
+                      <FichaProduto produto={p}>
+                        <button type="button" className="text-left text-[13px] font-semibold text-brand-700 hover:underline">
+                          {p.nomeCanonico}
+                        </button>
+                      </FichaProduto>
                       <p className="text-[10px] text-fg-soft flex items-center gap-1">
                         <Tag className="size-2.5" /> {p.alias.slice(0, 3).join(" · ")}
                         {p.hsCode && <span className="font-mono ml-1">HS {p.hsCode}</span>}
@@ -222,9 +262,17 @@ export default function IDTFPage() {
         </CardContent>
       </Card>
 
-      <p className="flex items-center gap-1.5 text-[11px] text-fg-muted">
-        <Info className="size-3.5" /> Alias resolvem nomes comerciais brasileiros ("farelo", "soja farelo", "soybean meal"). Toda regra aplicada grava a versão da base ({VERSAO_BASE_IDTF}).
+      <p className="flex items-start gap-1.5 text-[11px] text-fg-muted">
+        <Info className="size-3.5 shrink-0 mt-px" /> O vocabulário brasileiro resolve para o canônico sem criar produto
+        novo: sinônimo regional, nome comercial, nome em inglês e erro de digitação. Produto que não resolve entra na
+        fila e trava o uso. Toda regra aplicada grava a versão da base ({VERSAO_BASE_IDTF}).
       </p>
+        </TabsContent>
+
+        <TabsContent value="governanca">
+          <GovernancaBase />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
