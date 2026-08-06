@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Plus, ArrowRight, ArrowLeft, Truck, CheckCircle2, AlertTriangle, ShieldAlert, Zap } from "lucide-react";
+import { Plus, ArrowRight, ArrowLeft, Truck, CheckCircle2, AlertTriangle, ShieldAlert, Zap, GraduationCap } from "lucide-react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger, DialogClose,
 } from "@/components/ui/dialog";
@@ -17,6 +17,7 @@ import {
 } from "@/lib/domain/model";
 import { getT3, avaliarNovoCarregamento, type Tier } from "@/lib/domain/rules-engine";
 import { autoridadeDaRegra } from "@/lib/domain/control-tower";
+import { competenciaMotorista } from "@/lib/domain/academy";
 import { motoristas, viagens } from "@/lib/mock-data";
 import { useSession } from "@/lib/store/session";
 import { useToast } from "@/components/ui/toast";
@@ -57,7 +58,18 @@ export function NovaViagemModal() {
   const step1Ok = cliente && produtoId && origem && destino;
   const step2Ok = cavaloPlaca && implementoId && compartimentoId && motorista;
   const precisaJustificar = decisao?.tier === "ALERTA";
-  const podeCriar = step2Ok && decisao && (!precisaJustificar || justificativa.trim().length > 0);
+
+  // O regime exigido só é conhecido depois do compartimento. Trocar de
+  // compartimento pode tornar inelegível um motorista já escolhido — a
+  // competência é reavaliada aqui, e não só na hora de abrir a lista.
+  const motoristaSel = motoristas.find((m) => m.nome === motorista);
+  const compMotorista = motoristaSel
+    ? competenciaMotorista(motoristaSel.id, undefined, { regime: decisao?.regimeExigido })
+    : null;
+  const motoristaInelegivel = Boolean(compMotorista && !compMotorista.elegivel);
+
+  const podeCriar =
+    step2Ok && decisao && !motoristaInelegivel && (!precisaJustificar || justificativa.trim().length > 0);
 
   function reset() {
     setStep(1); setCliente(""); setProdutoId(""); setOrigem(""); setDestino(""); setKm(""); setPrevisao("");
@@ -162,7 +174,25 @@ export function NovaViagemModal() {
               <Field label="Motorista">
                 <Select value={motorista} onValueChange={setMotorista}>
                   <SelectTrigger className="h-9"><SelectValue placeholder="Motorista…" /></SelectTrigger>
-                  <SelectContent>{motoristas.map((m) => <SelectItem key={m.id} value={m.nome}>{m.nome} · {m.tipo}</SelectItem>)}</SelectContent>
+                  <SelectContent>
+                    {motoristas.map((m) => {
+                      const comp = competenciaMotorista(m.id, undefined, { regime: decisao?.regimeExigido });
+                      return (
+                        // Inelegível aparece desabilitado, não some: sumir faria o
+                        // despachante achar que o cadastro do motorista desapareceu.
+                        <SelectItem key={m.id} value={m.nome} disabled={!comp.elegivel}>
+                          <span className="flex flex-col gap-0.5">
+                            <span className={cn(!comp.elegivel && "text-fg-soft")}>
+                              {m.nome} · {m.tipo}
+                            </span>
+                            {!comp.elegivel && (
+                              <span className="text-[10px] font-semibold text-danger-700">{comp.motivo}</span>
+                            )}
+                          </span>
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
                 </Select>
               </Field>
               <Field label="Implemento (carreta)">
@@ -178,6 +208,25 @@ export function NovaViagemModal() {
                 </Select>
               </Field>
             </div>
+
+            {motoristaInelegivel && compMotorista && (
+              <div className="rounded-lg border border-danger-500/30 bg-danger-50 p-3 flex items-start gap-2.5">
+                <GraduationCap className="size-4 shrink-0 mt-0.5 text-danger-500" />
+                <div className="min-w-0">
+                  <p className="text-[12px] font-semibold text-danger-700">
+                    {motorista} não está elegível para esta operação
+                  </p>
+                  <p className="mt-0.5 text-[11px] text-danger-700/90">
+                    {compMotorista.motivo}
+                    {decisao?.regimeExigido && ` O regime ${decisao.regimeExigido} exige trilha específica.`}
+                    {" "}Competência é requisito de elegibilidade — registre a conclusão na Academy antes de despachar.
+                  </p>
+                  <Link href="/academy" className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-semibold text-danger-700 hover:underline">
+                    Abrir Academy <ArrowRight className="size-3" />
+                  </Link>
+                </div>
+              </div>
+            )}
 
             {compartimentoId && (
               <div className="rounded-lg border border-[hsl(200_18%_90%)] bg-[hsl(200_18%_98%)] p-3">
