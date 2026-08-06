@@ -11,10 +11,12 @@ import {
   KeyRound,
   Mail,
   Plus,
+  Scale,
 } from "lucide-react";
 import { PageHeader } from "@/components/shell/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { LGPD } from "@/components/configuracoes/lgpd";
 import { MotorRegras } from "@/components/configuracoes/motor-regras";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -216,6 +218,9 @@ export default function ConfiguracoesPage() {
             <TabsTrigger value="motor" className="justify-start">
               <SlidersHorizontal className="size-4" /> Motor de regras
             </TabsTrigger>
+            <TabsTrigger value="lgpd" className="justify-start">
+              <Scale className="size-4" /> LGPD
+            </TabsTrigger>
             <TabsTrigger value="seguranca" className="justify-start">
               <Shield className="size-4" /> Segurança
             </TabsTrigger>
@@ -233,6 +238,10 @@ export default function ConfiguracoesPage() {
           <div className="flex-1 min-w-0">
             <TabsContent value="motor">
               <MotorRegras />
+            </TabsContent>
+
+            <TabsContent value="lgpd">
+              <LGPD />
             </TabsContent>
 
             <TabsContent value="organizacao">

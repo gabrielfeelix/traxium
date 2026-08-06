@@ -31,6 +31,7 @@ import { Progress } from "@/components/ui/progress";
 import { StatusBadge, RegimeBadge } from "@/components/shell/status-badge";
 import { RastreioMap } from "@/components/map/rastreio-map-dynamic";
 import { RotuloOperacional } from "@/components/idtf/rotulo-operacional";
+import { RegistrosObrigatorios } from "@/components/viagens/registros-obrigatorios";
 import { viagens, fazendas, type Viagem } from "@/lib/mock-data";
 import {
   compartimentoPorViagem,
@@ -40,6 +41,7 @@ import {
 } from "@/lib/domain/model";
 import {
   avaliarCarregamento,
+  scoreConformidade,
   getT3,
   cavalosDistintosNoT3,
   type Tier,
@@ -98,6 +100,9 @@ export default function ViagemDetailPage({ params }: { params: Promise<{ id: str
   const compartimento = findCompartimento(compId);
   const implemento = compartimento ? findImplemento(compartimento.implementoId) : undefined;
   const decisao = avaliarCarregamento(viagem.id);
+  // O score sai das checagens do motor, não do campo `conformidade` do mock:
+  // uma carga bloqueada exibindo 100 é o tipo de número que ninguém confere.
+  const score = scoreConformidade(decisao);
   const t3 = getT3(compId);
   const cavalosT3 = cavalosDistintosNoT3(compId);
   const blocked = decisao.tier === "BLOQUEIO";
@@ -162,6 +167,9 @@ export default function ViagemDetailPage({ params }: { params: Promise<{ id: str
       {/* O que a IDTF diz desta carga, no vocabulário de quem carrega (Fase 8.2).
           Aparece sempre — inclusive no verde, onde o rótulo é a confirmação. */}
       <RotuloOperacional viagemId={viagem.id} />
+
+      {/* Classes registro e informação com efeito (Fase 10.1) */}
+      <RegistrosObrigatorios viagemId={viagem.id} />
 
       {blocked && (
         <div className="rounded-xl border border-[hsl(0_72%_70%)] bg-[hsl(0_72%_98%)] p-4 flex items-start gap-3 relative overflow-hidden">
@@ -523,14 +531,14 @@ export default function ViagemDetailPage({ params }: { params: Promise<{ id: str
                       r="42"
                       fill="none"
                       stroke={
-                        viagem.conformidade >= 90
+                        score >= 90
                           ? "hsl(142 71% 36%)"
-                          : viagem.conformidade >= 70
+                          : score >= 70
                           ? "hsl(28 92% 48%)"
                           : "hsl(0 78% 50%)"
                       }
                       strokeWidth="8"
-                      strokeDasharray={`${(viagem.conformidade / 100) * 264} 264`}
+                      strokeDasharray={`${(score / 100) * 264} 264`}
                       strokeLinecap="round"
                     />
                   </svg>
@@ -538,34 +546,37 @@ export default function ViagemDetailPage({ params }: { params: Promise<{ id: str
                     <p
                       className={cn(
                         "text-[34px] font-bold num leading-none tracking-tight",
-                        viagem.conformidade >= 90
+                        score >= 90
                           ? "text-[hsl(142_71%_24%)]"
-                          : viagem.conformidade >= 70
+                          : score >= 70
                           ? "text-[hsl(24_88%_32%)]"
                           : "text-[hsl(0_70%_38%)]"
                       )}
                     >
-                      {viagem.conformidade}
+                      {score}
                     </p>
                     <p className="text-[10px] text-[hsl(210_14%_42%)] uppercase tracking-wider font-semibold mt-0.5">
                       score
                     </p>
                   </div>
                 </div>
-                <p className="text-[11px] text-[hsl(210_14%_42%)] mt-3">
-                  {viagem.conformidade >= 90
+                <p className="text-[11px] text-[hsl(210_14%_42%)] mt-3 num">
+                  <span className="font-semibold">{decisao.checagens.filter((c) => c.ok).length}</span>
+                  /{decisao.checagens.length} condições conformes ·{" "}
+                </p>
+                <p className="text-[11px] text-[hsl(210_14%_42%)]">
+                  {score >= 90
                     ? "Conformidade alta"
-                    : viagem.conformidade >= 70
+                    : score >= 70
                     ? "Conformidade média — atenção"
                     : "Conformidade crítica"}
                 </p>
               </div>
+              {/* Uma linha por condição avaliada — a mesma lista do dossiê. */}
               <div className="space-y-2">
-                <ScoreLine label="Checklist LCI" value={blocked ? 50 : 100} />
-                <ScoreLine label="Certificações" value={blocked ? 60 : 100} />
-                <ScoreLine label="Documentação" value={100} />
-                <ScoreLine label="Foto + GPS" value={blocked ? 0 : 100} />
-                <ScoreLine label="Sequenciamento T-3" value={blocked ? 0 : 100} />
+                {decisao.checagens.map((c) => (
+                  <ScoreLine key={c.regra} label={c.nome} value={c.ok ? 100 : 0} detalhe={c.detalhe} />
+                ))}
               </div>
             </CardContent>
           </Card>
@@ -649,12 +660,12 @@ function Field({
   );
 }
 
-function ScoreLine({ label, value }: { label: string; value: number }) {
+function ScoreLine({ label, value, detalhe }: { label: string; value: number; detalhe?: string }) {
   return (
-    <div>
-      <div className="flex items-center justify-between mb-1 text-[11px]">
-        <span className="text-[hsl(210_14%_42%)]">{label}</span>
-        <span className="font-bold num">{value}%</span>
+    <div title={detalhe}>
+      <div className="flex items-center justify-between mb-1 text-[11px] gap-2">
+        <span className="text-[hsl(210_14%_42%)] truncate">{label}</span>
+        <span className="font-bold num shrink-0">{value === 100 ? "ok" : "falha"}</span>
       </div>
       <div className="h-1 rounded-full bg-[hsl(200_18%_94%)] overflow-hidden">
         <div

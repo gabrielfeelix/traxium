@@ -25,6 +25,7 @@ import {
   BadgeCheck,
   Activity,
   GraduationCap,
+  Gauge,
   Eye,
   LogOut,
 } from "lucide-react";
@@ -114,6 +115,7 @@ export const navigation: NavGroup[] = [
     items: [
       { href: "/auditoria", label: "Auditoria", icon: ShieldCheck, pilar: "Torre de Controle", mvp: false, access: { gestor: "full", diretoria_rt: "read", auditor_interno: "full" } },
       { href: "/dossie", label: "Dossiê de auditoria", icon: FileCheck2, pilar: "Torre de Controle", mvp: true, access: { gestor: "full", despachante: "read", diretoria_rt: "read", auditor_interno: "read" } },
+      { href: "/indicadores", label: "Indicadores do MVP", icon: Gauge, pilar: "Torre de Controle", mvp: true, access: { gestor: "full", despachante: "read", diretoria_rt: "full", admin_subcontratados: "read", auditor_interno: "read" } },
       { href: "/conformidade", label: "Conformidade", icon: BadgeCheck, pilar: "Torre de Controle", mvp: false, access: { gestor: "full", despachante: "read", diretoria_rt: "full", admin_subcontratados: "read", auditor_interno: "read" } },
       { href: "/documentos", label: "Documentos", icon: FileText, pilar: "Gatekeeper", mvp: false, access: { gestor: "full", despachante: "read", diretoria_rt: "read", admin_subcontratados: "read", auditor_interno: "read" } },
       { href: "/atividade", label: "Atividade", icon: Activity, pilar: "Torre de Controle", mvp: false, access: { gestor: "full", despachante: "read", diretoria_rt: "read", admin_subcontratados: "read", auditor_interno: "full" } },
