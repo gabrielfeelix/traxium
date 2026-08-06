@@ -52,6 +52,8 @@ import {
   type Implemento,
   type Compartimento,
   type Subcontratado,
+  type TipoVinculo,
+  type AcordoQA,
   type CleaningEvent,
   type InspectionEvent,
   type Regime,
@@ -218,6 +220,26 @@ type SessionCtx = {
   }) => { ok: boolean; motivo: string };
   /** Altera a classe de uma regra do motor. Retorna false se ficar abaixo do piso. */
   setClasseRegraMotor: (regra: RegraId, classe: ClasseRegra) => boolean;
+  /**
+   * Cria o subcontratado vindo do onboarding público (`/convite/[token]`).
+   * Nasce sempre `Pré-cadastrado`: sem certificado validado, sem base pública
+   * consultada e sem treinamento, o estado derivado não poderia ser outro.
+   */
+  addSubcontratadoPreCadastro: (i: {
+    razaoSocial: string;
+    documento: string;
+    tipoVinculo: TipoVinculo;
+    responsavel: string;
+    telefone: string;
+    cavaloPlaca: string;
+    implementoPlaca: string;
+    assinouAceite: boolean;
+  }) => string;
+  /** Assina/renova o acordo de qualidade. Devolve o acordo gravado. */
+  assinarAcordo: (
+    subId: string,
+    i: { versao: string; assinante: string; representantes: string[] }
+  ) => AcordoQA;
   addAuditoria: (i: NovaAuditoriaInput) => string;
   renovarCertificadoMotorista: (motoristaId: string, certNome: string, novaValidade: string) => void;
   renovarCertificadoImplemento: (implementoId: string, novaValidade: string) => void;
@@ -517,6 +539,58 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     return ok;
   }, [bump]);
 
+  const addSubcontratadoPreCadastro = useCallback<SessionCtx["addSubcontratadoPreCadastro"]>((i) => {
+    const id = nextId("sub");
+    subcontratados.unshift({
+      id,
+      cnpj: i.documento,
+      razaoSocial: i.razaoSocial,
+      tipoVinculo: i.tipoVinculo,
+      certGMP: {
+        // Nada é afirmado sobre o certificado: quem se cadastrou não o comprova.
+        // "Não localizado" é o estado honesto até a consulta à base pública.
+        numero: "—",
+        certificadora: "—",
+        escopo: [],
+        validade: HOJE,
+        statusBasePublica: "Não localizado",
+        sitesCobertos: [],
+      },
+      veiculosAutorizados: [i.implementoPlaca, i.cavaloPlaca].filter(Boolean),
+      motoristasAutorizados: [i.responsavel],
+      // Aceitou as regras no convite, mas não fez trilha nem enviou comprovante.
+      treinamento: { comprovante: false, quiz: false, aceiteRegras: i.assinouAceite },
+    });
+    bump();
+    return id;
+  }, [bump]);
+
+  const assinarAcordo = useCallback<SessionCtx["assinarAcordo"]>((subId, i) => {
+    const inicio = HOJE;
+    const fim = new Date(HOJE);
+    fim.setFullYear(fim.getFullYear() + 1);
+    const vigenciaFim = fim.toISOString().slice(0, 10);
+    // Renovação é disparada 60 dias ANTES do vencimento — mesma janela em que o
+    // certificado entra em alerta, para a empresa tratar as duas de uma vez.
+    const ren = new Date(vigenciaFim);
+    ren.setDate(ren.getDate() - 60);
+
+    const acordo: AcordoQA = {
+      versao: i.versao,
+      vigenciaInicio: inicio,
+      vigenciaFim,
+      assinadoEm: `${inicio}T10:00:00`,
+      assinante: i.assinante,
+      dispositivo: typeof navigator !== "undefined" ? navigator.userAgent.slice(0, 60) : "—",
+      renovacaoEm: ren.toISOString().slice(0, 10),
+      representantes: i.representantes,
+    };
+    const sub = subcontratados.find((x) => x.id === subId);
+    if (sub) sub.acordo = acordo;
+    bump();
+    return acordo;
+  }, [bump]);
+
   const addLote = useCallback<SessionCtx["addLote"]>((i) => {
     const id = nextId("l");
     const codigo = `LOT-2026-0${150 + (seq % 800)}`;
@@ -658,6 +732,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     decidirExcecao,
     registrarConclusao,
     setClasseRegraMotor,
+    addSubcontratadoPreCadastro,
+    assinarAcordo,
     addLote,
     updateLoteStatus,
     addFazenda,

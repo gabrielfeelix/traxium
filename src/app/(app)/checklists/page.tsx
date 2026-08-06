@@ -19,6 +19,7 @@ import {
   ImageOff,
   Check,
   X,
+  ShieldAlert,
 } from "lucide-react";
 import { PageHeader } from "@/components/shell/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -37,6 +38,7 @@ import {
   compartimentos,
   findImplemento,
   findCompartimento,
+  type Implemento,
   inspectionEvents,
   compartimentoPorViagem,
 } from "@/lib/domain/model";
@@ -60,15 +62,57 @@ function fotoMeta(compId: string, anguloId: string, n: number) {
   };
 }
 
-// Condições visuais essenciais (mínimo obrigatório para liberar — pergunta 10/11)
-const CONDICOES = [
-  { id: "seco", label: "Compartimento seco" },
-  { id: "odor", label: "Sem odor estranho" },
-  { id: "residuo", label: "Sem resíduo visível (>1cm)" },
-  { id: "pragas", label: "Sem pragas ou vestígios" },
-  { id: "integro", label: "Estrutura íntegra (sem ferrugem/avaria)" },
-  { id: "coberto", label: "Coberto / fechável" },
+// Condições visuais. `critico` marca o que a diretriz chama de item crítico
+// negativo: resíduo, praga, odor e dano estrutural reprovam a inspeção
+// AUTOMATICAMENTE, sem passar por decisão humana. Os demais deixam a inspeção
+// pendente — corrigível, não condenada.
+type ItemCondicao = { id: string; label: string; critico: boolean };
+
+const CONDICOES_BASE: ItemCondicao[] = [
+  { id: "seco", label: "Compartimento seco", critico: false },
+  { id: "odor", label: "Sem odor estranho", critico: true },
+  { id: "residuo", label: "Sem resíduo visível (>1cm)", critico: true },
+  { id: "pragas", label: "Sem pragas ou vestígios", critico: true },
+  { id: "integro", label: "Estrutura íntegra (sem ferrugem/avaria)", critico: true },
+  { id: "coberto", label: "Coberto / fechável", critico: false },
 ];
+
+/**
+ * Itens que só existem em certo tipo de implemento. O checklist deixa de ser um
+ * formulário único: quem inspeciona um tanque responde sobre válvula e mangote,
+ * não sobre lona.
+ */
+const CONDICOES_POR_TIPO: Partial<Record<Implemento["tipo"], ItemCondicao[]>> = {
+  Graneleiro: [
+    { id: "lona", label: "Lona sem rasgo e bem fixada", critico: true },
+    { id: "bica", label: "Bica de descarga limpa e vedada", critico: true },
+  ],
+  Bitrem: [
+    { id: "lona", label: "Lona sem rasgo em ambas as unidades", critico: true },
+    { id: "divisoria", label: "Divisórias sem passagem de produto", critico: true },
+  ],
+  Rodotrem: [
+    { id: "lona", label: "Lona sem rasgo em todas as unidades", critico: true },
+    { id: "divisoria", label: "Divisórias sem passagem de produto", critico: true },
+  ],
+  Tanque: [
+    { id: "valvula", label: "Válvula de fundo sem resíduo", critico: true },
+    { id: "mangote", label: "Mangote dedicado e identificado", critico: true },
+    { id: "lacre", label: "Lacre íntegro", critico: false },
+  ],
+  "Caçamba": [
+    { id: "tampa", label: "Tampa/cobertura sem avaria", critico: true },
+    { id: "cantos", label: "Cantos sem acúmulo de carga anterior", critico: true },
+  ],
+  "Baú": [
+    { id: "vedacao", label: "Vedação das portas íntegra", critico: true },
+    { id: "piso", label: "Piso sem infiltração", critico: true },
+  ],
+};
+
+function condicoesDoTipo(tipo?: Implemento["tipo"]): ItemCondicao[] {
+  return [...CONDICOES_BASE, ...((tipo && CONDICOES_POR_TIPO[tipo]) ?? [])];
+}
 
 // Ângulos mínimos de foto obrigatórios (pergunta 11)
 const ANGULOS = [
@@ -111,11 +155,17 @@ export default function ChecklistsPage() {
   // Viagens que usam este compartimento — para vincular a inspeção (opcional).
   const viagensDoComp = viagens.filter((v) => compartimentoPorViagem[v.id] === comp);
 
+  // O conjunto de itens muda com o tipo do implemento — trocar de compartimento
+  // troca o formulário, não só o cabeçalho.
+  const CONDICOES = condicoesDoTipo(imp?.tipo);
+  const ncCritica = CONDICOES.some((c) => c.critico && cond[c.id] === "nc");
   const anyNC = CONDICOES.some((c) => cond[c.id] === "nc");
   const allOk = CONDICOES.every((c) => cond[c.id] === "ok");
   const fotosOk = ANGULOS.every((a) => (fotos[a.id] ?? 0) >= 1);
   const fotosCount = ANGULOS.filter((a) => (fotos[a.id] ?? 0) >= 1).length;
-  const resultado: "aprovado" | "reprovado" | "pendente" = anyNC
+  // Item crítico negativo reprova sozinho, sem passar por humano. NC em item não
+  // crítico deixa pendente: é corrigível, e condenar por isso seria excesso.
+  const resultado: "aprovado" | "reprovado" | "pendente" = ncCritica
     ? "reprovado"
     : allOk && fotosOk && assinatura
     ? "aprovado"
@@ -211,15 +261,44 @@ export default function ChecklistsPage() {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle>Mínimo obrigatório para liberar</CardTitle>
-                  <CardDescription>Condições visuais essenciais. Uma reprovação bloqueia a liberação.</CardDescription>
+                  <CardDescription>
+                    Itens de {imp?.tipo ?? "implemento"}. Os marcados como críticos reprovam a inspeção
+                    automaticamente — não passam por análise.
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  {CONDICOES.map((c) => (
-                    <div key={c.id} className="flex items-center gap-3 p-2.5 rounded-lg border border-border-soft">
-                      <p className="flex-1 text-[13px] font-medium">{c.label}</p>
-                      <TriState value={cond[c.id]} onChange={(v) => setCond((s) => ({ ...s, [c.id]: v }))} />
+                  {CONDICOES.map((c) => {
+                    const reprovou = c.critico && cond[c.id] === "nc";
+                    return (
+                      <div
+                        key={c.id}
+                        className={cn(
+                          "flex items-center gap-3 p-2.5 rounded-lg border",
+                          reprovou ? "border-danger-500/40 bg-danger-50" : "border-border-soft"
+                        )}
+                      >
+                        <p className="flex-1 text-[13px] font-medium">{c.label}</p>
+                        {c.critico && (
+                          <span
+                            className="shrink-0 rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.08em] bg-danger-50 text-danger-700"
+                            title="Item crítico: negativo reprova a inspeção automaticamente"
+                          >
+                            crítico
+                          </span>
+                        )}
+                        <TriState value={cond[c.id]} onChange={(v) => setCond((s) => ({ ...s, [c.id]: v }))} />
+                      </div>
+                    );
+                  })}
+                  {ncCritica && (
+                    <div className="rounded-lg border border-danger-500/30 bg-danger-50 p-2.5 flex items-start gap-2">
+                      <ShieldAlert className="size-4 shrink-0 mt-0.5 text-danger-500" />
+                      <p className="text-[11px] text-danger-700">
+                        Item crítico negativo. A inspeção está reprovada e o registro sai como reprovação — corrigir
+                        exige nova inspeção, não edição desta.
+                      </p>
                     </div>
-                  ))}
+                  )}
                 </CardContent>
               </Card>
 
@@ -320,7 +399,7 @@ export default function ChecklistsPage() {
                   <ResultadoBadge resultado={resultado} />
 
                   <div className="space-y-1.5 text-[12px]">
-                    <Linha ok={allOk && !anyNC} label="Condições visuais" detalhe={anyNC ? "reprovação registrada" : `${CONDICOES.filter((c) => cond[c.id] === "ok").length}/${CONDICOES.length} conformes`} />
+                    <Linha ok={allOk && !anyNC} label="Condições visuais" detalhe={ncCritica ? "item crítico negativo — reprovação automática" : anyNC ? "não conformidade não crítica — pendente" : `${CONDICOES.filter((c) => cond[c.id] === "ok").length}/${CONDICOES.length} conformes`} />
                     <Linha ok={fotosOk} label="Fotos por ângulo" detalhe={`${fotosCount}/${ANGULOS.length}`} />
                     <Linha ok={assinatura} label="Assinatura" detalhe={assinatura ? "coletada" : "pendente"} />
                   </div>

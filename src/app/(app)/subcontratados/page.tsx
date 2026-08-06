@@ -25,6 +25,7 @@ import { ExpiryHorizon } from "@/components/kit/expiry-horizon";
 import { subcontratados, nivelVencimento, estadoQualificacao, ESTADO_QUALIFICACAO, type Subcontratado } from "@/lib/domain/model";
 import { QualificarSubcontratadoModal } from "@/components/modals/qualificar-subcontratado-modal";
 import { PassaporteFeedSafetyModal } from "@/components/modals/passaporte-modal";
+import { AssinarAcordoModal } from "@/components/modals/assinar-acordo-modal";
 import { OnboardingLinkModal } from "@/components/modals/onboarding-link-modal";
 
 const TONE_VARIANT = { success: "success", warning: "warning", danger: "destructive", muted: "muted" } as const;
@@ -229,7 +230,8 @@ function SubcontratadoCard({ s }: { s: Subcontratado }) {
           </div>
         )}
 
-        <div className="pt-0.5">
+        <div className="space-y-2 pt-0.5">
+          <AssinarAcordoModal s={s} />
           <PassaporteFeedSafetyModal s={s} />
         </div>
       </CardContent>

@@ -8,6 +8,7 @@
 import {
   BadgeCheck, Building2, ShieldCheck, FileSignature, GraduationCap, Truck,
   IdCard, AlertOctagon, CheckCircle2, XCircle, Smartphone, CalendarClock, Download,
+  ClipboardCheck, Boxes,
 } from "lucide-react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger,
@@ -16,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   type Subcontratado, estadoQualificacao, ESTADO_QUALIFICACAO, nivelVencimento,
+  implementos, compartimentos, inspectionEvents, cleaningEvents, findCompartimento, ORDEM_REGIME, type Regime,
 } from "@/lib/domain/model";
 import { naoConformidades } from "@/lib/mock-data";
 import { downloadCSV } from "@/lib/export";
@@ -30,6 +32,24 @@ export function PassaporteFeedSafetyModal({ s }: { s: Subcontratado }) {
   const meta = ESTADO_QUALIFICACAO[estado];
   const venc = nivelVencimento(s.certGMP.validade);
   const acordoVencido = s.acordo ? nivelVencimento(s.acordo.vigenciaFim).nivel === "vencido" : true;
+
+  // Inspeções dos compartimentos dos implementos desta empresa, mais recentes
+  // primeiro. Sai do registro real — empresa sem inspeção mostra vazio.
+  const compsDaEmpresa = implementos
+    .filter((i) => i.subcontratadoId === s.id)
+    .flatMap((i) => compartimentos.filter((c) => c.implementoId === i.id))
+    .map((c) => c.id);
+  const inspecoes = inspectionEvents
+    .filter((i) => compsDaEmpresa.includes(i.compartimentoId))
+    .sort((a, b) => b.dataHora.localeCompare(a.dataHora));
+
+  // Regime máximo que a empresa EVIDENCIA manter: o mais alto que ela já
+  // executou e registrou nos próprios compartimentos. Sem limpeza registrada
+  // não há evidência, e capacidade não se presume.
+  const limpezasDaEmpresa = cleaningEvents.filter((c) => compsDaEmpresa.includes(c.compartimentoId));
+  const regimeMax: Regime | null = limpezasDaEmpresa.length
+    ? limpezasDaEmpresa.reduce<Regime>((a, c) => (ORDEM_REGIME[c.regime] > ORDEM_REGIME[a] ? c.regime : a), "A")
+    : null;
 
   const ocorrencias = naoConformidades.filter(
     (nc) =>
@@ -160,6 +180,76 @@ export function PassaporteFeedSafetyModal({ s }: { s: Subcontratado }) {
                 </li>
               ))}
             </ul>
+          )}
+        </div>
+
+        {/* Inspeções realizadas — a diretriz lista este bloco no Passaporte e
+            ele faltava: sem histórico de inspeção, a credencial afirma
+            qualificação sem mostrar a verificação física que a sustenta. */}
+        <div className="rounded-xl border border-[hsl(200_18%_90%)] p-3.5">
+          <p className="mb-2 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.1em] text-[hsl(210_14%_42%)]">
+            <ClipboardCheck className="size-3.5" /> Inspeções realizadas
+          </p>
+          {inspecoes.length === 0 ? (
+            <p className="text-[12px] text-[hsl(210_14%_46%)]">
+              Nenhuma inspeção pré-carregamento registrada nos implementos desta empresa.
+            </p>
+          ) : (
+            <ul className="space-y-1.5">
+              {inspecoes.slice(0, 5).map((i) => (
+                <li key={i.id} className="flex items-center gap-2 text-[12px]">
+                  <Badge
+                    variant={i.resultado === "aprovado" ? "success" : i.resultado === "reprovado" ? "destructive" : "warning"}
+                    className="text-[9px] shrink-0"
+                  >
+                    {i.resultado}
+                  </Badge>
+                  <span className="font-mono text-[10.5px] text-[hsl(210_14%_48%)] shrink-0">
+                    {findCompartimento(i.compartimentoId)?.identificador ?? i.compartimentoId}
+                  </span>
+                  <span className="truncate text-[hsl(210_14%_38%)] num">
+                    {i.itensOk}/{i.itensTotal} itens · {i.fotos} fotos
+                  </span>
+                  <span className="ml-auto shrink-0 text-[10.5px] text-[hsl(210_14%_48%)] num">
+                    {formatDate(i.dataHora)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {/* Produtos e operações para os quais está apto */}
+        <div className="rounded-xl border border-[hsl(200_18%_90%)] p-3.5">
+          <p className="mb-2 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.1em] text-[hsl(210_14%_42%)]">
+            <Boxes className="size-3.5" /> Apto para
+          </p>
+          {!meta.opera ? (
+            <p className="text-[12px] text-[hsl(0_70%_38%)]">
+              Nada. {estado} — a empresa não opera sob a cadeia certificada até regularizar.
+            </p>
+          ) : (
+            <>
+              <div className="flex flex-wrap gap-1.5">
+                {s.certGMP.escopo.map((e) => (
+                  <Badge key={e} variant="secondary" className="text-[9px]">{e}</Badge>
+                ))}
+              </div>
+              <p className="mt-2 text-[11.5px] text-[hsl(210_14%_42%)] leading-relaxed">
+                {regimeMax ? (
+                  <>
+                    Regime de limpeza mais alto já executado e evidenciado nos compartimentos desta empresa:{" "}
+                    <strong className="text-[hsl(200_25%_18%)]">{regimeMax}</strong>. Carga proibida exige
+                    procedimento formal de liberação em qualquer caso.
+                  </>
+                ) : (
+                  <>
+                    Nenhuma limpeza registrada nos compartimentos desta empresa. A capacidade de executar cada
+                    regime não é presumida — é evidenciada.
+                  </>
+                )}
+              </p>
+            </>
           )}
         </div>
 

@@ -4,7 +4,7 @@
 // sem instalação obrigatória e sem criação longa de conta. O transportador abre
 // o link e informa os próprios dados. Aqui é o lado do escritório que gera o convite.
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link2, Copy, Check, Send, QrCode } from "lucide-react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger,
@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/toast";
+import { QRConvite } from "@/components/gatekeeper/qr-convite";
 
 const COLETA = [
   "CPF ou CNPJ",
@@ -32,7 +33,11 @@ export function OnboardingLinkModal() {
   const [token, setToken] = useState("");
   const [copiado, setCopiado] = useState(false);
 
-  const link = token ? `https://onboarding.traxium.com.br/c/${token}` : "";
+  // Aponta para a rota pública real deste protótipo — o QR abre o formulário
+  // de verdade, em vez de um domínio que não existe.
+  const [origem, setOrigem] = useState("");
+  useEffect(() => setOrigem(window.location.origin), []);
+  const link = token && origem ? `${origem}/convite/${token}` : "";
 
   function gerar() {
     // Token gerado sob interação (sem Math.random no render → sem hydration mismatch).
@@ -94,7 +99,17 @@ export function OnboardingLinkModal() {
                   <Send className="size-4" /> Enviar por WhatsApp
                 </a>
               </Button>
-              <p className="text-[10.5px] text-[hsl(210_14%_46%)]">Link de demonstração. Também pode ser enviado por SMS ou QR Code impresso no pátio.</p>
+              <div className="flex items-start gap-3 pt-1">
+                {link && <QRConvite url={link} size={112} />}
+                <div className="min-w-0">
+                  <p className="text-[11px] font-semibold text-[hsl(180_80%_18%)]">QR para o pátio</p>
+                  <p className="mt-0.5 text-[10.5px] leading-relaxed text-[hsl(210_14%_46%)]">
+                    Imprima e afixe na portaria. O motorista aponta a câmera e cai direto no formulário — sem
+                    instalar nada, sem criar conta.
+                  </p>
+                  <p className="mt-1 text-[10.5px] text-[hsl(210_14%_46%)]">Também pode ser enviado por SMS.</p>
+                </div>
+              </div>
             </div>
           )}
 

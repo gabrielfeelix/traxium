@@ -502,8 +502,26 @@ export type TipoVinculo =
   | "TAC pessoa física"
   | "ETC subcontratada"
   | "Agregado"
+  | "Motorista empregado"
+  | "Motorista vinculado a empresa terceira"
   | "Transportador certificado"
   | "Condição Gatekeeper";
+
+/** Os sete vínculos que a diretriz §Gatekeeper manda distinguir, em ordem. */
+export const TIPOS_VINCULO: TipoVinculo[] = [
+  "TAC pessoa física",
+  "ETC subcontratada",
+  "Agregado",
+  "Motorista empregado",
+  "Motorista vinculado a empresa terceira",
+  "Transportador certificado",
+  "Condição Gatekeeper",
+];
+
+/** Vínculo que é pessoa física conduzindo — não empresa contratada. */
+export function vinculoEhPessoa(t?: TipoVinculo): boolean {
+  return t === "TAC pessoa física" || t === "Motorista empregado" || t === "Motorista vinculado a empresa terceira";
+}
 
 // Acordo de Garantia da Qualidade digital (Gatekeeper §3) — deixa de ser arquivo
 // isolado e vira registro operacional controlado, com versão, vigência e assinatura.
@@ -514,6 +532,15 @@ export type AcordoQA = {
   assinadoEm?: string;
   assinante?: string;
   dispositivo?: string;
+  /** Quando a renovação deve ser disparada — antes do vencimento, não depois. */
+  renovacaoEm?: string;
+  /** Quem responde pela empresa no acordo (§Gatekeeper: "associação com empresa, TAC e representantes"). */
+  representantes?: string[];
+  /**
+   * Termo específico de ciência do motorista, separado do acordo da empresa: o
+   * acordo é da pessoa jurídica, a ciência é de quem dirige.
+   */
+  cienciaMotorista?: { motoristaId: string; aceitoEm: string };
 };
 
 export type Subcontratado = {
