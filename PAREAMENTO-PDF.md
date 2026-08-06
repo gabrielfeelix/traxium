@@ -10,8 +10,8 @@ Legenda: **✓ entregue** · **~ parcial** · **✗ não iniciado**
 | --- | --- | --- |
 | 1 · Gatekeeper | ✓ 9/10 ✅ | **Fase 6 entregue.** Onboarding público, QR real, acordo assinável, checklist dinâmico com item crítico, passaporte completo. |
 | 2 · Academy | ~ 2/3 ✅ | **Fase 4 entregue.** Competência derivada, elegibilidade no despacho, sala virtual, just-in-time. Falta o conteúdo em si (vídeo/PDF) e as regras por cliente/filial. |
-| 3 · IDTF Brasil | ~ 2/3 | Motor e camada brasileira de busca existem. Falta cadastro completo e governança. |
-| 4 · Control Tower | ✓ 5/5 ✅ | **Fases 5 e 7 entregues.** Verde com as 8 condições, motor configurável com piso, liberação padronizada com 9 campos, 6 níveis de autoridade e dossiê com os 16 blocos. Falta só o painel da fila (risco GMP+, miniaturas, notificações). |
+| 3 · IDTF Brasil | ✓ 3/3 ✅ | **Fase 8 entregue.** Cadastro de 18 campos, resolução por todo o vocabulário, 9 rótulos operacionais e governança da base com histórico. |
+| 4 · Control Tower | ✓ 5/5 ✅ | **Fases 5 e 7 entregues.** Verde com as 8 condições, motor configurável com piso, liberação padronizada com 9 campos, 6 níveis de autoridade, dossiê com os 16 blocos e a fila com risco GMP+, evidências e pendências. |
 | 5 · Network | ~ 1/4 | O modelo de ativos está certo. A operação em massa não existe. |
 | Transversais | ~ 3/4 ✅ | Offline, imutabilidade, RBAC e **motor configurável com 4 classes** ok. LGPD incompleto. |
 | §5 Ajustes no protótipo | ✓ 4/4 | Todos aplicados. |
@@ -23,9 +23,11 @@ Legenda: **✓ entregue** · **~ parcial** · **✗ não iniciado**
 
 > **Atualização — Fase 6 entregue.** Pilar 1 fechado: onboarding público em `/convite/[token]`, QR real, acordo assinável com renovação, checklist dinâmico por tipo com item crítico, passaporte com os 8 blocos.
 
-> **Atualização — Fase 7 entregue (commit `e204d58`).** Pilar 4 fechado no essencial. O motivo da liberação manual virou lista fechada por regra (`MOTIVOS_POR_REGRA`), com justificativa livre como complemento; o registro passou a ter os nove campos, e situação anterior/posterior são capturadas do estado da viagem, não digitadas. A hierarquia ganhou `trafego` e `inspetor`, fechando os seis níveis — checklist reprovado e fotos mínimas passaram ao inspetor, certificação a vencer e sincronização pendente ao tráfego. O dossiê foi de 8 para 16 blocos, todos na cadeia de hash. **Sobrou a tarefa 7.5** (risco GMP+ e miniaturas na fila).
+> **Atualização — Fase 8 entregue (commit `6c572b8`).** Pilar 3 fechado. O cadastro tem os 18 campos, e `resolveProdutoPorNome` varre sinônimo regional, nome comercial, inglês e erro de digitação, sem acento nem caixa. Os 9 rótulos operacionais existem como saída (`resultadoIDTF`) e são alcançáveis por combinação real da base — a página do Motor IDTF agora cruza carga anterior × produto de verdade, o que ela prometia na descrição e não fazia. Governança com fonte, periodicidade, aprovação de sinônimo, licenciamento e histórico datado. **Um teste de colisão pegou "casquinha" reivindicada por dois produtos com regimes diferentes**; a recusa está registrada no histórico da base.
 
-**A resposta curta para "implementamos tudo?": ainda não, mas os pilares 1, 2 e 4 estão fechados.** Restam: **IDTF** (Fase 8: cadastro de 18 campos e governança), **Network** (Fase 9: m:n, importação, operação em massa), os **indicadores** (Fase 10) e o painel da fila do Control Tower (tarefa 7.5).
+> **Atualização — Fase 7 entregue (commits `e204d58` e `976ffb6`).** Pilar 4 fechado no essencial. O motivo da liberação manual virou lista fechada por regra (`MOTIVOS_POR_REGRA`), com justificativa livre como complemento; o registro passou a ter os nove campos, e situação anterior/posterior são capturadas do estado da viagem, não digitadas. A hierarquia ganhou `trafego` e `inspetor`, fechando os seis níveis — checklist reprovado e fotos mínimas passaram ao inspetor, certificação a vencer e sincronização pendente ao tráfego. O dossiê foi de 8 para 16 blocos, todos na cadeia de hash. **Sobrou a tarefa 7.5** (risco GMP+ e miniaturas na fila).
+
+**A resposta curta para "implementamos tudo?": os pilares 1 a 4 estão fechados.** Restam: **Network** (Fase 9: m:n, importação, operação em massa), **LGPD** e os **indicadores** (Fase 10).
 
 ---
 
@@ -65,15 +67,15 @@ Legenda: **✓ entregue** · **~ parcial** · **✗ não iniciado**
 
 | O PDF pede | | Onde está / o que falta |
 | --- | --- | --- |
-| Busca por vocabulário brasileiro | ✓ | `alias[]` + `resolveProdutoPorNome()`. "casquinha", "farelo", "soybean hulls" resolvem para o canônico sem virar produto novo. |
+| Busca por vocabulário brasileiro | ✓ | `resolveProdutoPorNome()` varre canônico, alias, sinônimo regional, nome comercial, inglês e erro de digitação, ignorando acento e caixa. A busca da tela usa o mesmo vocabulário do motor. |
 | Motor cruzando produto + T-3 + limpeza + regra + evidência | ✓ | `avaliarCarregamento()` é exatamente isso. É o núcleo do produto. |
 | Produto não reconhecido entra em fila e fica bloqueado até definição formal | ✓ | `statusClassificacao: "em_fila"` trava o uso; `/idtf` tem a fila. |
 | Registro da versão da base usada em cada decisão | ✓ | `Decisao.versaoBaseIDTF`, gravada e exibida no dossiê. |
 | Evidências dinâmicas por regime (A/B/C/D) | ✓ | `/limpezas` muda os campos exigidos por regime: dosagem, tempo, enxágue, concentração. |
 | Carga proibida sem botão de "lavado" | ✓ | Exige procedimento formal; é bloqueio técnico desde a Fase 3. |
-| Estrutura do cadastro (18 campos) | ~ | 11 de 18. Faltam: nome oficial da fonte, sinônimos regionais separados dos brasileiros, nomes comerciais, nomes em inglês, erros comuns de digitação, estado físico, restrições, esquema de certificação, data da última atualização, responsável pela validação, fonte da decisão. |
-| Os 9 rótulos operacionais do resultado | ~ | O motor tem 8 regras internas, mas não expõe "Liberado após limpeza A/B/C/D" como estados distintos — resolve para LIBERADO/ALERTA/BLOQUEIO. |
-| Governança da base (8 itens) | ~ | Versão e data existem. Faltam: histórico de alterações, procedimento de revisão, aprovação técnica dos sinônimos, análise de licenciamento. |
+| Estrutura do cadastro (18 campos) | ✓ | Os 18 na ficha do produto em `/idtf`. Campo não preenchido aparece como "não informado" — em produto na fila, a lacuna é a informação. |
+| Os 9 rótulos operacionais do resultado | ✓ | `resultadoIDTF()` devolve os 9 com motivo e próximo passo; aparecem na viagem, no dossiê e na consulta de sequenciamento. Todos alcançáveis por dado real. |
+| Governança da base (8 itens) | ✓ | Aba "Governança da base" em `/idtf`: versão vigente, fonte oficial, periodicidade de revisão, aprovação técnica de sinônimo, licenciamento, política de divergência e histórico datado com responsável e fonte. |
 
 ## Pilar 4 · TRAXIUM CONTROL TOWER
 
@@ -91,7 +93,7 @@ O pilar mais coberto — foi o alvo da Fase 3.
 | Hierarquia de autoridade (6 papéis) | ✓ | Os 6: técnico, diretoria+RT, gestor, **inspetor** (condição física), **tráfego** (pendência simples) e cliente. Autoridade escala para cima; `tecnico` segue sem ninguém que libere. |
 | Registro da liberação manual (9 campos) | ✓ | Os 9 em `liberacao.ts`. Motivo vem de lista fechada por regra; situação anterior/posterior são derivadas de `situacaoDaViagem()` antes e depois da decisão; impacto e validade são listas fechadas. O store desfaz a liberação se o registro não fechar. |
 | Dossiê com os 16 itens | ✓ | Os 16: decisão, autoridade, registro da liberação, transportador, acordo, motorista, treinamentos, cavalo, implemento/compartimento, produto/IDTF, T-3, limpeza, inspeção, fotos, assinaturas e documentos. Bloco sem dado mostra a ausência em vez de sumir. |
-| Painel: fotos e documentos essenciais · risco GMP+ · notificações pendentes | ✗ | Não aparecem na fila. **Único item aberto do pilar** (tarefa 7.5). |
+| Painel: fotos e documentos essenciais · risco GMP+ · notificações pendentes | ✓ | Cada item de carregamento na fila traz o risco derivado da decisão, a miniatura das 6 evidências essenciais e as pendências de resposta com a idade real. |
 
 ## Pilar 5 · TRAXIUM NETWORK
 
