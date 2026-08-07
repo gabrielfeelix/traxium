@@ -80,7 +80,7 @@ export function ExpiryHorizon({
               key={t.d}
               className={cn(
                 "absolute -translate-x-1/2 text-[8px] uppercase tracking-[0.1em] whitespace-nowrap",
-                t.forte ? "font-bold text-fg-muted" : "text-fg-soft"
+                t.forte ? "font-bold text-fg-muted" : "hidden text-fg-soft sm:block"
               )}
               style={{ left: `${pct(t.d)}%` }}
             >

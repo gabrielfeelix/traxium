@@ -38,6 +38,8 @@ import {
 } from "@/lib/domain/model";
 import { statusCompartimento } from "@/lib/domain/rules-engine";
 import { cn, formatDate } from "@/lib/utils";
+import { Pagination } from "@/components/kit/pagination";
+import { useListPagination } from "@/lib/use-list-pagination";
 
 // Tom da vaga pelo veredito do motor — cor + badge com rótulo (nunca só cor).
 const VAGA_TONE: Record<string, string> = {
@@ -97,6 +99,9 @@ export default function FrotaPage() {
   const cavFiltrados = cavalos.filter(
     (c) => c.placa.toLowerCase().includes(q) || c.modelo.toLowerCase().includes(q)
   );
+  const paginasComp = useListPagination(compFiltrados, search, "comp-");
+  const paginasImp = useListPagination(impFiltrados, search, "imp-");
+  const paginasCav = useListPagination(cavFiltrados, search, "cav-");
 
   const bloqueados = compartimentos.filter((c) => statusCompartimento(c.id).status === "bloqueado").length;
   const certVencidas = implementos.filter((i) => i.certGMP.status === "Vencida").length;
@@ -115,7 +120,7 @@ export default function FrotaPage() {
                 downloadCSV(
                   "traxium-compartimentos",
                   ["Implemento", "Compartimento", "Última carga", "Regime exigido", "Status", "Última limpeza"],
-                  compartimentos.map((c) => {
+                  compFiltrados.map((c) => {
                     const st = statusCompartimento(c.id);
                     return [
                       findImplemento(c.implementoId)?.placa ?? "",
@@ -210,7 +215,7 @@ export default function FrotaPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {compFiltrados.map((c) => {
+                    {paginasComp.itens.map((c) => {
                       const imp = findImplemento(c.implementoId);
                       const st = statusCompartimento(c.id);
                       return (
@@ -266,6 +271,7 @@ export default function FrotaPage() {
                     })}
                   </TableBody>
                 </Table>
+                <Pagination {...paginasComp} onPagina={paginasComp.setPagina} onPorPagina={paginasComp.setPorPagina} />
               </CardContent>
             </Card>
             <p className="mt-2 flex items-center gap-1.5 text-[11px] text-fg-muted">
@@ -289,7 +295,7 @@ export default function FrotaPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {impFiltrados.map((i) => {
+                    {paginasImp.itens.map((i) => {
                       const sub = findSubcontratado(i.subcontratadoId);
                       return (
                         <TableRow key={i.id}>
@@ -322,6 +328,7 @@ export default function FrotaPage() {
                     })}
                   </TableBody>
                 </Table>
+                <Pagination {...paginasImp} onPagina={paginasImp.setPagina} onPorPagina={paginasImp.setPorPagina} />
               </CardContent>
             </Card>
             {certVencidas > 0 && (
@@ -346,7 +353,7 @@ export default function FrotaPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {cavFiltrados.map((c) => (
+                    {paginasCav.itens.map((c) => (
                       <TableRow key={c.id}>
                         <TableCell className="font-mono font-semibold">{c.placa}</TableCell>
                         <TableCell className="text-[13px]">{c.modelo}</TableCell>
@@ -367,6 +374,7 @@ export default function FrotaPage() {
                     ))}
                   </TableBody>
                 </Table>
+                <Pagination {...paginasCav} onPagina={paginasCav.setPagina} onPorPagina={paginasCav.setPorPagina} />
               </CardContent>
             </Card>
           </TabsContent>

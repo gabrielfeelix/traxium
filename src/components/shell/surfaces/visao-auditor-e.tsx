@@ -55,7 +55,7 @@ export function VisaoAuditorE() {
       <div className="flex items-center gap-2 bg-[hsl(202_45%_12%)] px-6 py-2 text-white">
         <Eye className="size-4 shrink-0 text-[hsl(176_84%_60%)]" />
         <p className="text-[12px] font-semibold tracking-wide">
-          SOMENTE LEITURA · amostra liberada — reconstrução da decisão, nada fora da amostra.
+          PRÉVIA FASE 2 · SOMENTE LEITURA · amostra liberada — no MVP, o compartilhamento externo é por exportação.
         </p>
         <div className="ml-auto">
           <SurfacePerfilMenu tone="dark" />

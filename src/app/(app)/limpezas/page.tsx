@@ -32,6 +32,8 @@ import { statusCompartimento } from "@/lib/domain/rules-engine";
 import { useSession } from "@/lib/store/session";
 import { useToast } from "@/components/ui/toast";
 import { formatDate, cn } from "@/lib/utils";
+import { Pagination } from "@/components/kit/pagination";
+import { useListPagination } from "@/lib/use-list-pagination";
 
 type Campo = {
   id: string;
@@ -113,6 +115,7 @@ export default function LimpezasPage() {
     () => [...cleaningEvents].sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime()),
     [version]
   );
+  const paginacao = useListPagination(eventosRecentes, String(version), "limpezas-");
 
   function registrar() {
     const s = (id: string) => (typeof valores[id] === "string" ? (valores[id] as string) : undefined);
@@ -309,7 +312,7 @@ export default function LimpezasPage() {
               <CardTitle>Limpezas recentes</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              {eventosRecentes.map((e) => {
+              {paginacao.itens.map((e) => {
                 const c = compartimentos.find((x) => x.id === e.compartimentoId);
                 const imp = c ? findImplemento(c.implementoId) : undefined;
                 return (
@@ -330,6 +333,7 @@ export default function LimpezasPage() {
                   </div>
                 );
               })}
+              <Pagination {...paginacao} onPagina={paginacao.setPagina} onPorPagina={paginacao.setPorPagina} />
             </CardContent>
           </Card>
         </div>

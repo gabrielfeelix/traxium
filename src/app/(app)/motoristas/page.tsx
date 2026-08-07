@@ -37,6 +37,8 @@ import { Credencial } from "@/components/motoristas/credencial";
 import { Sheet, SheetContent, SheetHeader, SheetBody, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { viagens, type Motorista } from "@/lib/mock-data";
 import Link from "next/link";
+import { Pagination } from "@/components/kit/pagination";
+import { useListPagination } from "@/lib/use-list-pagination";
 
 const confClass = (n: number) =>
   n >= 95 ? "text-success-700" : n >= 80 ? "text-warning-700" : "text-danger-700";
@@ -56,6 +58,7 @@ export default function MotoristasPage() {
   const filtered = motoristas.filter((m) =>
     foco ? m.id === foco : m.nome.toLowerCase().includes(search.toLowerCase())
   );
+  const paginacao = useListPagination(filtered, `${search}|${foco}`);
 
   // Deck de credenciais: quem precisa de atenção primeiro.
   const deck = [...motoristas].sort((a, b) => {
@@ -85,9 +88,9 @@ export default function MotoristasPage() {
                 downloadCSV(
                   "traxium-motoristas",
                   ["Nome", "Tipo", "CNH cat.", "Cidade", "UF", "Viagens", "Conformidade %", "Status", "Letramento"],
-                  motoristas.map((m) => [m.nome, m.tipo, m.cnh.categoria, m.cidade, m.uf, m.totalViagens, m.conformidadeMedia, m.status, m.letramentoDigital])
+                  filtered.map((m) => [m.nome, m.tipo, m.cnh.categoria, m.cidade, m.uf, m.totalViagens, m.conformidadeMedia, m.status, m.letramentoDigital])
                 );
-                toast("CSV exportado", { desc: `${motoristas.length} motoristas.` });
+                toast("CSV exportado", { desc: `${filtered.length} motorista(s) do filtro atual.` });
               }}
             >
               <Download className="size-4" /> Exportar
@@ -170,7 +173,7 @@ export default function MotoristasPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filtered.map((m) => {
+                  {paginacao.itens.map((m) => {
                     const vencidas = m.certificacoes.filter((c) => c.status === "Vencida" || c.status === "Pendente").length;
                     return (
                       <TableRow key={m.id}>
@@ -250,6 +253,7 @@ export default function MotoristasPage() {
                   })}
                 </TableBody>
               </Table>
+              <Pagination {...paginacao} onPagina={paginacao.setPagina} onPorPagina={paginacao.setPorPagina} />
             </CardContent>
           </Card>
         </TabsContent>

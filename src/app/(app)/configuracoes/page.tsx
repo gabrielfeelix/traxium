@@ -37,7 +37,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const PAPEIS_EQUIPE = ["Admin", "Compliance", "Operação", "Auditor (acesso limitado)"] as const;
+const PAPEIS_EQUIPE = ["Admin", "Compliance", "Operação", "Auditor interno (somente leitura)"] as const;
 import { navigation } from "@/components/shell/sidebar";
 import { PAPEL_LABEL, type Papel } from "@/lib/domain/model";
 import { useSession } from "@/lib/store/session";

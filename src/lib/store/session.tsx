@@ -10,6 +10,24 @@
 import { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { avaliarCarregamento } from "@/lib/domain/rules-engine";
 import {
+  convitesAcesso,
+  concluirConviteAcesso,
+  criarConviteAcesso,
+  enviarConviteAcesso,
+  revogarConviteAcesso,
+  type ConviteAcesso,
+  type TipoAcessoExterno,
+} from "@/lib/domain/access";
+import {
+  convitesOnboarding,
+  criarEntradaCadastro,
+  iniciarQualificacaoCadastro,
+  transicionarConvite,
+  type CanalConvite,
+  type ConviteOnboarding,
+  type EventoConvite,
+} from "@/lib/domain/onboarding";
+import {
   viagens,
   naoConformidades,
   lotes,
@@ -42,6 +60,7 @@ import {
   compartimentos,
   subcontratados,
   produtosIDTF,
+  historicoBase,
   cleaningEvents,
   inspectionEvents,
   loadHistory,
@@ -51,6 +70,7 @@ import {
   produtoAtualPorViagem,
   vinculos,
   vinculoVigente,
+  vinculoVigenteDaEntidade,
   motoristasDoSubcontratado,
   notificacoes,
   diasEntre,
@@ -59,6 +79,7 @@ import {
   HOJE,
   PAPEL_LABEL,
   podeAprovarExcecao,
+  vinculoEhPessoa,
   deriveSurface,
   PERFIL_POR_ID,
   type Cavalo,
@@ -137,7 +158,7 @@ export type NovaFazendaInput = {
 export type NovoMotoristaInput = {
   nome: string;
   cpf: string;
-  tipo: "Próprio" | "Agregado";
+  tipo: Motorista["tipo"];
   telefone: string;
   cidade: string;
   uf: string;
@@ -181,6 +202,20 @@ export type LinhaImportacao = {
   /** Motivo do descarte, quando houver. */
   problema?: string;
   duplicada?: boolean;
+};
+
+export type RevisaoSubcontratadoInput = {
+  cnpj: string;
+  razaoSocial: string;
+  tipoVinculo?: TipoVinculo;
+  certificado: {
+    numero: string;
+    certificadora: string;
+    escopo: Subcontratado["certGMP"]["escopo"];
+    validade: string;
+    sitesCobertos: string[];
+    statusBasePublica: Subcontratado["certGMP"]["statusBasePublica"];
+  };
 };
 
 export type TrocaVeiculoInput = {
@@ -231,9 +266,20 @@ type SessionCtx = {
   addImplemento: (i: NovoImplementoInput) => string;
   addCompartimento: (c: Omit<Compartimento, "id">) => string;
   addSubcontratado: (s: Omit<Subcontratado, "id">) => string;
+  /** Confirma os dados coletados e tira o registro da etapa de pré-cadastro. */
+  iniciarQualificacaoSubcontratado: (
+    id: string,
+    i: RevisaoSubcontratadoInput
+  ) => { ok: boolean; motivo: string };
   classificarProduto: (
     id: string,
-    patch: { regimeAntesDeFeed: Regime; bloqueiaFeed: boolean; idtfCode?: string }
+    patch: {
+      regimeAntesDeFeed: Regime;
+      bloqueiaFeed: boolean;
+      idtfCode?: string;
+      justificativa: string;
+      fonte: string;
+    }
   ) => void;
   addCleaningEvent: (c: Omit<CleaningEvent, "id">) => string;
   addInspectionEvent: (i: Omit<InspectionEvent, "id">) => string;
@@ -245,6 +291,16 @@ type SessionCtx = {
   // ── Network (Fase 9) ────────────────────────────────────────────────────
   /** Cria vínculo com vigência. Recusa duplicata vigente do mesmo par. */
   vincular: (i: { subcontratadoId: string; tipo: TipoEntidadeVinculo; entidadeId: string; inicio?: string }) => string | null;
+  /** Vincula um motorista já cadastrado, sem permitir duas empresas vigentes. */
+  vincularMotoristaSubcontratado: (
+    subcontratadoId: string,
+    motoristaId: string
+  ) => { ok: boolean; motivo: string };
+  /** Cria o motorista terceiro e o vínculo com a empresa na mesma ação de UI. */
+  cadastrarMotoristaSubcontratado: (
+    subcontratadoId: string,
+    i: Omit<NovoMotoristaInput, "tipo">
+  ) => { ok: boolean; motivo: string; motoristaId?: string };
   /** Encerra o vínculo com data e motivo. O registro fica — é o histórico. */
   encerrarVinculo: (id: string, motivo: string) => boolean;
   /** Arquiva sem apagar: o cadastro sai das listas ativas e o passado permanece. */
@@ -252,6 +308,24 @@ type SessionCtx = {
   desarquivarSubcontratado: (id: string) => boolean;
   /** Grava as linhas já conferidas da importação. Duplicadas não entram. */
   importarSubcontratados: (linhas: LinhaImportacao[]) => { criados: number; ignorados: number };
+  /** Registra a geração do link. Gerar não é enviar e não cria acesso. */
+  criarConviteOnboarding: (i: {
+    token: string;
+    destinatario?: string;
+    canal: CanalConvite;
+    expiraEm?: string;
+  }) => ConviteOnboarding;
+  /** Move o convite por uma transição auditável; recusa transições inválidas. */
+  moverConviteOnboarding: (token: string, evento: EventoConvite) => boolean;
+  criarConviteAcesso: (i: {
+    token: string;
+    tipo: TipoAcessoExterno;
+    entidadeId: string;
+    nome: string;
+    destinatario?: string;
+    expiraEm: string;
+  }) => ConviteAcesso;
+  moverConviteAcesso: (token: string, evento: "enviar" | "concluir" | "revogar") => boolean;
   /** Renovação coletiva de acordo. Só renova quem tem acordo a vencer ou vencido. */
   renovarAcordos: (subIds: string[]) => { renovados: number; ignorados: number };
   /** Atribui uma trilha aos motoristas vinculados às empresas escolhidas. */
@@ -300,6 +374,7 @@ type SessionCtx = {
    * consultada e sem treinamento, o estado derivado não poderia ser outro.
    */
   addSubcontratadoPreCadastro: (i: {
+    token: string;
     razaoSocial: string;
     documento: string;
     tipoVinculo: TipoVinculo;
@@ -488,22 +563,63 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
   const addSubcontratado = useCallback<SessionCtx["addSubcontratado"]>((s) => {
     const id = nextId("sub");
-    subcontratados.push({ ...s, id });
+    subcontratados.push({
+      ...s,
+      id,
+      cadastro: s.cadastro ?? criarEntradaCadastro({
+        origem: "manual",
+        criadoEm: `${HOJE}T10:00:00`,
+        criadoPor: PAPEL_LABEL[papel],
+      }),
+    });
     bump();
     return id;
+  }, [papel, bump]);
+
+  const iniciarQualificacaoSubcontratado = useCallback<SessionCtx["iniciarQualificacaoSubcontratado"]>((id, i) => {
+    const s = subcontratados.find((x) => x.id === id);
+    if (!s) return { ok: false, motivo: "Subcontratado não encontrado." };
+    if (s.arquivadoEm) return { ok: false, motivo: "Reative o cadastro antes de iniciar a qualificação." };
+    if (!s.cadastro || s.cadastro.etapa !== "pre_cadastro")
+      return { ok: false, motivo: "Este cadastro já saiu da etapa de pré-cadastro." };
+
+    s.cnpj = i.cnpj;
+    s.razaoSocial = i.razaoSocial;
+    s.tipoVinculo = i.tipoVinculo;
+    s.certGMP = { ...i.certificado };
+    s.cadastro = iniciarQualificacaoCadastro(s.cadastro);
+    bump();
+    return { ok: true, motivo: "Dados revisados. A qualificação agora é derivada dos documentos, acordo e treinamento." };
   }, [bump]);
 
   const classificarProduto = useCallback<SessionCtx["classificarProduto"]>((id, patch) => {
     const p = produtosIDTF.find((x) => x.id === id);
     if (p) {
+      const estavaNaFila = p.statusClassificacao === "em_fila";
+      const regimeAnterior = p.regimeAntesDeFeed;
+      const bloqueioAnterior = p.bloqueiaFeed;
       p.statusClassificacao = "classificado";
       p.regimeAntesDeFeed = patch.regimeAntesDeFeed;
       p.bloqueiaFeed = patch.bloqueiaFeed;
       if (patch.idtfCode) p.idtfCode = patch.idtfCode;
       p.versaoBase = VERSAO_BASE_IDTF;
+      p.atualizadoEm = HOJE;
+      p.responsavelValidacao = PAPEL_LABEL[papel];
+      p.fonteDecisao = patch.fonte;
+      historicoBase.unshift({
+        id: nextId("hb"),
+        data: HOJE,
+        versao: VERSAO_BASE_IDTF,
+        tipo: estavaNaFila ? "reclassificacao" : regimeAnterior !== patch.regimeAntesDeFeed ? "regime" : "reclassificacao",
+        produtoId: p.id,
+        descricao: `${patch.justificativa} Regime ${regimeAnterior} → ${patch.regimeAntesDeFeed}; bloqueio ${bloqueioAnterior ? "sim" : "não"} → ${patch.bloqueiaFeed ? "sim" : "não"}.`,
+        responsavel: PAPEL_LABEL[papel],
+        fonte: patch.fonte,
+        aprovadoPor: PAPEL_LABEL[papel],
+      });
       bump();
     }
-  }, [bump]);
+  }, [papel, bump]);
 
   const addCleaningEvent = useCallback<SessionCtx["addCleaningEvent"]>((c) => {
     const id = nextId("cl");
@@ -557,6 +673,9 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   // ── Network (Fase 9) ──────────────────────────────────────────────────────
 
   const vincular = useCallback<SessionCtx["vincular"]>((i) => {
+    // Um motorista só responde por uma transportadora por vez. O histórico
+    // continua aceitando várias empresas em períodos diferentes.
+    if (i.tipo === "motorista" && vinculoVigenteDaEntidade("motorista", i.entidadeId)) return null;
     const jaVigente = vinculos.some(
       (v) => v.subcontratadoId === i.subcontratadoId && v.tipo === i.tipo && v.entidadeId === i.entidadeId && vinculoVigente(v)
     );
@@ -622,6 +741,11 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
           statusBasePublica: "Não localizado", sitesCobertos: [],
         },
         treinamento: { comprovante: false, quiz: false, aceiteRegras: false },
+        cadastro: criarEntradaCadastro({
+          origem: "importacao",
+          criadoEm: `${HOJE}T10:00:00`,
+          criadoPor: PAPEL_LABEL[papel],
+        }),
       });
       if (l.implementoPlaca)
         vinculos.push({ id: nextId("vin"), subcontratadoId: id, tipo: "implemento", entidadeId: l.implementoPlaca, inicio: HOJE });
@@ -629,6 +753,55 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     }
     if (criados) bump();
     return { criados, ignorados };
+  }, [papel, bump]);
+
+  const criarConviteOnboarding = useCallback<SessionCtx["criarConviteOnboarding"]>((i) => {
+    const existente = convitesOnboarding.find((c) => c.token === i.token);
+    if (existente) return existente;
+    const convite: ConviteOnboarding = {
+      token: i.token,
+      estado: "nao_enviado",
+      canal: i.canal,
+      destinatario: i.destinatario,
+      criadoEm: new Date().toISOString(),
+      expiraEm: i.expiraEm,
+    };
+    convitesOnboarding.unshift(convite);
+    bump();
+    return convite;
+  }, [bump]);
+
+  const moverConviteOnboarding = useCallback<SessionCtx["moverConviteOnboarding"]>((token, evento) => {
+    const indice = convitesOnboarding.findIndex((c) => c.token === token);
+    if (indice < 0) return false;
+    const atualizado = transicionarConvite(convitesOnboarding[indice], evento, new Date().toISOString());
+    if (!atualizado) return false;
+    convitesOnboarding[indice] = atualizado;
+    bump();
+    return true;
+  }, [bump]);
+
+  const criarConviteAcessoStore = useCallback<SessionCtx["criarConviteAcesso"]>((i) => {
+    const convite = criarConviteAcesso(i);
+    convitesAcesso.unshift(convite);
+    bump();
+    return convite;
+  }, [bump]);
+
+  const moverConviteAcesso = useCallback<SessionCtx["moverConviteAcesso"]>((token, evento) => {
+    const indice = convitesAcesso.findIndex((c) => c.token === token);
+    if (indice < 0) return false;
+    const agora = new Date().toISOString();
+    const atual = convitesAcesso[indice];
+    const proximo = evento === "enviar"
+      ? enviarConviteAcesso(atual, agora)
+      : evento === "concluir"
+        ? concluirConviteAcesso(atual, agora)
+        : revogarConviteAcesso(atual, agora);
+    if (!proximo) return false;
+    convitesAcesso[indice] = proximo;
+    bump();
+    return true;
   }, [bump]);
 
   const renovarAcordos = useCallback<SessionCtx["renovarAcordos"]>((subIds) => {
@@ -811,6 +984,24 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   }, [bump]);
 
   const addSubcontratadoPreCadastro = useCallback<SessionCtx["addSubcontratadoPreCadastro"]>((i) => {
+    const conviteIndex = convitesOnboarding.findIndex((c) => c.token === i.token);
+    const concluidoEm = new Date().toISOString();
+    if (conviteIndex >= 0) {
+      const convite = convitesOnboarding[conviteIndex];
+      if (convite.estado === "expirado" || convite.estado === "revogado") return "";
+      const concluido = transicionarConvite(convite, "concluir", concluidoEm);
+      if (concluido) convitesOnboarding[conviteIndex] = concluido;
+    } else {
+      // Link externo à sessão de demonstração: preservar a origem ainda é mais
+      // honesto que fingir que o convite nunca existiu.
+      convitesOnboarding.unshift({
+        token: i.token,
+        estado: "concluido",
+        canal: "Link direto",
+        criadoEm: concluidoEm,
+        concluidoEm,
+      });
+    }
     const id = nextId("sub");
     subcontratados.unshift({
       id,
@@ -829,6 +1020,17 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       },
       // Aceitou as regras no convite, mas não fez trilha nem enviou comprovante.
       treinamento: { comprovante: false, quiz: false, aceiteRegras: i.assinouAceite },
+      cadastro: criarEntradaCadastro({
+        origem: "convite",
+        criadoEm: `${HOJE}T10:00:00`,
+        criadoPor: "Onboarding público",
+        convite: {
+          token: i.token,
+          estado: "concluido",
+          canal: "Link direto",
+          concluidoEm,
+        },
+      }),
     });
     // Vínculo com vigência a partir de hoje (Fase 9.1). O implemento entra pela
     // placa; o responsável entra como motorista do cadastro, para que exista
@@ -856,6 +1058,10 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         letramentoDigital: "Básico",
       });
       vinculos.push({ id: nextId("vin"), subcontratadoId: id, tipo: "motorista", entidadeId: motoristaId, inicio: HOJE });
+      if (vinculoEhPessoa(i.tipoVinculo)) {
+        const pessoaTransportadora = subcontratados.find((s) => s.id === id);
+        if (pessoaTransportadora) pessoaTransportadora.responsavelMotoristaId = motoristaId;
+      }
     }
     bump();
     return id;
@@ -949,6 +1155,46 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     return id;
   }, [bump]);
 
+  const vincularMotoristaSubcontratado = useCallback<SessionCtx["vincularMotoristaSubcontratado"]>((subcontratadoId, motoristaId) => {
+    const empresa = subcontratados.find((s) => s.id === subcontratadoId);
+    if (!empresa || empresa.arquivadoEm) {
+      return { ok: false, motivo: "A transportadora não está ativa para receber motoristas." };
+    }
+    const motorista = motoristas.find((m) => m.id === motoristaId);
+    if (!motorista) return { ok: false, motivo: "Motorista não encontrado." };
+
+    const atual = vinculoVigenteDaEntidade("motorista", motoristaId);
+    if (atual) {
+      const responsavel = subcontratados.find((s) => s.id === atual.subcontratadoId)?.razaoSocial ?? "outra empresa";
+      return {
+        ok: false,
+        motivo: atual.subcontratadoId === subcontratadoId
+          ? `${motorista.nome} já está vinculado a esta transportadora.`
+          : `${motorista.nome} já possui vínculo vigente com ${responsavel}. Encerre esse vínculo antes de transferir.`,
+      };
+    }
+
+    const id = vincular({ subcontratadoId, tipo: "motorista", entidadeId: motoristaId });
+    return id
+      ? { ok: true, motivo: `${motorista.nome} foi vinculado a ${empresa.razaoSocial}.` }
+      : { ok: false, motivo: "Não foi possível criar o vínculo." };
+  }, [vincular]);
+
+  const cadastrarMotoristaSubcontratado = useCallback<SessionCtx["cadastrarMotoristaSubcontratado"]>((subcontratadoId, i) => {
+    const empresa = subcontratados.find((s) => s.id === subcontratadoId);
+    if (!empresa || empresa.arquivadoEm) {
+      return { ok: false, motivo: "A transportadora não está ativa para receber motoristas." };
+    }
+    const cpfNormalizado = i.cpf.replace(/\D/g, "");
+    if (cpfNormalizado && motoristas.some((m) => m.cpf.replace(/\D/g, "") === cpfNormalizado)) {
+      return { ok: false, motivo: "Já existe um motorista com este CPF. Use “Vincular existente”." };
+    }
+
+    const motoristaId = addMotorista({ ...i, tipo: "Subcontratado" });
+    const resultado = vincularMotoristaSubcontratado(subcontratadoId, motoristaId);
+    return resultado.ok ? { ...resultado, motoristaId } : resultado;
+  }, [addMotorista, vincularMotoristaSubcontratado]);
+
   const addAuditoria = useCallback<SessionCtx["addAuditoria"]>((i) => {
     const id = nextId("a");
     auditorias.unshift({
@@ -1019,6 +1265,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     addImplemento,
     addCompartimento,
     addSubcontratado,
+    iniciarQualificacaoSubcontratado,
     classificarProduto,
     addCleaningEvent,
     addInspectionEvent,
@@ -1031,6 +1278,10 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     arquivarSubcontratado,
     desarquivarSubcontratado,
     importarSubcontratados,
+    criarConviteOnboarding,
+    moverConviteOnboarding,
+    criarConviteAcesso: criarConviteAcessoStore,
+    moverConviteAcesso,
     renovarAcordos,
     atribuirTrilhaEmMassa,
     enviarAlerta,
@@ -1044,6 +1295,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     updateLoteStatus,
     addFazenda,
     addMotorista,
+    vincularMotoristaSubcontratado,
+    cadastrarMotoristaSubcontratado,
     addAuditoria,
     renovarCertificadoMotorista,
     renovarCertificadoImplemento,

@@ -44,6 +44,9 @@ import { viagens, filialDaViagem, pertenceAFilial, type Viagem } from "@/lib/moc
 import { compartimentoPorViagem, ORDEM_REGIME } from "@/lib/domain/model";
 import type { Decisao } from "@/lib/domain/rules-engine";
 import { formatDate, formatDateTime, cn } from "@/lib/utils";
+import { Pagination } from "@/components/kit/pagination";
+import { useListPagination } from "@/lib/use-list-pagination";
+import { ListToolbar } from "@/components/kit/list-toolbar";
 
 const TIER_PESO = { BLOQUEIO: 0, ALERTA: 1, LIBERADO: 2 } as const;
 
@@ -203,6 +206,7 @@ export default function ViagensPage() {
     const matchRegime = regimeFilter === "todos" || v.regimeLimpeza === regimeFilter;
     return matchSearch && matchStatus && matchRegime;
   });
+  const paginacao = useListPagination(filtered, `${search}|${statusFilter}|${regimeFilter}|${foco}|${filialId}`);
 
   const counts = {
     total: escopadas.length,
@@ -277,8 +281,9 @@ export default function ViagensPage() {
       )}
 
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between gap-3 flex-wrap pb-3">
-          <div className="flex items-center gap-2 flex-1 min-w-[240px]">
+        <CardHeader className="pb-3">
+          <ListToolbar
+            principal={
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-fg-muted" />
               <Input
@@ -288,6 +293,9 @@ export default function ViagensPage() {
                 className="pl-9 h-9"
               />
             </div>
+            }
+            filtros={
+              <>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-44 h-9">
                 <SelectValue />
@@ -315,7 +323,9 @@ export default function ViagensPage() {
                 <SelectItem value="D">Regime D</SelectItem>
               </SelectContent>
             </Select>
-          </div>
+              </>
+            }
+            acoes={
           <div className="flex items-center gap-2">
             <div className="inline-flex rounded-md border border-border bg-white p-0.5">
               <button
@@ -339,6 +349,8 @@ export default function ViagensPage() {
             </div>
             <Badge variant="outline">{filtered.length} resultados</Badge>
           </div>
+            }
+          />
         </CardHeader>
         <CardContent className="p-0">
           {view === "tabela" ? (
@@ -357,7 +369,7 @@ export default function ViagensPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.map((v) => (
+                {paginacao.itens.map((v) => (
                   <TableRow key={v.id}>
                     <TableCell>
                       <Link href={`/viagens/${v.id}`} className="block">
@@ -449,7 +461,7 @@ export default function ViagensPage() {
             </Table>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4">
-              {filtered.map((v) => (
+              {paginacao.itens.map((v) => (
                 <Link
                   key={v.id}
                   href={`/viagens/${v.id}`}
@@ -487,6 +499,7 @@ export default function ViagensPage() {
               ))}
             </div>
           )}
+          <Pagination {...paginacao} onPagina={paginacao.setPagina} onPorPagina={paginacao.setPorPagina} />
         </CardContent>
       </Card>
     </div>

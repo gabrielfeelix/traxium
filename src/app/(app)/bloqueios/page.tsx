@@ -38,6 +38,8 @@ import { useSession } from "@/lib/store/session";
 import { useToast } from "@/components/ui/toast";
 import { downloadCSV } from "@/lib/export";
 import { cn, formatDate, formatDateTime } from "@/lib/utils";
+import { Pagination } from "@/components/kit/pagination";
+import { useListPagination } from "@/lib/use-list-pagination";
 
 // Severidade: barra de acento + chip sutil — sinal sem pintar o card inteiro.
 const SEV_META = {
@@ -71,6 +73,7 @@ export default function BloqueiosPage() {
     const catOk = cat === "todas" || nc.categoria === cat;
     return statusOk && buscaOk && sevOk && catOk;
   });
+  const paginacao = useListPagination(filtered, `${filter}|${busca}|${sev}|${cat}`);
 
   const counts = {
     abertas: naoConformidades.filter((n) => n.status === "Aberta").length,
@@ -93,12 +96,12 @@ export default function BloqueiosPage() {
                 downloadCSV(
                   "traxium-nao-conformidades",
                   ["Código", "Severidade", "Categoria", "Descrição", "Status", "Responsável", "Causa raiz", "Ação corretiva"],
-                  naoConformidades.map((n) => [
+                  filtered.map((n) => [
                     n.codigo, n.severidade, n.categoria, n.descricao, n.status, n.responsavel ?? "",
                     n.capa?.causaRaiz ?? "", n.capa?.acaoCorretiva ?? "",
                   ])
                 );
-                toast("CSV exportado", { desc: `${naoConformidades.length} NCs com CAPA.` });
+                toast("CSV exportado", { desc: `${filtered.length} NC(s) do filtro atual, com CAPA.` });
               }}
             >
               <Download className="size-4" /> Exportar
@@ -191,7 +194,7 @@ export default function BloqueiosPage() {
               </Select>
             </CardHeader>
             <CardContent className="space-y-2 pt-0">
-              {filtered.map((nc) => {
+              {paginacao.itens.map((nc) => {
                 const S = SEV_META[nc.severidade];
                 return (
                   <div
@@ -252,6 +255,9 @@ export default function BloqueiosPage() {
                     Nenhuma não conformidade para os filtros atuais.
                   </p>
                 </div>
+              )}
+              {filtered.length > 0 && (
+                <Pagination {...paginacao} onPagina={paginacao.setPagina} onPorPagina={paginacao.setPorPagina} />
               )}
             </CardContent>
           </Card>
@@ -464,4 +470,3 @@ function CapaPanel({
     </div>
   );
 }
-

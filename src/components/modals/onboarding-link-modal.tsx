@@ -14,6 +14,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/toast";
 import { QRConvite } from "@/components/gatekeeper/qr-convite";
+import { useSession } from "@/lib/store/session";
+import { convitesOnboarding, ESTADO_CONVITE_LABEL } from "@/lib/domain/onboarding";
 
 const COLETA = [
   "CPF ou CNPJ",
@@ -28,8 +30,11 @@ const COLETA = [
 
 export function OnboardingLinkModal() {
   const { toast } = useToast();
+  const { version, criarConviteOnboarding, moverConviteOnboarding } = useSession();
+  void version;
   const [open, setOpen] = useState(false);
   const [tel, setTel] = useState("");
+  const [validadeDias, setValidadeDias] = useState("7");
   const [token, setToken] = useState("");
   const [copiado, setCopiado] = useState(false);
 
@@ -38,10 +43,19 @@ export function OnboardingLinkModal() {
   const [origem, setOrigem] = useState("");
   useEffect(() => setOrigem(window.location.origin), []);
   const link = token && origem ? `${origem}/convite/${token}` : "";
+  const convite = token ? convitesOnboarding.find((c) => c.token === token) : undefined;
 
   function gerar() {
     // Token gerado sob interação (sem Math.random no render → sem hydration mismatch).
-    const t = Array.from({ length: 8 }, () => "abcdefghjkmnpqrstuvwxyz23456789"[Math.floor(Math.random() * 31)]).join("");
+    const t = crypto.randomUUID().replaceAll("-", "").slice(0, 12);
+    const expira = new Date();
+    expira.setDate(expira.getDate() + Number(validadeDias));
+    criarConviteOnboarding({
+      token: t,
+      destinatario: tel.trim() || undefined,
+      canal: tel.trim() ? "WhatsApp" : "Link direto",
+      expiraEm: expira.toISOString(),
+    });
     setToken(t);
     setCopiado(false);
   }
@@ -95,10 +109,21 @@ export function OnboardingLinkModal() {
                 </Button>
               </div>
               <Button variant="gradient" size="sm" asChild className="w-full">
-                <a href={waHref()} target="_blank" rel="noopener noreferrer">
-                  <Send className="size-4" /> Enviar por WhatsApp
+                <a
+                  href={waHref()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => moverConviteOnboarding(token, "enviar")}
+                >
+                  <Send className="size-4" /> {convite?.estado === "nao_enviado" ? "Enviar por WhatsApp" : "Abrir WhatsApp novamente"}
                 </a>
               </Button>
+              {convite ? (
+                <div className="flex flex-wrap items-center justify-between gap-2 text-[10.5px] text-fg-muted">
+                  <span>Estado: <strong className="text-fg">{ESTADO_CONVITE_LABEL[convite.estado]}</strong></span>
+                  <span>Expira em {convite.expiraEm ? new Date(convite.expiraEm).toLocaleDateString("pt-BR") : "—"}</span>
+                </div>
+              ) : null}
               <div className="flex items-start gap-3 pt-1">
                 {link && <QRConvite url={link} size={112} />}
                 <div className="min-w-0">
@@ -108,6 +133,7 @@ export function OnboardingLinkModal() {
                     instalar nada, sem criar conta.
                   </p>
                   <p className="mt-1 text-[10.5px] text-[hsl(210_14%_46%)]">Também pode ser enviado por SMS.</p>
+                  <p className="mt-1 text-[10.5px] text-[hsl(210_14%_46%)]">Copiar o link não marca o convite como enviado; o envio pelo WhatsApp marca.</p>
                 </div>
               </div>
             </div>
@@ -123,6 +149,26 @@ export function OnboardingLinkModal() {
               ))}
             </ul>
           </div>
+
+          {!token ? (
+            <div>
+              <Label className="text-[11px]">Validade do convite</Label>
+              <div className="mt-1.5 flex gap-2">
+                {["3", "7", "14"].map((dias) => (
+                  <button
+                    key={dias}
+                    type="button"
+                    onClick={() => setValidadeDias(dias)}
+                    className={`flex-1 rounded-lg border px-3 py-2 text-[12px] font-semibold ${
+                      validadeDias === dias ? "border-brand-500 bg-brand-50 text-brand-800" : "border-border bg-bg-elev text-fg-muted"
+                    }`}
+                  >
+                    {dias} dias
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </div>
 
         <DialogFooter>

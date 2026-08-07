@@ -13,7 +13,7 @@ import { useToast } from "@/components/ui/toast";
 
 export type Convidado = { nome: string; email: string; papel: string };
 
-const PAPEIS = ["Admin", "Compliance", "Operação", "Auditor (acesso limitado)", "Visualizador"];
+const PAPEIS = ["Admin", "Compliance", "Operação", "Auditor interno (somente leitura)", "Visualizador"];
 
 export function ConvidarUsuarioModal({
   open, onOpenChange, onInvite,
@@ -39,7 +39,7 @@ export function ConvidarUsuarioModal({
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2"><UserPlus className="size-4 text-[hsl(176_84%_25%)]" /> Convidar usuário</DialogTitle>
-          <DialogDescription>Um e-mail de acesso será disparado ao convidado.</DialogDescription>
+          <DialogDescription>Convide apenas pessoas da equipe interna. Portal de terceiros e App do motorista têm convites próprios.</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-3">

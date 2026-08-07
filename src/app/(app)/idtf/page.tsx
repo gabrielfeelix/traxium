@@ -80,7 +80,7 @@ export default function IDTFPage() {
                     "HS", "Categoria", "Estado físico", "Regime antes de feed", "Proibido", "Restrições",
                     "Esquema", "Status", "Atualizado em", "Responsável", "Fonte da decisão", "Versão",
                   ],
-                  produtosIDTF.map((p) => [
+                  baseFiltrada.map((p) => [
                     p.nomeCanonico,
                     p.nomeOficialFonte ?? "",
                     [...p.alias, ...(p.sinonimosRegionais ?? []).map((x) => `${x.nome} (${x.regiao})`)].join(" | "),
@@ -100,7 +100,7 @@ export default function IDTFPage() {
                     p.versaoBase,
                   ])
                 );
-                toast("Base IDTF exportada", { desc: `${produtosIDTF.length} produtos.` });
+                toast("Base IDTF exportada", { desc: `${baseFiltrada.length} produto(s) do filtro atual.` });
               }}
             >
               <Download className="size-4" /> Exportar base
@@ -207,12 +207,13 @@ export default function IDTFPage() {
                 <TableHead>Categoria</TableHead>
                 <TableHead>Se for carga anterior → regime mín.</TableHead>
                 <TableHead>Risco EUDR</TableHead>
+                <TableHead className="w-28">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {baseFiltrada.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-10 text-[12px] text-fg-muted">
+                  <TableCell colSpan={6} className="text-center py-10 text-[12px] text-fg-muted">
                     Nenhum produto{regimeFiltro ? ` no regime ${regimeFiltro}` : ""}
                     {q ? ` para “${search}”` : ""}.
                   </TableCell>
@@ -254,6 +255,7 @@ export default function IDTFPage() {
                     <TableCell>
                       <span className="text-[11px] text-fg-muted">{p.riscoEUDR}</span>
                     </TableCell>
+                    <TableCell><ClassificarIDTFModal produto={p} /></TableCell>
                   </TableRow>
                 ))
               )}

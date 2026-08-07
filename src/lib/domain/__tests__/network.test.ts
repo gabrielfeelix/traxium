@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   vinculos,
   vinculoVigente,
+  vinculoVigenteDaEntidade,
   vinculosDoSubcontratado,
   veiculosDoSubcontratado,
   motoristasDoSubcontratado,
@@ -14,6 +15,7 @@ import {
   HOJE,
 } from "../model";
 import { motoristas } from "@/lib/mock-data";
+import { criarEntradaCadastro } from "@/lib/domain/onboarding";
 
 // ── Fase 9.1 — vínculo m:n com vigência ─────────────────────────────────────
 
@@ -53,6 +55,23 @@ describe("vínculo m:n", () => {
     expect(historico.every((v) => v.tipo === "motorista")).toBe(true);
   });
 
+  it("TAC acumula identidade de transportador e motorista sem duplicar a pessoa", () => {
+    const tac = subcontratados.find((s) => s.tipoVinculo === "TAC pessoa física")!;
+    expect(tac.responsavelMotoristaId).toBeTruthy();
+    expect(motoristas.some((m) => m.id === tac.responsavelMotoristaId)).toBe(true);
+    expect(motoristasDoSubcontratado(tac.id)).toContain(tac.responsavelMotoristaId);
+  });
+
+  it("um motorista tem no máximo uma empresa vigente", () => {
+    for (const motorista of motoristas) {
+      const atuais = vinculos.filter(
+        (v) => v.tipo === "motorista" && v.entidadeId === motorista.id && vinculoVigente(v)
+      );
+      expect(atuais.length, motorista.nome).toBeLessThanOrEqual(1);
+      expect(vinculoVigenteDaEntidade("motorista", motorista.id)).toBe(atuais[0]);
+    }
+  });
+
   it("as listas derivadas cobrem o que as antigas cobriam", () => {
     expect(veiculosDoSubcontratado("sub-001")).toContain("PHC-2B17");
     expect(motoristasDoSubcontratado("sub-001")).toContain("m-001");
@@ -86,5 +105,46 @@ describe("arquivamento", () => {
     const apta = subcontratados.find((x) => ESTADO_QUALIFICACAO[estadoQualificacao(x).estado].opera)!;
     const arquivada = { ...apta, arquivadoEm: HOJE, motivoArquivo: "Teste." };
     expect(estadoQualificacao(arquivada).estado).toBe("Inativo");
+  });
+});
+
+// ── Ciclo de entrada — origem não é qualificação ────────────────────────────
+
+describe("entrada do subcontratado", () => {
+  it("importado continua pré-cadastrado até alguém iniciar a qualificação", () => {
+    const importado = {
+      ...subcontratados[0],
+      cadastro: criarEntradaCadastro({
+        origem: "importacao",
+        criadoEm: `${HOJE}T10:00:00`,
+        criadoPor: "Admin de subcontratados",
+      }),
+      certGMP: {
+        numero: "—",
+        certificadora: "—",
+        escopo: [],
+        validade: HOJE,
+        statusBasePublica: "Não localizado" as const,
+        sitesCobertos: [],
+      },
+    };
+
+    expect(estadoQualificacao(importado).estado).toBe("Pré-cadastrado");
+    expect(ESTADO_QUALIFICACAO[estadoQualificacao(importado).estado].opera).toBe(false);
+  });
+
+  it("cadastro manual já entra na qualificação, mas não nasce apto", () => {
+    const manual = {
+      ...subcontratados[0],
+      cadastro: criarEntradaCadastro({
+        origem: "manual",
+        criadoEm: `${HOJE}T10:00:00`,
+        criadoPor: "Gestor GMP+",
+      }),
+      acordo: undefined,
+    };
+
+    expect(estadoQualificacao(manual).estado).toBe("Pendente documental");
+    expect(ESTADO_QUALIFICACAO[estadoQualificacao(manual).estado].opera).toBe(false);
   });
 });

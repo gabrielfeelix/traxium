@@ -23,21 +23,32 @@ export function ClassificarIDTFModal({ produto }: { produto: ProdutoIDTF }) {
   const [regime, setRegime] = useState<Regime>(produto.regimeAntesDeFeed);
   const [bloqueia, setBloqueia] = useState(produto.bloqueiaFeed);
   const [idtf, setIdtf] = useState(produto.idtfCode ?? "");
+  const [justificativa, setJustificativa] = useState("");
+  const [fonte, setFonte] = useState(produto.fonteDecisao ?? "IDTF oficial vigente");
+  const edicao = produto.statusClassificacao !== "em_fila";
 
   function salvar() {
-    classificarProduto(produto.id, { regimeAntesDeFeed: regime, bloqueiaFeed: bloqueia, idtfCode: idtf || undefined });
-    toast(`${produto.nomeCanonico} classificado`, { desc: bloqueia ? "Marcado como proibido para feed." : `Regime mínimo ${regime} definido. Saiu da fila.` });
+    classificarProduto(produto.id, {
+      regimeAntesDeFeed: regime,
+      bloqueiaFeed: bloqueia,
+      idtfCode: idtf || undefined,
+      justificativa: justificativa.trim(),
+      fonte: fonte.trim(),
+    });
+    toast(edicao ? `${produto.nomeCanonico} atualizado` : `${produto.nomeCanonico} classificado`, {
+      desc: bloqueia ? "Marcado como proibido para feed, com histórico." : `Regime mínimo ${regime} definido e registrado no histórico.`,
+    });
     setOpen(false);
   }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" disabled={bloqueado} title={bloqueado ? "Só a qualidade (gestor) classifica produtos" : undefined}>Classificar</Button>
+        <Button variant="outline" size="sm" disabled={bloqueado} title={bloqueado ? "Só a qualidade (gestor) classifica produtos" : undefined}>{edicao ? "Editar regra" : "Classificar"}</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2"><Tag className="size-4 text-[hsl(176_84%_25%)]" /> Classificar produto</DialogTitle>
+          <DialogTitle className="flex items-center gap-2"><Tag className="size-4 text-[hsl(176_84%_25%)]" /> {edicao ? "Editar regra do produto" : "Classificar produto"}</DialogTitle>
           <DialogDescription>{produto.nomeCanonico} · alias: {produto.alias.join(" · ")}</DialogDescription>
         </DialogHeader>
 
@@ -61,6 +72,16 @@ export function ClassificarIDTFModal({ produto }: { produto: ProdutoIDTF }) {
             <div className="mt-1.5"><RegimeBadge regime={regime} size="sm" /></div>
           </div>
 
+          <div>
+            <Label className="text-[11px]">Justificativa da decisão</Label>
+            <Input value={justificativa} onChange={(e) => setJustificativa(e.target.value)} placeholder="Por que esta regra está sendo definida ou alterada?" className="h-9 mt-1" />
+          </div>
+
+          <div>
+            <Label className="text-[11px]">Fonte técnica</Label>
+            <Input value={fonte} onChange={(e) => setFonte(e.target.value)} placeholder="Item da IDTF, parecer ou consulta ao esquema" className="h-9 mt-1" />
+          </div>
+
           <div className="flex items-center justify-between rounded-md border border-[hsl(200_18%_90%)] px-3 h-10">
             <Label className="text-[12px] cursor-pointer">Proibido para feed (exige liberação formal + Regime D)</Label>
             <Switch checked={bloqueia} onCheckedChange={setBloqueia} />
@@ -73,7 +94,7 @@ export function ClassificarIDTFModal({ produto }: { produto: ProdutoIDTF }) {
         </div>
 
         <DialogFooter>
-          <Button variant="gradient" size="sm" onClick={salvar}>Classificar e liberar uso</Button>
+          <Button variant="gradient" size="sm" disabled={!justificativa.trim() || !fonte.trim()} onClick={salvar}>{edicao ? "Salvar com histórico" : "Classificar e liberar uso"}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

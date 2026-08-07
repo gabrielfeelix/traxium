@@ -62,7 +62,7 @@ export function Topbar() {
               <div className="size-7 rounded-md bg-gradient-to-br from-[hsl(176_84%_30%)] to-[hsl(200_92%_28%)] flex items-center justify-center text-white font-bold text-[10px] shadow-sm">
                 {initials(tenantNome)}
               </div>
-              <div className="text-left hidden xl:block">
+              <div className="text-left hidden 2xl:block">
                 <p className="text-[9px] uppercase tracking-[0.12em] text-[hsl(210_14%_42%)] font-semibold leading-none">Filial ativa</p>
                 <p className="text-[13px] font-semibold leading-tight mt-0.5 max-w-[140px] truncate">{filialAtiva}</p>
               </div>
@@ -108,7 +108,7 @@ export function Topbar() {
 
         {/* Right actions */}
         <div className="ml-auto flex shrink-0 items-center gap-0.5 sm:gap-1">
-          <Button variant="outline" size="sm" onClick={() => setCopilot(true)} className="hidden xl:flex h-9 gap-1.5 border-[hsl(176_60%_75%)] text-[hsl(176_84%_25%)] hover:bg-[hsl(174_64%_96%)]">
+          <Button variant="outline" size="sm" onClick={() => setCopilot(true)} className="hidden 2xl:flex h-9 gap-1.5 border-[hsl(176_60%_75%)] text-[hsl(176_84%_25%)] hover:bg-[hsl(174_64%_96%)]">
             <Sparkles className="size-3.5" /> Copilot
             <kbd className="ml-1 inline-flex h-4 items-center rounded border border-[hsl(176_60%_75%)] bg-white px-1 text-[9px] font-semibold num">⌘J</kbd>
           </Button>
@@ -165,7 +165,7 @@ export function Topbar() {
                 <Avatar className="size-7 ring-2 ring-white shadow-sm">
                   <AvatarFallback className="text-[11px] bg-gradient-to-br from-[hsl(176_84%_30%)] to-[hsl(200_92%_30%)] text-white">GF</AvatarFallback>
                 </Avatar>
-                <div className="text-left hidden xl:block">
+                <div className="text-left hidden 2xl:block">
                   <p className="text-[12px] font-semibold leading-tight">Gabriel Felix</p>
                   <p className="text-[10px] text-[hsl(210_14%_42%)] leading-tight">{PERFIL_POR_ID[perfilId].label}</p>
                 </div>

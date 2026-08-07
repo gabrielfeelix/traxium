@@ -41,12 +41,23 @@ import { QualificarSubcontratadoModal } from "@/components/modals/qualificar-sub
 import { PassaporteFeedSafetyModal } from "@/components/modals/passaporte-modal";
 import { AssinarAcordoModal } from "@/components/modals/assinar-acordo-modal";
 import { OnboardingLinkModal } from "@/components/modals/onboarding-link-modal";
+import { ConvitesOnboarding } from "@/components/subcontratados/convites-onboarding";
+import { RevisarSubcontratadoModal } from "@/components/modals/revisar-subcontratado-modal";
+import { GerenciarMotoristasSubcontratadoModal } from "@/components/modals/gerenciar-motoristas-subcontratado-modal";
+import { ConvidarAcessoExternoModal } from "@/components/modals/convidar-acesso-externo-modal";
+import { Pagination } from "@/components/kit/pagination";
+import { useListPagination } from "@/lib/use-list-pagination";
 
 const TONE_VARIANT = { success: "success", warning: "warning", danger: "destructive", muted: "muted" } as const;
 import { useSession } from "@/lib/store/session";
 import { useToast } from "@/components/ui/toast";
 import { downloadCSV } from "@/lib/export";
 import { formatDate, cn } from "@/lib/utils";
+import {
+  ESTADO_CONVITE_LABEL,
+  ORIGEM_CADASTRO_LABEL,
+  proximoPassoDaEntrada,
+} from "@/lib/domain/onboarding";
 
 export default function SubcontratadosPage() {
   const { version, arquivarSubcontratado, desarquivarSubcontratado } = useSession();
@@ -91,6 +102,10 @@ export default function SubcontratadosPage() {
     if (ate && s.certGMP.validade > ate) return false;
     return casa(s);
   });
+  const paginacao = useListPagination(
+    lista,
+    `${search}|${foco}|${vinculoFiltro}|${de}|${ate}|${verArquivadas}`
+  );
 
   const ativas = subcontratados.filter((s) => !s.arquivadoEm);
   const arquivadas = subcontratados.filter((s) => s.arquivadoEm);
@@ -159,6 +174,8 @@ export default function SubcontratadosPage() {
         selectedId={foco}
         onSelect={setFoco}
       />
+
+      <ConvitesOnboarding />
 
       <div className="flex items-end gap-2 flex-wrap">
         <div className="relative min-w-[220px] flex-1">
@@ -235,8 +252,9 @@ export default function SubcontratadosPage() {
           </CardContent>
         </Card>
       ) : (
+        <>
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-          {lista.map((s) => (
+          {paginacao.itens.map((s) => (
             <SubcontratadoCard
               key={s.id}
               s={s}
@@ -268,6 +286,10 @@ export default function SubcontratadosPage() {
             />
           ))}
         </div>
+        <div className="mt-4 overflow-hidden rounded-xl border border-border-soft bg-bg-elev">
+          <Pagination {...paginacao} onPagina={paginacao.setPagina} onPorPagina={paginacao.setPorPagina} />
+        </div>
+        </>
       )}
     </div>
   );
@@ -294,6 +316,7 @@ function SubcontratadoCard({
   const condutores = motoristasDoSubcontratado(s.id);
   const encerrados = vinculosDoSubcontratado(s.id, { incluirEncerrados: true }).filter((v) => v.fim);
   const alertas = notificacoesDoSubcontratado(s.id);
+  const preCadastro = s.cadastro?.etapa === "pre_cadastro";
 
   return (
     <Card className={cn(meta.tone === "danger" && "border-danger-500/40", selecionada && "ring-2 ring-brand-500/40")}>
@@ -320,6 +343,9 @@ function SubcontratadoCard({
                     <span className="text-[10px] font-medium text-fg-muted">{s.tipoVinculo}</span>
                   </>
                 )}
+                {s.responsavelMotoristaId && (
+                  <Badge variant="outline" className="text-[8px]" title="A mesma pessoa é o transportador TAC e o motorista no App">TAC no App</Badge>
+                )}
               </div>
             </div>
           </div>
@@ -327,6 +353,23 @@ function SubcontratadoCard({
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
+        {s.cadastro && (
+          <div className="rounded-lg border border-brand-200/70 bg-brand-50/70 p-2.5 text-[11px]">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-brand-800">
+              <span className="font-semibold">Origem: {ORIGEM_CADASTRO_LABEL[s.cadastro.origem]}</span>
+              {s.cadastro.convite ? (
+                <>
+                  <span aria-hidden="true">·</span>
+                  <span>Convite {ESTADO_CONVITE_LABEL[s.cadastro.convite.estado].toLowerCase()}</span>
+                </>
+              ) : null}
+            </div>
+            <p className="mt-1 text-fg-muted">
+              <strong className="text-fg">Próximo passo:</strong> {proximoPassoDaEntrada(s.cadastro)}.
+            </p>
+          </div>
+        )}
+
         {/* Escopo GMP+ */}
         <div>
           <p className="text-[10px] uppercase tracking-[0.1em] text-fg-muted font-semibold mb-1.5">Escopo GMP+</p>
@@ -338,28 +381,37 @@ function SubcontratadoCard({
         </div>
 
         {/* Certificado + validade com alerta */}
-        <div className="rounded-lg border border-border-soft p-2.5">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.1em] text-fg-muted font-semibold">Certificado</p>
-              <p className="text-[12px] font-mono">{s.certGMP.numero}</p>
-              <p className="text-[10px] text-fg-soft">{s.certGMP.certificadora}</p>
-            </div>
-            <VencimentoBadge nivel={venc.nivel} dias={venc.dias} validade={s.certGMP.validade} />
+        {preCadastro ? (
+          <div className="rounded-lg border border-dashed border-border bg-bg p-2.5">
+            <p className="text-[10px] uppercase tracking-[0.1em] text-fg-muted font-semibold">Certificado</p>
+            <p className="mt-1 text-[11px] text-fg-muted">Ainda não conferido. O pré-cadastro não afirma validade nem status na base pública.</p>
           </div>
-        </div>
+        ) : (
+          <div className="rounded-lg border border-border-soft p-2.5">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.1em] text-fg-muted font-semibold">Certificado</p>
+                <p className="text-[12px] font-mono">{s.certGMP.numero}</p>
+                <p className="text-[10px] text-fg-soft">{s.certGMP.certificadora}</p>
+              </div>
+              <VencimentoBadge nivel={venc.nivel} dias={venc.dias} validade={s.certGMP.validade} />
+            </div>
+          </div>
+        )}
 
         {/* Status base pública + site */}
-        <div className="grid grid-cols-2 gap-2 text-[11px]">
-          <div className="flex items-center gap-1.5">
-            <Globe className="size-3.5 text-fg-muted" />
-            <span className="text-fg-muted">Base pública:</span>
-            <span className={cn("font-semibold", s.certGMP.statusBasePublica === "Ativo" ? "text-success-700" : "text-danger-700")}>
-              {s.certGMP.statusBasePublica}
-            </span>
+        {!preCadastro ? (
+          <div className="grid grid-cols-2 gap-2 text-[11px]">
+            <div className="flex items-center gap-1.5">
+              <Globe className="size-3.5 text-fg-muted" />
+              <span className="text-fg-muted">Base pública:</span>
+              <span className={cn("font-semibold", s.certGMP.statusBasePublica === "Ativo" ? "text-success-700" : "text-danger-700")}>
+                {s.certGMP.statusBasePublica}
+              </span>
+            </div>
+            <div className="text-fg-muted truncate">Sites: {s.certGMP.sitesCobertos.join(", ")}</div>
           </div>
-          <div className="text-fg-muted truncate">Sites: {s.certGMP.sitesCobertos.join(", ")}</div>
-        </div>
+        ) : null}
 
         {/* Vínculos vigentes — e o passado que não some */}
         <div className="flex items-center gap-4 text-[11px] text-fg-muted flex-wrap">
@@ -408,8 +460,18 @@ function SubcontratadoCard({
         )}
 
         <div className="space-y-2 pt-0.5">
-          <AssinarAcordoModal s={s} />
-          <PassaporteFeedSafetyModal s={s} />
+          {preCadastro ? (
+            <RevisarSubcontratadoModal s={s} />
+          ) : (
+            <>
+              {!s.arquivadoEm && <GerenciarMotoristasSubcontratadoModal s={s} />}
+              {!s.arquivadoEm && (
+                <ConvidarAcessoExternoModal tipo="portal_subcontratado" entidadeId={s.id} nome={s.razaoSocial} />
+              )}
+              <AssinarAcordoModal s={s} />
+              <PassaporteFeedSafetyModal s={s} />
+            </>
+          )}
           {s.arquivadoEm ? (
             <Button variant="outline" size="sm" className="w-full" onClick={onDesarquivar}>
               <ArchiveRestore className="size-4" /> Reativar cadastro

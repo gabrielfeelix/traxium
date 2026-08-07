@@ -661,7 +661,7 @@ function Reconstrucao({ viagemId }: { viagemId: string }) {
       conteudo: `exigido:${d.regimeExigido ?? "-"}|aplicado:${d.regimeAplicado ?? "-"}|${limpeza?.id ?? "sem-evento"}`,
       jsx: (
         <>
-          <div className="flex items-center gap-2 text-[12px]">
+          <div className="flex flex-wrap items-center gap-2 text-[12px]">
             <span className="text-fg-muted">Exigido</span>
             {d.regimeExigido ? <RegimeBadge regime={d.regimeExigido} size="sm" /> : "—"}
             <span className="text-fg-muted">· Aplicado</span>

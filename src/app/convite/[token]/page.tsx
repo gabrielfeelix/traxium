@@ -11,7 +11,7 @@
 // qualificação continua sendo derivada dos fatos (certificado, base pública,
 // acordo, treinamento) como em qualquer outro subcontratado.
 
-import { useState, use } from "react";
+import { useEffect, useState, use } from "react";
 import Link from "next/link";
 import {
   ArrowRight, ArrowLeft, Check, Truck, IdCard, Building2, ClipboardList,
@@ -26,6 +26,7 @@ import { AssinaturaCanvas } from "@/components/gatekeeper/assinatura-canvas";
 import { useSession } from "@/lib/store/session";
 import { TIPOS_VINCULO, vinculoEhPessoa, produtosIDTF, ORDEM_REGIME, type TipoVinculo, type Regime } from "@/lib/domain/model";
 import { cn } from "@/lib/utils";
+import { convitesOnboarding } from "@/lib/domain/onboarding";
 
 const PASSOS = [
   { n: 1, titulo: "Quem é você", icon: IdCard },
@@ -40,7 +41,8 @@ const REGIMES: Regime[] = ["A", "B", "C", "D"];
 
 export default function ConvitePage({ params }: { params: Promise<{ token: string }> }) {
   const { token } = use(params);
-  const { addSubcontratadoPreCadastro } = useSession();
+  const { version, addSubcontratadoPreCadastro, moverConviteOnboarding } = useSession();
+  void version;
 
   const [passo, setPasso] = useState(1);
   const [enviado, setEnviado] = useState(false);
@@ -69,6 +71,17 @@ export default function ConvitePage({ params }: { params: Promise<{ token: strin
   // 6 · aceite
   const [aceite, setAceite] = useState(false);
   const [assinatura, setAssinatura] = useState<string | null>(null);
+  const [erroEnvio, setErroEnvio] = useState("");
+
+  const convite = convitesOnboarding.find((c) => c.token === token);
+  const conviteIndisponivel = convite?.estado === "expirado" || convite?.estado === "revogado";
+
+  useEffect(() => {
+    const atual = convitesOnboarding.find((c) => c.token === token);
+    if (!atual || atual.estado === "aberto" || atual.estado === "concluido" || atual.estado === "expirado" || atual.estado === "revogado") return;
+    if (atual.expiraEm && new Date(atual.expiraEm).getTime() < Date.now()) moverConviteOnboarding(token, "expirar");
+    else moverConviteOnboarding(token, "abrir");
+  }, [token, moverConviteOnboarding]);
 
   const pessoa = vinculoEhPessoa(vinculo || undefined);
   const okPasso: Record<number, boolean> = {
@@ -92,7 +105,8 @@ export default function ConvitePage({ params }: { params: Promise<{ token: strin
     Boolean(limpezaRegime && exigido) && ORDEM_REGIME[limpezaRegime as Regime] < ORDEM_REGIME[exigido!];
 
   function enviar() {
-    addSubcontratadoPreCadastro({
+    const id = addSubcontratadoPreCadastro({
+      token,
       razaoSocial: pessoa ? nome.trim() : contratante.trim() || nome.trim(),
       documento: doc.trim(),
       tipoVinculo: vinculo as TipoVinculo,
@@ -102,7 +116,24 @@ export default function ConvitePage({ params }: { params: Promise<{ token: strin
       implementoPlaca: implemento.trim().toUpperCase(),
       assinouAceite: true,
     });
+    if (!id) {
+      setErroEnvio("Este convite não aceita mais respostas. Solicite um novo link à transportadora.");
+      return;
+    }
     setEnviado(true);
+  }
+
+  if (conviteIndisponivel) {
+    return (
+      <Casca token={token}>
+        <div className="rounded-2xl border border-warning-500/30 bg-warning-50 p-6 text-center">
+          <h1 className="text-[20px] font-bold text-fg">Convite indisponível</h1>
+          <p className="mt-2 text-[13px] leading-relaxed text-fg-muted">
+            Este link foi {convite?.estado === "expirado" ? "expirado" : "revogado"}. Peça um novo convite à transportadora.
+          </p>
+        </div>
+      </Casca>
+    );
   }
 
   if (enviado) {
@@ -356,6 +387,7 @@ export default function ConvitePage({ params }: { params: Promise<{ token: strin
           </button>
         )}
       </div>
+      {erroEnvio ? <p role="alert" className="mt-3 text-[12px] font-medium text-danger-700">{erroEnvio}</p> : null}
     </Casca>
   );
 }

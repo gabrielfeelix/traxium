@@ -10,6 +10,8 @@
 //
 // Este módulo é aditivo: convive com mock-data.ts sem quebrar exports existentes.
 
+import type { EntradaCadastro } from "@/lib/domain/onboarding";
+
 export const VERSAO_BASE_IDTF = "IDTF-BR 2026.05";
 
 /** Data de referência "hoje" do protótipo (para alertas de vencimento). */
@@ -458,6 +460,17 @@ export function notificacoesDoSubcontratado(subcontratadoId: string): Notificaca
 /** Vigente na data de referência: começou e não terminou. */
 export function vinculoVigente(v: Vinculo, hoje = HOJE): boolean {
   return v.inicio <= hoje && (!v.fim || v.fim >= hoje);
+}
+
+/** Vínculo vigente de uma entidade, independentemente da empresa responsável. */
+export function vinculoVigenteDaEntidade(
+  tipo: TipoEntidadeVinculo,
+  entidadeId: string,
+  hoje = HOJE
+): Vinculo | undefined {
+  return vinculos.find(
+    (v) => v.tipo === tipo && v.entidadeId === entidadeId && vinculoVigente(v, hoje)
+  );
 }
 
 export function vinculosDoSubcontratado(
@@ -968,6 +981,9 @@ export type Subcontratado = {
   cnpj: string;
   razaoSocial: string;
   tipoVinculo?: TipoVinculo;
+  /** Quando o transportador é uma pessoa (ex.: TAC), aponta para a mesma
+   * identidade operacional no cadastro de motoristas — não é outra pessoa. */
+  responsavelMotoristaId?: string;
   certGMP: {
     numero: string;
     certificadora: string;
@@ -978,6 +994,8 @@ export type Subcontratado = {
   };
   treinamento: { comprovante: boolean; quiz: boolean; aceiteRegras: boolean };
   acordo?: AcordoQA;
+  /** Como o registro entrou e em qual etapa do Gatekeeper ele está. */
+  cadastro?: EntradaCadastro;
   /**
    * Arquivamento (Fase 9.5). Guardar a data em vez de apagar o registro é o que
    * mantém o histórico: viagem antiga continua apontando para a empresa que a
@@ -1067,6 +1085,7 @@ export const subcontratados: Subcontratado[] = [
     cnpj: "45.678.901/0001-23",
     razaoSocial: "Rondon Fretes — José A. Ferreira (TAC)",
     tipoVinculo: "TAC pessoa física",
+    responsavelMotoristaId: "m-007",
     certGMP: {
       numero: "GMP-BR-2025-2077",
       certificadora: "Único Organismo Certificador BR",
@@ -1124,6 +1143,16 @@ export function estadoQualificacao(s: Subcontratado): { estado: EstadoQualificac
       estado: "Inativo",
       motivo: `Arquivada em ${s.arquivadoEm.slice(0, 10)}. ${s.motivoArquivo ?? ""}`.trim(),
     };
+  // Importação e onboarding público só coletam fatos. Antes de alguém iniciar a
+  // qualificação, certificado ausente significa pré-cadastro — não uma empresa
+  // já avaliada e bloqueada. Ao avançar a etapa, as regras abaixo assumem.
+  if (s.cadastro?.etapa === "pre_cadastro") {
+    const origem = s.cadastro.origem === "importacao" ? "importação" : "convite público";
+    return {
+      estado: "Pré-cadastrado",
+      motivo: `Cadastro recebido por ${origem}. Revise os dados e inicie a qualificação; nenhuma aptidão foi afirmada.`,
+    };
+  }
   const venc = nivelVencimento(s.certGMP.validade);
   if (s.certGMP.statusBasePublica === "Suspenso")
     return { estado: "Suspenso", motivo: "Status “Suspenso” na base pública GMP+ International." };

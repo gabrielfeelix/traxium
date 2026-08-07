@@ -11,7 +11,6 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { type Subcontratado, estadoQualificacao, ESTADO_QUALIFICACAO, podeExecutar } from "@/lib/domain/model";
-import { motoristas } from "@/lib/mock-data";
 import { useSession } from "@/lib/store/session";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
@@ -33,21 +32,19 @@ export function QualificarSubcontratadoModal() {
   const [sites, setSites] = useState("");
   const [statusBase, setStatusBase] = useState<Subcontratado["certGMP"]["statusBasePublica"]>("Ativo");
   const [veiculos, setVeiculos] = useState("");
-  const [mot, setMot] = useState("");
   const [tComprovante, setTComprovante] = useState(false);
   const [tQuiz, setTQuiz] = useState(false);
   const [tAceite, setTAceite] = useState(false);
 
   function reset() {
     setCnpj(""); setRazao(""); setNumero(""); setEscopos(["Road Transport of Feed"]); setValidade("");
-    setSites(""); setStatusBase("Ativo"); setVeiculos(""); setMot(""); setTComprovante(false); setTQuiz(false); setTAceite(false);
+    setSites(""); setStatusBase("Ativo"); setVeiculos(""); setTComprovante(false); setTQuiz(false); setTAceite(false);
   }
   const toggleEscopo = (e: Escopo) => setEscopos((s) => (s.includes(e) ? s.filter((x) => x !== e) : [...s, e]));
 
   const valido = cnpj && razao && numero && validade && escopos.length > 0;
 
   function salvar() {
-    const naoCadastrados: string[] = [];
     const novo = {
       cnpj, razaoSocial: razao,
       certGMP: {
@@ -63,21 +60,12 @@ export function QualificarSubcontratadoModal() {
     for (const placa of veiculos.split(",").map((v) => v.trim()).filter(Boolean)) {
       vincular({ subcontratadoId: id, tipo: "implemento", entidadeId: placa });
     }
-    for (const nome of mot.split(",").map((v) => v.trim()).filter(Boolean)) {
-      const m = motoristas.find((x) => x.nome.toLowerCase() === nome.toLowerCase());
-      // Motorista sem cadastro não vira vínculo: vínculo aponta para id, e um
-      // nome digitado não é identidade. A tela avisa em vez de gravar fantasma.
-      if (m) vincular({ subcontratadoId: id, tipo: "motorista", entidadeId: m.id });
-      else naoCadastrados.push(nome);
-    }
     // Estado real derivado (novo cadastro sem acordo firmado → Pendente documental).
     const { estado, motivo } = estadoQualificacao(novo as Subcontratado);
     const meta = ESTADO_QUALIFICACAO[estado];
     toast(`${razao} · ${estado}`, {
       type: meta.opera ? "success" : meta.tone === "danger" ? "error" : "info",
-      desc: naoCadastrados.length
-        ? `${motivo} Sem vínculo para ${naoCadastrados.join(", ")}: motorista precisa existir no cadastro.`
-        : motivo,
+      desc: motivo,
     });
     setOpen(false); reset();
   }
@@ -86,13 +74,15 @@ export function QualificarSubcontratadoModal() {
     <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) reset(); }}>
       <DialogTrigger asChild>
         <Button variant="gradient" size="sm" disabled={bloqueado} title={bloqueado ? "Seu papel não qualifica subcontratados" : undefined}>
-          <Plus className="size-4" /> Qualificar subcontratado
+          <Plus className="size-4" /> Cadastrar manualmente
         </Button>
       </DialogTrigger>
       <DialogContent className="max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2"><Building2 className="size-4 text-[hsl(176_84%_25%)]" /> Qualificar subcontratado</DialogTitle>
-          <DialogDescription>Valida mais que o CNPJ: escopo, validade, base pública e autorizados.</DialogDescription>
+          <DialogTitle className="flex items-center gap-2"><Building2 className="size-4 text-[hsl(176_84%_25%)]" /> Cadastrar manualmente</DialogTitle>
+          <DialogDescription>
+            Você preenche o cadastro e inicia a qualificação. Esta ação não envia convite nem cria acesso ao portal.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -138,10 +128,10 @@ export function QualificarSubcontratadoModal() {
           </Secao>
 
           <Secao titulo="Autorização e treinamento">
-            <div className="grid grid-cols-2 gap-3">
-              <F label="Veículos autorizados (vírgula)"><Input value={veiculos} onChange={(e) => setVeiculos(e.target.value)} placeholder="ABC-1D23, …" className="h-9" /></F>
-              <F label="Motoristas autorizados (vírgula)"><Input value={mot} onChange={(e) => setMot(e.target.value)} placeholder="Nome, …" className="h-9" /></F>
-            </div>
+            <F label="Veículos autorizados (vírgula)"><Input value={veiculos} onChange={(e) => setVeiculos(e.target.value)} placeholder="ABC-1D23, …" className="h-9" /></F>
+            <p className="mt-2 text-[11px] text-fg-muted">
+              Depois de salvar, use <strong className="text-fg">Gerenciar motoristas</strong> no card da empresa para cadastrar um novo condutor ou vincular alguém que já existe.
+            </p>
             <div className="space-y-2 mt-2">
               {[
                 { l: "Comprovante de treinamento", v: tComprovante, set: setTComprovante },
@@ -158,7 +148,7 @@ export function QualificarSubcontratadoModal() {
         </div>
 
         <DialogFooter>
-          <Button variant="gradient" size="sm" disabled={!valido} onClick={salvar}>Qualificar</Button>
+          <Button variant="gradient" size="sm" disabled={!valido} onClick={salvar}>Salvar e iniciar qualificação</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

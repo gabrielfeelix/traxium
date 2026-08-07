@@ -19,7 +19,7 @@ pnpm install          # pnpm, NÃO npm — ver armadilha #1
 pnpm dev              # localhost:3000
 pnpm test             # vitest, só o domínio (src/lib/**)
 npx tsc --noEmit      # antes de todo commit
-npm run build         # antes de todo commit
+pnpm build            # antes de todo commit
 ```
 
 ## 3. Armadilhas — leia antes de debugar
@@ -107,6 +107,19 @@ Diretriz do P.O.: 5 pilares. Estado por pilar (detalhe item a item em **`PAREAME
 | Transversais | ✓ fechado (Fase 10) |
 | §8 Indicadores | ✓ 15 de 15 — 11 medidos, 4 declarados como não medidos |
 
+### Fluxos de produto amarrados em 06/08/2026
+
+- Todas as rotas têm skeleton por segmento: back-office, autenticação e páginas públicas.
+- Subcontratado entra por três portas explícitas: cadastro manual, importação e onboarding público. Origem, estado e próximo passo aparecem no card.
+- Convite de onboarding tem registro e transições (`não enviado → enviado/aberto → concluído`, além de expiração e revogação). Ele coleta dados; **não cria login**.
+- Pré-cadastro público ou importado precisa passar por revisão antes da qualificação.
+- Motorista terceiro pode ser vinculado ou criado dentro da transportadora; dupla empresa vigente é recusada. TAC aponta para a mesma identidade de motorista por `responsavelMotoristaId`.
+- Acesso ao Portal do Subcontratado e ao App do Motorista usa convite próprio em `/acesso/[token]`, separado do onboarding. Auditor externo continua export-only no MVP; a superfície E está rotulada como prévia da Fase 2.
+- Subcontratados, motoristas, viagens, não conformidades, limpezas e frota usam paginação 25/50. Página e tamanho ficam na URL; filtros adicionais de Viagens recolhem em telas estreitas.
+- A regra de um produto IDTF classificado pode ser editada com justificativa e fonte. A mutação registra autor/data no histórico da base; exportações respeitam o filtro atual.
+
+Os registries continuam em memória, como o restante do protótipo. Abrir um convite em outra sessão do navegador demonstra a ativação pela URL, mas não sincroniza a fila da sessão emissora; isso depende do backend.
+
 ## 8. O que vem agora
 
 **O roadmap de `PLANO-COBERTURA-PDF.md` está inteiro entregue** — fases 0 e 4 a 10. Os cinco pilares e os transversais estão fechados; o que sobra é dívida conhecida (§9), não fase.
@@ -149,6 +162,9 @@ O que faria sentido atacar a seguir, em ordem de retorno:
 
 ```
 src/lib/domain/
+  onboarding.ts      # entrada de terceiros + máquina de estados do convite de dados
+  access.ts          # convites separados de acesso ao Portal/App
+  pagination.ts      # paginação determinística após filtros
   model.ts           # entidades, estadoQualificacao, tipos de vínculo, acordo
   rules-engine.ts    # avaliarCarregamento (12 condições) + CAPA + T-3
   motor-config.ts    # 4 classes, 12 RegraId, piso por regra
@@ -159,11 +175,12 @@ src/lib/domain/
   registro.ts        # classes registro/informacao com efeito; podeConcluir
   lgpd.ts            # retenção, inativação, consentimentos e bases legais
   indicadores.ts     # os 15 do §8, com "não medido" explícito
-  __tests__/         # vitest (113 testes)
+  __tests__/         # vitest (127 testes)
 src/lib/store/session.tsx   # todas as ações de escrita
 src/components/shell/       # sidebar (+drawer), topbar, torre-de-controle
 src/app/(app)/              # back-office (tem shell)
-src/app/convite/[token]/    # onboarding público (SEM shell, de propósito)
+src/app/convite/[token]/    # onboarding público de dados (SEM shell, de propósito)
+src/app/acesso/[token]/     # ativação pública de login externo (Portal/App)
 ```
 
 **Documentos:** `PAREAMENTO-PDF.md` (diretriz × entregue, item a item) · `PLANO-COBERTURA-PDF.md` (roadmap fases 7–10) · `BRIEFING-DESIGN.md` (**briefing funcional para redesenho: telas, objetivos, dados e fluxos, sem interface**) · `REVISAO-UI-UX.md` (revisão visual com medições de contraste) · `DESIGN.md` (design system atual) · `PLANO-PRODUTO.md`, `PLANO-PERFIS.md`, `PESQUISA-UX.md`.

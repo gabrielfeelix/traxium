@@ -99,8 +99,8 @@ export function ImportarPlanilhaModal() {
     toast(`${r.criados} empresa(s) importada(s)`, {
       type: r.criados ? "success" : "info",
       desc: r.ignorados
-        ? `${r.ignorados} linha(s) não entraram. Toda importada nasce sem certificado comprovado — a base pública ainda não foi consultada.`
-        : "Todas nascem sem certificado comprovado: importar traz o cadastro, não a conformidade.",
+        ? `${r.ignorados} linha(s) não entraram. Nenhum convite foi enviado; revise os pré-cadastros antes de solicitar documentos.`
+        : "Nenhum convite foi enviado. As empresas entraram como pré-cadastradas para revisão.",
     });
     setOpen(false);
     setTexto("");
@@ -118,7 +118,7 @@ export function ImportarPlanilhaModal() {
           <DialogTitle>Importar subcontratados</DialogTitle>
           <DialogDescription>
             Cole as linhas da planilha. Colunas: razão social, CNPJ, vínculo, responsável, telefone, placa do
-            implemento. A conferência de duplicidade acontece antes de gravar.
+            implemento. A conferência de duplicidade acontece antes de gravar. Importar não envia mensagem nem cria acesso.
           </DialogDescription>
         </DialogHeader>
 
