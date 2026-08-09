@@ -19,7 +19,7 @@ body{margin:0;background:#f2f5f4;font-family:'Hanken Grotesk',sans-serif;color:#
 </style>
 </helmet>
 <div style="display:flex;min-height:100vh;min-width:1560px" data-screen-label="Motoristas">
-  <aside style="width:{{ navW }};flex:none;background:linear-gradient(178deg,#093D44,#0A4650);color:#fff;display:flex;flex-direction:column;padding:24px {{ navPad }};position:sticky;top:0;height:100vh;transition:width .25s ease;overflow-x:hidden;overflow-y:auto">
+  <div style="width:{{ navW }};flex:none;background:linear-gradient(178deg,#093D44,#0A4650);color:#fff;display:flex;flex-direction:column;padding:24px {{ navPad }};position:sticky;top:0;height:100vh;transition:width .25s ease;overflow-x:hidden;overflow-y:auto">
     <div style="display:flex;align-items:center;gap:10px;padding:4px 8px 22px">
       <svg width="34" height="34" viewBox="0 0 32 32"><defs><linearGradient id="lgT" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1a9e93"></stop><stop offset="1" stop-color="#0E78B5"></stop></linearGradient></defs><polygon points="16,2.5 27.5,9 27.5,23 16,29.5 4.5,23 4.5,9" fill="url(#lgT)"></polygon><polyline points="9,20 13,13 18,17 23,10" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
       <div style="display:{{ navL }}"><div style="font-weight:800;font-size:17px;letter-spacing:.2px">Traxium</div><div style="font-size:10.5px;letter-spacing:2.2px;color:rgba(255,255,255,.5);text-transform:uppercase">Compliance</div></div>
@@ -53,27 +53,42 @@ body{margin:0;background:#f2f5f4;font-family:'Hanken Grotesk',sans-serif;color:#
       <a href="App de Campo.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="1.8" width="9" height="12.4" rx="2"></rect><line x1="6.5" y1="4" x2="9.5" y2="4"></line><circle cx="8" cy="11.7" r=".65" fill="currentColor" stroke="none"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Protótipo mobile</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">12 telas</span></a>
     <div onClick="{{ navToggle }}" title="Recolher ou expandir o menu" style="display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:11px;cursor:pointer;font-size:13px;font-weight:600;color:rgba(255,255,255,.6)" style-hover="background:rgba(255,255,255,.08);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" style="transform:{{ navFlip }};transition:transform .25s"><path d="m9.5 3-5 5 5 5"></path><path d="M12 3v10"></path></svg><span style="display:{{ navL }};white-space:nowrap">Recolher menu</span></div>
   </div>
-  </aside>
+  </div>
 
-  <main style="flex:1;padding:26px 32px 44px;min-width:0">
-    <header style="display:flex;align-items:center;gap:14px">
+  <div style="flex:1;padding:26px 32px 44px;min-width:0">
+    <div style="display:flex;align-items:center;gap:14px">
       <div><div style="font-size:24px;font-weight:800">Motoristas</div><div style="font-size:13.5px;color:#5c706e;margin-top:2px">competência calculada, vínculo com vigência e documentos sob LGPD</div></div>
       <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
         <div style="display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #dde5e3;border-radius:12px;padding:0 13px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#7c8f8d" stroke-width="1.6"><circle cx="7" cy="7" r="4.2"></circle><path d="m10.2 10.2 3 3"></path></svg><input value="{{ busca }}" onInput="{{ onBusca }}" placeholder="Nome, CPF, CNH ou empresa…" style="border:0;outline:0;background:transparent;font-size:13.5px;padding:10px 0;width:235px;color:#0b2224"></div>
         <div onClick="{{ exportar }}" style="background:#fff;border:1px solid #dde5e3;border-radius:11px;padding:9px 15px;font-size:13px;font-weight:700;cursor:pointer" style-hover="border-color:#127670;color:#0C5862">Exportar</div>
         <div onClick="{{ abrirNovo }}" style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;border-radius:11px;padding:10px 17px;font-size:13.5px;font-weight:800;cursor:pointer;box-shadow:0 8px 18px rgba(18,118,112,.25)" style-hover="transform:translateY(-1px)">Novo motorista</div>
-        <div style="width:38px;height:38px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;box-shadow:0 0 0 3px #fff,0 0 0 4.5px #d8e4e2">RA</div>
+        <div data-tx-pop style="position:relative">
+          <div onClick="{{ onPerfil }}" style="width:38px;height:38px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13.5px;box-shadow:0 0 0 3px #fff,0 0 0 4.5px #d8e4e2;cursor:pointer" style-hover="box-shadow:0 0 0 3px #fff,0 0 0 4.5px #127670">RA</div>
+          <sc-if value="{{ perfilOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;right:0;top:48px;background:#fff;border:1px solid #e4eae8;border-radius:16px;box-shadow:0 16px 40px rgba(9,61,68,.16);padding:6px;width:250px;z-index:60;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;gap:11px;padding:11px 12px;border-bottom:1px solid #f0f4f3;margin-bottom:4px">
+                <span style="width:38px;height:38px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none">RA</span>
+                <div><div style="font-size:13.5px;font-weight:800">Rafael Antunes</div><div style="font-size:11.5px;color:#5c706e">Gestor de qualidade · GMP+</div></div>
+              </div>
+              <div onClick="{{ abrirPerfil }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer" style-hover="background:#f6f9f8">Meu perfil</div>
+              <div onClick="{{ abrirPrefs }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer" style-hover="background:#f6f9f8">Preferências e notificações</div>
+              <div onClick="{{ abrirPapel }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px" style-hover="background:#f6f9f8">Papel ativo<span style="display:inline-block;font-size:10.5px;font-weight:700;color:#0C5862;background:#e9f3f2;border-radius:99px;padding:2px 9px;white-space:nowrap">{{ papelBadge }}</span></div>
+              <div style="height:1px;background:#f0f4f3;margin:5px 8px"></div>
+              <div onClick="{{ abrirSair }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;color:#c43d3d" style-hover="background:#fdf6f6">Sair</div>
+            </div>
+          </sc-if>
+        </div>
       </div>
-    </header>
+    </div>
 
-    <section style="margin-top:22px;background:linear-gradient(118deg,#093D44,#0C5862 58%,#0E78B5 145%);border-radius:22px;padding:22px 26px;color:#fff;display:grid;grid-template-columns:1.15fr repeat(4,.7fr);gap:14px;position:relative;overflow:hidden">
+    <div style="margin-top:22px;background:linear-gradient(118deg,#093D44,#0C5862 58%,#0E78B5 145%);border-radius:22px;padding:22px 26px;color:#fff;display:grid;grid-template-columns:1.15fr repeat(4,.7fr);gap:14px;position:relative;overflow:hidden">
       <div style="position:absolute;right:-70px;top:-100px;width:340px;height:340px;border-radius:99px;background:radial-gradient(circle,rgba(255,255,255,.14),transparent 68%)"></div>
       <div style="position:relative;padding-right:18px;border-right:1px solid rgba(255,255,255,.13)"><div style="font-size:10.5px;letter-spacing:1.5px;font-weight:800;color:rgba(255,255,255,.55)">ELEGIBILIDADE É RESULTADO</div><div style="font-size:18px;font-weight:800;margin-top:7px;line-height:1.25">Ninguém marca um motorista como apto.</div><div style="font-size:12.5px;color:rgba(255,255,255,.68);margin-top:6px;line-height:1.45">CNH, vínculo e trilhas vigentes produzem o estado automaticamente.</div></div>
       <sc-for list="{{ kpis }}" as="kp" hint-placeholder-count="4"><div style="position:relative;padding:5px 10px"><div style="font-size:11.5px;color:rgba(255,255,255,.62);font-weight:600">{{ kp.n }}</div><div style="display:flex;align-items:baseline;gap:7px;margin-top:7px"><span style="font-size:31px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums">{{ kp.v }}</span><span style="font-size:11.5px;color:{{ kp.c }};font-weight:700">{{ kp.d }}</span></div><div style="font-size:11px;color:rgba(255,255,255,.52);margin-top:7px;line-height:1.35">{{ kp.sub }}</div></div></sc-for>
-    </section>
+    </div>
 
     <div style="display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:18px;margin-top:20px;align-items:start">
-      <section style="min-width:0">
+      <div style="min-width:0">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><sc-for list="{{ filtros }}" as="ft" hint-placeholder-count="4"><div onClick="{{ ft.onClick }}" style="background:{{ ft.bg }};color:{{ ft.c }};border:1px solid {{ ft.bd }};border-radius:99px;padding:7px 14px;font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:{{ ft.sh }}">{{ ft.n }}</div></sc-for><span style="margin-left:auto;font-size:12px;color:#7c8f8d">{{ resultado }}</span></div>
         <sc-if value="{{ listaVazia }}" hint-placeholder-val="{{ false }}"><div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:54px;text-align:center"><div style="font-size:17px;font-weight:800">Nenhum motorista encontrado</div><div style="font-size:13px;color:#5c706e;margin-top:5px">Ajuste a busca ou volte para todos os vínculos.</div></div></sc-if>
         <div style="display:flex;flex-direction:column;gap:10px">
@@ -87,14 +102,14 @@ body{margin:0;background:#f2f5f4;font-family:'Hanken Grotesk',sans-serif;color:#
             </div>
           </sc-for>
         </div>
-      </section>
+      </div>
 
-      <aside style="display:flex;flex-direction:column;gap:14px;position:sticky;top:24px">
+      <div style="display:flex;flex-direction:column;gap:14px;position:sticky;top:24px">
         <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:19px 20px"><div style="font-size:15px;font-weight:800">Como o estado nasce</div><div style="font-size:12px;color:#5c706e;margin-top:3px">uma conta visível, nunca um campo editável</div><div style="display:flex;flex-direction:column;gap:8px;margin-top:15px"><sc-for list="{{ formula }}" as="fm" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:10px;background:{{ fm.bg }};border-radius:12px;padding:10px 12px"><span style="width:24px;height:24px;border-radius:99px;background:{{ fm.dot }};color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex:none">{{ fm.i }}</span><div style="flex:1"><div style="font-size:12.5px;font-weight:750">{{ fm.n }}</div><div style="font-size:10.5px;color:#6d817f">{{ fm.sub }}</div></div></div></sc-for></div><div style="margin-top:13px;background:#eef7f6;border-left:3px solid #127670;border-radius:0 11px 11px 0;padding:10px 12px;font-size:11.5px;color:#0C5862;line-height:1.45">Quando qualquer fato vence, a elegibilidade cai sozinha. Corrigir o fato faz o estado voltar sem aprovação manual.</div></div>
         <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:19px 20px"><div style="display:flex;align-items:center"><div style="font-size:15px;font-weight:800">Atenção nos próximos 30 dias</div><span style="margin-left:auto;background:#fdf3e2;color:#b97514;border-radius:99px;padding:2px 8px;font-size:10.5px;font-weight:800">5</span></div><div style="display:flex;flex-direction:column;margin-top:10px"><sc-for list="{{ vencimentos }}" as="vc" hint-placeholder-count="3"><div onClick="{{ vc.abrir }}" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid {{ vc.linha }};cursor:pointer"><span style="width:32px;height:32px;border-radius:99px;background:linear-gradient(135deg,{{ vc.a1 }},{{ vc.a2 }});color:#fff;font-size:10.5px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ vc.ini }}</span><div style="flex:1"><div style="font-size:12.5px;font-weight:750">{{ vc.n }}</div><div style="font-size:10.5px;color:#7c8f8d">{{ vc.oque }}</div></div><span style="font-size:11px;font-weight:800;color:{{ vc.c }}">{{ vc.dias }}</span></div></sc-for></div><a href="Academy.dc.html" style="display:block;margin-top:13px;background:#f0f4f3;border-radius:99px;padding:9px;text-align:center;font-size:12.5px;font-weight:750" style-hover="background:#e4ebe9">Abrir matriz da Academy</a></div>
-      </aside>
+      </div>
     </div>
-  </main>
+  </div>
 
   <sc-if value="{{ drawer }}" hint-placeholder-val="{{ false }}">
     <div onClick="{{ fecharDrawer }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;justify-content:flex-end">
@@ -119,6 +134,75 @@ body{margin:0;background:#f2f5f4;font-family:'Hanken Grotesk',sans-serif;color:#
   <sc-if value="{{ modalNovo }}" hint-placeholder-val="{{ false }}"><div onClick="{{ fecharNovo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1100;display:flex;align-items:center;justify-content:center;padding:28px"><div onClick="{{ pararClique }}" style="width:520px;background:#fff;border-radius:22px;padding:24px 26px;box-shadow:0 35px 90px rgba(9,34,36,.35)"><div style="display:flex;align-items:center"><div><div style="font-size:17px;font-weight:800">Cadastrar motorista</div><div style="font-size:11.5px;color:#5c706e;margin-top:2px">o estado nasce pendente até os fatos serem conferidos</div></div><span onClick="{{ fecharNovo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer">✕</span></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px"><div style="grid-column:1/-1"><div style="font-size:11.5px;font-weight:700;margin-bottom:5px">Nome completo</div><div style="background:#f7faf9;border:1.5px solid #e0e7e5;border-radius:12px;padding:0 13px"><input value="{{ novoNome }}" onInput="{{ onNovoNome }}" placeholder="nome do motorista" style="border:0;outline:0;background:transparent;padding:11px 0;width:100%;font-size:13px;color:#0b2224"></div></div><div><div style="font-size:11.5px;font-weight:700;margin-bottom:5px">CPF</div><div style="background:#f7faf9;border:1.5px solid #e0e7e5;border-radius:12px;padding:0 13px"><input value="{{ novoCpf }}" onInput="{{ onNovoCpf }}" placeholder="000.000.000-00" style="border:0;outline:0;background:transparent;padding:11px 0;width:100%;font-family:'Spline Sans Mono';font-size:12px;color:#0b2224"></div></div><div><div style="font-size:11.5px;font-weight:700;margin-bottom:5px">Categoria da CNH</div><div style="background:#f7faf9;border:1.5px solid #e0e7e5;border-radius:12px;padding:11px 13px;font-size:13px;font-weight:700">E</div></div></div><div style="font-size:11.5px;font-weight:700;margin-top:14px">Tipo de vínculo</div><div style="display:flex;gap:7px;margin-top:7px"><sc-for list="{{ novoTipos }}" as="nt" hint-placeholder-count="3"><span onClick="{{ nt.onClick }}" style="flex:1;border:1.5px solid {{ nt.bd }};background:{{ nt.bg }};color:{{ nt.c }};border-radius:12px;padding:10px;text-align:center;font-size:12px;font-weight:750;cursor:pointer">{{ nt.n }}</span></sc-for></div><div style="background:#fdf3e2;border-left:3px solid #e8a33d;border-radius:0 11px 11px 0;padding:10px 12px;font-size:11.5px;color:#8b5d16;line-height:1.45;margin-top:14px">Cadastrar não libera para viagem. CNH, vínculo e trilhas serão verificados antes de o motorista aparecer como elegível.</div><div style="display:flex;gap:9px;justify-content:flex-end;margin-top:18px"><span onClick="{{ fecharNovo }}" style="background:#f0f4f3;border-radius:99px;padding:10px 18px;font-size:12.5px;font-weight:750;cursor:pointer">Cancelar</span><span onClick="{{ salvarNovo }}" style="background:{{ novoBtnBg }};color:{{ novoBtnC }};border-radius:99px;padding:10px 19px;font-size:12.5px;font-weight:800;cursor:pointer">Cadastrar e conferir fatos</span></div></div></div></sc-if>
 
   <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}"><div style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:1300;background:#0b2224;color:#fff;border-radius:99px;padding:12px 20px;font-size:13px;font-weight:650;box-shadow:0 16px 40px rgba(9,34,36,.35);display:flex;align-items:center;gap:9px"><span style="width:8px;height:8px;border-radius:99px;background:#48c78e;box-shadow:0 0 0 4px rgba(72,199,142,.15)"></span>{{ toastMsg }}</div></sc-if>
+  <sc-if value="{{ modalPapel }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePop }}" style="background:#fff;border-radius:24px;width:540px;max-height:86vh;overflow:auto;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Papel ativo</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:3px;line-height:1.55">O papel define o que a matriz de autoridade permite assinar. A autoridade escala para cima, nunca para baixo, e ninguém assina acima do próprio nível.</div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-top:16px">
+          <sc-for list="{{ papeisLista }}" as="pp" hint-placeholder-count="5">
+            <div onClick="{{ pp.onClick }}" style="display:flex;align-items:center;gap:13px;border:1.5px solid {{ pp.bd }};background:{{ pp.bg }};border-radius:15px;padding:13px 15px;cursor:pointer;transition:all .15s" style-hover="border-color:#127670">
+              <span style="width:19px;height:19px;border-radius:99px;border:2.5px solid {{ pp.dotBd }};background:{{ pp.dot }};flex:none"></span>
+              <span style="width:34px;height:34px;border-radius:11px;flex:none;background:linear-gradient(135deg,{{ pp.g1 }},{{ pp.g2 }});color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ pp.nivel }}</span>
+              <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:800">{{ pp.n }}</div><div style="font-size:11.5px;color:#5c706e;margin-top:2px;line-height:1.4">{{ pp.resolve }}</div></div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#f7faf9;border-radius:14px;padding:12px 15px;margin-top:14px;font-size:12px;color:#5c706e;line-height:1.55">Nível 0 é técnico: é o nível de autoridade de ninguém. Contaminação não se aprova, se regulariza.</div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalSair }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePop }}" style="background:#fff;border-radius:24px;width:440px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Sair da conta</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;align-items:center;gap:12px;background:#f7faf9;border-radius:15px;padding:13px 15px;margin-top:16px">
+          <span style="width:40px;height:40px;border-radius:99px;flex:none;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">RA</span>
+          <div><div style="font-size:13.5px;font-weight:800">Rafael Antunes</div><div style="font-size:11.5px;color:#5c706e">{{ papelBadge }} · nível {{ papelNivel }} na matriz</div></div>
+        </div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:14px;line-height:1.6">Nada é perdido ao sair. Registro lacrado continua lacrado, e o que estava em preenchimento não foi gravado em lugar nenhum.</div>
+        <div style="display:flex;gap:8px;margin-top:18px;justify-content:flex-end">
+          <span onClick="{{ fecharModalTopo }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer" style-hover="background:#e4ebe9">Cancelar</span>
+          <span onClick="{{ confirmarSair }}" style="background:linear-gradient(135deg,#e46969,#c43d3d);color:#fff;font-size:13.5px;font-weight:800;border-radius:99px;padding:10px 22px;cursor:pointer;box-shadow:0 8px 18px rgba(196,61,61,.3);transition:transform .15s" style-hover="transform:translateY(-1px)">Sair</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalPerfil }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:460px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Meu perfil</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:16px">
+          <span style="width:76px;height:76px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:26px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #fff,0 0 0 6px #f0debb">RA</span>
+          <div style="font-size:17px;font-weight:800;margin-top:4px">Rafael Antunes</div>
+          <div style="font-size:12.5px;color:#5c706e">rafael.antunes@traxium.com.br</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-top:18px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Papel</span><span style="font-weight:700">Gestor de qualidade</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Autoridade na matriz</span><span style="font-weight:700">nível 3 · Gestor</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Filiais</span><span style="font-weight:700">Rondonópolis, Sorriso</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Liberações assinadas em 2026</span><span style="font-family:'Spline Sans Mono';font-weight:600">14</span></div>
+        </div>
+        <div style="font-size:12px;color:#5c706e;margin-top:12px;line-height:1.5">Toda assinatura sua fica no registro lacrado da viagem. O papel define o que a matriz permite; ninguém assina acima do próprio nível.</div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalPrefs }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:520px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Preferências e notificações</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:16px">
+          <sc-for list="{{ prefs }}" as="pf" hint-placeholder-count="4">
+            <div onClick="{{ pf.onClick }}" style="display:flex;align-items:center;gap:12px;border:1px solid #eef2f1;border-radius:14px;padding:12px 14px;cursor:pointer" style-hover="border-color:#c9d5d3">
+              <div style="flex:1"><div style="font-size:13.5px;font-weight:700">{{ pf.t }}</div><div style="font-size:11.5px;color:#5c706e">{{ pf.sub }}</div></div>
+              <span style="width:40px;height:23px;border-radius:99px;background:{{ pf.swBg }};position:relative;flex:none;transition:background .2s"><span style="position:absolute;top:2.5px;left:{{ pf.swPos }};width:18px;height:18px;border-radius:99px;background:#fff;box-shadow:0 1px 4px rgba(9,34,36,.25);transition:left .2s"></span></span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:12px;color:#5c706e;margin-top:12px">O alerta de bloqueio técnico não pode ser desligado: é requisito da certificação.</div>
+      </div>
+    </div>
+  </sc-if>
 </div>
 </x-dc>
 
@@ -136,6 +220,62 @@ class Component extends DCLogic {
       { k:'rf', n:'Rogério Ferreira', ini:'RF', cpf:'***.331.908-**', tipo:'Próprio', empresa:'Transrural Log Ltda', empIni:'TL', desde:'03 mai 2020', cnh:'E', cnhV:'26/05/2030', cnhC:'#5c706e', st:'Elegível', motivo:'4 trilhas vigentes', nivel:'ok', a1:'#127670', a2:'#0E78B5', ring:'#cdeeda' },
       { k:'ed', n:'Eduardo Dias Lopes', ini:'ED', cpf:'***.609.114-**', tipo:'Subcontratado', empresa:'Cerrado Cargas S.A.', empIni:'CC', desde:'01 jul 2026', cnh:'D', cnhV:'04/02/2029', cnhC:'#5c706e', st:'Pendente', motivo:'aguarda trilha de integração', nivel:'pend', a1:'#9fc9c6', a2:'#6ba8a4', ring:'#dfeceb' }
     ];
+  }
+  papelVals() {
+    const diz = m => { if (typeof this.avisar === 'function') this.avisar(m); };
+    const PAPEIS = [
+      { n: 'Inspetor de pátio', nivel: 1, resolve: 'condição física do equipamento: checklist reprovado, foto ausente', g1: '#9fc9c6', g2: '#6ba8a4' },
+      { n: 'Tráfego', nivel: 2, resolve: 'pendência simples: certificação a vencer, sincronização pendente', g1: '#5b8def', g2: '#4c5bc0' },
+      { n: 'Gestor de qualidade', nivel: 3, resolve: 'pendência corrigível mediante evidência da correção', g1: '#127670', g2: '#0E78B5' },
+      { n: 'Diretoria e Resp. Técnico', nivel: 4, resolve: 'impacto contratual, risco residual aceito, terceiro emergencial', g1: '#e8a33d', g2: '#d97544' },
+      { n: 'Auditor interno', nivel: 0, resolve: 'somente leitura, mais abrir não conformidade', g1: '#c9d5d3', g2: '#9db0ae' }
+    ];
+    const ativo = this.state.papelAtivo || 'Gestor de qualidade';
+    const atual = PAPEIS.find(p => p.n === ativo) || PAPEIS[2];
+    return {
+      pararClique: e => e.stopPropagation(),
+      pararCliquePop: e => e.stopPropagation(),
+      papelBadge: atual.n === 'Diretoria e Resp. Técnico' ? 'Diretoria' : atual.n.split(' ')[0],
+      papelNivel: atual.nivel,
+      modalPapel: this.state.modalTopo === 'papel',
+      modalSair: this.state.modalTopo === 'sair',
+      abrirPapel: () => this.setState({ modalTopo: 'papel', perfilOpen: false }),
+      abrirSair: () => this.setState({ modalTopo: 'sair', perfilOpen: false }),
+      confirmarSair: () => { this.setState({ modalTopo: null }); diz('Sessão encerrada. Registros assinados continuam no dossiê com seu nome e a data.'); },
+      papeisLista: PAPEIS.map(p => {
+        const on = p.n === ativo;
+        return { ...p, onClick: () => { this.setState({ papelAtivo: p.n, modalTopo: null }); diz('Papel ativo agora é ' + p.n + ', nível ' + p.nivel + '. A fila e as ações de assinatura passam a refletir esta autoridade.'); },
+          bd: on ? '#127670' : '#e0e7e5', bg: on ? '#eef7f6' : '#fff',
+          dot: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#fff', dotBd: on ? '#127670' : '#c9d5d3' };
+      })
+    };
+  }
+  perfilVals() {
+    return {
+      perfilOpen: !!this.state.perfilOpen,
+      onPerfil: () => this.setState(s => ({ perfilOpen: !s.perfilOpen })),
+      modalPerfil: this.state.modalTopo === 'perfil', modalPrefs: this.state.modalTopo === 'prefs',
+      abrirPerfil: () => this.setState({ modalTopo: 'perfil', perfilOpen: false }),
+      abrirPrefs: () => this.setState({ modalTopo: 'prefs', perfilOpen: false }),
+      fecharModalTopo: () => this.setState({ modalTopo: null }),
+      pararClique: e => e.stopPropagation(),
+      prefs: [
+        { k: 'bloq', t: 'Bloqueio técnico na filial', sub: 'sempre ativo: requisito da certificação', lock: true },
+        { k: 'fila', t: 'Item há mais de 2h na fila', sub: 'aviso no app e por e-mail' },
+        { k: 'cert', t: 'Certificado de terceiro a vencer', sub: 'aos 30 e aos 15 dias' },
+        { k: 'idtf', t: 'Nova versão da base IDTF', sub: 'quando a Qualidade publicar revisão' }
+      ].map(p => {
+        const on = p.lock || (this.state.prefsOn || { fila: true, cert: true, idtf: false })[p.k];
+        return { ...p, swBg: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#dde5e3', swPos: on ? '19.5px' : '2.5px',
+          onClick: () => { if (p.lock) return; const cur = this.state.prefsOn || { fila: true, cert: true, idtf: false }; this.setState({ prefsOn: { ...cur, [p.k]: !cur[p.k] } }); } };
+      })
+    };
+  }
+  componentDidMount() {
+    this._txFora = ev => { if (!ev.target.closest || !ev.target.closest('[data-tx-pop]')) this.setState({ perfilOpen: false, filialOpen: false, periodoOpen: false, menuOpen: false }); };
+    this._txEsc = ev => { if (ev.key === 'Escape') this.setState({ perfilOpen: false, filialOpen: false, periodoOpen: false, menuOpen: false, modalTopo: null }); };
+    document.addEventListener('mousedown', this._txFora);
+    document.addEventListener('keydown', this._txEsc);
   }
   navVals() {
     const c = this.state.navC ?? (localStorage.getItem('tx-nav') === '1');
@@ -183,7 +323,7 @@ class Component extends DCLogic {
       exportar:()=>this.avisar('Lista exportada com documentos mascarados, vínculo vigente e origem de cada estado.'),toast:!!this.state.toast,toastMsg:this.state.toast
     };
   }
-  renderVals(){return{...this.navVals(),...this.mainVals()};}
+  renderVals() { return { ...this.navVals(), ...this.papelVals(), ...this.perfilVals(),...this.mainVals()};}
 }
 </script>
 </body>

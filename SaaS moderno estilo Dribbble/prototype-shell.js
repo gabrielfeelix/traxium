@@ -18,7 +18,8 @@
     'Viagens.dc.html',
     'Configuracoes.dc.html',
     'Console Traxium.dc.html',
-    'Acessos Externos.dc.html'
+    'Acessos Externos.dc.html',
+    'Motoristas.dc.html'
   ]);
   const currentPage = decodeURIComponent(location.pathname.split('/').pop() || '');
   const themeStorageKey = 'tx-prototype-theme';
