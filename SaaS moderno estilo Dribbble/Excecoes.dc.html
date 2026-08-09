@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<script src="./prototype-shell.js" defer></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f2f5f4;font-family:'Hanken Grotesk',sans-serif;color:#0b2224;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0C5862;text-decoration:none}a:hover{color:#127670}
+textarea{font-family:'Hanken Grotesk',sans-serif}
+@keyframes txsh{from{background-position:-600px 0}to{background-position:600px 0}}
+</style>
+</helmet>
+<div style="display:flex;min-height:100vh;min-width:1560px" data-screen-label="Exceções e liberações">
+  <!-- SIDEBAR -->
+  <div style="width:{{ navW }};flex:none;background:linear-gradient(178deg,#093D44,#0A4650);color:#fff;display:flex;flex-direction:column;padding:24px {{ navPad }};position:sticky;top:0;height:100vh;transition:width .25s ease;overflow-x:hidden;overflow-y:auto">
+    <div style="display:flex;align-items:center;gap:10px;padding:4px 8px 22px">
+      <svg width="34" height="34" viewBox="0 0 32 32"><defs><linearGradient id="lgT" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1a9e93"></stop><stop offset="1" stop-color="#0E78B5"></stop></linearGradient></defs><polygon points="16,2.5 27.5,9 27.5,23 16,29.5 4.5,23 4.5,9" fill="url(#lgT)"></polygon><polyline points="9,20 13,13 18,17 23,10" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></polyline><circle cx="9" cy="20" r="1.6" fill="#fff"></circle><circle cx="13" cy="13" r="1.6" fill="#fff"></circle><circle cx="18" cy="17" r="1.6" fill="#fff"></circle><circle cx="23" cy="10" r="1.6" fill="#fff"></circle></svg>
+      <div style="display:{{ navL }}"><div style="font-weight:800;font-size:17px;letter-spacing:.2px">Traxium</div><div style="font-size:10.5px;letter-spacing:2.2px;color:rgba(255,255,255,.5);text-transform:uppercase">Compliance</div></div>
+    </div>
+    <a href="Torre de Controle v2.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;font-size:14px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="5.6"></circle><circle cx="8" cy="8" r="1.4" fill="currentColor" stroke="none"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Torre de Controle</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">7</span></a>
+    <div style="font-size:10.5px;letter-spacing:1.8px;color:rgba(255,255,255,.38);padding:20px 12px 8px;font-weight:700;display:{{ navSec }}">OPERAÇÃO</div>
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:14px;color:rgba(255,255,255,.66)">
+      <a href="Viagens.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 8h9"></path><path d="M8 4.5 11.5 8 8 11.5"></path></svg><span style="display:{{ navL }};white-space:nowrap">Viagens</span></a>
+      <div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px;background:linear-gradient(90deg,rgba(26,158,147,.35),rgba(14,120,181,.28));border:1px solid rgba(255,255,255,.14);font-weight:700;color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6"></circle><line x1="8" y1="4.8" x2="8" y2="8.6"></line><circle cx="8" cy="11.2" r=".9" fill="currentColor" stroke="none"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Exceções e liberações</span><span style="margin-left:auto;display:{{ navL }};background:#fff;color:#0C5862;font-size:11.5px;font-weight:800;padding:1px 8px;border-radius:99px">5</span></div>
+      <a href="Inspecoes.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 6.5 12 13 4.5"></path></svg><span style="display:{{ navL }};white-space:nowrap">Inspeções</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">3</span></a>
+      <a href="Limpezas.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.8c2.4 2.8 3.7 4.6 3.7 6.5a3.7 3.7 0 1 1-7.4 0c0-1.9 1.3-3.7 3.7-6.5z"></path></svg><span style="display:{{ navL }};white-space:nowrap">Limpezas</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">3</span></a>
+    </div>
+    <div style="font-size:10.5px;letter-spacing:1.8px;color:rgba(255,255,255,.38);padding:20px 12px 8px;font-weight:700;display:{{ navSec }}">PILARES</div>
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:14px;color:rgba(255,255,255,.66)">
+      <a href="Motor IDTF.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="2.5" width="11" height="11" rx="3"></rect><line x1="8" y1="2.5" x2="8" y2="13.5"></line></svg><span style="display:{{ navL }};white-space:nowrap">Motor IDTF</span></a>
+      <a href="Subcontratados.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5.4" cy="6.2" r="2.4"></circle><circle cx="10.8" cy="6.2" r="2.4"></circle><path d="M2.5 13c.6-2 1.7-3 3-3s2.3 1 2.9 3" stroke-linecap="round"></path></svg><span style="display:{{ navL }};white-space:nowrap">Subcontratados</span></a>
+      <a href="Motoristas.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="5.4" r="2.6"></circle><path d="M3 13.4c.8-2.6 2.6-3.9 5-3.9s4.2 1.3 5 3.9"></path></svg><span style="display:{{ navL }};white-space:nowrap">Motoristas</span></a>
+      <a href="Acessos Externos.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.4 8.6a3.2 3.2 0 1 0 0-.01z"></path><path d="M9 7.2 14 2.2M12 4.2l1.6 1.6M10.6 5.6l1.6 1.6"></path></svg><span style="display:{{ navL }};white-space:nowrap">Acessos externos</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">2</span></a>
+      <a href="Academy.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M2 6.3 8 3.4l6 2.9-6 2.9z"></path><path d="M4.6 8.4v2.6c0 .9 1.5 1.8 3.4 1.8s3.4-.9 3.4-1.8V8.4" stroke-linecap="round"></path></svg><span style="display:{{ navL }};white-space:nowrap">Academy</span></a>
+      <a href="Ativos e Frota.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="4.5" width="8" height="5.5" rx="1.4"></rect><path d="M10 6.5h2.4l1.6 2v1.5h-4z" stroke-linejoin="round"></path><circle cx="5" cy="11.8" r="1.4"></circle><circle cx="11.6" cy="11.8" r="1.4"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Ativos e frota</span></a>
+    </div>
+    <div style="font-size:10.5px;letter-spacing:1.8px;color:rgba(255,255,255,.38);padding:20px 12px 8px;font-weight:700;display:{{ navSec }}">PROVA</div>
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:14px;color:rgba(255,255,255,.66)">
+      <a href="Dossie.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3.2" y="2.5" width="9.6" height="11" rx="2"></rect><line x1="6" y1="6" x2="10" y2="6"></line><line x1="6" y1="9" x2="10" y2="9"></line></svg><span style="display:{{ navL }};white-space:nowrap">Dossiê de auditoria</span></a>
+      <a href="Indicadores.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="4" y1="13" x2="4" y2="8.5"></line><line x1="8" y1="13" x2="8" y2="3.5"></line><line x1="12" y1="13" x2="12" y2="10"></line></svg><span style="display:{{ navL }};white-space:nowrap">Indicadores</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">11/15</span></a>
+      <a href="Nao Conformidades.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="5.8" stroke-dasharray="2.4 2.4"></circle><circle cx="8" cy="8" r="2.2"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Não conformidades</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">4</span></a>
+    </div>
+    <a href="Configuracoes.dc.html" style="margin-top:auto;display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="2.3"></circle><path d="M8 1.8v1.9M8 12.3v1.9M14.2 8h-1.9M3.7 8H1.8M12.4 3.6l-1.3 1.3M4.9 11.1l-1.3 1.3M12.4 12.4l-1.3-1.3M4.9 4.9 3.6 3.6" stroke-linecap="round"></path></svg><span style="display:{{ navL }};white-space:nowrap">Configurações</span></a>
+    <a href="Onboarding Publico.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13V3.8c0-.7.5-1.2 1.2-1.2h5.6c.7 0 1.2.5 1.2 1.2V13"></path><path d="M6 8h7M10.5 5.5 13 8l-2.5 2.5"></path></svg><span style="display:{{ navL }};white-space:nowrap">Onboarding público</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">6 passos</span></a>
+      <a href="App de Campo.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="1.8" width="9" height="12.4" rx="2"></rect><line x1="6.5" y1="4" x2="9.5" y2="4"></line><circle cx="8" cy="11.7" r=".65" fill="currentColor" stroke="none"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Protótipo mobile</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">12 telas</span></a>
+      <div onClick="{{ navToggle }}" title="Recolher ou expandir o menu" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;cursor:pointer;font-size:13px;font-weight:600;color:rgba(255,255,255,.6)" style-hover="background:rgba(255,255,255,.08);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="transform:{{ navFlip }};transition:transform .25s;flex:none"><path d="M9.5 3 4.5 8l5 5"></path><line x1="12" y1="3" x2="12" y2="13"></line></svg><span style="display:{{ navL }};white-space:nowrap">Recolher menu</span></div><div style="display:{{ navCard }};margin-top:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px">
+      <div style="font-size:12px;color:rgba(255,255,255,.55);margin-bottom:8px">Base IDTF Brasil</div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600"><span style="width:8px;height:8px;border-radius:99px;background:#3ddc97;box-shadow:0 0 0 4px rgba(61,220,151,.18)"></span>v2026.07 vigente</div>
+      <div style="font-size:11.5px;color:rgba(255,255,255,.45);margin-top:4px">Revisada em 28 jul · Qualidade</div>
+    </div>
+  </div>
+  <!-- CONTENT -->
+  <div style="flex:1;display:flex;flex-direction:column;padding:26px 32px 48px;gap:20px;min-width:0">
+    <div style="display:flex;align-items:center;gap:16px">
+      <div><div style="font-size:24px;font-weight:800">Exceções e liberações</div><div style="font-size:13.5px;color:#5c706e;margin-top:2px">Quarta, 6 ago · a fila de aprovação com trilha de autoridade · idade média: 1h 09min</div></div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+        <div data-tx-pop style="position:relative">
+          <div onClick="{{ onFilial }}" style="background:#fff;border:1px solid #e0e7e5;border-radius:11px;padding:9px 14px;font-size:13.5px;font-weight:600;cursor:pointer" style-hover="border-color:#127670">Filial {{ filial }} ▾</div>
+          <sc-if value="{{ filialOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;right:0;top:46px;background:#fff;border:1px solid #e4eae8;border-radius:14px;box-shadow:0 16px 40px rgba(9,61,68,.16);padding:6px;width:230px;z-index:60;display:flex;flex-direction:column">
+              <sc-for list="{{ filiais }}" as="fl" hint-placeholder-count="4">
+                <div onClick="{{ fl.onClick }}" style="display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;background:{{ fl.bg }}" style-hover="background:#f6f9f8"><span style="width:7px;height:7px;border-radius:99px;background:{{ fl.dot }}"></span>{{ fl.n }}</div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+        <div onClick="{{ exportarFila }}" style="background:#093D44;color:#fff;border-radius:11px;padding:9px 16px;font-size:13.5px;font-weight:700;cursor:pointer" style-hover="background:#0C5862">Exportar</div>
+        <div data-tx-pop style="position:relative">
+          <div onClick="{{ onPerfil }}" style="width:38px;height:38px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13.5px;box-shadow:0 0 0 3px #fff,0 0 0 4.5px #d8e4e2;cursor:pointer" style-hover="box-shadow:0 0 0 3px #fff,0 0 0 4.5px #127670">RA</div>
+          <sc-if value="{{ perfilOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;right:0;top:48px;background:#fff;border:1px solid #e4eae8;border-radius:16px;box-shadow:0 16px 40px rgba(9,61,68,.16);padding:6px;width:250px;z-index:60;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;gap:11px;padding:11px 12px;border-bottom:1px solid #f0f4f3;margin-bottom:4px">
+                <span style="width:38px;height:38px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none">RA</span>
+                <div><div style="font-size:13.5px;font-weight:800">Rafael Antunes</div><div style="font-size:11.5px;color:#5c706e">Gestor de qualidade · GMP+</div></div>
+              </div>
+              <div onClick="{{ abrirPerfil }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer" style-hover="background:#f6f9f8">Meu perfil</div>
+              <div onClick="{{ abrirPrefs }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer" style-hover="background:#f6f9f8">Preferências e notificações</div>
+              <div onClick="{{ abrirPapel }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px" style-hover="background:#f6f9f8">Papel ativo<span style="display:inline-block;font-size:10.5px;font-weight:700;color:#0C5862;background:#e9f3f2;border-radius:99px;padding:2px 9px;white-space:nowrap">{{ papelBadge }}</span></div>
+              <div style="height:1px;background:#f0f4f3;margin:5px 8px"></div>
+              <div onClick="{{ abrirSair }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;color:#c43d3d" style-hover="background:#fdf6f6">Sair</div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px">
+      <sc-for list="{{ filtros }}" as="f" hint-placeholder-count="3">
+        <span onClick="{{ f.onClick }}" style="font-size:12.5px;font-weight:700;border-radius:99px;padding:7px 15px;cursor:pointer;background:{{ f.bg }};color:{{ f.c }};box-shadow:{{ f.sh }};transition:all .15s">{{ f.label }}</span>
+      </sc-for>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 392px;gap:20px;align-items:start">
+      <!-- FILA -->
+      <div style="display:flex;flex-direction:column;gap:12px;min-width:0">
+        <sc-if value="{{ loading }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <sc-for list="{{ skel }}" as="s" hint-placeholder-count="4">
+              <div style="background:#fff;border:1px solid #eef2f1;border-radius:20px;padding:18px 20px;display:flex;align-items:center;gap:16px">
+                <span style="width:44px;height:44px;border-radius:99px;flex:none;background:linear-gradient(90deg,#eef2f1 25%,#f7faf9 40%,#eef2f1 55%);background-size:600px 100%;animation:txsh 1.3s linear infinite"></span>
+                <div style="flex:1;display:flex;flex-direction:column;gap:9px"><span style="height:13px;width:44%;border-radius:99px;background:linear-gradient(90deg,#eef2f1 25%,#f7faf9 40%,#eef2f1 55%);background-size:600px 100%;animation:txsh 1.3s linear infinite"></span><span style="height:11px;width:68%;border-radius:99px;background:linear-gradient(90deg,#eef2f1 25%,#f7faf9 40%,#eef2f1 55%);background-size:600px 100%;animation:txsh 1.3s linear infinite"></span></div>
+                <span style="height:28px;width:110px;border-radius:99px;background:linear-gradient(90deg,#eef2f1 25%,#f7faf9 40%,#eef2f1 55%);background-size:600px 100%;animation:txsh 1.3s linear infinite"></span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-for list="{{ fila }}" as="it" hint-placeholder-count="5">
+          <div style="background:#fff;border:1px solid #eef2f1;border-radius:20px;box-shadow:0 2px 10px rgba(9,61,68,.04);padding:18px 20px;transition:box-shadow .2s" style-hover="box-shadow:0 12px 32px rgba(9,61,68,.10)">
+            <div style="display:flex;align-items:center;gap:14px">
+              <span style="width:44px;height:44px;border-radius:99px;flex:none;background:linear-gradient(135deg,{{ it.avc1 }},{{ it.avc2 }});color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #fff,0 0 0 4.5px {{ it.ring }}">{{ it.si }}</span>
+              <div style="min-width:0;flex:1"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><a href="Viagem Detalhe.dc.html" style="font-family:'Spline Sans Mono';font-size:13px;font-weight:600">{{ it.id }}</a><span style="font-size:15px;font-weight:800">{{ it.produto }}</span><span style="font-family:'Spline Sans Mono';font-size:11px;font-weight:600;color:#7c8f8d;background:#f0f4f3;border-radius:7px;padding:2px 8px">regra: {{ it.regra }}</span></div><div style="font-size:12.5px;color:#5c706e;margin-top:2px">solicitado por {{ it.quem }} · {{ it.quando }} · {{ it.nEvid }} evidências anexadas</div></div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;flex:none"><span style="display:inline-block;font-size:12px;font-weight:700;color:{{ it.nivC }};background:{{ it.nivBg }};border-radius:99px;padding:4px 12px;white-space:nowrap">{{ it.nivel }}</span><span style="font-size:11px;color:#7c8f8d;margin-top:4px">autoridade requerida</span></div>
+            </div>
+            <div style="font-size:13.5px;line-height:1.55;margin-top:12px;color:#1c3234">{{ it.motivo }}</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:14px">
+              <sc-if value="{{ it.podeAnalisar }}" hint-placeholder-val="{{ false }}">
+                <span onClick="{{ it.abrir }}" style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;font-size:13px;font-weight:700;border-radius:99px;padding:8px 18px;cursor:pointer;box-shadow:0 6px 14px rgba(18,118,112,.3);transition:transform .15s" style-hover="transform:translateY(-1px)">Analisar e decidir</span>
+                <span onClick="{{ it.pedirEvid }}" style="background:#f0f4f3;font-size:13px;font-weight:700;border-radius:99px;padding:8px 18px;cursor:pointer" style-hover="background:#e4ebe9">Pedir mais evidência</span>
+              </sc-if>
+              <sc-if value="{{ it.isTec }}" hint-placeholder-val="{{ false }}">
+                <span style="font-size:12.5px;font-weight:700;color:#c43d3d;background:#fdecec;border-radius:99px;padding:7px 14px">Não existe motivo que libere esta regra</span>
+                <span onClick="{{ abrirPlano }}" style="background:#f0f4f3;font-size:13px;font-weight:700;border-radius:99px;padding:8px 18px;cursor:pointer" style-hover="background:#e4ebe9">Ver plano de regularização</span>
+              </sc-if>
+              <sc-if value="{{ it.decidida }}" hint-placeholder-val="{{ false }}">
+                <span style="font-size:12.5px;font-weight:700;color:{{ it.decC }};background:{{ it.decBg }};border-radius:99px;padding:7px 14px">{{ it.decLabel }}</span>
+                <span onClick="{{ it.verRegistro }}" style="background:#f0f4f3;font-size:13px;font-weight:700;border-radius:99px;padding:8px 18px;cursor:pointer" style-hover="background:#e4ebe9">Ver registro de 9 campos</span>
+              </sc-if>
+              <span style="margin-left:auto;font-family:'Spline Sans Mono';font-size:12.5px;font-weight:600;color:{{ it.idadeC }}">{{ it.idade }} em fila</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <!-- RAIL -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:22px">
+          <div style="font-size:15.5px;font-weight:800">Matriz de autoridade</div>
+          <div style="font-size:12.5px;color:#5c706e;margin-top:2px">escala para cima, nunca para baixo</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:14px">
+            <sc-for list="{{ matriz }}" as="mx" hint-placeholder-count="6">
+              <div style="display:flex;align-items:center;gap:11px;background:{{ mx.bg }};border:1px solid {{ mx.bd }};border-radius:13px;padding:10px 13px">
+                <span style="width:26px;height:26px;border-radius:9px;flex:none;background:{{ mx.nBg }};color:{{ mx.nC }};font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ mx.n }}</span>
+                <div style="min-width:0"><div style="font-size:13px;font-weight:800">{{ mx.nome }}</div><div style="font-size:11.5px;color:#5c706e;line-height:1.4">{{ mx.resolve }}</div></div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font-size:12px;color:#5c706e;margin-top:12px;line-height:1.5">Não existe botão genérico de "aprovar mesmo assim" em lugar nenhum do produto. A ausência dele é decisão de produto.</div>
+        </div>
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:22px">
+          <div style="font-size:15.5px;font-weight:800">A fila em números</div>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:14px">
+            <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span style="font-weight:600">Caso simples (15 min a 4h)</span><span style="font-family:'Spline Sans Mono';font-weight:600;color:#0C5862">3</span></div><div style="height:8px;border-radius:99px;background:repeating-linear-gradient(-45deg,#eef2f1 0 5px,#e2e9e7 5px 10px);overflow:hidden"><div style="height:100%;width:60%;border-radius:99px;background:linear-gradient(90deg,#48c78e,#127670)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span style="font-weight:600">Caso crítico (1 a 2 dias)</span><span style="font-family:'Spline Sans Mono';font-weight:600;color:#0C5862">2</span></div><div style="height:8px;border-radius:99px;background:repeating-linear-gradient(-45deg,#eef2f1 0 5px,#e2e9e7 5px 10px);overflow:hidden"><div style="height:100%;width:40%;border-radius:99px;background:linear-gradient(90deg,#f4c15d,#e8a33d)"></div></div></div>
+          </div>
+          <div style="font-size:12px;color:#5c706e;margin-top:12px">A idade do item na fila é informação de primeira classe.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- MODAL MANTER BLOQUEIO -->
+  <sc-if value="{{ mbAberto }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ mbFechar }}" style="position:fixed;inset:0;background:rgba(9,34,36,.5);backdrop-filter:blur(3px);z-index:1100;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:540px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Manter o bloqueio</div><span style="margin-left:10px;font-size:11.5px;font-weight:700;color:#3c4f4e;background:#f0f4f3;border-radius:99px;padding:3px 11px">também é decisão registrada</span><span onClick="{{ mbFechar }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e;margin-top:16px">MOTIVO DA REJEIÇÃO</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+          <sc-for list="{{ mbMotivos }}" as="mm" hint-placeholder-count="3">
+            <div onClick="{{ mm.onClick }}" style="display:flex;align-items:center;gap:10px;border:1.5px solid {{ mm.bd }};background:{{ mm.bg }};border-radius:13px;padding:10px 14px;cursor:pointer" style-hover="border-color:#127670">
+              <span style="width:15px;height:15px;border-radius:99px;border:2px solid {{ mm.dotBd }};background:{{ mm.dot }};flex:none"></span>
+              <span style="font-size:13px;font-weight:600;flex:1">{{ mm.n }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e;margin-top:14px">AÇÃO INDICADA A QUEM PEDIU</div>
+        <div style="border:1.5px solid #e0e7e5;border-radius:13px;padding:0 14px;margin-top:8px"><input value="{{ mbAcao }}" onInput="{{ mbOnAcao }}" placeholder="o que precisa acontecer para reapresentar, mínimo 15 caracteres" style="border:none;outline:none;background:transparent;font-size:13px;padding:11px 0;width:100%;color:#0b2224"></div>
+        <div style="display:flex;align-items:center;gap:10px;background:#f7faf9;border-radius:13px;padding:10px 14px;margin-top:12px">
+          <span style="width:30px;height:30px;border-radius:99px;flex:none;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">RA</span>
+          <span style="font-size:12.5px;color:#3c4f4e">Assina como <strong>Rafael Antunes · Gestor de qualidade (nível 3)</strong></span>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+          <span onClick="{{ mbFechar }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer;white-space:nowrap" style-hover="background:#e4ebe9">Voltar</span>
+          <span onClick="{{ mbConfirmar }}" style="font-size:13.5px;font-weight:800;border-radius:99px;padding:10px 22px;cursor:{{ mbCur }};background:{{ mbBg }};color:{{ mbC }};white-space:nowrap">Assinar e manter bloqueio</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <!-- MODAL PEDIR EVIDÊNCIA -->
+  <sc-if value="{{ peAberto }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ peFechar }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:520px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Pedir mais evidência</div><span style="margin-left:10px;font-family:'Spline Sans Mono';font-size:12px;font-weight:600;color:#0C5862;background:#e9f3f2;border-radius:99px;padding:3px 11px">{{ peId }}</span><span onClick="{{ peFechar }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e;margin-top:16px">PARA QUEM</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+          <sc-for list="{{ peDest }}" as="pd" hint-placeholder-count="3">
+            <div onClick="{{ pd.onClick }}" style="display:flex;align-items:center;gap:11px;border:1.5px solid {{ pd.bd }};background:{{ pd.bg }};border-radius:13px;padding:9px 13px;cursor:pointer" style-hover="border-color:#127670">
+              <span style="width:30px;height:30px;border-radius:99px;flex:none;background:linear-gradient(135deg,{{ pd.a1 }},{{ pd.a2 }});color:#fff;font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ pd.ini }}</span>
+              <div style="flex:1"><div style="font-size:13px;font-weight:700">{{ pd.n }}</div><div style="font-size:11px;color:#5c706e">{{ pd.sub }}</div></div>
+              <span style="width:15px;height:15px;border-radius:99px;border:2px solid {{ pd.dotBd }};background:{{ pd.dot }};flex:none"></span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:14px"><span style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e">PRAZO</span>
+          <sc-for list="{{ pePrazos }}" as="pp" hint-placeholder-count="3"><span onClick="{{ pp.onClick }}" style="font-size:12px;font-weight:700;border-radius:99px;padding:6px 14px;cursor:pointer;border:1.5px solid {{ pp.bd }};background:{{ pp.bg }};color:{{ pp.c }}">{{ pp.n }}</span></sc-for>
+        </div>
+        <div style="font-size:11.5px;color:#7c8f8d;margin-top:12px;line-height:1.5">O item continua na fila com o relógio correndo. Vencido o prazo sem resposta, a solicitação escala um nível na matriz.</div>
+        <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+          <span onClick="{{ peFechar }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer;white-space:nowrap" style-hover="background:#e4ebe9">Cancelar</span>
+          <span onClick="{{ peConfirmar }}" style="font-size:13.5px;font-weight:800;border-radius:99px;padding:10px 22px;cursor:{{ peCur }};background:{{ peBg }};color:{{ peC }};white-space:nowrap;box-shadow:{{ peSh }}">Enviar pedido</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <!-- TOAST -->
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:1200;background:#0b2224;color:#fff;border-radius:99px;padding:12px 22px;font-size:13.5px;font-weight:600;box-shadow:0 16px 40px rgba(9,34,36,.35);display:flex;align-items:center;gap:10px"><span style="width:20px;height:20px;border-radius:99px;background:linear-gradient(135deg,#48c78e,#127670);display:flex;align-items:center;justify-content:center;font-size:11px">✓</span>{{ toastMsg }}</div>
+  </sc-if>
+  <!-- MODAL PLANO DE REGULARIZAÇÃO -->
+  <sc-if value="{{ planoAberto }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharPlano }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:560px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Plano de regularização · VG-2487</div><span onClick="{{ fecharPlano }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:3px">bloqueio técnico: nenhuma assinatura substitui estas etapas. O caminho é regularizar o fato.</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px">
+          <sc-for list="{{ planoEtapas }}" as="et" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:12px;border:1px solid #eef2f1;border-radius:14px;padding:12px 14px">
+              <span style="width:28px;height:28px;border-radius:10px;flex:none;background:{{ et.nBg }};color:{{ et.nC }};font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ et.n }}</span>
+              <div style="flex:1"><div style="font-size:13.5px;font-weight:700">{{ et.t }}</div><div style="font-size:11.5px;color:#5c706e">{{ et.sub }}</div></div>
+              <span style="display:inline-block;font-size:11.5px;font-weight:700;color:{{ et.stC }};background:{{ et.stBg }};border-radius:99px;padding:3px 10px;white-space:nowrap">{{ et.st }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+          <span onClick="{{ fecharPlano }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer" style-hover="background:#e4ebe9">Fechar</span>
+          <span onClick="{{ notificarPlano }}" style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer;box-shadow:0 6px 14px rgba(18,118,112,.3)">Notificar responsáveis</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <!-- MODAL REGISTRO LACRADO -->
+  <sc-if value="{{ regAberto }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharReg }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:620px;max-height:90vh;overflow:auto;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center;gap:12px"><div style="font-size:16px;font-weight:800">Registro lacrado · {{ mReg.id }}</div><span style="display:inline-block;font-size:11.5px;font-weight:700;color:{{ mReg.c }};background:{{ mReg.bg }};border-radius:99px;padding:3px 11px">{{ mReg.tipo }}</span><span onClick="{{ fecharReg }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12px;color:#5c706e;margin-top:3px;display:flex;align-items:center;gap:7px"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="#1a8f57" stroke-width="1.6" stroke-linecap="round"><rect x="3.5" y="7" width="9" height="6.5" rx="1.6"></rect><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"></path></svg>imutável desde a assinatura · hash <span style="font-family:'Spline Sans Mono'">{{ mReg.hash }}</span></div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-top:16px">
+          <sc-if value="{{ mRegExp }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:10px;background:#fdfaf3;border:1px dashed #e5d9b8;border-radius:12px;padding:10px 14px">
+              <span style="width:9px;height:9px;border-radius:99px;background:#e8a33d;box-shadow:0 0 0 3px rgba(232,163,61,.18);flex:none"></span>
+              <span style="font-size:12.5px;color:#3c4f4e;flex:1"><strong>Validade da liberação:</strong> {{ mRegValidade }} · <span style="font-family:'Spline Sans Mono';color:#b97514;font-weight:600">{{ mRegExpira }}</span></span>
+              <span style="font-size:11px;color:#7c8f8d">expirada, a viagem volta ao estado do fato</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{ mRegRevogada }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:10px;background:#fdf6f6;border:1px solid #f3d4d4;border-radius:12px;padding:10px 14px">
+              <span style="width:9px;height:9px;border-radius:99px;background:#c43d3d;box-shadow:0 0 0 3px rgba(196,61,61,.16);flex:none"></span>
+              <span style="font-size:12.5px;color:#a54545;font-weight:600">Liberação revogada hoje por Rafael Antunes. A viagem voltou ao estado do fato: bloqueada. O registro original permanece lacrado.</span>
+            </div>
+          </sc-if>
+          <sc-for list="{{ mReg.campos }}" as="cp" hint-placeholder-count="9">
+            <div style="display:flex;gap:12px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="width:170px;flex:none;font-size:11.5px;font-weight:700;color:#7c8f8d;letter-spacing:.4px">{{ cp.k }}</span><span style="font-size:13px;font-weight:600;line-height:1.45">{{ cp.v }}</span></div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ mRegPodeRevogar }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:10px;margin-top:14px">
+            <span style="font-size:11.5px;color:#7c8f8d;flex:1;line-height:1.4">Revogar não apaga nada: cria um evento novo e devolve a viagem ao estado do fato.</span>
+            <span onClick="{{ mRegRevogar }}" style="background:#fff;border:1.5px solid #f3d4d4;color:#c43d3d;font-size:13px;font-weight:700;border-radius:99px;padding:9px 18px;cursor:pointer;white-space:nowrap" style-hover="background:#fdf6f6">Revogar liberação</span>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+  <!-- MODAL 9 CAMPOS -->
+  <sc-if value="{{ modalAberto }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fechar }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:1060px;max-height:92vh;overflow:auto;box-shadow:0 40px 100px rgba(9,34,36,.4)">
+        <div style="padding:22px 28px;border-bottom:1px solid #eef2f1;display:flex;align-items:center;gap:14px;position:sticky;top:0;background:#fff;border-radius:24px 24px 0 0;z-index:5">
+          <div><div style="font-size:17px;font-weight:800">Registro de liberação · {{ mItem.id }}</div><div style="font-size:12.5px;color:#5c706e;margin-top:2px">{{ mItem.produto }} · regra: {{ mItem.regra }} · autoridade: {{ mItem.nivel }}</div></div>
+          <span style="margin-left:auto;font-size:12.5px;font-weight:700;color:{{ progC }};background:{{ progBg }};border-radius:99px;padding:5px 13px">{{ progresso }} de 9 campos</span>
+          <span onClick="{{ fechar }}" style="width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span>
+        </div>
+        <div style="padding:24px 28px;display:grid;grid-template-columns:1.25fr 1fr;gap:26px">
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <div>
+              <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e">1 · MOTIVO PADRONIZADO <span style="color:#c43d3d">*</span></div>
+              <div style="font-size:11.5px;color:#7c8f8d;margin-top:2px">lista fechada desta regra; a justificativa complementa, nunca substitui</div>
+              <div style="display:flex;flex-direction:column;gap:6px;margin-top:9px">
+                <sc-for list="{{ motivoOpts }}" as="op" hint-placeholder-count="3">
+                  <div onClick="{{ op.onClick }}" style="display:flex;align-items:center;gap:10px;border:1.5px solid {{ op.bd }};background:{{ op.bg }};border-radius:12px;padding:10px 14px;cursor:pointer;transition:all .15s" style-hover="border-color:#127670">
+                    <span style="width:16px;height:16px;border-radius:99px;border:2px solid {{ op.dotBd }};background:{{ op.dot }};flex:none;box-shadow:{{ op.dotSh }}"></span>
+                    <span style="font-size:13px;font-weight:600">{{ op.label }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e">2 · JUSTIFICATIVA <span style="color:#c43d3d">*</span></div>
+              <textarea value="{{ just }}" onInput="{{ onJust }}" placeholder="Complemento do motivo: contexto, protocolo, contato com a certificadora… (mínimo 20 caracteres)" style="margin-top:9px;width:100%;height:88px;border:1.5px solid #e0e7e5;border-radius:12px;padding:12px 14px;font-size:13px;resize:none;outline:none;color:#0b2224" style-focus="border-color:#127670"></textarea>
+            </div>
+            <div>
+              <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e">3 · EVIDÊNCIAS <span style="color:#c43d3d">*</span></div>
+              <div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:9px">
+                <sc-for list="{{ mEvid }}" as="ev" hint-placeholder-count="2"><span style="font-size:12px;font-weight:600;color:#0C5862;background:#e9f3f2;border-radius:99px;padding:6px 13px;display:flex;align-items:center;gap:7px"><svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M13 8.5 8.7 12.8a3.2 3.2 0 0 1-4.5-4.5L9 3.5a2.1 2.1 0 0 1 3 3l-4.6 4.6a1 1 0 0 1-1.5-1.5L10 5.5"></path></svg>{{ ev }}</span></sc-for>
+                <span onClick="{{ addEvid }}" style="font-size:12px;font-weight:700;color:#5c706e;border:1.5px dashed #c9d5d3;border-radius:99px;padding:6px 13px;cursor:pointer" style-hover="border-color:#127670;color:#0C5862">+ anexar</span>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+              <div>
+                <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e">8 · IMPACTO DECLARADO <span style="color:#c43d3d">*</span></div>
+                <div style="display:flex;flex-direction:column;gap:6px;margin-top:9px">
+                  <sc-for list="{{ impactoOpts }}" as="op" hint-placeholder-count="3">
+                    <div onClick="{{ op.onClick }}" style="display:flex;align-items:center;gap:10px;border:1.5px solid {{ op.bd }};background:{{ op.bg }};border-radius:12px;padding:9px 13px;cursor:pointer" style-hover="border-color:#127670"><span style="width:14px;height:14px;border-radius:99px;border:2px solid {{ op.dotBd }};background:{{ op.dot }};flex:none"></span><span style="font-size:12.5px;font-weight:600">{{ op.label }}</span></div>
+                  </sc-for>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e">9 · VALIDADE <span style="color:#c43d3d">*</span></div>
+                <div style="display:flex;flex-direction:column;gap:6px;margin-top:9px">
+                  <sc-for list="{{ validadeOpts }}" as="op" hint-placeholder-count="4">
+                    <div onClick="{{ op.onClick }}" style="display:flex;align-items:center;gap:10px;border:1.5px solid {{ op.bd }};background:{{ op.bg }};border-radius:12px;padding:9px 13px;cursor:pointer" style-hover="border-color:#127670"><span style="width:14px;height:14px;border-radius:99px;border:2px solid {{ op.dotBd }};background:{{ op.dot }};flex:none"></span><span style="font-size:12.5px;font-weight:600">{{ op.label }}</span></div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="background:#f7faf9;border:1px solid #eef2f1;border-radius:16px;padding:16px">
+              <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e">4 · RESPONSÁVEL <span style="font-weight:600;color:#7c8f8d;letter-spacing:0">· automático</span></div>
+              <div style="display:flex;align-items:center;gap:11px;margin-top:10px"><span style="width:36px;height:36px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center">RA</span><div><div style="font-size:13.5px;font-weight:800">Rafael Antunes</div><div style="font-size:11.5px;color:#5c706e">assina como Diretoria + Resp. Técnico</div></div></div>
+            </div>
+            <div style="background:#f7faf9;border:1px solid #eef2f1;border-radius:16px;padding:16px">
+              <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e">5 · DATA E HORA <span style="font-weight:600;color:#7c8f8d;letter-spacing:0">· automático</span></div>
+              <div style="font-family:'Spline Sans Mono';font-size:13.5px;font-weight:600;margin-top:8px">6 ago 2026 · 10:32</div>
+            </div>
+            <div style="background:#f7faf9;border:1px solid #eef2f1;border-radius:16px;padding:16px">
+              <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e">6 · SITUAÇÃO ANTERIOR <span style="font-weight:600;color:#7c8f8d;letter-spacing:0">· capturada do estado real</span></div>
+              <div style="font-size:12.5px;margin-top:8px;display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:99px;background:#c43d3d;box-shadow:0 0 0 3px rgba(196,61,61,.14)"></span><span style="font-weight:700">Bloqueada</span><span style="color:#5c706e">· motor reprova (11 de 12)</span></div>
+            </div>
+            <div style="background:#f7faf9;border:1px solid #eef2f1;border-radius:16px;padding:16px">
+              <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e">7 · SITUAÇÃO POSTERIOR <span style="font-weight:600;color:#7c8f8d;letter-spacing:0">· capturada, não digitada</span></div>
+              <div style="font-size:12.5px;margin-top:8px;display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:99px;background:#e8a33d;box-shadow:0 0 0 3px rgba(232,163,61,.16)"></span><span style="font-weight:700">Liberada por autoridade</span><span style="color:#5c706e">· motor segue reprovando</span></div>
+            </div>
+            <div style="background:linear-gradient(90deg,#fdfaf3,#fff);border:1px dashed #e5d9b8;border-radius:14px;padding:12px 15px;font-size:12px;color:#5c706e;line-height:1.5">Se o registro não for completado, <strong>a liberação é desfeita por inteiro</strong>. Não existe liberação sem registro.</div>
+          </div>
+        </div>
+        <div style="padding:18px 28px 22px;border-top:1px solid #eef2f1;display:flex;align-items:center;gap:10px">
+          <span onClick="{{ abrirManter }}" style="background:#fff;border:1.5px solid #e0e7e5;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer" style-hover="border-color:#c43d3d;color:#c43d3d">Manter bloqueio</span>
+          <span style="font-size:11.5px;color:#7c8f8d;max-width:280px;line-height:1.4">manter também é decisão registrada, com responsável e motivo</span>
+          <span onClick="{{ assinar }}" style="margin-left:auto;font-size:14px;font-weight:800;border-radius:99px;padding:12px 26px;cursor:{{ btnCur }};background:{{ btnBg }};color:{{ btnC }};box-shadow:{{ btnSh }};transition:all .2s">{{ btnLabel }}</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalPerfil }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePerfil }}" style="background:#fff;border-radius:24px;width:460px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Meu perfil</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:16px">
+          <span style="width:76px;height:76px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:26px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #fff,0 0 0 6px #f0debb">RA</span>
+          <div style="font-size:17px;font-weight:800;margin-top:4px">Rafael Antunes</div>
+          <div style="font-size:12.5px;color:#5c706e">rafael.antunes@traxium.com.br</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-top:18px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Papel</span><span style="font-weight:700">Gestor de qualidade</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Autoridade na matriz</span><span style="font-weight:700">nível 3 · Gestor</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Filiais</span><span style="font-weight:700">Rondonópolis, Sorriso</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Liberações assinadas em 2026</span><span style="font-family:'Spline Sans Mono';font-weight:600">14</span></div>
+        </div>
+        <div style="font-size:12px;color:#5c706e;margin-top:12px;line-height:1.5">Toda assinatura sua fica no registro lacrado da viagem. O papel define o que a matriz permite; ninguém assina acima do próprio nível.</div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalPrefs }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePerfil }}" style="background:#fff;border-radius:24px;width:520px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Preferências e notificações</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:16px">
+          <sc-for list="{{ prefs }}" as="pf" hint-placeholder-count="4">
+            <div onClick="{{ pf.onClick }}" style="display:flex;align-items:center;gap:12px;border:1px solid #eef2f1;border-radius:14px;padding:12px 14px;cursor:pointer" style-hover="border-color:#c9d5d3">
+              <div style="flex:1"><div style="font-size:13.5px;font-weight:700">{{ pf.t }}</div><div style="font-size:11.5px;color:#5c706e">{{ pf.sub }}</div></div>
+              <span style="width:40px;height:23px;border-radius:99px;background:{{ pf.swBg }};position:relative;flex:none;transition:background .2s"><span style="position:absolute;top:2.5px;left:{{ pf.swPos }};width:18px;height:18px;border-radius:99px;background:#fff;box-shadow:0 1px 4px rgba(9,34,36,.25);transition:left .2s"></span></span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:12px;color:#5c706e;margin-top:12px">O alerta de bloqueio técnico não pode ser desligado: é requisito da certificação.</div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalPapel }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePop }}" style="background:#fff;border-radius:24px;width:540px;max-height:86vh;overflow:auto;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Papel ativo</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:3px;line-height:1.55">O papel define o que a matriz de autoridade permite assinar. A autoridade escala para cima, nunca para baixo, e ninguém assina acima do próprio nível.</div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-top:16px">
+          <sc-for list="{{ papeisLista }}" as="pp" hint-placeholder-count="5">
+            <div onClick="{{ pp.onClick }}" style="display:flex;align-items:center;gap:13px;border:1.5px solid {{ pp.bd }};background:{{ pp.bg }};border-radius:15px;padding:13px 15px;cursor:pointer;transition:all .15s" style-hover="border-color:#127670">
+              <span style="width:19px;height:19px;border-radius:99px;border:2.5px solid {{ pp.dotBd }};background:{{ pp.dot }};flex:none"></span>
+              <span style="width:34px;height:34px;border-radius:11px;flex:none;background:linear-gradient(135deg,{{ pp.g1 }},{{ pp.g2 }});color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ pp.nivel }}</span>
+              <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:800">{{ pp.n }}</div><div style="font-size:11.5px;color:#5c706e;margin-top:2px;line-height:1.4">{{ pp.resolve }}</div></div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#f7faf9;border-radius:14px;padding:12px 15px;margin-top:14px;font-size:12px;color:#5c706e;line-height:1.55">Nível 0 é técnico: é o nível de autoridade de ninguém. Contaminação não se aprova, se regulariza.</div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalSair }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePop }}" style="background:#fff;border-radius:24px;width:440px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Sair da conta</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;align-items:center;gap:12px;background:#f7faf9;border-radius:15px;padding:13px 15px;margin-top:16px">
+          <span style="width:40px;height:40px;border-radius:99px;flex:none;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">RA</span>
+          <div><div style="font-size:13.5px;font-weight:800">Rafael Antunes</div><div style="font-size:11.5px;color:#5c706e">{{ papelBadge }} · nível {{ papelNivel }} na matriz</div></div>
+        </div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:14px;line-height:1.6">Nada é perdido ao sair. Registro lacrado continua lacrado, e o que estava em preenchimento não foi gravado em lugar nenhum.</div>
+        <div style="display:flex;gap:8px;margin-top:18px;justify-content:flex-end">
+          <span onClick="{{ fecharModalTopo }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer" style-hover="background:#e4ebe9">Cancelar</span>
+          <span onClick="{{ confirmarSair }}" style="background:linear-gradient(135deg,#e46969,#c43d3d);color:#fff;font-size:13.5px;font-weight:800;border-radius:99px;padding:10px 22px;cursor:pointer;box-shadow:0 8px 18px rgba(196,61,61,.3);transition:transform .15s" style-hover="transform:translateY(-1px)">Sair</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { loading: true, filtro: 'all', modal: null, motivo: null, just: '', impacto: null, validade: null, evid: ['Protocolo de renovação GMP+ nº 44.812', 'E-mail da certificadora (05 ago)'], decisao: {}, toast: null, filial: 'Rondonópolis MT', filialOpen: false, plano: false, verReg: null };
+  componentDidMount() {
+    this._txFora = ev => { if (!ev.target.closest || !ev.target.closest('[data-tx-pop]')) this.setState({ perfilOpen: false, filialOpen: false, periodoOpen: false, menuOpen: false, versaoOpen: false, notifOpen: false }); };
+    this._txEsc = ev => { if (ev.key === 'Escape') this.setState({ perfilOpen: false, filialOpen: false, periodoOpen: false, menuOpen: false, versaoOpen: false, notifOpen: false, modalTopo: null }); };
+    document.addEventListener('mousedown', this._txFora);
+    document.addEventListener('keydown', this._txEsc); setTimeout(() => this.setState({ loading: false }), 900); this._t = null; }
+  itens() {
+    return [
+      { id: 'VG-2490', produto: 'Farelo de soja', regra: 'R-06 subcontratado não apto', nivel: 'Diretoria + RT', nivC: '#0b2224', nivBg: '#f0f4f3',
+        quem: 'Ivan Prado (motorista)', quando: 'hoje, 09:20', nEvid: 2, si: 'IP', avc1: '#0C5862', avc2: '#0E78B5', ring: '#f3d4d4',
+        motivo: 'Certificado GMP+ da Lima Logística suspenso na base pública da certificadora. Acordo de qualidade vigente; a suspensão bloqueia mesmo assim. Transportadora afirma que a renovação já foi protocolada.',
+        idade: '1h 12min', idadeC: '#3c4f4e', tipo: 'pend',
+        motivoOpts: ['Certificado renovado, aguardando atualização da base pública', 'Divergência cadastral confirmada com a certificadora', 'Auditoria emergencial realizada no terceiro'] },
+      { id: 'VG-2487', produto: 'Farelo de amendoim', regra: 'R-02 carga anterior proibida', nivel: 'Bloqueio técnico', nivC: '#c43d3d', nivBg: '#fdecec',
+        quem: 'Edson Farias (motorista)', quando: 'hoje, 07:12', nEvid: 3, si: 'EF', avc1: '#c43d3d', avc2: '#93313f', ring: '#f3d4d4',
+        motivo: 'Ureia pecuária no T-1 do compartimento C2. Contaminação não se aprova; se regulariza. A lista de motivos desta regra é vazia por definição.',
+        idade: '3h 20min', idadeC: '#c43d3d', tipo: 'tec' },
+      { id: 'VG-2492', produto: 'Milho a granel', regra: 'R-08 competência do motorista', nivel: 'Gestor', nivC: '#0b2224', nivBg: '#f0f4f3',
+        quem: 'Ana Beltrão (despachante)', quando: 'hoje, 09:43', nEvid: 1, si: 'AB', avc1: '#127670', avc2: '#0E78B5', ring: '#f0debb',
+        motivo: 'Trilha "Regimes de limpeza" de Valdir Nunes vencida há 6 dias. Reciclagem de 45 min já atribuída ao motorista; carregamento marcado para as 17:30.',
+        idade: '49 min', idadeC: '#3c4f4e', tipo: 'pend',
+        motivoOpts: ['Reciclagem concluída, aguardando recálculo da matriz', 'Motorista substituto confirmado para o carregamento', 'Prorrogação técnica avaliada pela Qualidade'] },
+      { id: 'VG-2496', produto: 'Calcário calcítico', regra: 'R-11 documentação a vencer', nivel: 'Tráfego', nivC: '#0b2224', nivBg: '#f0f4f3',
+        quem: 'Rogério Sales (tráfego)', quando: 'hoje, 10:16', nEvid: 1, si: 'RS', avc1: '#5b8def', avc2: '#4c5bc0', ring: '#dbe4f8',
+        motivo: 'Documentação do implemento SQT 7D22 (laudo de inspeção) vence em 12 dias. Regra de alerta: segue mediante justificativa registrada; renovação já disparada ao subcontratado.',
+        idade: '16 min', idadeC: '#3c4f4e', tipo: 'pend',
+        motivoOpts: ['Renovação protocolada dentro do prazo', 'Implemento substituto indisponível na janela', 'Janela de carregamento inadiável do cliente'] },
+      { id: 'VG-2483', produto: 'Farelo de trigo', regra: 'R-11 documentação a vencer', nivel: 'Tráfego', nivC: '#0b2224', nivBg: '#f0f4f3',
+        quem: 'Rogério Sales (tráfego)', quando: 'ontem, 15:02', nEvid: 2, si: 'RS', avc1: '#e8a33d', avc2: '#b97514', ring: '#cdeeda',
+        motivo: 'Liberada ontem com registro completo. O motor segue reprovando até a renovação constar; os dois registros convivem no dossiê.',
+        idade: 'decidida', idadeC: '#7c8f8d', tipo: 'aprov' },
+      { id: 'VG-2471', produto: 'Sorgo granífero', regra: 'R-03 limpeza incompatível', nivel: 'Gestor', nivC: '#0b2224', nivBg: '#f0f4f3',
+        quem: 'Milton Costa (motorista)', quando: 'segunda, 08:40', nEvid: 1, si: 'MC', avc1: '#9db0ae', avc2: '#5c706e', ring: '#eef2f1',
+        motivo: 'Bloqueio mantido: a limpeza declarada (regime A) não atende o regime B exigido pelo T-3. Manter é decisão registrada, com responsável e motivo.',
+        idade: 'decidida', idadeC: '#7c8f8d', tipo: 'rej' }
+    ];
+  }
+  renderVals() { return { ...this.navVals(), ...this.papelVals(), ...this.perfilVals(), ...this.mainVals() }; }
+  perfilVals() {
+    return {
+      perfilOpen: !!this.state.perfilOpen,
+      onPerfil: () => this.setState(s => ({ perfilOpen: !s.perfilOpen })),
+      modalPerfil: this.state.modalTopo === 'perfil', modalPrefs: this.state.modalTopo === 'prefs',
+      abrirPerfil: () => this.setState({ modalTopo: 'perfil', perfilOpen: false }),
+      abrirPrefs: () => this.setState({ modalTopo: 'prefs', perfilOpen: false }),
+      fecharModalTopo: () => this.setState({ modalTopo: null }),
+      pararCliquePerfil: e => e.stopPropagation(),
+      prefs: [
+        { k: 'bloq', t: 'Bloqueio técnico na filial', sub: 'sempre ativo: requisito da certificação', lock: true },
+        { k: 'fila', t: 'Item há mais de 2h na fila', sub: 'aviso no app e por e-mail' },
+        { k: 'cert', t: 'Certificado de terceiro a vencer', sub: 'aos 30 e aos 15 dias' },
+        { k: 'idtf', t: 'Nova versão da base IDTF', sub: 'quando a Qualidade publicar revisão' }
+      ].map(p => {
+        const on = p.lock || (this.state.prefsOn || { fila: true, cert: true, idtf: false })[p.k];
+        return { ...p, swBg: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#dde5e3', swPos: on ? '19.5px' : '2.5px',
+          onClick: () => { if (p.lock) return; const cur = this.state.prefsOn || { fila: true, cert: true, idtf: false }; this.setState({ prefsOn: { ...cur, [p.k]: !cur[p.k] } }); } };
+      })
+    };
+  }
+  papelVals() {
+    const diz = m => { if (typeof this.avisar === 'function') this.avisar(m); };
+    const PAPEIS = [
+      { n: 'Inspetor de pátio', nivel: 1, resolve: 'condição física do equipamento: checklist reprovado, foto ausente', g1: '#9fc9c6', g2: '#6ba8a4' },
+      { n: 'Tráfego', nivel: 2, resolve: 'pendência simples: certificação a vencer, sincronização pendente', g1: '#5b8def', g2: '#4c5bc0' },
+      { n: 'Gestor de qualidade', nivel: 3, resolve: 'pendência corrigível mediante evidência da correção', g1: '#127670', g2: '#0E78B5' },
+      { n: 'Diretoria e Resp. Técnico', nivel: 4, resolve: 'impacto contratual, risco residual aceito, terceiro emergencial', g1: '#e8a33d', g2: '#d97544' },
+      { n: 'Auditor interno', nivel: 0, resolve: 'somente leitura, mais abrir não conformidade', g1: '#c9d5d3', g2: '#9db0ae' }
+    ];
+    const ativo = this.state.papelAtivo || 'Gestor de qualidade';
+    const atual = PAPEIS.find(p => p.n === ativo) || PAPEIS[2];
+    return {
+      pararClique: e => e.stopPropagation(),
+      pararCliquePop: e => e.stopPropagation(),
+      papelBadge: atual.n === 'Diretoria e Resp. Técnico' ? 'Diretoria' : atual.n.split(' ')[0],
+      papelNivel: atual.nivel,
+      modalPapel: this.state.modalTopo === 'papel',
+      modalSair: this.state.modalTopo === 'sair',
+      abrirPapel: () => this.setState({ modalTopo: 'papel', perfilOpen: false }),
+      abrirSair: () => this.setState({ modalTopo: 'sair', perfilOpen: false }),
+      confirmarSair: () => { this.setState({ modalTopo: null }); diz('Sessão encerrada. Registros assinados continuam no dossiê com seu nome e a data.'); },
+      papeisLista: PAPEIS.map(p => {
+        const on = p.n === ativo;
+        return { ...p, onClick: () => { this.setState({ papelAtivo: p.n, modalTopo: null }); diz('Papel ativo agora é ' + p.n + ', nível ' + p.nivel + '. A fila e as ações de assinatura passam a refletir esta autoridade.'); },
+          bd: on ? '#127670' : '#e0e7e5', bg: on ? '#eef7f6' : '#fff',
+          dot: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#fff', dotBd: on ? '#127670' : '#c9d5d3' };
+      })
+    };
+  }
+  navVals() {
+    const c = this.state.navC ?? (localStorage.getItem('tx-nav') === '1');
+    return { navW: c ? '84px' : '264px', navPad: c ? '14px' : '16px', navL: c ? 'none' : 'block', navSec: c ? 'none' : 'block', navCard: c ? 'none' : 'block', navFlip: c ? 'rotate(180deg)' : 'none',
+      navToggle: () => { const n = !c; localStorage.setItem('tx-nav', n ? '1' : '0'); this.setState({ navC: n }); } };
+  }
+  mainVals() {
+    const s = this.state;
+    const decoEstado = it => {
+      const dec = s.decisao[it.id] || (it.tipo === 'aprov' ? 'aprovada' : it.tipo === 'rej' ? 'mantida' : null);
+      return { ...it,
+        podeAnalisar: !dec && it.tipo === 'pend', isTec: it.tipo === 'tec', decidida: !!dec,
+        decLabel: dec === 'aprovada' ? '✓ Liberada por autoridade · motor segue reprovando' : dec === 'mantida' ? 'Bloqueio mantido · decisão registrada' : '',
+        decC: dec === 'aprovada' ? '#b97514' : '#3c4f4e', decBg: dec === 'aprovada' ? '#fdf3e2' : '#f0f4f3',
+        abrir: () => this.setState({ modal: it.id, motivo: null, just: '', impacto: null, validade: null }),
+        pedirEvid: () => this.setState({ pe: it.id, peDest: null, pePrazo: null }),
+        verRegistro: () => this.setState({ verReg: it.id }) };
+    };
+    let fila = s.loading ? [] : this.itens().map(decoEstado);
+    if (s.filtro === 'pend') fila = fila.filter(i => i.podeAnalisar || i.isTec);
+    if (s.filtro === 'dec') fila = fila.filter(i => i.decidida);
+    const mk = (key, label) => ({ label, onClick: () => this.setState({ filtro: key }),
+      bg: s.filtro === key ? '#0b2224' : '#fff', c: s.filtro === key ? '#fff' : '#3c4f4e',
+      sh: s.filtro === key ? 'none' : '0 2px 8px rgba(9,61,68,.06)' });
+    const mItem = this.itens().find(i => i.id === s.modal) || this.itens()[0];
+    const radio = (opts, cur, key) => (opts || []).map(label => {
+      const on = cur === label;
+      return { label, onClick: () => this.setState({ [key]: label }),
+        bd: on ? '#127670' : '#e0e7e5', bg: on ? '#eef7f6' : '#fff',
+        dot: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#fff', dotBd: on ? '#127670' : '#c9d5d3', dotSh: on ? '0 0 0 2px rgba(18,118,112,.15)' : 'none' };
+    });
+    const done = 4 + (s.motivo ? 1 : 0) + (s.just.trim().length >= 20 ? 1 : 0) + (s.evid.length > 0 ? 1 : 0) + (s.impacto ? 1 : 0) + (s.validade ? 1 : 0);
+    const pronto = done === 9;
+    const toast = msg => this.toastMsgFn(msg);
+    const decAtual = s.decisao[s.verReg] || (s.verReg === 'VG-2471' ? 'mantida' : 'aprovada');
+    const regAprov = {
+      tipo: 'Liberada por autoridade', c: '#b97514', bg: '#fdf3e2', hash: '9f2c…e41a',
+      campos: [
+        { k: '1 · MOTIVO', v: 'Renovação protocolada dentro do prazo (lista fechada da regra R-11)' },
+        { k: '2 · JUSTIFICATIVA', v: 'Protocolo nº 44.812 confirmado com a certificadora por telefone e e-mail; janela do cliente inadiável.' },
+        { k: '3 · EVIDÊNCIAS', v: '2 anexos: protocolo de renovação, e-mail da certificadora' },
+        { k: '4 · RESPONSÁVEL', v: 'Rogério Sales · assinou como Tráfego' },
+        { k: '5 · DATA E HORA', v: '5 ago 2026 · 15:02' },
+        { k: '6 · SITUAÇÃO ANTERIOR', v: 'Bloqueada · motor reprova (11 de 12) · capturada do estado real' },
+        { k: '7 · SITUAÇÃO POSTERIOR', v: 'Liberada por autoridade · motor segue reprovando · capturada, não digitada' },
+        { k: '8 · IMPACTO DECLARADO', v: 'Sem impacto sobre a segurança do feed' },
+        { k: '9 · VALIDADE', v: 'Somente esta viagem' }
+      ]
+    };
+    const regMant = {
+      tipo: 'Bloqueio mantido', c: '#3c4f4e', bg: '#f0f4f3', hash: 'b71d…08cc',
+      campos: [
+        { k: 'DECISÃO', v: 'Manter o bloqueio. Manter também é decisão registrada, não é "não fazer nada".' },
+        { k: 'MOTIVO', v: 'A limpeza declarada (regime A) não atende o regime B exigido pelo T-3 do compartimento.' },
+        { k: 'RESPONSÁVEL', v: 'Helena Duarte · assinou como Gestora de qualidade' },
+        { k: 'DATA E HORA', v: '4 ago 2026 · 11:18' },
+        { k: 'AÇÃO INDICADA', v: 'Executar limpeza no regime B com evidência e reapresentar. O motor reavalia sozinho.' },
+        { k: 'SITUAÇÃO', v: 'Bloqueada antes · bloqueada depois. O fato não mudou; o registro prova que alguém olhou.' }
+      ]
+    };
+    const mReg = { id: s.verReg || '', ...(decAtual === 'mantida' ? regMant : regAprov) };
+    return {
+      loading: s.loading, skel: [1, 2, 3, 4], fila,
+      filtros: [mk('all', 'Todas · 6'), mk('pend', 'Aguardando decisão · 4'), mk('dec', 'Decididas · 2')],
+      matriz: [
+        { n: '0', nome: 'Técnico', resolve: 'Ninguém. Contaminação não se aprova; se regulariza.', bg: '#fdf6f6', bd: '#f3d4d4', nBg: '#fdecec', nC: '#c43d3d' },
+        { n: '1', nome: 'Inspetor', resolve: 'Condição física: checklist reprovado, fotos ausentes', bg: '#fff', bd: '#eef2f1', nBg: '#f0f4f3', nC: '#3c4f4e' },
+        { n: '2', nome: 'Tráfego', resolve: 'Pendência simples: certificação a vencer, sincronização', bg: '#fff', bd: '#eef2f1', nBg: '#f0f4f3', nC: '#3c4f4e' },
+        { n: '3', nome: 'Gestor', resolve: 'Pendência corrigível mediante evidência da correção', bg: '#fff', bd: '#eef2f1', nBg: '#f0f4f3', nC: '#3c4f4e' },
+        { n: '4', nome: 'Diretoria + RT', resolve: 'Impacto contratual, risco residual, terceiro emergencial', bg: '#fff', bd: '#eef2f1', nBg: '#e9f3f2', nC: '#0C5862' },
+        { n: '5', nome: 'Cliente', resolve: 'Só escopo comercial. Nunca "perdoa" contaminação.', bg: '#fff', bd: '#eef2f1', nBg: '#f0f4f3', nC: '#3c4f4e' }
+      ],
+      modalAberto: !!s.modal, mItem,
+      fechar: () => this.setState({ modal: null }),
+      pararClique: e => e.stopPropagation(),
+      motivoOpts: radio(mItem.motivoOpts, s.motivo, 'motivo'),
+      impactoOpts: radio(['Sem impacto sobre a segurança do feed', 'Risco residual aceito com monitoramento', 'Risco mitigado por evidência da correção'], s.impacto, 'impacto'),
+      validadeOpts: radio(['Somente esta viagem', '72 horas', '7 dias', 'Até a regularização do fato'], s.validade, 'validade'),
+      just: s.just, onJust: e => this.setState({ just: e.target.value }),
+      mEvid: s.evid, addEvid: () => this.setState({ evid: [...s.evid, 'Anexo ' + (s.evid.length + 1) + ' · comprovante.pdf'] }),
+      progresso: done, progC: pronto ? '#1a8f57' : '#b97514', progBg: pronto ? '#e9f7ef' : '#fdf3e2',
+      btnLabel: pronto ? 'Assinar liberação' : 'Assinar liberação (complete os 9 campos)',
+      btnBg: pronto ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#eef2f1', btnC: pronto ? '#fff' : '#9db0ae',
+      btnSh: pronto ? '0 8px 18px rgba(18,118,112,.35)' : 'none', btnCur: pronto ? 'pointer' : 'not-allowed',
+      assinar: () => { if (!pronto) return; const id = s.modal; this.setState({ modal: null, decisao: { ...s.decisao, [id]: 'aprovada' } }); toast('Liberação da ' + id + ' assinada e registrada. O motor segue reprovando; os dois registros ficam no dossiê.'); },
+      abrirManter: () => this.setState({ mb: true, mbMotivo: null, mbAcao: '' }),
+      mbAberto: !!s.mb, mbFechar: () => this.setState({ mb: false }),
+      mbMotivos: ['Evidência insuficiente para o risco declarado', 'A correção do fato é viável antes da janela', 'Fora da minha alçada na matriz: escalar', 'Pedido não se sustenta contra a regra'].map(n => {
+        const on = s.mbMotivo === n;
+        return { n, onClick: () => this.setState({ mbMotivo: n }), bd: on ? '#127670' : '#e0e7e5', bg: on ? '#eef7f6' : '#fff', dot: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#fff', dotBd: on ? '#127670' : '#c9d5d3' };
+      }),
+      mbAcao: s.mbAcao || '', mbOnAcao: e => this.setState({ mbAcao: e.target.value }),
+      mbBg: (s.mbMotivo && (s.mbAcao || '').trim().length >= 15) ? '#0b2224' : '#eef2f1',
+      mbC: (s.mbMotivo && (s.mbAcao || '').trim().length >= 15) ? '#fff' : '#9db0ae',
+      mbCur: (s.mbMotivo && (s.mbAcao || '').trim().length >= 15) ? 'pointer' : 'not-allowed',
+      mbConfirmar: () => {
+        if (!(s.mbMotivo && (s.mbAcao || '').trim().length >= 15)) return;
+        const id = s.modal;
+        this.setState({ mb: false, modal: null, decisao: { ...s.decisao, [id]: 'mantida' } });
+        toast('Bloqueio da ' + id + ' mantido e assinado por Rafael Antunes. Motivo e ação indicada foram para o registro lacrado.');
+      },
+      peAberto: !!s.pe, peId: s.pe || '', peFechar: () => this.setState({ pe: null }),
+      peDest: [
+        { k: 'mot', n: 'Ivan Prado', sub: 'motorista · quem está com a carga', ini: 'IP', a1: '#0C5862', a2: '#0E78B5' },
+        { k: 'sub', n: 'Lima Logística', sub: 'subcontratado · dono do certificado', ini: 'LL', a1: '#c43d3d', a2: '#93313f' },
+        { k: 'insp', n: 'Jorge Mattos', sub: 'inspetor de pátio · evidência física', ini: 'JM', a1: '#e8a33d', a2: '#d97544' }
+      ].map(d => {
+        const on = s.peDest === d.k;
+        return { ...d, onClick: () => this.setState({ peDest: d.k }), bd: on ? '#127670' : '#e0e7e5', bg: on ? '#eef7f6' : '#fff', dot: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#fff', dotBd: on ? '#127670' : '#c9d5d3' };
+      }),
+      pePrazos: ['2 horas', 'até 18:00 de hoje', '24 horas'].map(n => {
+        const on = s.pePrazo === n;
+        return { n, onClick: () => this.setState({ pePrazo: n }), bd: on ? '#127670' : '#e0e7e5', bg: on ? '#eef7f6' : '#fff', c: on ? '#0C5862' : '#3c4f4e' };
+      }),
+      peBg: (s.peDest && s.pePrazo) ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#eef2f1',
+      peC: (s.peDest && s.pePrazo) ? '#fff' : '#9db0ae', peSh: (s.peDest && s.pePrazo) ? '0 8px 18px rgba(18,118,112,.35)' : 'none',
+      peCur: (s.peDest && s.pePrazo) ? 'pointer' : 'not-allowed',
+      peConfirmar: () => {
+        if (!(s.peDest && s.pePrazo)) return;
+        this.setState({ pe: null });
+        toast('Pedido de evidência enviado com prazo de ' + s.pePrazo + '. Sem resposta no prazo, escala um nível na matriz.');
+      },
+      mRegExp: decAtual === 'aprovada' && !(s.revogadas || []).includes(s.verReg),
+      mRegValidade: 'somente esta viagem', mRegExpira: 'expira no fechamento da VG ou em 72h, o que vier antes',
+      mRegRevogada: (s.revogadas || []).includes(s.verReg),
+      mRegPodeRevogar: decAtual === 'aprovada' && !(s.revogadas || []).includes(s.verReg),
+      mRegRevogar: () => {
+        this.setState({ revogadas: [...(s.revogadas || []), s.verReg], decisao: { ...s.decisao, [s.verReg]: 'mantida' } });
+        toast('Liberação da ' + s.verReg + ' revogada. A viagem voltou ao estado do fato; os dois registros ficam no dossiê.');
+      },
+      manter: () => { const id = s.modal; this.setState({ modal: null, decisao: { ...s.decisao, [id]: 'mantida' } }); toast('Bloqueio da ' + id + ' mantido. Decisão registrada com responsável e motivo.'); },
+      exportarFila: () => this.toastMsgFn('Fila de exceções exportada: itens, decisões, responsáveis e motivos, com carimbo de 6 ago.'),
+      toast: !!s.toast, toastMsg: s.toast,
+      filial: s.filial, filialOpen: s.filialOpen,
+      onFilial: () => this.setState({ filialOpen: !s.filialOpen }),
+      filiais: ['Rondonópolis MT', 'Sorriso MT', 'Cuiabá MT', 'Rio Verde GO'].map(n => ({ n,
+        bg: s.filial === n ? '#eef7f6' : '#fff', dot: s.filial === n ? '#127670' : '#dde5e3',
+        onClick: () => { this.setState({ filial: n, filialOpen: false }); this.toastMsgFn('Vendo a fila da filial ' + n + '.'); } })),
+      planoAberto: s.plano, abrirPlano: () => this.setState({ plano: true }),
+      fecharPlano: () => this.setState({ plano: false }),
+      notificarPlano: () => { this.setState({ plano: false }); this.toastMsgFn('Responsáveis notificados: Qualidade e estação de lavagem. Etapas na trilha da VG-2487.'); },
+      planoEtapas: [
+        { n: '1', t: 'Destinação do resíduo com laudo', sub: 'remover a ureia com destino documentado', st: 'em andamento', stC: '#b97514', stBg: '#fdf3e2', nBg: '#e9f3f2', nC: '#0C5862' },
+        { n: '2', t: 'Limpeza qualificada · regime D', sub: 'estação credenciada, 19 campos de evidência', st: 'pendente', stC: '#7c8f8d', stBg: '#f0f4f3', nBg: '#e9f3f2', nC: '#0C5862' },
+        { n: '3', t: 'Inspeção qualificada com fotos', sub: '6 ângulos + assinatura do inspetor', st: 'pendente', stC: '#7c8f8d', stBg: '#f0f4f3', nBg: '#e9f3f2', nC: '#0C5862' },
+        { n: '4', t: 'Reavaliação pelo motor', sub: 'o estado recalcula do fato; ninguém assina por cima', st: 'automática', stC: '#0C5862', stBg: '#e9f3f2', nBg: '#e9f3f2', nC: '#0C5862' }
+      ],
+      regAberto: !!s.verReg, fecharReg: () => this.setState({ verReg: null }), mReg
+    };
+  }
+  toastMsgFn(msg) { this.setState({ toast: msg }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 3800); }
+}
+</script>
+</body>
+</html>

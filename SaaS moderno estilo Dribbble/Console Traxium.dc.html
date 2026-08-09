@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<script src="./prototype-shell.js" defer></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f2f5f4;font-family:'Hanken Grotesk',sans-serif;color:#0b2224;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0C5862;text-decoration:none}a:hover{color:#127670}
+input{font-family:'Hanken Grotesk',sans-serif}
+input::placeholder{color:#8ba09e}
+@keyframes txsh{from{background-position:-600px 0}to{background-position:600px 0}}
+@keyframes deslizar{from{transform:translateX(40px);opacity:.4}to{transform:translateX(0);opacity:1}}
+</style>
+</helmet>
+<div style="display:flex;min-height:100vh;min-width:1560px" data-screen-label="Console Traxium">
+  <!-- SIDEBAR DO CONSOLE -->
+  <div style="width:{{ navW }};flex:none;background:linear-gradient(178deg,#0b2224,#12333a);color:#fff;display:flex;flex-direction:column;padding:24px {{ navPad }};position:sticky;top:0;height:100vh;transition:width .25s ease;overflow-x:hidden;overflow-y:auto">
+    <div style="display:flex;align-items:center;gap:10px;padding:4px 8px 8px">
+      <svg width="34" height="34" viewBox="0 0 32 32"><defs><linearGradient id="lgC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1a9e93"></stop><stop offset="1" stop-color="#0E78B5"></stop></linearGradient></defs><polygon points="16,2.5 27.5,9 27.5,23 16,29.5 4.5,23 4.5,9" fill="url(#lgC)"></polygon><polyline points="9,20 13,13 18,17 23,10" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></polyline><circle cx="9" cy="20" r="1.6" fill="#fff"></circle><circle cx="13" cy="13" r="1.6" fill="#fff"></circle><circle cx="18" cy="17" r="1.6" fill="#fff"></circle><circle cx="23" cy="10" r="1.6" fill="#fff"></circle></svg>
+      <div style="display:{{ navL }}"><div style="font-weight:800;font-size:17px;letter-spacing:.2px">Traxium</div><div style="font-size:10.5px;letter-spacing:2.2px;color:rgba(255,255,255,.5);text-transform:uppercase">Console interno</div></div>
+    </div>
+    <div style="display:{{ navCard }};margin:0 8px 18px;background:rgba(232,163,61,.14);border:1px solid rgba(232,163,61,.3);border-radius:11px;padding:8px 11px;font-size:11px;font-weight:700;letter-spacing:.6px;color:#f4c15d">SUPERFÍCIE A · A FORNECEDORA</div>
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:14px;color:rgba(255,255,255,.66)">
+      <sc-for list="{{ menu }}" as="mn" hint-placeholder-count="6">
+        <div onClick="{{ mn.onClick }}" style="display:flex;align-items:center;gap:11px;padding:{{ mn.pad }};border-radius:11px;cursor:pointer;background:{{ mn.bg }};border:{{ mn.bd }};font-weight:{{ mn.fw }};color:{{ mn.c }}" style-hover="background:rgba(255,255,255,.07);color:#fff">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="{{ mn.d }}"></path></svg>
+          <span style="display:{{ navL }};white-space:nowrap">{{ mn.n }}</span>
+          <sc-if value="{{ mn.temBadge }}" hint-placeholder-val="{{ false }}"><span style="margin-left:auto;display:{{ navL }};background:{{ mn.bgBadge }};color:{{ mn.cBadge }};font-size:11.5px;font-weight:800;padding:1px 8px;border-radius:99px">{{ mn.badge }}</span></sc-if>
+        </div>
+      </sc-for>
+    </div>
+    <div style="margin-top:auto;display:flex;flex-direction:column;gap:2px">
+      <a href="Torre de Controle v2.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.5);font-size:12.5px;font-weight:600" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 8h-9"></path><path d="M8 4.5 4.5 8 8 11.5"></path></svg><span style="display:{{ navL }};white-space:nowrap">Voltar ao back-office</span></a>
+      <div onClick="{{ navToggle }}" title="Recolher ou expandir o menu" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;cursor:pointer;font-size:13px;font-weight:600;color:rgba(255,255,255,.6)" style-hover="background:rgba(255,255,255,.08);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="transform:{{ navFlip }};transition:transform .25s;flex:none"><path d="M9.5 3 4.5 8l5 5"></path><line x1="12" y1="3" x2="12" y2="13"></line></svg><span style="display:{{ navL }};white-space:nowrap">Recolher menu</span></div>
+    </div>
+  </div>
+  <!-- CONTENT -->
+  <div style="flex:1;display:flex;flex-direction:column;padding:26px 32px 40px;gap:22px;min-width:0">
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div><div style="font-size:24px;font-weight:800">{{ tituloSecao }}</div><div style="font-size:13.5px;color:#5c706e;margin-top:2px">{{ headSub }}</div></div>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+        <div style="background:#fff;border:1px solid #e0e7e5;border-radius:11px;padding:0 14px;display:flex;gap:8px;align-items:center">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#7c8f8d" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.6"></circle><line x1="10.5" y1="10.5" x2="13.5" y2="13.5"></line></svg>
+          <input value="{{ busca }}" onInput="{{ onBusca }}" placeholder="Buscar cliente, CNPJ, plano…" style="border:none;outline:none;background:transparent;font-size:13.5px;padding:10px 0;width:220px;color:#0b2224">
+        </div>
+        <div onClick="{{ novoCliente }}" style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;border-radius:99px;padding:10px 20px;font-size:13.5px;font-weight:800;cursor:pointer;box-shadow:0 6px 14px rgba(18,118,112,.3);transition:transform .15s" style-hover="transform:translateY(-1px)">Novo cliente</div>
+        <div data-tx-pop style="position:relative">
+          <div onClick="{{ onPerfil }}" style="width:38px;height:38px;border-radius:99px;background:linear-gradient(135deg,#5b8def,#4c5bc0);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13.5px;box-shadow:0 0 0 3px #fff,0 0 0 4.5px #d8e4e2;cursor:pointer" style-hover="box-shadow:0 0 0 3px #fff,0 0 0 4.5px #127670">MS</div>
+          <sc-if value="{{ perfilOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;right:0;top:48px;background:#fff;border:1px solid #e4eae8;border-radius:16px;box-shadow:0 16px 40px rgba(9,61,68,.16);padding:6px;width:260px;z-index:60;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;gap:11px;padding:11px 12px;border-bottom:1px solid #f0f4f3;margin-bottom:4px">
+                <span style="width:38px;height:38px;border-radius:99px;background:linear-gradient(135deg,#5b8def,#4c5bc0);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none">MS</span>
+                <div><div style="font-size:13.5px;font-weight:800">Marina Sales</div><div style="font-size:11.5px;color:#5c706e">Customer Success · Traxium</div></div>
+              </div>
+              <div onClick="{{ abrirPerfil }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer" style-hover="background:#f6f9f8">Meu perfil</div>
+              <div style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;display:flex;justify-content:space-between;align-items:center;color:#5c706e">Acesso<span style="display:inline-block;font-size:10.5px;font-weight:700;color:#4c5bc0;background:#eceffa;border-radius:99px;padding:2px 9px">Console</span></div>
+              <a href="Torre de Controle v2.dc.html" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;color:#0b2224;display:block" style-hover="background:#f6f9f8;color:#0b2224">Ir ao back-office do cliente</a>
+              <div style="height:1px;background:#f0f4f3;margin:5px 8px"></div>
+              <div onClick="{{ abrirSair }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;color:#c43d3d" style-hover="background:#fdf6f6">Sair</div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+    <!-- KPIs -->
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:14px">
+      <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:18px 20px">
+        <div style="font-size:13px;font-weight:600;color:#5c706e">Clientes por faixa contratada</div>
+        <div style="display:flex;align-items:baseline;gap:10px;margin-top:6px"><span style="font-size:36px;font-weight:800;font-variant-numeric:tabular-nums">{{ kClientes }}</span><span style="font-size:13px;color:#5c706e">ativos · {{ kTrial }} em avaliação</span></div>
+        <div style="margin-top:12px;height:12px;border-radius:99px;overflow:hidden;display:flex;background:repeating-linear-gradient(-45deg,#eef2f1 0 5px,#e2e9e7 5px 10px)">
+          <sc-for list="{{ faixaBar }}" as="fb" hint-placeholder-count="4"><div title="{{ fb.tip }}" style="width:{{ fb.w }};background:linear-gradient(90deg,{{ fb.g1 }},{{ fb.g2 }});transition:width .4s ease"></div></sc-for>
+        </div>
+        <div style="display:flex;gap:14px;margin-top:9px;font-size:12px;color:#5c706e">
+          <sc-for list="{{ faixaBar }}" as="fb" hint-placeholder-count="4"><span><span style="display:inline-block;width:8px;height:8px;border-radius:3px;background:{{ fb.g2 }};margin-right:5px"></span>{{ fb.n }}</span></sc-for>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:18px 20px;display:flex;flex-direction:column">
+        <div style="font-size:13px;font-weight:600;color:#5c706e">Receita recorrente</div>
+        <div style="font-size:32px;font-weight:800;margin-top:6px;font-variant-numeric:tabular-nums">{{ kMrr }}</div>
+        <div style="margin-top:auto;display:flex;align-items:center;gap:7px;font-size:12.5px;color:#5c706e;font-weight:600"><span style="width:9px;height:9px;border-radius:99px;background:linear-gradient(135deg,#48c78e,#127670);box-shadow:0 0 0 3px rgba(26,143,87,.16)"></span>{{ kMrrSub }}</div>
+      </div>
+      <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:18px 20px;display:flex;flex-direction:column">
+        <div style="font-size:13px;font-weight:600;color:#5c706e">Acima da faixa</div>
+        <div style="font-size:36px;font-weight:800;margin-top:6px;font-variant-numeric:tabular-nums">{{ kAcima }}</div>
+        <div style="margin-top:auto;display:flex;align-items:center;gap:7px;font-size:12.5px;color:#5c706e;font-weight:600"><span style="width:9px;height:9px;border-radius:99px;background:linear-gradient(135deg,#f4c15d,#e8a33d);box-shadow:0 0 0 3px rgba(232,163,61,.16)"></span>conversa de upgrade, não corte</div>
+      </div>
+      <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:18px 20px;display:flex;flex-direction:column">
+        <div style="font-size:13px;font-weight:600;color:#5c706e">Viagens processadas no mês</div>
+        <div style="font-size:32px;font-weight:800;margin-top:6px;font-variant-numeric:tabular-nums">{{ kViagens }}</div>
+        <div style="margin-top:auto;display:flex;align-items:center;gap:7px;font-size:12.5px;color:#5c706e;font-weight:600"><span style="width:9px;height:9px;border-radius:99px;background:linear-gradient(135deg,#5b8def,#4c5bc0);box-shadow:0 0 0 3px rgba(91,141,239,.16)"></span>contagem agregada, sem conteúdo</div>
+      </div>
+    </div>
+    <!-- MAIN -->
+    <div style="display:grid;grid-template-columns:1fr 392px;gap:20px;align-items:start">
+      <div style="display:flex;flex-direction:column;gap:12px;min-width:0">
+        <sc-if value="{{ ehClientes }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;align-items:center;gap:10px;padding:2px 4px">
+            <div style="font-size:17px;font-weight:800">Clientes</div>
+            <div style="font-size:12.5px;color:#5c706e">consumo do mês contra a faixa contratada</div>
+            <div style="margin-left:auto;display:flex;gap:6px">
+              <sc-for list="{{ filtros }}" as="f" hint-placeholder-count="3">
+                <span onClick="{{ f.onClick }}" style="font-size:12.5px;font-weight:700;border-radius:99px;padding:6px 14px;cursor:pointer;background:{{ f.bg }};color:{{ f.c }};box-shadow:{{ f.sh }};transition:all .15s">{{ f.label }}</span>
+              </sc-for>
+            </div>
+          </div>
+          <sc-if value="{{ loading }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <sc-for list="{{ skel }}" as="s" hint-placeholder-count="5">
+                <div style="background:#fff;border:1px solid #eef2f1;border-radius:20px;padding:15px 20px;display:flex;align-items:center;gap:16px">
+                  <span style="width:44px;height:44px;border-radius:14px;flex:none;background:linear-gradient(90deg,#eef2f1 25%,#f7faf9 40%,#eef2f1 55%);background-size:600px 100%;animation:txsh 1.3s linear infinite"></span>
+                  <div style="flex:1;display:flex;flex-direction:column;gap:9px"><span style="height:13px;width:40%;border-radius:99px;background:linear-gradient(90deg,#eef2f1 25%,#f7faf9 40%,#eef2f1 55%);background-size:600px 100%;animation:txsh 1.3s linear infinite"></span><span style="height:11px;width:62%;border-radius:99px;background:linear-gradient(90deg,#eef2f1 25%,#f7faf9 40%,#eef2f1 55%);background-size:600px 100%;animation:txsh 1.3s linear infinite"></span></div>
+                  <span style="height:28px;width:120px;border-radius:99px;background:linear-gradient(90deg,#eef2f1 25%,#f7faf9 40%,#eef2f1 55%);background-size:600px 100%;animation:txsh 1.3s linear infinite"></span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ listaVazia }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:50px 20px;display:flex;flex-direction:column;align-items:center;gap:10px">
+              <div style="font-size:15.5px;font-weight:800">Nenhum cliente neste recorte</div>
+              <div style="font-size:13px;color:#5c706e;text-align:center;max-width:400px">{{ listaVaziaSub }}</div>
+            </div>
+          </sc-if>
+          <sc-for list="{{ clientes }}" as="cl" hint-placeholder-count="6">
+            <div onClick="{{ cl.abrir }}" style="background:#fff;border:1px solid {{ cl.borda }};border-radius:20px;box-shadow:0 2px 10px rgba(9,61,68,.04);padding:15px 20px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:box-shadow .2s" style-hover="box-shadow:0 12px 32px rgba(9,61,68,.10)">
+              <span style="width:46px;height:46px;border-radius:14px;flex:none;background:linear-gradient(135deg,{{ cl.a1 }},{{ cl.a2 }});color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px rgba(9,61,68,.16)">{{ cl.ini }}</span>
+              <div style="min-width:0;flex:1.4">
+                <div style="display:flex;gap:8px;align-items:baseline"><span style="font-size:15px;font-weight:800">{{ cl.n }}</span><span style="font-family:'Spline Sans Mono';font-size:11.5px;color:#7c8f8d">{{ cl.cnpj }}</span></div>
+                <div style="font-size:12.5px;color:#5c706e;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ cl.filiais }} · cliente desde {{ cl.desde }}</div>
+              </div>
+              <span style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:{{ cl.stC }};background:{{ cl.stBg }};border-radius:99px;padding:4px 12px;white-space:nowrap"><span style="width:7px;height:7px;border-radius:99px;background:{{ cl.stC }}"></span>{{ cl.st }}</span>
+              <div style="min-width:172px">
+                <div style="display:flex;align-items:baseline;gap:6px"><span style="font-family:'Spline Sans Mono';font-size:13px;font-weight:600;color:{{ cl.usoC }}">{{ cl.uso }}</span><span style="font-size:11px;color:#5c706e">de {{ cl.limite }} viagens</span></div>
+                <div style="margin-top:5px;height:8px;border-radius:99px;overflow:hidden;background:repeating-linear-gradient(-45deg,#f0f4f3 0 5px,#e4ebe9 5px 10px)">
+                  <div style="width:{{ cl.usoW }};height:100%;background:linear-gradient(90deg,{{ cl.g1 }},{{ cl.g2 }});transition:width .4s ease"></div>
+                </div>
+              </div>
+              <div style="text-align:right;min-width:104px"><div style="font-size:13.5px;font-weight:800">{{ cl.faixa }}</div><div style="font-size:11px;color:#5c706e">{{ cl.valor }}</div></div>
+              <div style="display:flex;gap:4px;min-width:104px;justify-content:flex-end">
+                <sc-for list="{{ cl.modulos }}" as="mo" hint-placeholder-count="5">
+                  <span title="{{ mo.tip }}" style="width:22px;height:22px;border-radius:7px;background:{{ mo.bg }};color:{{ mo.c }};font-size:9.5px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ mo.l }}</span>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </sc-if>
+
+        <sc-if value="{{ ehPlanos }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:10px;padding:2px 4px">
+            <div style="font-size:17px;font-weight:800">Faixas de preço</div>
+            <div style="font-size:12.5px;color:#5c706e">o preço acompanha o volume de viagens decididas, não o número de usuários</div>
+          </div>
+          <sc-for list="{{ faixas }}" as="fx" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid {{ fx.borda }};border-radius:20px;padding:20px 22px;display:flex;align-items:center;gap:20px;box-shadow:0 2px 10px rgba(9,61,68,.04)">
+              <span style="width:52px;height:52px;border-radius:16px;flex:none;background:linear-gradient(135deg,{{ fx.g1 }},{{ fx.g2 }});color:#fff;font-size:19px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px {{ fx.glow }}">{{ fx.n }}</span>
+              <div style="flex:1.2;min-width:0">
+                <div style="font-size:16px;font-weight:800">{{ fx.t }}</div>
+                <div style="font-size:12.5px;color:#5c706e;margin-top:2px">{{ fx.sub }}</div>
+              </div>
+              <div style="flex:none;text-align:right;min-width:150px">
+                <div style="font-size:22px;font-weight:800;font-variant-numeric:tabular-nums">{{ fx.valor }}</div>
+                <div style="font-size:11.5px;color:#5c706e">por mês</div>
+              </div>
+              <div style="flex:none;text-align:right;min-width:104px">
+                <div style="font-size:19px;font-weight:800;font-variant-numeric:tabular-nums">{{ fx.qtd }}</div>
+                <div style="font-size:11.5px;color:#5c706e">clientes</div>
+              </div>
+              <span onClick="{{ fx.onClick }}" style="background:#f0f4f3;color:#0b2224;font-size:13px;font-weight:700;border-radius:99px;padding:9px 18px;cursor:pointer;white-space:nowrap;flex:none" style-hover="background:#e4ebe9">Ver clientes</span>
+            </div>
+          </sc-for>
+          <div style="background:#f7faf9;border:1px solid #e4eae8;border-radius:18px;padding:16px 20px;display:flex;align-items:center;gap:13px">
+            <span style="width:34px;height:34px;border-radius:99px;flex:none;background:linear-gradient(135deg,#5b8def,#4c5bc0);color:#fff;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center">i</span>
+            <div style="flex:1;font-size:12.5px;color:#5c706e;line-height:1.55">Estourar a faixa não corta o serviço nem bloqueia decisão de carga. O sistema segue decidindo e o excedente abre uma conversa comercial: derrubar a operação de um cliente por questão de contrato seria transformar compliance em refém de cobrança.</div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ ehModulos }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:10px;padding:2px 4px">
+            <div style="font-size:17px;font-weight:800">Módulos</div>
+            <div style="font-size:12.5px;color:#5c706e">quantos clientes têm cada um ativo</div>
+          </div>
+          <sc-for list="{{ modulos }}" as="md" hint-placeholder-count="7">
+            <div style="background:#fff;border:1px solid {{ md.borda }};border-radius:20px;padding:18px 22px;display:flex;align-items:center;gap:18px">
+              <span style="width:44px;height:44px;border-radius:13px;flex:none;background:linear-gradient(135deg,{{ md.g1 }},{{ md.g2 }});color:#fff;font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ md.l }}</span>
+              <div style="flex:1.3;min-width:0"><div style="font-size:15px;font-weight:800">{{ md.n }}</div><div style="font-size:12.5px;color:#5c706e;margin-top:2px">{{ md.sub }}</div></div>
+              <div style="flex:1;min-width:0">
+                <div style="display:flex;align-items:baseline;gap:7px"><span style="font-family:'Spline Sans Mono';font-size:13px;font-weight:600">{{ md.qtd }} de {{ kClientes }}</span><span style="font-size:11px;color:#5c706e">clientes</span></div>
+                <div style="margin-top:5px;height:8px;border-radius:99px;overflow:hidden;background:repeating-linear-gradient(-45deg,#f0f4f3 0 5px,#e4ebe9 5px 10px)"><div style="width:{{ md.w }};height:100%;background:linear-gradient(90deg,{{ md.g1 }},{{ md.g2 }})"></div></div>
+              </div>
+              <span style="font-size:11.5px;font-weight:700;color:{{ md.stC }};background:{{ md.stBg }};border-radius:99px;padding:4px 12px;white-space:nowrap;flex:none">{{ md.st }}</span>
+            </div>
+          </sc-for>
+        </sc-if>
+
+        <sc-if value="{{ ehUsuarios }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:10px;padding:2px 4px">
+            <div style="font-size:17px;font-weight:800">Usuários da Traxium</div>
+            <div style="font-size:12.5px;color:#5c706e">quem tem acesso a este console e até onde</div>
+          </div>
+          <sc-for list="{{ usuarios }}" as="us" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #eef2f1;border-radius:20px;padding:16px 22px;display:flex;align-items:center;gap:16px">
+              <span style="width:42px;height:42px;border-radius:99px;flex:none;background:linear-gradient(135deg,{{ us.a1 }},{{ us.a2 }});color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #fff,0 0 0 4.5px {{ us.ring }}">{{ us.ini }}</span>
+              <div style="flex:1.3;min-width:0"><div style="font-size:14.5px;font-weight:800">{{ us.n }}</div><div style="font-size:12px;color:#5c706e">{{ us.papel }}</div></div>
+              <div style="flex:1.4;min-width:0"><div style="font-size:11px;letter-spacing:1.2px;font-weight:700;color:#7c8f8d">PODE</div><div style="font-size:12.5px;font-weight:600;margin-top:1px">{{ us.pode }}</div></div>
+              <span style="font-family:'Spline Sans Mono';font-size:12px;color:#5c706e;white-space:nowrap">{{ us.ultimo }}</span>
+              <span onClick="{{ us.onClick }}" style="font-size:12.5px;font-weight:700;border-radius:99px;padding:8px 16px;cursor:pointer;background:#f0f4f3;color:#0b2224;white-space:nowrap" style-hover="background:#e4ebe9">Ajustar</span>
+            </div>
+          </sc-for>
+        </sc-if>
+      </div>
+      <!-- RAIL -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:linear-gradient(115deg,#0b2224,#12333a 65%,#0C5862 150%);border-radius:20px;padding:22px;color:#fff;position:relative;overflow:hidden">
+          <div style="position:absolute;right:-50px;top:-70px;width:240px;height:240px;border-radius:99px;background:radial-gradient(circle,rgba(255,255,255,.09),transparent 68%)"></div>
+          <div style="position:relative">
+            <div style="font-size:15.5px;font-weight:800">O que este console não mostra</div>
+            <div style="font-size:12.5px;color:rgba(255,255,255,.65);margin-top:3px;line-height:1.5">o espaço negativo desta superfície é requisito de conformidade, não recurso que faltou</div>
+            <div style="display:flex;flex-direction:column;gap:7px;margin-top:16px">
+              <sc-for list="{{ naoMostra }}" as="nm" hint-placeholder-count="5">
+                <div style="display:flex;align-items:center;gap:11px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:13px;padding:11px 13px">
+                  <span style="width:20px;height:20px;border-radius:6px;flex:none;background:rgba(196,61,61,.24);border:1px solid rgba(228,105,105,.5);color:#f0a6a6;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center">✕</span>
+                  <span style="font-size:12.5px;font-weight:600;color:rgba(255,255,255,.85)">{{ nm }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:14px;line-height:1.55">A Traxium enxerga contagem de uso, nunca conteúdo de decisão. Suporte que precisa ver um caso pede acesso ao cliente, e o acesso fica registrado nos dois lados.</div>
+          </div>
+        </div>
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:22px">
+          <div style="font-size:15.5px;font-weight:800">Base IDTF Brasil</div>
+          <div style="font-size:12.5px;color:#5c706e;margin-top:2px">a base normativa é produto da Traxium e serve todos os clientes</div>
+          <div style="display:flex;align-items:center;gap:9px;margin-top:14px">
+            <span style="width:9px;height:9px;border-radius:99px;background:linear-gradient(135deg,#48c78e,#127670);box-shadow:0 0 0 3px rgba(26,143,87,.16)"></span>
+            <div style="font-size:14px;font-weight:800">v2026.07 vigente</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:12px">
+            <sc-for list="{{ baseInfo }}" as="bi" hint-placeholder-count="4">
+              <div style="display:flex;justify-content:space-between;gap:10px;font-size:12.5px;background:#f7faf9;border-radius:12px;padding:9px 13px"><span style="color:#5c706e">{{ bi.k }}</span><span style="font-weight:700;font-family:{{ bi.f }}">{{ bi.v }}</span></div>
+            </sc-for>
+          </div>
+          <a href="Motor IDTF.dc.html" style="display:block;margin-top:14px;background:#f0f4f3;color:#0b2224;font-size:13px;font-weight:700;border-radius:99px;padding:10px;text-align:center" style-hover="background:#e4ebe9;color:#0b2224">Abrir a governança da base</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- DRAWER DO CLIENTE -->
+  <sc-if value="{{ clAberto }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ clFechar }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;justify-content:flex-end">
+      <div onClick="{{ pararClique }}" style="width:540px;background:#f7faf9;height:100vh;overflow:auto;box-shadow:-30px 0 80px rgba(9,34,36,.35);animation:deslizar .3s">
+        <div style="background:linear-gradient(130deg,#0b2224,#12333a 55%,#0C5862 130%);color:#fff;padding:22px 26px">
+          <div style="display:flex;align-items:center"><div style="font-size:10.5px;letter-spacing:1.6px;font-weight:700;color:rgba(255,255,255,.6)">CLIENTE</div><span onClick="{{ clFechar }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:rgba(255,255,255,.22)">✕</span></div>
+          <div style="display:flex;align-items:center;gap:13px;margin-top:10px">
+            <span style="width:48px;height:48px;border-radius:15px;flex:none;background:linear-gradient(135deg,{{ cli.a1 }},{{ cli.a2 }});color:#fff;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ cli.ini }}</span>
+            <div><div style="font-size:19px;font-weight:800">{{ cli.n }}</div><div style="font-family:'Spline Sans Mono';font-size:12px;color:rgba(255,255,255,.65)">{{ cli.cnpj }}</div></div>
+          </div>
+        </div>
+        <div style="padding:18px 22px;display:flex;flex-direction:column;gap:14px">
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:16px 18px">
+            <div style="font-size:11px;letter-spacing:1.4px;font-weight:700;color:#7c8f8d">CONTRATO</div>
+            <div style="display:flex;flex-direction:column;gap:6px;margin-top:9px">
+              <sc-for list="{{ cli.contrato }}" as="ct" hint-placeholder-count="5">
+                <div style="display:flex;justify-content:space-between;gap:12px;font-size:12.5px;background:#f7faf9;border-radius:12px;padding:9px 13px"><span style="color:#5c706e">{{ ct.k }}</span><span style="font-weight:700;text-align:right">{{ ct.v }}</span></div>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:13px">
+              <span onClick="{{ clMudarFaixa }}" style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;font-size:13px;font-weight:700;border-radius:99px;padding:9px 18px;cursor:pointer;box-shadow:0 6px 14px rgba(18,118,112,.3);transition:transform .15s" style-hover="transform:translateY(-1px)">Propor mudança de faixa</span>
+              <span onClick="{{ clFatura }}" style="background:#f0f4f3;color:#0b2224;font-size:13px;font-weight:700;border-radius:99px;padding:9px 18px;cursor:pointer" style-hover="background:#e4ebe9">Ver faturas</span>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:16px 18px">
+            <div style="font-size:11px;letter-spacing:1.4px;font-weight:700;color:#7c8f8d">MÓDULOS CONTRATADOS</div>
+            <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px">
+              <sc-for list="{{ cli.mods }}" as="cm" hint-placeholder-count="6">
+                <div onClick="{{ cm.onClick }}" style="display:flex;align-items:center;gap:11px;border:1px solid {{ cm.bd }};background:{{ cm.bg }};border-radius:13px;padding:10px 13px;cursor:pointer" style-hover="border-color:#127670">
+                  <span style="width:26px;height:26px;border-radius:8px;flex:none;background:{{ cm.icBg }};color:{{ cm.icC }};font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ cm.l }}</span>
+                  <div style="flex:1"><div style="font-size:13px;font-weight:700">{{ cm.n }}</div></div>
+                  <span style="width:38px;height:22px;border-radius:99px;background:{{ cm.swBg }};position:relative;flex:none;transition:background .2s"><span style="position:absolute;top:2.5px;left:{{ cm.swPos }};width:17px;height:17px;border-radius:99px;background:#fff;box-shadow:0 1px 4px rgba(9,34,36,.25);transition:left .2s"></span></span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:16px 18px">
+            <div style="font-size:11px;letter-spacing:1.4px;font-weight:700;color:#7c8f8d">USO NO MÊS</div>
+            <div style="display:flex;gap:6px;align-items:flex-end;height:70px;margin-top:14px">
+              <sc-for list="{{ cli.serie }}" as="se" hint-placeholder-count="12">
+                <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%"><div style="width:100%;height:{{ se.h }};border-radius:5px;background:linear-gradient(180deg,{{ se.g1 }},{{ se.g2 }})"></div></div>
+              </sc-for>
+            </div>
+            <div style="font-size:11.5px;color:#5c706e;margin-top:10px;line-height:1.5">{{ cli.usoNota }}</div>
+          </div>
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:16px 18px">
+            <div style="font-size:11px;letter-spacing:1.4px;font-weight:700;color:#7c8f8d">SUPORTE</div>
+            <div style="font-size:12.5px;color:#5c706e;margin-top:9px;line-height:1.55">Para ver um caso concreto deste cliente é preciso pedir acesso nominal. O pedido aparece para o gestor de qualidade dele e fica no log dos dois lados.</div>
+            <span onClick="{{ clPedirAcesso }}" style="display:inline-block;margin-top:12px;background:#f0f4f3;color:#0b2224;font-size:13px;font-weight:700;border-radius:99px;padding:9px 18px;cursor:pointer" style-hover="background:#e4ebe9">Pedir acesso temporário</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalPerfil }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:460px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Meu perfil</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:16px">
+          <span style="width:76px;height:76px;border-radius:99px;background:linear-gradient(135deg,#5b8def,#4c5bc0);color:#fff;font-size:26px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #fff,0 0 0 6px #d5def7">MS</span>
+          <div style="font-size:17px;font-weight:800;margin-top:4px">Marina Sales</div>
+          <div style="font-size:12.5px;color:#5c706e">marina.sales@traxium.com.br</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-top:18px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Papel</span><span style="font-weight:700">Customer Success</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Superfície</span><span style="font-weight:700">A · Console Traxium</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Acesso a dado de cliente</span><span style="font-weight:700;color:#c43d3d">nenhum, sem pedido</span></div>
+        </div>
+        <div style="font-size:12px;color:#5c706e;margin-top:12px;line-height:1.5">Seu acesso cobre contrato, uso agregado e módulos. Ver um caso concreto exige pedido nominal, aprovado pelo cliente e registrado nos dois lados.</div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:1200;background:#0b2224;color:#fff;border-radius:99px;padding:12px 22px;font-size:13.5px;font-weight:600;box-shadow:0 16px 40px rgba(9,34,36,.35);display:flex;align-items:center;gap:10px"><span style="width:20px;height:20px;border-radius:99px;background:linear-gradient(135deg,#48c78e,#127670);display:flex;align-items:center;justify-content:center;font-size:11px">✓</span>{{ toastMsg }}</div>
+  </sc-if>
+  <sc-if value="{{ modalPapel }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePop }}" style="background:#fff;border-radius:24px;width:540px;max-height:86vh;overflow:auto;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Papel ativo</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:3px;line-height:1.55">O papel define o que a matriz de autoridade permite assinar. A autoridade escala para cima, nunca para baixo, e ninguém assina acima do próprio nível.</div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-top:16px">
+          <sc-for list="{{ papeisLista }}" as="pp" hint-placeholder-count="5">
+            <div onClick="{{ pp.onClick }}" style="display:flex;align-items:center;gap:13px;border:1.5px solid {{ pp.bd }};background:{{ pp.bg }};border-radius:15px;padding:13px 15px;cursor:pointer;transition:all .15s" style-hover="border-color:#127670">
+              <span style="width:19px;height:19px;border-radius:99px;border:2.5px solid {{ pp.dotBd }};background:{{ pp.dot }};flex:none"></span>
+              <span style="width:34px;height:34px;border-radius:11px;flex:none;background:linear-gradient(135deg,{{ pp.g1 }},{{ pp.g2 }});color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ pp.nivel }}</span>
+              <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:800">{{ pp.n }}</div><div style="font-size:11.5px;color:#5c706e;margin-top:2px;line-height:1.4">{{ pp.resolve }}</div></div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#f7faf9;border-radius:14px;padding:12px 15px;margin-top:14px;font-size:12px;color:#5c706e;line-height:1.55">Nível 0 é técnico: é o nível de autoridade de ninguém. Contaminação não se aprova, se regulariza.</div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalSair }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePop }}" style="background:#fff;border-radius:24px;width:440px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Sair da conta</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;align-items:center;gap:12px;background:#f7faf9;border-radius:15px;padding:13px 15px;margin-top:16px">
+          <span style="width:40px;height:40px;border-radius:99px;flex:none;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">RA</span>
+          <div><div style="font-size:13.5px;font-weight:800">Rafael Antunes</div><div style="font-size:11.5px;color:#5c706e">{{ papelBadge }} · nível {{ papelNivel }} na matriz</div></div>
+        </div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:14px;line-height:1.6">Nada é perdido ao sair. Registro lacrado continua lacrado, e o que estava em preenchimento não foi gravado em lugar nenhum.</div>
+        <div style="display:flex;gap:8px;margin-top:18px;justify-content:flex-end">
+          <span onClick="{{ fecharModalTopo }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer" style-hover="background:#e4ebe9">Cancelar</span>
+          <span onClick="{{ confirmarSair }}" style="background:linear-gradient(135deg,#e46969,#c43d3d);color:#fff;font-size:13.5px;font-weight:800;border-radius:99px;padding:10px 22px;cursor:pointer;box-shadow:0 8px 18px rgba(196,61,61,.3);transition:transform .15s" style-hover="transform:translateY(-1px)">Sair</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { loading: true, toast: null, secao: 'clientes', filtro: 'all', busca: '', cli: null, mods: {} };
+  componentDidMount() {
+    this._txFora = ev => { if (!ev.target.closest || !ev.target.closest('[data-tx-pop]')) this.setState({ perfilOpen: false, filialOpen: false, periodoOpen: false, menuOpen: false, versaoOpen: false, notifOpen: false }); };
+    this._txEsc = ev => { if (ev.key === 'Escape') this.setState({ perfilOpen: false, filialOpen: false, periodoOpen: false, menuOpen: false, versaoOpen: false, notifOpen: false, modalTopo: null }); };
+    document.addEventListener('mousedown', this._txFora);
+    document.addEventListener('keydown', this._txEsc); setTimeout(() => this.setState({ loading: false }), 900); }
+  avisar(msg) { this.setState({ toast: msg }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 4200); }
+
+  MODS() {
+    return [
+      { k: 'gate', l: 'GK', n: 'Gatekeeper e subcontratados', sub: 'qualificação de terceiros com estado derivado', g1: '#127670', g2: '#0E78B5' },
+      { k: 'acad', l: 'AC', n: 'Academy', sub: 'competência do motorista como requisito', g1: '#e8a33d', g2: '#d97544' },
+      { k: 'idtf', l: 'ID', n: 'Motor IDTF Brasil', sub: 'base normativa de sequenciamento', g1: '#5b8def', g2: '#4c5bc0' },
+      { k: 'torre', l: 'CT', n: 'Control Tower', sub: 'fila de decisões e exceções', g1: '#48c78e', g2: '#127670' },
+      { k: 'net', l: 'NW', n: 'Network e ativos', sub: 'cavalo, implemento e compartimento', g1: '#9fc9c6', g2: '#6ba8a4' },
+      { k: 'doss', l: 'DS', n: 'Dossiê de auditoria', sub: 'reconstrução lacrada da decisão', g1: '#0C5862', g2: '#093D44' },
+      { k: 'eudr', l: 'EU', n: 'EUDR e origem', sub: 'segunda onda, ainda não liberado', g1: '#c9d5d3', g2: '#9db0ae', indisp: true }
+    ];
+  }
+  clientesBase() {
+    return [
+      { k: 'transrural', n: 'Transrural Log Ltda', cnpj: '11.204.336/0001-58', ini: 'TL', a1: '#127670', a2: '#0E78B5', filiais: '4 filiais MT e GO', desde: 'mar 2025',
+        st: 'ativo', faixa: 'Faixa 2', valor: 'R$ 6.400', uso: 512, limite: 600, mods: ['gate', 'acad', 'idtf', 'torre', 'net', 'doss'],
+        serie: [38, 42, 40, 45, 47, 44, 49, 52, 48, 55, 51, 58],
+        usoNota: 'Cresceu 34% em seis meses. No ritmo atual estoura a faixa 2 em novembro, e a conversa de upgrade vale começar antes disso.' },
+      { k: 'agrosafra', n: 'AgroSafra Transportes', cnpj: '24.881.907/0001-40', ini: 'AS', a1: '#e8a33d', a2: '#d97544', filiais: '2 filiais MS', desde: 'jul 2025',
+        st: 'acima da faixa', faixa: 'Faixa 1', valor: 'R$ 2.900', uso: 247, limite: 200, mods: ['gate', 'idtf', 'torre', 'doss'],
+        serie: [12, 15, 14, 18, 20, 19, 22, 24, 23, 26, 25, 28],
+        usoNota: 'Passou da faixa 1 há dois meses seguidos. O serviço não foi cortado em nenhum momento: seguem decidindo carga normalmente enquanto a proposta de faixa 2 não fecha.' },
+      { k: 'cerrado', n: 'Cerrado Cargas S.A.', cnpj: '31.556.088/0001-12', ini: 'CC', a1: '#5b8def', a2: '#4c5bc0', filiais: '9 filiais MT, GO e MG', desde: 'nov 2024',
+        st: 'ativo', faixa: 'Faixa 3', valor: 'R$ 12.800', uso: 1180, limite: 1500, mods: ['gate', 'acad', 'idtf', 'torre', 'net', 'doss'],
+        serie: [88, 92, 95, 91, 99, 104, 101, 108, 112, 106, 115, 118],
+        usoNota: 'Cliente mais antigo da base e o primeiro a usar o dossiê numa auditoria real de certificadora, em fevereiro.' },
+      { k: 'planalto', n: 'Planalto Logística', cnpj: '07.443.219/0001-85', ini: 'PL', a1: '#9fc9c6', a2: '#6ba8a4', filiais: '1 filial GO', desde: 'jun 2026',
+        st: 'em avaliação', faixa: 'Avaliação', valor: 'sem cobrança', uso: 34, limite: 200, mods: ['gate', 'idtf', 'torre'],
+        serie: [0, 0, 0, 0, 0, 0, 0, 4, 9, 14, 22, 34],
+        usoNota: 'Avaliação de 60 dias, no dia 31. Ainda não gerou dossiê nenhum, que é o momento em que o produto costuma se provar.' },
+      { k: 'norte', n: 'Norte Grãos Transportes', cnpj: '18.900.774/0001-63', ini: 'NG', a1: '#c43d3d', a2: '#93313f', filiais: '3 filiais MT e PA', desde: 'jan 2026',
+        st: 'inadimplente', faixa: 'Faixa 2', valor: 'R$ 6.400', uso: 388, limite: 600, mods: ['gate', 'acad', 'idtf', 'torre', 'doss'],
+        serie: [30, 33, 31, 35, 34, 36, 38, 35, 37, 34, 36, 38],
+        usoNota: 'Duas faturas em aberto. Mesmo assim o motor segue decidindo: suspender a decisão de carga por inadimplência colocaria ração contaminada na estrada por causa de um boleto.' },
+      { k: 'vale', n: 'Vale do Rio Transportes', cnpj: '29.117.450/0001-27', ini: 'VR', a1: '#0C5862', a2: '#093D44', filiais: '2 filiais MG', desde: 'set 2025',
+        st: 'ativo', faixa: 'Faixa 1', valor: 'R$ 2.900', uso: 118, limite: 200, mods: ['gate', 'idtf', 'torre', 'doss'],
+        serie: [8, 9, 11, 10, 12, 11, 13, 12, 11, 13, 12, 12],
+        usoNota: 'Volume estável. Não usa Academy: a frota é própria e o treinamento roda fora do produto, o que aparece como lacuna nos indicadores deles.' }
+    ];
+  }
+  renderVals() { return { ...this.navVals(), ...this.papelVals(), ...this.mainVals() }; }
+  papelVals() {
+    const diz = m => { if (typeof this.avisar === 'function') this.avisar(m); };
+    const PAPEIS = [
+      { n: 'Inspetor de pátio', nivel: 1, resolve: 'condição física do equipamento: checklist reprovado, foto ausente', g1: '#9fc9c6', g2: '#6ba8a4' },
+      { n: 'Tráfego', nivel: 2, resolve: 'pendência simples: certificação a vencer, sincronização pendente', g1: '#5b8def', g2: '#4c5bc0' },
+      { n: 'Gestor de qualidade', nivel: 3, resolve: 'pendência corrigível mediante evidência da correção', g1: '#127670', g2: '#0E78B5' },
+      { n: 'Diretoria e Resp. Técnico', nivel: 4, resolve: 'impacto contratual, risco residual aceito, terceiro emergencial', g1: '#e8a33d', g2: '#d97544' },
+      { n: 'Auditor interno', nivel: 0, resolve: 'somente leitura, mais abrir não conformidade', g1: '#c9d5d3', g2: '#9db0ae' }
+    ];
+    const ativo = this.state.papelAtivo || 'Gestor de qualidade';
+    const atual = PAPEIS.find(p => p.n === ativo) || PAPEIS[2];
+    return {
+      pararClique: e => e.stopPropagation(),
+      pararCliquePop: e => e.stopPropagation(),
+      papelBadge: atual.n === 'Diretoria e Resp. Técnico' ? 'Diretoria' : atual.n.split(' ')[0],
+      papelNivel: atual.nivel,
+      modalPapel: this.state.modalTopo === 'papel',
+      modalSair: this.state.modalTopo === 'sair',
+      abrirPapel: () => this.setState({ modalTopo: 'papel', perfilOpen: false }),
+      abrirSair: () => this.setState({ modalTopo: 'sair', perfilOpen: false }),
+      confirmarSair: () => { this.setState({ modalTopo: null }); diz('Sessão encerrada. Registros assinados continuam no dossiê com seu nome e a data.'); },
+      papeisLista: PAPEIS.map(p => {
+        const on = p.n === ativo;
+        return { ...p, onClick: () => { this.setState({ papelAtivo: p.n, modalTopo: null }); diz('Papel ativo agora é ' + p.n + ', nível ' + p.nivel + '. A fila e as ações de assinatura passam a refletir esta autoridade.'); },
+          bd: on ? '#127670' : '#e0e7e5', bg: on ? '#eef7f6' : '#fff',
+          dot: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#fff', dotBd: on ? '#127670' : '#c9d5d3' };
+      })
+    };
+  }
+  navVals() {
+    const c = this.state.navC ?? (localStorage.getItem('tx-nav') === '1');
+    return { navW: c ? '84px' : '264px', navPad: c ? '14px' : '16px', navL: c ? 'none' : 'block', navSec: c ? 'none' : 'block', navCard: c ? 'none' : 'block', navFlip: c ? 'rotate(180deg)' : 'none',
+      navToggle: () => { const n = !c; localStorage.setItem('tx-nav', n ? '1' : '0'); this.setState({ navC: n }); } };
+  }
+  clienteVals() {
+    const sel = this.state.cli, M = this.MODS();
+    const vazio = { n: '', cnpj: '', ini: '', a1: '#127670', a2: '#0E78B5', contrato: [], mods: [], serie: [], usoNota: '' };
+    if (!sel) return { clAberto: false, clFechar: () => this.setState({ cli: null }), cli: vazio,
+      clMudarFaixa: () => {}, clFatura: () => {}, clPedirAcesso: () => {} };
+    const max = Math.max(...sel.serie) || 1;
+    const ativos = this.state.mods[sel.k] || sel.mods;
+    return {
+      clAberto: true, clFechar: () => this.setState({ cli: null }),
+      cli: { ...sel,
+        contrato: [
+          { k: 'Faixa contratada', v: sel.faixa + ' · até ' + sel.limite + ' viagens/mês' },
+          { k: 'Valor mensal', v: sel.valor },
+          { k: 'Uso no mês', v: sel.uso + ' viagens decididas' },
+          { k: 'Situação', v: sel.st },
+          { k: 'Cliente desde', v: sel.desde }
+        ],
+        mods: M.map(m => {
+          const on = ativos.includes(m.k);
+          return { ...m, l: m.l, n: m.n,
+            icBg: on ? '#eef7f6' : '#f7faf9', icC: on ? '#0C5862' : '#b6c4c2',
+            bd: on ? '#d5e5e3' : '#eef2f1', bg: on ? '#fbfdfc' : '#fff',
+            swBg: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#dde5e3', swPos: on ? '18.5px' : '2.5px',
+            onClick: () => {
+              if (m.indisp) { this.avisar('EUDR é segunda onda e não está liberado para nenhum cliente. A diretriz manda deixar só os trilhos prontos.'); return; }
+              const cur = this.state.mods[sel.k] || sel.mods;
+              const novo = on ? cur.filter(x => x !== m.k) : cur.concat([m.k]);
+              this.setState({ mods: { ...this.state.mods, [sel.k]: novo } });
+              this.avisar(m.n + (on ? ' desativado' : ' ativado') + ' para ' + sel.n + '. A mudança entra na próxima fatura e fica no log do contrato.');
+            } };
+        }),
+        serie: sel.serie.map((v, i) => ({ h: Math.round(v / max * 100) + '%',
+          g1: i === sel.serie.length - 1 ? '#48c78e' : '#9fc9c6', g2: i === sel.serie.length - 1 ? '#127670' : '#6ba8a4' })) },
+      clMudarFaixa: () => this.avisar('Proposta de faixa gerada para ' + sel.n + '. Nada muda no serviço até o cliente aceitar.'),
+      clFatura: () => this.avisar('Faturas de ' + sel.n + ' abertas. Valor por faixa, sem cobrança por usuário.'),
+      clPedirAcesso: () => this.avisar('Pedido de acesso temporário enviado ao gestor de qualidade de ' + sel.n + '. Você só entra se ele aprovar, e o acesso expira em 24h.')
+    };
+  }
+  mainVals() {
+    const M = this.MODS();
+    const stTone = {
+      'ativo': { stC: '#1a8f57', stBg: '#e9f7ef', borda: '#eef2f1' },
+      'acima da faixa': { stC: '#b97514', stBg: '#fdf3e2', borda: '#f0debb' },
+      'em avaliação': { stC: '#4c5bc0', stBg: '#eceffa', borda: '#eef2f1' },
+      'inadimplente': { stC: '#c43d3d', stBg: '#fdecec', borda: '#f3d4d4' }
+    };
+    const todos = this.clientesBase();
+    const q = this.state.busca.trim().toLowerCase();
+    const f = this.state.filtro;
+    const view = this.state.loading ? [] : todos.filter(c => {
+      if (f === 'acima' && c.st !== 'acima da faixa') return false;
+      if (f === 'aval' && c.st !== 'em avaliação') return false;
+      if (q && !(c.n + ' ' + c.cnpj + ' ' + c.faixa).toLowerCase().includes(q)) return false;
+      return true;
+    });
+    const clientes = view.map(c => {
+      const t = stTone[c.st], pct = Math.min(Math.round(c.uso / c.limite * 100), 100);
+      const estourou = c.uso > c.limite;
+      const ativos = this.state.mods[c.k] || c.mods;
+      return { ...c, ...t, usoW: pct + '%',
+        usoC: estourou ? '#b97514' : '#3c4f4e',
+        g1: estourou ? '#f4c15d' : '#48c78e', g2: estourou ? '#e8a33d' : '#127670',
+        modulos: M.filter(m => !m.indisp).map(m => {
+          const on = ativos.includes(m.k);
+          return { l: m.l, bg: on ? '#eef7f6' : '#f7faf9', c: on ? '#0C5862' : '#cdd9d7',
+            tip: m.n + (on ? ': contratado' : ': não contratado') };
+        }),
+        abrir: () => this.setState({ cli: c }) };
+    });
+    const mk = (key, label) => ({ label, onClick: () => this.setState({ filtro: key }),
+      bg: f === key ? '#0b2224' : '#fff', c: f === key ? '#fff' : '#3c4f4e',
+      sh: f === key ? 'none' : '0 2px 8px rgba(9,61,68,.06)' });
+    const sec = this.state.secao;
+    const menu = [
+      { k: 'clientes', n: 'Clientes', d: 'M5.4 6.2a2.4 2.4 0 1 0 0-.01z M10.8 6.2a2.4 2.4 0 1 0 0-.01z M2.5 13c.6-2 1.7-3 3-3s2.3 1 2.9 3', badge: '6' },
+      { k: 'planos', n: 'Planos e faixas', d: 'M2.5 12.5h11 M4.5 12.5V8 M8 12.5V4.5 M11.5 12.5v-6' },
+      { k: 'modulos', n: 'Módulos', d: 'M2.5 2.5h5v5h-5z M8.5 2.5h5v5h-5z M2.5 8.5h5v5h-5z M8.5 8.5h5v5h-5z' },
+      { k: 'usuarios', n: 'Usuários admin', d: 'M8 8.6a2.8 2.8 0 1 0 0-.01z M3 14c.8-2.6 2.4-3.9 5-3.9s4.2 1.3 5 3.9' }
+    ].map(m => ({ ...m, onClick: () => this.setState({ secao: m.k }),
+      pad: sec === m.k ? '10px 12px' : '9px 12px',
+      bg: sec === m.k ? 'linear-gradient(90deg,rgba(26,158,147,.35),rgba(14,120,181,.28))' : 'transparent',
+      bd: sec === m.k ? '1px solid rgba(255,255,255,.14)' : '1px solid transparent',
+      fw: sec === m.k ? '700' : '500', c: sec === m.k ? '#fff' : 'rgba(255,255,255,.66)',
+      temBadge: !!m.badge, badge: m.badge,
+      bgBadge: sec === m.k ? '#fff' : 'rgba(255,255,255,.14)', cBadge: sec === m.k ? '#0C5862' : '#fff' }));
+    const titulos = { clientes: 'Clientes', planos: 'Planos e faixas', modulos: 'Módulos', usuarios: 'Usuários admin' };
+    const faixas = [
+      { n: '1', t: 'Faixa 1', sub: 'até 200 viagens decididas por mês', valor: 'R$ 2.900', qtd: 2, g1: '#9fc9c6', g2: '#6ba8a4', glow: 'rgba(107,168,164,.28)', borda: '#eef2f1' },
+      { n: '2', t: 'Faixa 2', sub: 'até 600 viagens decididas por mês', valor: 'R$ 6.400', qtd: 2, g1: '#48c78e', g2: '#127670', glow: 'rgba(26,143,87,.28)', borda: '#eef2f1' },
+      { n: '3', t: 'Faixa 3', sub: 'até 1.500 viagens decididas por mês', valor: 'R$ 12.800', qtd: 1, g1: '#5b8def', g2: '#4c5bc0', glow: 'rgba(91,141,239,.28)', borda: '#eef2f1' },
+      { n: '4', t: 'Faixa 4', sub: 'acima de 1.500, com contrato dedicado', valor: 'sob proposta', qtd: 0, g1: '#e8a33d', g2: '#d97544', glow: 'rgba(232,163,61,.28)', borda: '#eef2f1' }
+    ].map(fx => ({ ...fx, onClick: () => { this.setState({ secao: 'clientes', filtro: 'all' }); this.avisar(fx.t + ': ' + fx.qtd + ' clientes. O preço acompanha viagens decididas, não usuários cadastrados.'); } }));
+    const totF = faixas.reduce((a, b) => a + b.qtd, 0) || 1;
+    return {
+      ...this.clienteVals(),
+      loading: this.state.loading, skel: [1, 2, 3, 4, 5],
+      tituloSecao: titulos[sec] || 'Console Traxium',
+      headSub: 'Agosto de 2026 · 6 clientes · a Traxium vê uso e contrato, nunca conteúdo de decisão',
+      menu, clientes,
+      ehClientes: sec === 'clientes', ehPlanos: sec === 'planos', ehModulos: sec === 'modulos', ehUsuarios: sec === 'usuarios',
+      listaVazia: !this.state.loading && sec === 'clientes' && clientes.length === 0,
+      listaVaziaSub: q ? 'Nada corresponde à busca "' + this.state.busca + '".' : 'Nenhum cliente com este status agora.',
+      filtros: [mk('all', 'Todos · ' + todos.length), mk('acima', 'Acima da faixa · ' + todos.filter(c => c.st === 'acima da faixa').length), mk('aval', 'Em avaliação · ' + todos.filter(c => c.st === 'em avaliação').length)],
+      busca: this.state.busca, onBusca: e => this.setState({ busca: e.target.value }),
+      kClientes: todos.filter(c => c.st !== 'em avaliação').length,
+      kTrial: todos.filter(c => c.st === 'em avaliação').length,
+      kMrr: 'R$ 31,4 mil', kMrrSub: '+ R$ 3,5 mil se a faixa 2 fechar',
+      kAcima: todos.filter(c => c.st === 'acima da faixa').length,
+      kViagens: '2.479',
+      faixaBar: faixas.map(fx => ({ n: fx.t + ' · ' + fx.qtd, tip: fx.qtd + ' clientes na ' + fx.t, w: Math.round(fx.qtd / totF * 100) + '%', g1: fx.g1, g2: fx.g2 })),
+      faixas,
+      modulos: M.map(m => {
+        const qtd = todos.filter(c => (this.state.mods[c.k] || c.mods).includes(m.k)).length;
+        return { ...m, qtd, w: Math.round(qtd / todos.length * 100) + '%',
+          borda: m.indisp ? '#eef2f1' : '#eef2f1',
+          st: m.indisp ? 'segunda onda' : (qtd === todos.length ? 'em todos' : 'opcional'),
+          stC: m.indisp ? '#7c8f8d' : (qtd === todos.length ? '#1a8f57' : '#4c5bc0'),
+          stBg: m.indisp ? '#f0f4f3' : (qtd === todos.length ? '#e9f7ef' : '#eceffa') };
+      }),
+      usuarios: [
+        { n: 'Marina Sales', papel: 'Customer Success', ini: 'MS', a1: '#5b8def', a2: '#4c5bc0', ring: '#d5def7', pode: 'contrato, uso agregado e módulos', ultimo: 'agora' },
+        { n: 'Diego Nakamura', papel: 'Suporte técnico', ini: 'DN', a1: '#127670', a2: '#0E78B5', ring: '#cdeeda', pode: 'logs de integração, sem dado de viagem', ultimo: 'há 2h' },
+        { n: 'Cláudia Bueno', papel: 'Qualidade Traxium', ini: 'CB', a1: '#e8a33d', a2: '#d97544', ring: '#f0debb', pode: 'governança da base IDTF', ultimo: 'ontem' },
+        { n: 'Fernando Reis', papel: 'Financeiro', ini: 'FR', a1: '#9fc9c6', a2: '#6ba8a4', ring: '#dfeceb', pode: 'faturamento e faixas', ultimo: 'há 3 dias' }
+      ].map(u => ({ ...u, onClick: () => this.avisar(u.n + ': acesso ajustável dentro do console. Nenhum papel daqui enxerga dado de viagem sem pedido nominal ao cliente.') })),
+      naoMostra: [
+        'viagens, produtos e rotas de um cliente',
+        'nomes de motoristas ou subcontratados',
+        'fotos, assinaturas e dossiês',
+        'motivo de bloqueio de uma carga específica',
+        'quem assinou uma liberação'
+      ],
+      baseInfo: [
+        { k: 'Produtos na base', v: '1.284', f: 'Spline Sans Mono' },
+        { k: 'Sinônimos regionais', v: '3.911', f: 'Spline Sans Mono' },
+        { k: 'Fila de classificação', v: '7 em análise', f: 'Hanken Grotesk' },
+        { k: 'Próxima revisão', v: 'out 2026', f: 'Hanken Grotesk' }
+      ],
+      novoCliente: () => this.avisar('Novo cliente: o cadastro pede CNPJ, faixa inicial e módulos. A operação dele nasce vazia, sem dado nenhum vindo daqui.'),
+      perfilOpen: !!this.state.perfilOpen,
+      onPerfil: () => this.setState(s => ({ perfilOpen: !s.perfilOpen })),
+      modalPerfil: this.state.modalTopo === 'perfil',
+      abrirPerfil: () => this.setState({ modalTopo: 'perfil', perfilOpen: false }),
+      fecharModalTopo: () => this.setState({ modalTopo: null }),
+      pararClique: e => e.stopPropagation(),
+      toast: !!this.state.toast, toastMsg: this.state.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

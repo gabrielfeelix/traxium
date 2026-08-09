@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<script src="./prototype-shell.js" defer></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f2f5f4;font-family:'Hanken Grotesk',sans-serif;color:#0b2224;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0C5862;text-decoration:none}a:hover{color:#127670}
+input,textarea{font-family:'Hanken Grotesk',sans-serif}
+input::placeholder,textarea::placeholder{color:#8ba09e}
+@keyframes txsh{from{background-position:-600px 0}to{background-position:600px 0}}
+@keyframes deslizar{from{transform:translateX(40px);opacity:.4}to{transform:translateX(0);opacity:1}}
+</style>
+</helmet>
+<div style="display:flex;min-height:100vh;min-width:1560px" data-screen-label="Não conformidades">
+  <!-- SIDEBAR -->
+  <div style="width:{{ navW }};flex:none;background:linear-gradient(178deg,#093D44,#0A4650);color:#fff;display:flex;flex-direction:column;padding:24px {{ navPad }};position:sticky;top:0;height:100vh;transition:width .25s ease;overflow-x:hidden;overflow-y:auto">
+    <div style="display:flex;align-items:center;gap:10px;padding:4px 8px 22px">
+      <svg width="34" height="34" viewBox="0 0 32 32"><defs><linearGradient id="lgT" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1a9e93"></stop><stop offset="1" stop-color="#0E78B5"></stop></linearGradient></defs><polygon points="16,2.5 27.5,9 27.5,23 16,29.5 4.5,23 4.5,9" fill="url(#lgT)"></polygon><polyline points="9,20 13,13 18,17 23,10" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></polyline><circle cx="9" cy="20" r="1.6" fill="#fff"></circle><circle cx="13" cy="13" r="1.6" fill="#fff"></circle><circle cx="18" cy="17" r="1.6" fill="#fff"></circle><circle cx="23" cy="10" r="1.6" fill="#fff"></circle></svg>
+      <div style="display:{{ navL }}"><div style="font-weight:800;font-size:17px;letter-spacing:.2px">Traxium</div><div style="font-size:10.5px;letter-spacing:2.2px;color:rgba(255,255,255,.5);text-transform:uppercase">Compliance</div></div>
+    </div>
+    <a href="Torre de Controle v2.dc.html" style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="5.6"></circle><circle cx="8" cy="8" r="1.4" fill="currentColor" stroke="none"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Torre de Controle</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);color:#fff;font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px">7</span></a>
+    <div style="font-size:10.5px;letter-spacing:1.8px;color:rgba(255,255,255,.38);padding:20px 12px 8px;font-weight:700;display:{{ navSec }}">OPERAÇÃO</div>
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:14px;color:rgba(255,255,255,.66)">
+      <a href="Viagens.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 8h9"></path><path d="M8 4.5 11.5 8 8 11.5"></path></svg><span style="display:{{ navL }};white-space:nowrap">Viagens</span></a>
+      <a href="Excecoes.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6"></circle><line x1="8" y1="4.8" x2="8" y2="8.6"></line><circle cx="8" cy="11.2" r=".9" fill="currentColor" stroke="none"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Exceções e liberações</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">5</span></a>
+      <a href="Inspecoes.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 6.5 12 13 4.5"></path></svg><span style="display:{{ navL }};white-space:nowrap">Inspeções</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">3</span></a>
+      <a href="Limpezas.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.8c2.4 2.8 3.7 4.6 3.7 6.5a3.7 3.7 0 1 1-7.4 0c0-1.9 1.3-3.7 3.7-6.5z"></path></svg><span style="display:{{ navL }};white-space:nowrap">Limpezas</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">3</span></a>
+    </div>
+    <div style="font-size:10.5px;letter-spacing:1.8px;color:rgba(255,255,255,.38);padding:20px 12px 8px;font-weight:700;display:{{ navSec }}">PILARES</div>
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:14px;color:rgba(255,255,255,.66)">
+      <a href="Motor IDTF.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="2.5" width="11" height="11" rx="3"></rect><line x1="8" y1="2.5" x2="8" y2="13.5"></line></svg><span style="display:{{ navL }};white-space:nowrap">Motor IDTF</span></a>
+      <a href="Subcontratados.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5.4" cy="6.2" r="2.4"></circle><circle cx="10.8" cy="6.2" r="2.4"></circle><path d="M2.5 13c.6-2 1.7-3 3-3s2.3 1 2.9 3" stroke-linecap="round"></path></svg><span style="display:{{ navL }};white-space:nowrap">Subcontratados</span></a>
+      <a href="Motoristas.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="5.4" r="2.6"></circle><path d="M3 13.4c.8-2.6 2.6-3.9 5-3.9s4.2 1.3 5 3.9"></path></svg><span style="display:{{ navL }};white-space:nowrap">Motoristas</span></a>
+      <a href="Acessos Externos.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.4 8.6a3.2 3.2 0 1 0 0-.01z"></path><path d="M9 7.2 14 2.2M12 4.2l1.6 1.6M10.6 5.6l1.6 1.6"></path></svg><span style="display:{{ navL }};white-space:nowrap">Acessos externos</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">2</span></a>
+      <a href="Academy.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M2 6.3 8 3.4l6 2.9-6 2.9z"></path><path d="M4.6 8.4v2.6c0 .9 1.5 1.8 3.4 1.8s3.4-.9 3.4-1.8V8.4" stroke-linecap="round"></path></svg><span style="display:{{ navL }};white-space:nowrap">Academy</span></a>
+      <a href="Ativos e Frota.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="4.5" width="8" height="5.5" rx="1.4"></rect><path d="M10 6.5h2.4l1.6 2v1.5h-4z" stroke-linejoin="round"></path><circle cx="5" cy="11.8" r="1.4"></circle><circle cx="11.6" cy="11.8" r="1.4"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Ativos e frota</span></a>
+    </div>
+    <div style="font-size:10.5px;letter-spacing:1.8px;color:rgba(255,255,255,.38);padding:20px 12px 8px;font-weight:700;display:{{ navSec }}">PROVA</div>
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:14px;color:rgba(255,255,255,.66)">
+      <a href="Dossie.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3.2" y="2.5" width="9.6" height="11" rx="2"></rect><line x1="6" y1="6" x2="10" y2="6"></line><line x1="6" y1="9" x2="10" y2="9"></line></svg><span style="display:{{ navL }};white-space:nowrap">Dossiê de auditoria</span></a>
+      <a href="Indicadores.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="4" y1="13" x2="4" y2="8.5"></line><line x1="8" y1="13" x2="8" y2="3.5"></line><line x1="12" y1="13" x2="12" y2="10"></line></svg><span style="display:{{ navL }};white-space:nowrap">Indicadores</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">11/15</span></a>
+      <div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px;background:linear-gradient(90deg,rgba(26,158,147,.35),rgba(14,120,181,.28));border:1px solid rgba(255,255,255,.14);font-size:14px;font-weight:700;color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="5.8" stroke-dasharray="2.4 2.4"></circle><circle cx="8" cy="8" r="2.2"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Não conformidades</span><span style="margin-left:auto;display:{{ navL }};background:#fff;color:#0C5862;font-size:11.5px;font-weight:800;padding:1px 8px;border-radius:99px">4</span></div>
+    </div>
+    <a href="Configuracoes.dc.html" style="margin-top:auto;display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="2.3"></circle><path d="M8 1.8v1.9M8 12.3v1.9M14.2 8h-1.9M3.7 8H1.8M12.4 3.6l-1.3 1.3M4.9 11.1l-1.3 1.3M12.4 12.4l-1.3-1.3M4.9 4.9 3.6 3.6" stroke-linecap="round"></path></svg><span style="display:{{ navL }};white-space:nowrap">Configurações</span></a>
+    <a href="Onboarding Publico.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13V3.8c0-.7.5-1.2 1.2-1.2h5.6c.7 0 1.2.5 1.2 1.2V13"></path><path d="M6 8h7M10.5 5.5 13 8l-2.5 2.5"></path></svg><span style="display:{{ navL }};white-space:nowrap">Onboarding público</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">6 passos</span></a>
+      <a href="App de Campo.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="1.8" width="9" height="12.4" rx="2"></rect><line x1="6.5" y1="4" x2="9.5" y2="4"></line><circle cx="8" cy="11.7" r=".65" fill="currentColor" stroke="none"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Protótipo mobile</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">12 telas</span></a>
+      <div onClick="{{ navToggle }}" title="Recolher ou expandir o menu" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;cursor:pointer;font-size:13px;font-weight:600;color:rgba(255,255,255,.6)" style-hover="background:rgba(255,255,255,.08);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="transform:{{ navFlip }};transition:transform .25s;flex:none"><path d="M9.5 3 4.5 8l5 5"></path><line x1="12" y1="3" x2="12" y2="13"></line></svg><span style="display:{{ navL }};white-space:nowrap">Recolher menu</span></div>
+    <div style="display:{{ navCard }};margin-top:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px">
+      <div style="font-size:12px;color:rgba(255,255,255,.55);margin-bottom:8px">Prazo vencido</div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600"><span style="width:8px;height:8px;border-radius:99px;background:#e46969;box-shadow:0 0 0 4px rgba(228,105,105,.2)"></span>1 ação corretiva</div>
+      <div style="font-size:11.5px;color:rgba(255,255,255,.45);margin-top:4px">NC-0403 · vencida há 2 dias</div>
+    </div>
+  </div>
+  <!-- CONTENT -->
+  <div style="flex:1;display:flex;flex-direction:column;padding:26px 32px 40px;gap:22px;min-width:0">
+    <div style="display:flex;align-items:center;gap:16px">
+      <div><div style="font-size:24px;font-weight:800">Não conformidades</div><div style="font-size:13.5px;color:#5c706e;margin-top:2px">{{ headSub }}</div></div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+        <div style="background:#fff;border:1px solid #e0e7e5;border-radius:11px;padding:0 14px;display:flex;gap:8px;align-items:center">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#7c8f8d" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.6"></circle><line x1="10.5" y1="10.5" x2="13.5" y2="13.5"></line></svg>
+          <input value="{{ busca }}" onInput="{{ onBusca }}" placeholder="Buscar código, origem, responsável…" style="border:none;outline:none;background:transparent;font-size:13.5px;padding:10px 0;width:220px;color:#0b2224">
+          <span style="font-family:'Spline Sans Mono';font-size:11px;background:#f0f4f3;border-radius:6px;padding:1px 6px;color:#5c706e">⌘K</span>
+        </div>
+        <div data-tx-pop style="position:relative">
+          <div onClick="{{ onFilial }}" style="background:#fff;border:1px solid #e0e7e5;border-radius:11px;padding:9px 14px;font-size:13.5px;font-weight:600;cursor:pointer" style-hover="border-color:#127670">Filial {{ filial }} ▾</div>
+          <sc-if value="{{ filialOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;right:0;top:46px;background:#fff;border:1px solid #e4eae8;border-radius:14px;box-shadow:0 16px 40px rgba(9,61,68,.16);padding:6px;width:230px;z-index:60;display:flex;flex-direction:column">
+              <sc-for list="{{ filiais }}" as="fl" hint-placeholder-count="4">
+                <div onClick="{{ fl.onClick }}" style="display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;background:{{ fl.bg }}" style-hover="background:#f6f9f8"><span style="width:7px;height:7px;border-radius:99px;background:{{ fl.dot }}"></span>{{ fl.n }}</div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+        <div onClick="{{ exportar }}" style="background:#093D44;color:#fff;border-radius:11px;padding:9px 16px;font-size:13.5px;font-weight:700;cursor:pointer" style-hover="background:#0C5862">Exportar</div>
+        <div onClick="{{ abrirNova }}" style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;border-radius:99px;padding:10px 20px;font-size:13.5px;font-weight:800;cursor:pointer;box-shadow:0 6px 14px rgba(18,118,112,.3);transition:transform .15s" style-hover="transform:translateY(-1px)">Abrir NC</div>
+        <div data-tx-pop style="position:relative">
+          <div onClick="{{ onPerfil }}" style="width:38px;height:38px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13.5px;box-shadow:0 0 0 3px #fff,0 0 0 4.5px #d8e4e2;cursor:pointer" style-hover="box-shadow:0 0 0 3px #fff,0 0 0 4.5px #127670">RA</div>
+          <sc-if value="{{ perfilOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;right:0;top:48px;background:#fff;border:1px solid #e4eae8;border-radius:16px;box-shadow:0 16px 40px rgba(9,61,68,.16);padding:6px;width:250px;z-index:60;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;gap:11px;padding:11px 12px;border-bottom:1px solid #f0f4f3;margin-bottom:4px">
+                <span style="width:38px;height:38px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none">RA</span>
+                <div><div style="font-size:13.5px;font-weight:800">Rafael Antunes</div><div style="font-size:11.5px;color:#5c706e">Gestor de qualidade · GMP+</div></div>
+              </div>
+              <div onClick="{{ abrirPerfil }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer" style-hover="background:#f6f9f8">Meu perfil</div>
+              <div onClick="{{ abrirPrefs }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer" style-hover="background:#f6f9f8">Preferências e notificações</div>
+              <div onClick="{{ abrirPapel }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px" style-hover="background:#f6f9f8">Papel ativo<span style="display:inline-block;font-size:10.5px;font-weight:700;color:#0C5862;background:#e9f3f2;border-radius:99px;padding:2px 9px;white-space:nowrap">{{ papelBadge }}</span></div>
+              <div style="height:1px;background:#f0f4f3;margin:5px 8px"></div>
+              <div onClick="{{ abrirSair }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;color:#c43d3d" style-hover="background:#fdf6f6">Sair</div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+    <!-- KPIs -->
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:14px">
+      <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:18px 20px">
+        <div style="font-size:13px;font-weight:600;color:#5c706e">Onde as NCs abertas estão paradas</div>
+        <div style="display:flex;align-items:baseline;gap:10px;margin-top:6px"><span style="font-size:36px;font-weight:800;font-variant-numeric:tabular-nums">{{ kAbertas }}</span><span style="font-size:13px;color:#5c706e">abertas · {{ kFechadas }} concluídas no ano</span></div>
+        <div style="margin-top:12px;height:12px;border-radius:99px;overflow:hidden;display:flex;background:repeating-linear-gradient(-45deg,#eef2f1 0 5px,#e2e9e7 5px 10px)">
+          <sc-for list="{{ etapaBar }}" as="eb" hint-placeholder-count="4">
+            <div title="{{ eb.tip }}" style="width:{{ eb.w }};background:linear-gradient(90deg,{{ eb.g1 }},{{ eb.g2 }});transition:width .4s ease"></div>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:14px;margin-top:9px;font-size:12px;color:#5c706e">
+          <sc-for list="{{ etapaBar }}" as="eb" hint-placeholder-count="4"><span><span style="display:inline-block;width:8px;height:8px;border-radius:3px;background:{{ eb.g2 }};margin-right:5px"></span>{{ eb.n }}</span></sc-for>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:18px 20px;display:flex;flex-direction:column">
+        <div style="font-size:13px;font-weight:600;color:#5c706e">Críticas</div>
+        <div style="font-size:36px;font-weight:800;margin-top:6px;font-variant-numeric:tabular-nums">{{ kCriticas }}</div>
+        <div style="margin-top:auto;display:flex;align-items:center;gap:7px;font-size:12.5px;color:#5c706e;font-weight:600"><span style="width:9px;height:9px;border-radius:99px;background:linear-gradient(135deg,#e46969,#c43d3d);box-shadow:0 0 0 3px rgba(196,61,61,.16)"></span>ligada à exceção correspondente</div>
+      </div>
+      <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:18px 20px;display:flex;flex-direction:column">
+        <div style="font-size:13px;font-weight:600;color:#5c706e">Prazo vencido</div>
+        <div style="font-size:36px;font-weight:800;margin-top:6px;font-variant-numeric:tabular-nums">{{ kVencidas }}</div>
+        <div style="margin-top:auto;display:flex;align-items:center;gap:7px;font-size:12.5px;color:#5c706e;font-weight:600"><span style="width:9px;height:9px;border-radius:99px;background:linear-gradient(135deg,#f4c15d,#e8a33d);box-shadow:0 0 0 3px rgba(232,163,61,.16)"></span>ação corretiva sem entrega</div>
+      </div>
+      <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:18px 20px;display:flex;flex-direction:column">
+        <div style="font-size:13px;font-weight:600;color:#5c706e">Subcontratados reincidentes</div>
+        <div style="font-size:36px;font-weight:800;margin-top:6px;font-variant-numeric:tabular-nums">{{ kReinc }}</div>
+        <div style="margin-top:auto;display:flex;align-items:center;gap:7px;font-size:12.5px;color:#5c706e;font-weight:600"><span style="width:9px;height:9px;border-radius:99px;background:linear-gradient(135deg,#5b8def,#4c5bc0);box-shadow:0 0 0 3px rgba(91,141,239,.16)"></span>2 ou mais na mesma categoria em 90d</div>
+      </div>
+    </div>
+    <!-- MAIN -->
+    <div style="display:grid;grid-template-columns:1fr 392px;gap:20px;align-items:start">
+      <div style="display:flex;flex-direction:column;gap:12px;min-width:0">
+        <div style="display:flex;align-items:center;gap:10px;padding:2px 4px">
+          <div style="font-size:17px;font-weight:800">Não conformidades</div>
+          <div style="font-size:12.5px;color:#5c706e">severidade → prazo → idade</div>
+          <div style="margin-left:auto;display:flex;gap:6px">
+            <sc-for list="{{ filtros }}" as="f" hint-placeholder-count="4">
+              <span onClick="{{ f.onClick }}" style="font-size:12.5px;font-weight:700;border-radius:99px;padding:6px 14px;cursor:pointer;background:{{ f.bg }};color:{{ f.c }};box-shadow:{{ f.sh }};transition:all .15s">{{ f.label }}</span>
+            </sc-for>
+          </div>
+        </div>
+        <sc-if value="{{ loading }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <sc-for list="{{ skel }}" as="s" hint-placeholder-count="4">
+              <div style="background:#fff;border:1px solid #eef2f1;border-radius:20px;padding:15px 20px;display:flex;align-items:center;gap:16px">
+                <span style="width:44px;height:44px;border-radius:14px;flex:none;background:linear-gradient(90deg,#eef2f1 25%,#f7faf9 40%,#eef2f1 55%);background-size:600px 100%;animation:txsh 1.3s linear infinite"></span>
+                <div style="flex:1;display:flex;flex-direction:column;gap:9px"><span style="height:13px;width:44%;border-radius:99px;background:linear-gradient(90deg,#eef2f1 25%,#f7faf9 40%,#eef2f1 55%);background-size:600px 100%;animation:txsh 1.3s linear infinite"></span><span style="height:11px;width:66%;border-radius:99px;background:linear-gradient(90deg,#eef2f1 25%,#f7faf9 40%,#eef2f1 55%);background-size:600px 100%;animation:txsh 1.3s linear infinite"></span></div>
+                <span style="height:28px;width:112px;border-radius:99px;background:linear-gradient(90deg,#eef2f1 25%,#f7faf9 40%,#eef2f1 55%);background-size:600px 100%;animation:txsh 1.3s linear infinite"></span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ listaVazia }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:52px 20px;display:flex;flex-direction:column;align-items:center;gap:11px">
+            <span style="width:52px;height:52px;border-radius:99px;background:linear-gradient(135deg,#48c78e,#127670);color:#fff;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 6.5 12 13 4.5"></path></svg></span>
+            <div style="font-size:16px;font-weight:800">Nada neste recorte</div>
+            <div style="font-size:13.5px;color:#5c706e;text-align:center;max-width:420px">{{ listaVaziaSub }}</div>
+          </div>
+        </sc-if>
+        <sc-for list="{{ lista }}" as="nc" hint-placeholder-count="5">
+          <div style="background:#fff;border:1px solid {{ nc.borda }};border-radius:20px;box-shadow:0 2px 10px rgba(9,61,68,.04);transition:box-shadow .2s" style-hover="box-shadow:0 12px 32px rgba(9,61,68,.10)">
+            <div onClick="{{ nc.toggle }}" style="display:flex;align-items:center;gap:16px;padding:15px 20px;cursor:pointer">
+              <span style="width:46px;height:46px;border-radius:14px;flex:none;background:linear-gradient(135deg,{{ nc.g1 }},{{ nc.g2 }});color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px {{ nc.glow }}">
+                <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="{{ nc.icone }}"></path></svg>
+              </span>
+              <div style="min-width:0;flex:1.4">
+                <div style="display:flex;gap:8px;align-items:baseline"><span style="font-family:'Spline Sans Mono';font-size:13.5px;font-weight:600;color:#0C5862">{{ nc.id }}</span><span style="font-size:15px;font-weight:800">{{ nc.categoria }}</span><sc-if value="{{ nc.reincidente }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;font-weight:800;letter-spacing:.5px;color:#4c5bc0;background:#eceffa;border-radius:99px;padding:2px 9px;white-space:nowrap">REINCIDENTE</span></sc-if></div>
+                <div style="font-size:12.5px;color:#5c706e;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ nc.resumo }}</div>
+              </div>
+              <span style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:{{ nc.sevC }};background:{{ nc.sevBg }};border-radius:99px;padding:4px 12px;white-space:nowrap"><span style="width:7px;height:7px;border-radius:99px;background:{{ nc.sevC }}"></span>{{ nc.sev }}</span>
+              <div style="min-width:0;flex:1"><div style="font-size:11px;letter-spacing:1.2px;font-weight:700;color:#7c8f8d">ORIGEM</div><div style="font-size:12.5px;font-weight:700;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ nc.origem }}</div></div>
+              <div style="text-align:right;min-width:98px"><div style="font-family:'Spline Sans Mono';font-size:13px;font-weight:600;color:{{ nc.prazoC }}">{{ nc.prazo }}</div><div style="font-size:11px;color:#5c706e">prazo</div></div>
+              <div style="text-align:right;min-width:74px"><div style="font-family:'Spline Sans Mono';font-size:13px;font-weight:600;color:#3c4f4e">{{ nc.idade }}</div><div style="font-size:11px;color:#5c706e">aberta</div></div>
+              <span style="width:30px;height:30px;border-radius:99px;background:#f0f4f3;color:#3c4f4e;display:flex;align-items:center;justify-content:center;font-size:12px;transform:rotate({{ nc.chev }});transition:transform .2s;flex:none">▾</span>
+            </div>
+            <sc-if value="{{ nc.open }}" hint-placeholder-val="{{ false }}">
+              <div style="border-top:1px dashed #e4eae8;margin:0 20px;padding:16px 0 18px">
+                <div style="font-size:13.5px;line-height:1.6">{{ nc.descricao }}</div>
+                <!-- TRILHO DO CICLO -->
+                <div style="font-size:11px;letter-spacing:1.4px;font-weight:700;color:#7c8f8d;margin-top:18px">O CICLO ATÉ A RAIZ</div>
+                <div style="display:flex;margin-top:12px">
+                  <sc-for list="{{ nc.ciclo }}" as="cy" hint-placeholder-count="4">
+                    <div style="flex:1;min-width:0;position:relative;padding-right:10px">
+                      <div style="display:flex;align-items:center;gap:0">
+                        <span style="width:34px;height:34px;border-radius:99px;flex:none;background:{{ cy.iBg }};color:{{ cy.iC }};font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:{{ cy.sh }};z-index:2">{{ cy.icon }}</span>
+                        <span style="flex:1;height:3px;background:{{ cy.linha }};border-radius:99px"></span>
+                      </div>
+                      <div style="margin-top:9px;padding-right:12px">
+                        <div style="display:flex;align-items:center;gap:6px"><span style="font-size:12.5px;font-weight:800">{{ cy.t }}</span></div>
+                        <div style="display:inline-block;font-size:10.5px;font-weight:700;color:{{ cy.tagC }};background:{{ cy.tagBg }};border-radius:99px;padding:2px 9px;margin-top:4px;white-space:nowrap">{{ cy.tag }}</div>
+                        <div style="font-size:11.5px;color:#5c706e;margin-top:6px;line-height:1.45">{{ cy.sub }}</div>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+                <!-- RODAPÉ -->
+                <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:20px;margin-top:18px">
+                  <div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap">
+                      <span onClick="{{ nc.acao }}" style="background:{{ nc.acaoBg }};color:{{ nc.acaoC }};font-size:13px;font-weight:700;border-radius:99px;padding:9px 18px;cursor:pointer;box-shadow:{{ nc.acaoSh }};transition:transform .15s" style-hover="transform:translateY(-1px)">{{ nc.acaoLabel }}</span>
+                      <a href="{{ nc.href }}" style="background:#f0f4f3;color:#0b2224;font-size:13px;font-weight:700;border-radius:99px;padding:9px 18px;display:inline-block" style-hover="background:#e4ebe9;color:#0b2224">{{ nc.hrefLabel }}</a>
+                      <sc-if value="{{ nc.temExcecao }}" hint-placeholder-val="{{ false }}">
+                        <a href="Excecoes.dc.html" style="background:#fdecec;color:#c43d3d;font-size:13px;font-weight:700;border-radius:99px;padding:9px 18px;border:1px solid #f3d4d4;display:inline-block" style-hover="background:#fbdede;color:#c43d3d">Ver o bloqueio ligado</a>
+                      </sc-if>
+                    </div>
+                    <div style="font-size:11.5px;color:#5c706e;margin-top:12px;line-height:1.5">{{ nc.nota }}</div>
+                  </div>
+                  <div>
+                    <div style="display:flex;flex-direction:column;gap:6px">
+                      <div style="display:flex;justify-content:space-between;gap:10px;font-size:12.5px;background:#f7faf9;border-radius:12px;padding:9px 13px"><span style="color:#5c706e">Responsável</span><span style="font-weight:700">{{ nc.resp }}</span></div>
+                      <div style="display:flex;justify-content:space-between;gap:10px;font-size:12.5px;background:#f7faf9;border-radius:12px;padding:9px 13px"><span style="color:#5c706e">Aberta por</span><span style="font-weight:700">{{ nc.autor }}</span></div>
+                      <div style="display:flex;justify-content:space-between;gap:10px;font-size:12.5px;background:#f7faf9;border-radius:12px;padding:9px 13px"><span style="color:#5c706e">Evidências</span><span style="font-weight:700">{{ nc.evid }}</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+        <sc-if value="{{ temPaginacao }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 4px 2px">
+            <div style="font-size:12.5px;color:#5c706e">{{ pagInfo }}</div>
+            <div style="margin-left:auto;display:flex;gap:6px;align-items:center">
+              <span onClick="{{ pagAnterior }}" style="font-size:12.5px;font-weight:700;border-radius:99px;padding:7px 15px;cursor:{{ pagAntCur }};background:#fff;color:{{ pagAntC }};border:1px solid #e0e7e5" style-hover="border-color:#127670">Anterior</span>
+              <sc-for list="{{ txPaginas }}" as="txp" hint-placeholder-count="3">
+                <span onClick="{{ txp.onClick }}" style="font-size:12.5px;font-weight:800;border-radius:99px;padding:7px 14px;cursor:pointer;background:{{ txp.bg }};color:{{ txp.c }};border:1px solid {{ txp.bd }};min-width:36px;text-align:center" style-hover="border-color:#127670">{{ txp.n }}</span>
+              </sc-for>
+              <span onClick="{{ pagProxima }}" style="font-size:12.5px;font-weight:700;border-radius:99px;padding:7px 15px;cursor:{{ pagProxCur }};background:#fff;color:{{ pagProxC }};border:1px solid #e0e7e5" style-hover="border-color:#127670">Próxima</span>
+            </div>
+          </div>
+        </sc-if>
+
+      </div>
+      <!-- RAIL -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:22px">
+          <div style="font-size:15.5px;font-weight:800">Reincidência por subcontratado</div>
+          <div style="font-size:12.5px;color:#5c706e;margin-top:2px">o que melhor prevê bloqueio futuro: repetir a mesma categoria</div>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:16px">
+            <sc-for list="{{ reincidencia }}" as="rc" hint-placeholder-count="4">
+              <div onClick="{{ rc.onClick }}" style="cursor:pointer;border-radius:10px;padding:2px" style-hover="background:#f7faf9">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <span style="width:30px;height:30px;border-radius:99px;flex:none;background:linear-gradient(135deg,{{ rc.a1 }},{{ rc.a2 }});color:#fff;font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2.5px #fff,0 0 0 4px {{ rc.ring }}">{{ rc.ini }}</span>
+                  <div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ rc.n }}</div><div style="font-size:11px;color:#5c706e">{{ rc.cat }}</div></div>
+                  <span style="font-family:'Spline Sans Mono';font-size:13px;font-weight:600;color:{{ rc.c }}">{{ rc.v }}</span>
+                </div>
+                <div style="margin-top:6px;height:8px;border-radius:99px;overflow:hidden;background:repeating-linear-gradient(-45deg,#f0f4f3 0 5px,#e4ebe9 5px 10px)">
+                  <div style="width:{{ rc.w }};height:100%;background:linear-gradient(90deg,{{ rc.g1 }},{{ rc.g2 }});transition:width .4s ease"></div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font-size:11.5px;color:#5c706e;margin-top:14px;line-height:1.5">Duas NCs de categorias diferentes na mesma empresa não contam como reincidência: o padrão é que importa.</div>
+        </div>
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:22px">
+          <div style="font-size:15.5px;font-weight:800">Por categoria, em 90 dias</div>
+          <div style="font-size:12.5px;color:#5c706e;margin-top:2px">de onde os desvios vêm</div>
+          <div style="display:flex;gap:9px;margin-top:16px;align-items:flex-end;height:104px">
+            <sc-for list="{{ categorias }}" as="ct" hint-placeholder-count="5">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end">
+                <div style="font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums">{{ ct.v }}</div>
+                <div title="{{ ct.n }}" style="width:100%;height:{{ ct.h }};border-radius:9px;background:linear-gradient(180deg,{{ ct.g1 }},{{ ct.g2 }});transition:filter .15s" style-hover="filter:brightness(1.08)"></div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:9px;margin-top:8px">
+            <sc-for list="{{ categorias }}" as="ct" hint-placeholder-count="5"><div style="flex:1;font-size:10.5px;color:#5c706e;text-align:center;line-height:1.25;font-weight:600">{{ ct.curto }}</div></sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- MODAL ABRIR NC -->
+  <sc-if value="{{ nvAberto }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ nvFechar }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:640px;max-height:88vh;overflow:auto;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Abrir não conformidade</div><span onClick="{{ nvFechar }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:3px">a NC nasce com a ação imediata, porque desvio sem contenção continua acontecendo enquanto se investiga.</div>
+        <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e;margin-top:18px">ORIGEM</div>
+        <div style="display:flex;gap:7px;margin-top:8px">
+          <sc-for list="{{ nvOrigens }}" as="no" hint-placeholder-count="4">
+            <span onClick="{{ no.onClick }}" style="flex:1;text-align:center;font-size:12.5px;font-weight:700;border-radius:12px;padding:9px 6px;cursor:pointer;border:1.5px solid {{ no.bd }};background:{{ no.bg }};color:{{ no.c }};transition:all .15s">{{ no.n }}</span>
+          </sc-for>
+        </div>
+        <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e;margin-top:18px">SEVERIDADE</div>
+        <div style="display:flex;gap:7px;margin-top:8px">
+          <sc-for list="{{ nvSevs }}" as="ns" hint-placeholder-count="3">
+            <div onClick="{{ ns.onClick }}" style="flex:1;border:1.5px solid {{ ns.bd }};background:{{ ns.bg }};border-radius:14px;padding:11px 13px;cursor:pointer;transition:all .15s" style-hover="border-color:#127670">
+              <div style="display:flex;align-items:center;gap:8px"><span style="width:9px;height:9px;border-radius:99px;background:{{ ns.dot }};box-shadow:0 0 0 3px {{ ns.glow }}"></span><span style="font-size:13.5px;font-weight:800">{{ ns.n }}</span></div>
+              <div style="font-size:11px;color:#5c706e;margin-top:4px;line-height:1.4">{{ ns.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e;margin-top:18px">CATEGORIA</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">
+          <sc-for list="{{ nvCats }}" as="ncat" hint-placeholder-count="6">
+            <span onClick="{{ ncat.onClick }}" style="font-size:12px;font-weight:600;border-radius:99px;padding:6px 13px;cursor:pointer;border:1.5px solid {{ ncat.bd }};background:{{ ncat.bg }};color:{{ ncat.c }};transition:all .15s">{{ ncat.n }}</span>
+          </sc-for>
+        </div>
+        <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e;margin-top:18px">DESCRIÇÃO DO DESVIO</div>
+        <textarea value="{{ nvDesc }}" onInput="{{ nvOnDesc }}" placeholder="O que foi observado, onde e quando. Fato, não interpretação." style="width:100%;margin-top:8px;border:1.5px solid #e0e7e5;border-radius:14px;padding:12px 14px;font-size:13px;min-height:74px;outline:none;resize:vertical;color:#0b2224;line-height:1.5"></textarea>
+        <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e;margin-top:14px">AÇÃO IMEDIATA DE CONTENÇÃO</div>
+        <textarea value="{{ nvAcao }}" onInput="{{ nvOnAcao }}" placeholder="O que foi feito agora para o desvio parar de acontecer enquanto se investiga a raiz." style="width:100%;margin-top:8px;border:1.5px solid #e0e7e5;border-radius:14px;padding:12px 14px;font-size:13px;min-height:60px;outline:none;resize:vertical;color:#0b2224;line-height:1.5"></textarea>
+        <div style="display:flex;gap:8px;margin-top:18px;justify-content:flex-end;align-items:center">
+          <span style="margin-right:auto;font-size:11.5px;color:#5c706e;max-width:330px;line-height:1.45">{{ nvDica }}</span>
+          <span onClick="{{ nvFechar }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer;white-space:nowrap" style-hover="background:#e4ebe9">Cancelar</span>
+          <span onClick="{{ nvConfirmar }}" style="background:{{ nvBg }};color:{{ nvC }};font-size:13.5px;font-weight:800;border-radius:99px;padding:10px 22px;cursor:{{ nvCur }};white-space:nowrap;box-shadow:{{ nvSh }};transition:transform .15s">Abrir NC</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <!-- MODAL VERIFICAÇÃO DE EFICÁCIA -->
+  <sc-if value="{{ efAberto }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ efFechar }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:560px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center;gap:10px"><div style="font-size:16px;font-weight:800">Verificação de eficácia</div><span style="font-family:'Spline Sans Mono';font-size:12px;font-weight:600;color:#0C5862;background:#e9f3f2;border-radius:99px;padding:3px 11px">{{ efId }}</span><span onClick="{{ efFechar }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:3px">a NC não fecha porque a ação foi executada; fecha quando se comprova que o desvio parou de acontecer.</div>
+        <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e;margin-top:18px">A AÇÃO CORRETIVA FOI EFICAZ?</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:9px">
+          <sc-for list="{{ efOpcoes }}" as="eo" hint-placeholder-count="2">
+            <div onClick="{{ eo.onClick }}" style="display:flex;align-items:flex-start;gap:12px;border:1.5px solid {{ eo.bd }};background:{{ eo.bg }};border-radius:14px;padding:12px 14px;cursor:pointer" style-hover="border-color:#127670">
+              <span style="width:17px;height:17px;border-radius:99px;border:2px solid {{ eo.dotBd }};background:{{ eo.dot }};flex:none;margin-top:2px"></span>
+              <div style="flex:1"><div style="font-size:13.5px;font-weight:700">{{ eo.n }}</div><div style="font-size:11.5px;color:#5c706e;margin-top:2px;line-height:1.45">{{ eo.sub }}</div></div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e;margin-top:18px">EVIDÊNCIA DA VERIFICAÇÃO</div>
+        <textarea value="{{ efNota }}" onInput="{{ efOnNota }}" placeholder="O que foi conferido, em que amostra e em que período." style="width:100%;margin-top:8px;border:1.5px solid #e0e7e5;border-radius:14px;padding:12px 14px;font-size:13px;min-height:70px;outline:none;resize:vertical;color:#0b2224;line-height:1.5"></textarea>
+        <div style="display:flex;gap:8px;margin-top:18px;justify-content:flex-end;align-items:center">
+          <span style="margin-right:auto;font-size:11.5px;color:#5c706e;max-width:300px;line-height:1.45">{{ efDica }}</span>
+          <span onClick="{{ efFechar }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer;white-space:nowrap" style-hover="background:#e4ebe9">Cancelar</span>
+          <span onClick="{{ efConfirmar }}" style="background:{{ efBg }};color:{{ efC }};font-size:13.5px;font-weight:800;border-radius:99px;padding:10px 22px;cursor:{{ efCur }};white-space:nowrap;box-shadow:{{ efSh }};transition:transform .15s">Registrar verificação</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <!-- MODAIS DO PERFIL -->
+  <sc-if value="{{ modalPerfil }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:460px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Meu perfil</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:16px">
+          <span style="width:76px;height:76px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:26px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #fff,0 0 0 6px #f0debb">RA</span>
+          <div style="font-size:17px;font-weight:800;margin-top:4px">Rafael Antunes</div>
+          <div style="font-size:12.5px;color:#5c706e">rafael.antunes@traxium.com.br</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-top:18px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Papel</span><span style="font-weight:700">Gestor de qualidade</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Autoridade na matriz</span><span style="font-weight:700">nível 3 · Gestor</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Filiais</span><span style="font-weight:700">Rondonópolis, Sorriso</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Liberações assinadas em 2026</span><span style="font-family:'Spline Sans Mono';font-weight:600">14</span></div>
+        </div>
+        <div style="font-size:12px;color:#5c706e;margin-top:12px;line-height:1.5">Toda assinatura sua fica no registro lacrado da viagem. O papel define o que a matriz permite; ninguém assina acima do próprio nível.</div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalPrefs }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:520px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Preferências e notificações</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:16px">
+          <sc-for list="{{ prefs }}" as="pf" hint-placeholder-count="4">
+            <div onClick="{{ pf.onClick }}" style="display:flex;align-items:center;gap:12px;border:1px solid #eef2f1;border-radius:14px;padding:12px 14px;cursor:pointer" style-hover="border-color:#c9d5d3">
+              <div style="flex:1"><div style="font-size:13.5px;font-weight:700">{{ pf.t }}</div><div style="font-size:11.5px;color:#5c706e">{{ pf.sub }}</div></div>
+              <span style="width:40px;height:23px;border-radius:99px;background:{{ pf.swBg }};position:relative;flex:none;transition:background .2s"><span style="position:absolute;top:2.5px;left:{{ pf.swPos }};width:18px;height:18px;border-radius:99px;background:#fff;box-shadow:0 1px 4px rgba(9,34,36,.25);transition:left .2s"></span></span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:12px;color:#5c706e;margin-top:12px">O alerta de bloqueio técnico não pode ser desligado: é requisito da certificação.</div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:1200;background:#0b2224;color:#fff;border-radius:99px;padding:12px 22px;font-size:13.5px;font-weight:600;box-shadow:0 16px 40px rgba(9,34,36,.35);display:flex;align-items:center;gap:10px"><span style="width:20px;height:20px;border-radius:99px;background:linear-gradient(135deg,#48c78e,#127670);display:flex;align-items:center;justify-content:center;font-size:11px">✓</span>{{ toastMsg }}</div>
+  </sc-if>
+  <sc-if value="{{ modalPapel }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePop }}" style="background:#fff;border-radius:24px;width:540px;max-height:86vh;overflow:auto;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Papel ativo</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:3px;line-height:1.55">O papel define o que a matriz de autoridade permite assinar. A autoridade escala para cima, nunca para baixo, e ninguém assina acima do próprio nível.</div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-top:16px">
+          <sc-for list="{{ papeisLista }}" as="pp" hint-placeholder-count="5">
+            <div onClick="{{ pp.onClick }}" style="display:flex;align-items:center;gap:13px;border:1.5px solid {{ pp.bd }};background:{{ pp.bg }};border-radius:15px;padding:13px 15px;cursor:pointer;transition:all .15s" style-hover="border-color:#127670">
+              <span style="width:19px;height:19px;border-radius:99px;border:2.5px solid {{ pp.dotBd }};background:{{ pp.dot }};flex:none"></span>
+              <span style="width:34px;height:34px;border-radius:11px;flex:none;background:linear-gradient(135deg,{{ pp.g1 }},{{ pp.g2 }});color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ pp.nivel }}</span>
+              <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:800">{{ pp.n }}</div><div style="font-size:11.5px;color:#5c706e;margin-top:2px;line-height:1.4">{{ pp.resolve }}</div></div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#f7faf9;border-radius:14px;padding:12px 15px;margin-top:14px;font-size:12px;color:#5c706e;line-height:1.55">Nível 0 é técnico: é o nível de autoridade de ninguém. Contaminação não se aprova, se regulariza.</div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalSair }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePop }}" style="background:#fff;border-radius:24px;width:440px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Sair da conta</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;align-items:center;gap:12px;background:#f7faf9;border-radius:15px;padding:13px 15px;margin-top:16px">
+          <span style="width:40px;height:40px;border-radius:99px;flex:none;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">RA</span>
+          <div><div style="font-size:13.5px;font-weight:800">Rafael Antunes</div><div style="font-size:11.5px;color:#5c706e">{{ papelBadge }} · nível {{ papelNivel }} na matriz</div></div>
+        </div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:14px;line-height:1.6">Nada é perdido ao sair. Registro lacrado continua lacrado, e o que estava em preenchimento não foi gravado em lugar nenhum.</div>
+        <div style="display:flex;gap:8px;margin-top:18px;justify-content:flex-end">
+          <span onClick="{{ fecharModalTopo }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer" style-hover="background:#e4ebe9">Cancelar</span>
+          <span onClick="{{ confirmarSair }}" style="background:linear-gradient(135deg,#e46969,#c43d3d);color:#fff;font-size:13.5px;font-weight:800;border-radius:99px;padding:10px 22px;cursor:pointer;box-shadow:0 8px 18px rgba(196,61,61,.3);transition:transform .15s" style-hover="transform:translateY(-1px)">Sair</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { loading: true, toast: null, open: 'NC-0412', filtro: 'abertas', busca: '',
+    nv: false, nvOrigem: null, nvSev: null, nvCat: null, nvDesc: '', nvAcao: '',
+    ef: null, efOp: null, efNota: '', novas: [], fechadas: [] };
+  componentDidMount() {
+    this._txFora = ev => { if (!ev.target.closest || !ev.target.closest('[data-tx-pop]')) this.setState({ perfilOpen: false, filialOpen: false, periodoOpen: false, menuOpen: false, versaoOpen: false, notifOpen: false }); };
+    this._txEsc = ev => { if (ev.key === 'Escape') this.setState({ perfilOpen: false, filialOpen: false, periodoOpen: false, menuOpen: false, versaoOpen: false, notifOpen: false, modalTopo: null }); };
+    document.addEventListener('mousedown', this._txFora);
+    document.addEventListener('keydown', this._txEsc); setTimeout(() => this.setState({ loading: false }), 900); }
+  avisar(msg) { this.setState({ toast: msg }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 4200); }
+
+  ICONES() {
+    return {
+      contaminacao: 'M8 2.8c2.4 2.8 3.7 4.6 3.7 6.5a3.7 3.7 0 1 1-7.4 0c0-1.9 1.3-3.7 3.7-6.5z',
+      documento: 'M4 2.5h5.5L12.5 5.5v8h-8.5z M6 8h4 M6 10.5h4',
+      foto: 'M2.5 5.5h2l1.2-1.7h4.6L11.5 5.5h2v7h-11z M10.2 8.4a2.2 2.2 0 1 1-4.4 0 2.2 2.2 0 0 1 4.4 0z',
+      registro: 'M3.2 2.8h9.6v10.4H3.2z M5.6 6h4.8 M5.6 8.6h4.8 M5.6 11.2h2.6',
+      cadastro: 'M5.4 6.2a2.4 2.4 0 1 0 0-.01z M2.6 13c.6-2 1.7-3 2.8-3s2.2 1 2.8 3 M11 5.5v5 M8.5 8h5'
+    };
+  }
+  ncs() {
+    const I = this.ICONES();
+    return [
+      { id: 'NC-0412', sev: 'critica', categoria: 'Contaminação cruzada', icone: I.contaminacao,
+        resumo: 'Resíduo de ureia pecuária no C2 com farelo de amendoim programado', origem: 'VG-2487 · C2 · QAS 7C31',
+        href: 'Viagem Detalhe.dc.html', hrefLabel: 'Abrir a viagem', temExcecao: true, aberta: true,
+        prazo: 'hoje 18:00', prazoC: '#c43d3d', idade: '9h', resp: 'Rafael Antunes', autor: 'Edson Farias · app', evid: '6 fotos e 1 laudo',
+        descricao: 'Durante a inspeção pré-carregamento do C2, o inspetor identificou resíduo compatível com ureia pecuária, registrada como T-1 do compartimento. O produto programado para carregar era farelo de amendoim, par classificado como proibido pela base IDTF. O conjunto ficou retido no pátio antes de qualquer carregamento.',
+        etapa: 1,
+        ciclo: [
+          { t: 'Ação imediata', sub: 'Conjunto retido no pátio e viagem bloqueada pelo motor às 07:52.', st: 'feito' },
+          { t: 'Causa raiz', sub: 'Investigando por que o T-1 de ureia não travou a atribuição do compartimento na criação da viagem.', st: 'agora' },
+          { t: 'Ação corretiva', sub: 'Depende da causa raiz. Provável trava na seleção de compartimento por par proibido.', st: 'aguarda' },
+          { t: 'Verificação de eficácia', sub: 'Amostra de 30 dias de viagens com par proibido tentado.', st: 'aguarda' }
+        ],
+        nota: 'NC crítica está ligada ao bloqueio técnico da VG-2487. Fechar a NC não libera a viagem: são trilhas separadas, e a viagem depende do plano de regularização.' },
+      { id: 'NC-0409', sev: 'maior', categoria: 'Documentação de terceiro', icone: I.documento,
+        resumo: 'Certificado suspenso na base pública com acordo de qualidade vigente', origem: 'Lima Logística · CNPJ 08.441.220/0001-73',
+        href: 'Subcontratados.dc.html', hrefLabel: 'Abrir o subcontratado', temExcecao: false, aberta: true, reincidente: true,
+        prazo: 'em 3 dias', prazoC: '#b97514', idade: '2 dias', resp: 'Helena Duarte', autor: 'consulta automática à base', evid: '2 documentos',
+        descricao: 'A consulta automática à base pública da certificadora retornou status suspenso para a Lima Logística. O acordo de qualidade seguia vigente e assinado, e três viagens foram atribuídas à empresa entre a suspensão na base e a detecção pelo sistema.',
+        etapa: 2,
+        ciclo: [
+          { t: 'Ação imediata', sub: 'Empresa saiu de Apto automaticamente; três viagens reatribuídas a Cerrado Cargas.', st: 'feito' },
+          { t: 'Causa raiz', sub: 'A consulta à base pública rodava a cada 24h; a suspensão ficou invisível por quase um dia.', st: 'feito' },
+          { t: 'Ação corretiva', sub: 'Consulta passa a rodar antes de cada atribuição de viagem, além da varredura diária.', st: 'agora' },
+          { t: 'Verificação de eficácia', sub: 'Conferir em 60 dias se alguma atribuição ocorreu com status suspenso na base.', st: 'aguarda' }
+        ],
+        nota: 'Segunda NC de documentação de terceiro da Lima Logística em 90 dias. A reincidência é por categoria, e é ela que entra no indicador.' },
+      { id: 'NC-0407', sev: 'menor', categoria: 'Evidência fotográfica', icone: I.foto,
+        resumo: 'Ângulo da bica de descarga ausente em 4 inspeções do mesmo inspetor', origem: 'Padrão detectado em 15 dias',
+        href: 'Inspecoes.dc.html', hrefLabel: 'Ver cobertura por ângulo', temExcecao: false, aberta: true,
+        prazo: 'em 6 dias', prazoC: '#3c4f4e', idade: '1 dia', resp: 'Jorge Mattos', autor: 'Rafael Antunes', evid: '4 inspeções citadas',
+        descricao: 'Quatro inspeções enviadas pelo mesmo inspetor nos últimos 15 dias ficaram sem o ângulo obrigatório da bica de descarga. Não é falha isolada de captura: é padrão, e padrão de ausência de evidência é NC mesmo quando cada caso individual foi corrigido depois.',
+        etapa: 2,
+        ciclo: [
+          { t: 'Ação imediata', sub: 'As quatro inspeções foram completadas com a captura do ângulo faltante.', st: 'feito' },
+          { t: 'Causa raiz', sub: 'A bica fica em posição desconfortável com o conjunto engatado; o inspetor pulava e voltava depois.', st: 'feito' },
+          { t: 'Ação corretiva', sub: 'Trilha 6 de reforço atribuída e o app passa a bloquear o envio sem os seis ângulos.', st: 'agora' },
+          { t: 'Verificação de eficácia', sub: 'Conferir a cobertura do ângulo bica nas próximas 30 inspeções.', st: 'aguarda' }
+        ],
+        nota: 'Reprovar não gera competência: a trilha de reforço só conta quando concluída com nota, e até lá o indicador de fotos completas não se move.' },
+      { id: 'NC-0403', sev: 'maior', categoria: 'Registro de limpeza', icone: I.registro,
+        resumo: 'Comprovante da estação pendente em duas limpezas regime B', origem: 'C2 · SQT 3A90',
+        href: 'Limpezas.dc.html', hrefLabel: 'Abrir as limpezas', temExcecao: false, aberta: true, vencida: true,
+        prazo: 'vencido há 2 dias', prazoC: '#c43d3d', idade: '4 dias', resp: 'Paulo Lima', autor: 'Helena Duarte', evid: '1 documento',
+        descricao: 'Duas limpezas de regime B registradas no pátio próprio seguem sem a foto do interior após a lavagem e sem o tempo de aplicação. As viagens correspondentes operaram, mas não fecham enquanto o registro obrigatório estiver incompleto.',
+        etapa: 3,
+        ciclo: [
+          { t: 'Ação imediata', sub: 'As duas viagens ficaram travadas na conclusão, e a Qualidade foi notificada.', st: 'feito' },
+          { t: 'Causa raiz', sub: 'Lavagem no pátio próprio sem tablet disponível; o registro era anotado em papel e digitado depois.', st: 'feito' },
+          { t: 'Ação corretiva', sub: 'Prazo vencido há 2 dias sem entrega. Requer replanejamento com responsável e nova data.', st: 'vencido' },
+          { t: 'Verificação de eficácia', sub: 'Bloqueada enquanto a ação corretiva não for entregue.', st: 'aguarda' }
+        ],
+        nota: 'Prazo vencido não fecha sozinho nem some da fila. Ou a ação é entregue, ou o prazo é replanejado com justificativa, e as duas coisas ficam registradas.' },
+      { id: 'NC-0398', sev: 'menor', categoria: 'Cadastro duplicado', icone: I.cadastro,
+        resumo: 'Dois cadastros com o mesmo CNPJ e grafias diferentes', origem: 'Auditoria interna · amostra de julho',
+        href: 'Ativos e Frota.dc.html', hrefLabel: 'Ver duplicidades', temExcecao: false, aberta: false,
+        prazo: 'concluída', prazoC: '#1a8f57', idade: 'fechada em 1 ago', resp: 'Helena Duarte', autor: 'auditoria interna', evid: '3 documentos',
+        descricao: 'A auditoria interna encontrou "Lima Logística" e "Lima Logistica" cadastradas separadamente com o mesmo CNPJ, cada uma com ativos vinculados. O histórico de viagens estava dividido entre as duas, o que quebraria a reconstrução de dossiê da empresa.',
+        etapa: 4,
+        ciclo: [
+          { t: 'Ação imediata', sub: 'Cadastros unificados preservando os vínculos datados de ambos.', st: 'feito' },
+          { t: 'Causa raiz', sub: 'A importação por planilha comparava a razão social, não os dígitos do documento.', st: 'feito' },
+          { t: 'Ação corretiva', sub: 'Triagem de duplicidade passou a comparar só os dígitos, contra a base e dentro do próprio lote.', st: 'feito' },
+          { t: 'Verificação de eficácia', sub: 'Confirmado em 1 ago: 3 lotes importados depois da mudança, nenhuma duplicidade gravada.', st: 'feito' }
+        ],
+        nota: 'Fechada com eficácia verificada. O indicador de cadastros duplicados caiu de 7 para 4 depois desta correção.' }
+    ];
+  }
+  renderVals() { return { ...this.navVals(), ...this.papelVals(), ...this.perfilVals(), ...this.mainVals() }; }
+  papelVals() {
+    const diz = m => { if (typeof this.avisar === 'function') this.avisar(m); };
+    const PAPEIS = [
+      { n: 'Inspetor de pátio', nivel: 1, resolve: 'condição física do equipamento: checklist reprovado, foto ausente', g1: '#9fc9c6', g2: '#6ba8a4' },
+      { n: 'Tráfego', nivel: 2, resolve: 'pendência simples: certificação a vencer, sincronização pendente', g1: '#5b8def', g2: '#4c5bc0' },
+      { n: 'Gestor de qualidade', nivel: 3, resolve: 'pendência corrigível mediante evidência da correção', g1: '#127670', g2: '#0E78B5' },
+      { n: 'Diretoria e Resp. Técnico', nivel: 4, resolve: 'impacto contratual, risco residual aceito, terceiro emergencial', g1: '#e8a33d', g2: '#d97544' },
+      { n: 'Auditor interno', nivel: 0, resolve: 'somente leitura, mais abrir não conformidade', g1: '#c9d5d3', g2: '#9db0ae' }
+    ];
+    const ativo = this.state.papelAtivo || 'Gestor de qualidade';
+    const atual = PAPEIS.find(p => p.n === ativo) || PAPEIS[2];
+    return {
+      pararClique: e => e.stopPropagation(),
+      pararCliquePop: e => e.stopPropagation(),
+      papelBadge: atual.n === 'Diretoria e Resp. Técnico' ? 'Diretoria' : atual.n.split(' ')[0],
+      papelNivel: atual.nivel,
+      modalPapel: this.state.modalTopo === 'papel',
+      modalSair: this.state.modalTopo === 'sair',
+      abrirPapel: () => this.setState({ modalTopo: 'papel', perfilOpen: false }),
+      abrirSair: () => this.setState({ modalTopo: 'sair', perfilOpen: false }),
+      confirmarSair: () => { this.setState({ modalTopo: null }); diz('Sessão encerrada. Registros assinados continuam no dossiê com seu nome e a data.'); },
+      papeisLista: PAPEIS.map(p => {
+        const on = p.n === ativo;
+        return { ...p, onClick: () => { this.setState({ papelAtivo: p.n, modalTopo: null }); diz('Papel ativo agora é ' + p.n + ', nível ' + p.nivel + '. A fila e as ações de assinatura passam a refletir esta autoridade.'); },
+          bd: on ? '#127670' : '#e0e7e5', bg: on ? '#eef7f6' : '#fff',
+          dot: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#fff', dotBd: on ? '#127670' : '#c9d5d3' };
+      })
+    };
+  }
+  _pagN() { return 6; }
+  _pagFatia(arr) { const pp = this._pagN(); const n = Math.max(1, Math.ceil(arr.length / pp)); const p = Math.min(this.state.pag || 1, n); return arr.slice((p - 1) * pp, p * pp); }
+  _pagVals(total, rotulo) {
+    const pp = this._pagN(); const n = Math.max(1, Math.ceil(total / pp)); const p = Math.min(this.state.pag || 1, n);
+    const ini = (p - 1) * pp, fim = Math.min(p * pp, total);
+    return {
+      temPaginacao: n > 1,
+      pagInfo: total === 0 ? 'nenhum registro' : ('mostrando ' + (ini + 1) + ' a ' + fim + ' de ' + total + ' ' + rotulo),
+      txPaginas: Array.from({ length: n }, (_, i) => i + 1).map(x => ({ n: x,
+        onClick: () => this.setState({ pag: x }),
+        bg: x === p ? '#0b2224' : '#fff', c: x === p ? '#fff' : '#3c4f4e', bd: x === p ? '#0b2224' : '#e0e7e5' })),
+      pagAnterior: () => { if (p > 1) this.setState({ pag: p - 1 }); },
+      pagProxima: () => { if (p < n) this.setState({ pag: p + 1 }); },
+      pagAntCur: p > 1 ? 'pointer' : 'not-allowed', pagAntC: p > 1 ? '#3c4f4e' : '#c9d5d3',
+      pagProxCur: p < n ? 'pointer' : 'not-allowed', pagProxC: p < n ? '#3c4f4e' : '#c9d5d3'
+    };
+  }
+  navVals() {
+    const c = this.state.navC ?? (localStorage.getItem('tx-nav') === '1');
+    return { navW: c ? '84px' : '264px', navPad: c ? '14px' : '16px', navL: c ? 'none' : 'block', navSec: c ? 'none' : 'block', navCard: c ? 'none' : 'block', navFlip: c ? 'rotate(180deg)' : 'none',
+      navToggle: () => { const n = !c; localStorage.setItem('tx-nav', n ? '1' : '0'); this.setState({ navC: n }); } };
+  }
+  perfilVals() {
+    return {
+      perfilOpen: !!this.state.perfilOpen,
+      onPerfil: () => this.setState(s => ({ perfilOpen: !s.perfilOpen })),
+      modalPerfil: this.state.modalTopo === 'perfil', modalPrefs: this.state.modalTopo === 'prefs',
+      abrirPerfil: () => this.setState({ modalTopo: 'perfil', perfilOpen: false }),
+      abrirPrefs: () => this.setState({ modalTopo: 'prefs', perfilOpen: false }),
+      fecharModalTopo: () => this.setState({ modalTopo: null }),
+      pararClique: e => e.stopPropagation(),
+      prefs: [
+        { k: 'bloq', t: 'Bloqueio técnico na filial', sub: 'sempre ativo: requisito da certificação', lock: true },
+        { k: 'fila', t: 'Item há mais de 2h na fila', sub: 'aviso no app e por e-mail' },
+        { k: 'cert', t: 'Certificado de terceiro a vencer', sub: 'aos 30 e aos 15 dias' },
+        { k: 'idtf', t: 'Nova versão da base IDTF', sub: 'quando a Qualidade publicar revisão' }
+      ].map(p => {
+        const on = p.lock || (this.state.prefsOn || { fila: true, cert: true, idtf: false })[p.k];
+        return { ...p, swBg: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#dde5e3', swPos: on ? '19.5px' : '2.5px',
+          onClick: () => { if (p.lock) return; const cur = this.state.prefsOn || { fila: true, cert: true, idtf: false }; this.setState({ prefsOn: { ...cur, [p.k]: !cur[p.k] } }); } };
+      })
+    };
+  }
+  novaVals() {
+    const s = this.state;
+    const pronto = !!s.nvOrigem && !!s.nvSev && !!s.nvCat && s.nvDesc.trim().length >= 20 && s.nvAcao.trim().length >= 15;
+    const chip = (on, vermelho) => ({ bd: on ? (vermelho ? '#c43d3d' : '#127670') : '#e0e7e5', bg: on ? (vermelho ? '#fdf6f6' : '#eef7f6') : '#fff', c: on ? (vermelho ? '#c43d3d' : '#0C5862') : '#3c4f4e' });
+    return {
+      nvAberto: s.nv, nvFechar: () => this.setState({ nv: false }),
+      abrirNova: () => this.setState({ nv: true, nvOrigem: null, nvSev: null, nvCat: null, nvDesc: '', nvAcao: '' }),
+      nvOrigens: ['Viagem', 'Compartimento', 'Subcontratado', 'Auditoria'].map(n => ({ n, ...chip(s.nvOrigem === n), onClick: () => this.setState({ nvOrigem: n }) })),
+      nvSevs: [
+        { n: 'Crítica', sub: 'segurança do feed em risco; conecta à exceção', dot: 'linear-gradient(135deg,#e46969,#c43d3d)', glow: 'rgba(196,61,61,.16)' },
+        { n: 'Maior', sub: 'falha de processo com efeito sobre a evidência', dot: 'linear-gradient(135deg,#f4c15d,#e8a33d)', glow: 'rgba(232,163,61,.18)' },
+        { n: 'Menor', sub: 'desvio pontual, corrigível sem parar a operação', dot: 'linear-gradient(135deg,#9fc9c6,#6ba8a4)', glow: 'rgba(107,168,164,.18)' }
+      ].map(x => ({ ...x, ...chip(s.nvSev === x.n, x.n === 'Crítica'), onClick: () => this.setState({ nvSev: x.n }) })),
+      nvCats: ['Contaminação cruzada', 'Documentação de terceiro', 'Evidência fotográfica', 'Registro de limpeza', 'Cadastro duplicado', 'Competência do motorista'].map(n => ({ n, ...chip(s.nvCat === n), onClick: () => this.setState({ nvCat: n }) })),
+      nvDesc: s.nvDesc, nvOnDesc: e => this.setState({ nvDesc: e.target.value }),
+      nvAcao: s.nvAcao, nvOnAcao: e => this.setState({ nvAcao: e.target.value }),
+      nvDica: !s.nvOrigem ? 'Escolha a origem do desvio.' : (!s.nvSev ? 'Escolha a severidade: ela define quem responde.' : (!s.nvCat ? 'Escolha a categoria: é ela que mede reincidência.' : (s.nvDesc.trim().length < 20 ? 'Descreva o desvio com pelo menos 20 caracteres.' : (s.nvAcao.trim().length < 15 ? 'A ação imediata é obrigatória: desvio sem contenção continua acontecendo.' : (s.nvSev === 'Crítica' ? 'NC crítica abre também o vínculo com a exceção correspondente.' : 'Pronto. A NC nasce na etapa de causa raiz.'))))),
+      nvBg: pronto ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#eef2f1', nvC: pronto ? '#fff' : '#9db0ae',
+      nvSh: pronto ? '0 8px 18px rgba(18,118,112,.35)' : 'none', nvCur: pronto ? 'pointer' : 'not-allowed',
+      nvConfirmar: () => {
+        if (!pronto) return;
+        const cod = 'NC-04' + (13 + this.state.novas.length);
+        this.setState({ nv: false, novas: this.state.novas.concat([{ id: cod, sev: s.nvSev, cat: s.nvCat, origem: s.nvOrigem, desc: s.nvDesc, acao: s.nvAcao }]) });
+        this.avisar(cod + ' aberta por Rafael Antunes, com a ação imediata registrada. Próxima etapa: causa raiz.');
+      }
+    };
+  }
+  eficaciaVals() {
+    const s = this.state;
+    const pronto = !!s.efOp && s.efNota.trim().length >= 20;
+    return {
+      efAberto: !!s.ef, efFechar: () => this.setState({ ef: null }),
+      efId: s.ef || '',
+      efOpcoes: [
+        { k: 'sim', n: 'Sim, o desvio parou de acontecer', sub: 'a NC fecha e a verificação fica no registro com a amostra conferida' },
+        { k: 'nao', n: 'Não, o desvio se repetiu', sub: 'a NC volta para causa raiz; ação corretiva ineficaz é informação, não fracasso a esconder' }
+      ].map(o => {
+        const on = s.efOp === o.k;
+        return { ...o, onClick: () => this.setState({ efOp: o.k }),
+          bd: on ? '#127670' : '#e0e7e5', bg: on ? '#eef7f6' : '#fff',
+          dot: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#fff', dotBd: on ? '#127670' : '#c9d5d3' };
+      }),
+      efNota: s.efNota, efOnNota: e => this.setState({ efNota: e.target.value }),
+      efDica: !s.efOp ? 'Escolha o resultado da verificação.' : (s.efNota.trim().length < 20 ? 'Descreva o que foi conferido, com pelo menos 20 caracteres.' : (s.efOp === 'sim' ? 'A NC fecha e entra na contagem de eficácia verificada.' : 'A NC volta para causa raiz com o histórico preservado.')),
+      efBg: pronto ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#eef2f1', efC: pronto ? '#fff' : '#9db0ae',
+      efSh: pronto ? '0 8px 18px rgba(18,118,112,.35)' : 'none', efCur: pronto ? 'pointer' : 'not-allowed',
+      efConfirmar: () => {
+        if (!pronto) return;
+        const id = s.ef, eficaz = s.efOp === 'sim';
+        this.setState({ ef: null, efOp: null, efNota: '', fechadas: eficaz ? this.state.fechadas.concat([id]) : this.state.fechadas });
+        this.avisar(eficaz ? (id + ' fechada com eficácia verificada por Rafael Antunes. Entra na contagem do indicador.')
+          : (id + ' devolvida para causa raiz: a ação corretiva não impediu a repetição. O histórico anterior fica intacto.'));
+      }
+    };
+  }
+  mainVals() {
+    const sevTone = {
+      critica: { sev: 'crítica', sevC: '#c43d3d', sevBg: '#fdecec', g1: '#e46969', g2: '#c43d3d', glow: 'rgba(196,61,61,.28)', borda: '#f3d4d4' },
+      maior: { sev: 'maior', sevC: '#b97514', sevBg: '#fdf3e2', g1: '#f4c15d', g2: '#e8a33d', glow: 'rgba(232,163,61,.28)', borda: '#eef2f1' },
+      menor: { sev: 'menor', sevC: '#3c4f4e', sevBg: '#f0f4f3', g1: '#9fc9c6', g2: '#6ba8a4', glow: 'rgba(107,168,164,.28)', borda: '#eef2f1' }
+    };
+    const stTone = {
+      feito: { icon: '✓', iBg: '#e9f7ef', iC: '#1a8f57', sh: 'none', tag: 'feito', tagC: '#1a8f57', tagBg: '#e9f7ef', linha: '#48c78e' },
+      agora: { icon: '2', iBg: 'linear-gradient(135deg,#127670,#0E78B5)', iC: '#fff', sh: '0 6px 14px rgba(18,118,112,.3)', tag: 'em andamento', tagC: '#0C5862', tagBg: '#e9f3f2', linha: '#e4eae8' },
+      aguarda: { icon: '·', iBg: '#f0f4f3', iC: '#9db0ae', sh: 'none', tag: 'aguarda', tagC: '#7c8f8d', tagBg: '#f0f4f3', linha: '#e4eae8' },
+      vencido: { icon: '!', iBg: 'linear-gradient(135deg,#e46969,#c43d3d)', iC: '#fff', sh: '0 6px 14px rgba(196,61,61,.3)', tag: 'prazo vencido', tagC: '#c43d3d', tagBg: '#fdecec', linha: '#e4eae8' }
+    };
+    const fechadasExtra = this.state.fechadas;
+    const todas = this.ncs().map(n => fechadasExtra.includes(n.id) ? { ...n, aberta: false, prazo: 'concluída', prazoC: '#1a8f57', etapa: 4 } : n);
+    const q = this.state.busca.trim().toLowerCase();
+    const f = this.state.filtro;
+    const view = this.state.loading ? [] : todas.filter(n => {
+      if (f === 'abertas' && !n.aberta) return false;
+      if (f === 'criticas' && n.sev !== 'critica') return false;
+      if (f === 'vencidas' && !n.vencida) return false;
+      if (q && !(n.id + ' ' + n.categoria + ' ' + n.origem + ' ' + n.resp + ' ' + n.resumo).toLowerCase().includes(q)) return false;
+      return true;
+    });
+    const lista = view.map(n => {
+      const t = sevTone[n.sev], open = this.state.open === n.id;
+      const podeVerificar = n.aberta && n.ciclo[2].st === 'feito';
+      return { ...n, ...t, open, chev: open ? '180deg' : '0deg',
+        reincidente: !!n.reincidente, temExcecao: !!n.temExcecao,
+        ciclo: n.ciclo.map((c, i) => {
+          const st = stTone[c.st];
+          return { ...c, ...st, icon: c.st === 'agora' ? String(i + 1) : st.icon,
+            linha: i === n.ciclo.length - 1 ? 'transparent' : st.linha };
+        }),
+        acaoLabel: !n.aberta ? 'Ver o registro fechado' : (podeVerificar ? 'Registrar verificação de eficácia' : (n.vencida ? 'Replanejar o prazo' : 'Avançar a etapa')),
+        acaoBg: !n.aberta ? '#f0f4f3' : 'linear-gradient(135deg,#127670,#0E78B5)',
+        acaoC: !n.aberta ? '#0b2224' : '#fff',
+        acaoSh: !n.aberta ? 'none' : '0 6px 14px rgba(18,118,112,.3)',
+        acao: () => {
+          if (!n.aberta) { this.avisar(n.id + ' está fechada e lacrada. O registro segue no dossiê com as quatro etapas e a verificação.'); return; }
+          if (podeVerificar) { this.setState({ ef: n.id, efOp: null, efNota: '' }); return; }
+          if (n.vencida) { this.avisar('Replanejamento aberto para ' + n.id + ': nova data exige justificativa, e o atraso original fica registrado.'); return; }
+          this.avisar(n.id + ' avançou de etapa. Cada avanço grava autor e data; nada retrocede sem evento novo.');
+        },
+        toggle: () => this.setState(s => ({ open: s.open === n.id ? null : n.id })) };
+    });
+    const abertas = todas.filter(n => n.aberta);
+    const mk = (key, label) => ({ label, onClick: () => this.setState({ filtro: key, pag: 1 }),
+      bg: f === key ? '#0b2224' : '#fff', c: f === key ? '#fff' : '#3c4f4e',
+      sh: f === key ? 'none' : '0 2px 8px rgba(9,61,68,.06)' });
+    const etapas = [
+      { n: 'Causa raiz', k: 1, g1: '#5b8def', g2: '#4c5bc0' },
+      { n: 'Ação corretiva', k: 2, g1: '#f4c15d', g2: '#e8a33d' },
+      { n: 'Verificação', k: 3, g1: '#48c78e', g2: '#127670' },
+      { n: 'Prazo vencido', k: 9, g1: '#e46969', g2: '#c43d3d' }
+    ].map(e => {
+      const qtd = e.k === 9 ? abertas.filter(n => n.vencida).length : abertas.filter(n => n.etapa === e.k && !n.vencida).length;
+      return { ...e, qtd };
+    });
+    const totEt = etapas.reduce((a, b) => a + b.qtd, 0) || 1;
+    const reinc = [
+      { n: 'Lima Logística', cat: 'documentação de terceiro', v: 2, ini: 'LL', a1: '#c43d3d', a2: '#93313f', ring: '#f3d4d4' },
+      { n: 'Transrocha Transportes', cat: 'registro de limpeza', v: 2, ini: 'TR', a1: '#e8a33d', a2: '#d97544', ring: '#f0debb' },
+      { n: 'AgroLima Ltda', cat: 'evidência fotográfica', v: 1, ini: 'AL', a1: '#127670', a2: '#0E78B5', ring: '#cdeeda' },
+      { n: 'Cerrado Cargas', cat: 'nenhuma categoria repetida', v: 0, ini: 'CC', a1: '#9fc9c6', a2: '#6ba8a4', ring: '#dfeceb' }
+    ];
+    const cats = [
+      { n: 'Documentação de terceiro', curto: 'Doc. terceiro', v: 5 },
+      { n: 'Registro de limpeza', curto: 'Limpeza', v: 4 },
+      { n: 'Evidência fotográfica', curto: 'Fotos', v: 3 },
+      { n: 'Contaminação cruzada', curto: 'Contaminação', v: 2 },
+      { n: 'Cadastro duplicado', curto: 'Cadastro', v: 1 }
+    ];
+    const maxC = Math.max(...cats.map(c => c.v));
+    return {
+      ...this.novaVals(), ...this.eficaciaVals(),
+      loading: this.state.loading, skel: [1, 2, 3, 4],
+      headSub: 'Terça, 5 ago · ' + abertas.length + ' abertas · 1 com prazo vencido · Filial ' + (this.state.filial || 'Rondonópolis MT'),
+      kAbertas: abertas.length, kFechadas: 12,
+      kCriticas: abertas.filter(n => n.sev === 'critica').length,
+      kVencidas: abertas.filter(n => n.vencida).length,
+      kReinc: 2,
+      etapaBar: etapas.map(e => ({ n: e.n + ' · ' + e.qtd, tip: e.qtd + ' em ' + e.n.toLowerCase(), w: Math.round(e.qtd / totEt * 100) + '%', g1: e.g1, g2: e.g2 })),
+      lista: this._pagFatia(lista), ...this._pagVals(lista.length, "NCs"),
+      listaVazia: !this.state.loading && lista.length === 0,
+      listaVaziaSub: q ? 'Nada corresponde à busca "' + this.state.busca + '" neste filtro.' : 'Nenhuma NC neste recorte. Desvio que não vira NC continua acontecendo em silêncio, então vale conferir a fila de exceções.',
+      filtros: [mk('abertas', 'Abertas · ' + abertas.length), mk('criticas', 'Críticas · ' + todas.filter(n => n.sev === 'critica' && n.aberta).length), mk('vencidas', 'Prazo vencido · ' + abertas.filter(n => n.vencida).length), mk('all', 'Todas · ' + todas.length)],
+      busca: this.state.busca, onBusca: e => this.setState({ busca: e.target.value, pag: 1 }),
+      reincidencia: reinc.map(r => ({ ...r, w: Math.round(r.v / 2 * 100) + '%',
+        c: r.v >= 2 ? '#c43d3d' : r.v === 1 ? '#b97514' : '#1a8f57',
+        g1: r.v >= 2 ? '#e46969' : r.v === 1 ? '#f4c15d' : '#9fc9c6',
+        g2: r.v >= 2 ? '#c43d3d' : r.v === 1 ? '#e8a33d' : '#6ba8a4',
+        onClick: () => this.avisar(r.v >= 2 ? (r.n + ' é reincidente em ' + r.cat + '. Reincidência entra na avaliação de qualificação da empresa.') : (r.n + ': ' + r.cat + '. Fora da contagem de reincidência.')) })),
+      categorias: cats.map(c => ({ ...c, h: Math.round(c.v / maxC * 100) + '%',
+        g1: c.v >= 4 ? '#f4c15d' : '#9fc9c6', g2: c.v >= 4 ? '#e8a33d' : '#6ba8a4' })),
+      filial: this.state.filial || 'Rondonópolis MT', filialOpen: !!this.state.filialOpen,
+      onFilial: () => this.setState(s => ({ filialOpen: !s.filialOpen })),
+      filiais: ['Rondonópolis MT', 'Sorriso MT', 'Cuiabá MT', 'Todas as filiais'].map(n => ({ n,
+        bg: (this.state.filial || 'Rondonópolis MT') === n ? '#eef7f6' : '#fff',
+        dot: (this.state.filial || 'Rondonópolis MT') === n ? '#127670' : '#dde5e3',
+        onClick: () => { this.setState({ filial: n, filialOpen: false }); this.avisar('Filial ' + n + ': NCs e reincidência recalculadas.'); } })),
+      exportar: () => this.avisar("NCs exportadas com severidade, origem, ciclo e prazo. Vencidas primeiro, que é a ordem de quem vai cobrar."),
+      toast: !!this.state.toast, toastMsg: this.state.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

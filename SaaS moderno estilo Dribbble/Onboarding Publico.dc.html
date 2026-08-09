@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<script src="./prototype-shell.js" defer></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#e3e9e7;font-family:'Hanken Grotesk',sans-serif;color:#0b2224;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0C5862;text-decoration:none}
+@keyframes subir{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</helmet>
+<section style="padding:64px;display:flex;flex-direction:column;gap:32px" data-screen-label="Onboarding público">
+  <div>
+    <div style="font-size:26px;font-weight:800">Onboarding público do transportador</div>
+    <div style="font-size:15px;color:#5c706e;margin-top:4px;max-width:1000px;line-height:1.6">O link chega por WhatsApp, QR ou link direto e abre no navegador do celular. Sem conta, sem senha, seis passos. Linguagem de quem dirige, não de quem audita. Os passos 2, 4, 5 e 6 são interativos: toque neles.</div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:36px">
+
+    <!-- 0 · CONVITE -->
+    <div style="width:393px;flex:none">
+      <div style="font-size:12px;font-weight:800;letter-spacing:1.4px;color:#5c706e;margin-bottom:10px">0 · O LINK DO WHATSAPP</div>
+      <div style="width:393px;height:812px;border-radius:32px;background:#fff;box-shadow:0 24px 60px rgba(9,34,36,.18);border:1px solid #d6dedc;overflow:hidden;display:flex;flex-direction:column">
+        <div style="background:#eef2f1;padding:11px 14px;display:flex;align-items:center;gap:8px;flex:none;border-bottom:1px solid #e0e7e5">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="#1a8f57" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="7" width="9" height="6.2" rx="1.6"></rect><path d="M5.6 7V5.2a2.4 2.4 0 0 1 4.8 0V7"></path></svg>
+          <div style="flex:1;background:#fff;border-radius:99px;padding:5px 12px;font-family:'Spline Sans Mono';font-size:11px;color:#5c706e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">traxium.com.br/convite/8f3a</div>
+        </div>
+        <div style="flex:1;background:linear-gradient(168deg,#093D44,#0C5862 62%,#0E78B5 150%);color:#fff;padding:44px 28px;display:flex;flex-direction:column;position:relative;overflow:hidden">
+          <div style="position:absolute;right:-70px;top:-40px;width:300px;height:300px;border-radius:99px;background:radial-gradient(circle,rgba(255,255,255,.14),transparent 68%)"></div>
+          <div style="position:relative;display:flex;align-items:center;gap:11px">
+            <svg width="38" height="38" viewBox="0 0 32 32"><defs><linearGradient id="lgOb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3ddc97"></stop><stop offset="1" stop-color="#5b8def"></stop></linearGradient></defs><polygon points="16,2.5 27.5,9 27.5,23 16,29.5 4.5,23 4.5,9" fill="url(#lgOb)"></polygon><polyline points="9,20 13,13 18,17 23,10" fill="none" stroke="#093D44" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
+            <div><div style="font-weight:800;font-size:18px">Traxium</div><div style="font-size:10.5px;letter-spacing:2.2px;color:rgba(255,255,255,.55);text-transform:uppercase">Compliance</div></div>
+          </div>
+          <div style="position:relative;margin-top:52px">
+            <div style="display:flex;align-items:center;gap:11px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);border-radius:16px;padding:13px 15px">
+              <span style="width:40px;height:40px;border-radius:99px;flex:none;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2.5px rgba(255,255,255,.9)">CC</span>
+              <div><div style="font-size:14px;font-weight:800">Cerrado Cargas</div><div style="font-size:12px;color:rgba(255,255,255,.7)">convidou você a transportar</div></div>
+            </div>
+            <div style="font-size:31px;font-weight:800;line-height:1.22;margin-top:26px">Seu cadastro para levar carga de ração</div>
+            <div style="font-size:15px;color:rgba(255,255,255,.78);margin-top:12px;line-height:1.6">São seis perguntas sobre você, seu caminhão e as últimas cargas que ele levou. Leva uns seis minutos e não precisa de senha.</div>
+          </div>
+          <div style="position:relative;margin-top:30px;display:flex;flex-direction:column;gap:10px">
+            <sc-for list="{{ resumoPassos }}" as="rp" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:11px;font-size:13.5px;color:rgba(255,255,255,.82)">
+                <span style="width:26px;height:26px;border-radius:99px;flex:none;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ rp.i }}</span>{{ rp.t }}
+              </div>
+            </sc-for>
+          </div>
+          <div style="position:relative;margin-top:auto">
+            <div style="background:#fff;color:#093D44;border-radius:99px;padding:17px;text-align:center;font-size:16.5px;font-weight:800;box-shadow:0 12px 26px rgba(0,0,0,.22)">Começar</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.6);text-align:center;margin-top:13px;line-height:1.5">Pode parar no meio e voltar depois pelo mesmo link. O que você já respondeu fica guardado.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1 · QUEM É VOCÊ -->
+    <div style="width:393px;flex:none">
+      <div style="font-size:12px;font-weight:800;letter-spacing:1.4px;color:#5c706e;margin-bottom:10px">1 · QUEM É VOCÊ</div>
+      <div style="width:393px;height:812px;border-radius:32px;background:#f7faf9;box-shadow:0 24px 60px rgba(9,34,36,.18);border:1px solid #d6dedc;overflow:hidden;display:flex;flex-direction:column">
+        <div style="background:#eef2f1;padding:11px 14px;display:flex;align-items:center;gap:8px;flex:none;border-bottom:1px solid #e0e7e5">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="#1a8f57" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="7" width="9" height="6.2" rx="1.6"></rect><path d="M5.6 7V5.2a2.4 2.4 0 0 1 4.8 0V7"></path></svg>
+          <div style="flex:1;background:#fff;border-radius:99px;padding:5px 12px;font-family:'Spline Sans Mono';font-size:11px;color:#5c706e">traxium.com.br/convite/8f3a</div>
+        </div>
+        <div style="padding:22px 24px;background:#fff;border-bottom:1px solid #eef2f1;flex:none">
+          <div style="display:flex;gap:5px">
+            <sc-for list="{{ barra1 }}" as="b1" hint-placeholder-count="6"><div style="flex:1;height:6px;border-radius:99px;background:{{ b1.bg }}"></div></sc-for>
+          </div>
+          <div style="font-size:12.5px;color:#5c706e;margin-top:10px;font-weight:600">Passo 1 de 6</div>
+          <div style="font-size:23px;font-weight:800;margin-top:3px">Quem é você</div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:22px 24px;display:flex;flex-direction:column;gap:16px">
+          <sc-for list="{{ campos1 }}" as="c1" hint-placeholder-count="5">
+            <div>
+              <div style="font-size:13.5px;font-weight:700;margin-bottom:7px">{{ c1.rot }}</div>
+              <div style="background:#fff;border:1.5px solid {{ c1.bd }};border-radius:15px;padding:15px 16px;font-size:16px;font-weight:{{ c1.fw }};color:{{ c1.c }};font-family:{{ c1.f }};display:flex;align-items:center;gap:10px">
+                <sc-if value="{{ c1.ok }}" hint-placeholder-val="{{ true }}"><span style="width:20px;height:20px;border-radius:99px;flex:none;background:linear-gradient(135deg,#48c78e,#127670);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center">✓</span></sc-if>
+                <span style="flex:1">{{ c1.v }}</span>
+              </div>
+              <sc-if value="{{ c1.dica }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:#5c706e;margin-top:6px;line-height:1.45">{{ c1.dicaTxt }}</div></sc-if>
+            </div>
+          </sc-for>
+          <div style="background:#eef7f6;border:1px solid #d5e5e3;border-radius:15px;padding:14px 15px;display:flex;gap:11px;align-items:flex-start">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="#0C5862" stroke-width="1.7" stroke-linecap="round" style="flex:none;margin-top:1px"><rect x="3.5" y="7" width="9" height="6.2" rx="1.6"></rect><path d="M5.6 7V5.2a2.4 2.4 0 0 1 4.8 0V7"></path></svg>
+            <div style="font-size:12.5px;color:#0C5862;line-height:1.5">Seu CPF e sua CNH ficam guardados só para provar quem dirigiu em cada carga. Não vão para propaganda nem para terceiros.</div>
+          </div>
+        </div>
+        <div style="padding:18px 24px;background:#fff;border-top:1px solid #eef2f1;flex:none">
+          <div style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;border-radius:99px;padding:16px;text-align:center;font-size:16px;font-weight:800;box-shadow:0 10px 22px rgba(18,118,112,.3)">Continuar</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 · VÍNCULO -->
+    <div style="width:393px;flex:none">
+      <div style="font-size:12px;font-weight:800;letter-spacing:1.4px;color:#5c706e;margin-bottom:10px">2 · COMO VOCÊ TRABALHA · INTERATIVO</div>
+      <div style="width:393px;height:812px;border-radius:32px;background:#f7faf9;box-shadow:0 24px 60px rgba(9,34,36,.18);border:1px solid #d6dedc;overflow:hidden;display:flex;flex-direction:column">
+        <div style="background:#eef2f1;padding:11px 14px;display:flex;align-items:center;gap:8px;flex:none;border-bottom:1px solid #e0e7e5">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="#1a8f57" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="7" width="9" height="6.2" rx="1.6"></rect><path d="M5.6 7V5.2a2.4 2.4 0 0 1 4.8 0V7"></path></svg>
+          <div style="flex:1;background:#fff;border-radius:99px;padding:5px 12px;font-family:'Spline Sans Mono';font-size:11px;color:#5c706e">traxium.com.br/convite/8f3a</div>
+        </div>
+        <div style="padding:22px 24px;background:#fff;border-bottom:1px solid #eef2f1;flex:none">
+          <div style="display:flex;gap:5px">
+            <sc-for list="{{ barra2 }}" as="b2" hint-placeholder-count="6"><div style="flex:1;height:6px;border-radius:99px;background:{{ b2.bg }}"></div></sc-for>
+          </div>
+          <div style="font-size:12.5px;color:#5c706e;margin-top:10px;font-weight:600">Passo 2 de 6</div>
+          <div style="font-size:23px;font-weight:800;margin-top:3px">Como você trabalha</div>
+          <div style="font-size:13.5px;color:#5c706e;margin-top:4px;line-height:1.5">Escolha o que mais parece com a sua situação. Isso muda o que vamos pedir depois.</div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:18px 24px;display:flex;flex-direction:column;gap:9px">
+          <sc-for list="{{ vinculos }}" as="vi" hint-placeholder-count="7">
+            <div onClick="{{ vi.onClick }}" style="display:flex;align-items:center;gap:13px;background:{{ vi.bg }};border:1.5px solid {{ vi.bd }};border-radius:16px;padding:15px 16px;cursor:pointer;transition:all .15s">
+              <span style="width:21px;height:21px;border-radius:99px;border:2.5px solid {{ vi.dotBd }};background:{{ vi.dot }};flex:none"></span>
+              <div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:700">{{ vi.n }}</div><div style="font-size:12.5px;color:#5c706e;margin-top:2px;line-height:1.4">{{ vi.sub }}</div></div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="padding:18px 24px;background:#fff;border-top:1px solid #eef2f1;flex:none">
+          <div style="font-size:12.5px;color:{{ vinculoC }};margin-bottom:11px;line-height:1.45">{{ vinculoDica }}</div>
+          <div style="background:{{ vinculoBg }};color:{{ vinculoBtC }};border-radius:99px;padding:16px;text-align:center;font-size:16px;font-weight:800;box-shadow:{{ vinculoSh }}">Continuar</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 · VEÍCULO -->
+    <div style="width:393px;flex:none">
+      <div style="font-size:12px;font-weight:800;letter-spacing:1.4px;color:#5c706e;margin-bottom:10px">3 · O CAMINHÃO</div>
+      <div style="width:393px;height:812px;border-radius:32px;background:#f7faf9;box-shadow:0 24px 60px rgba(9,34,36,.18);border:1px solid #d6dedc;overflow:hidden;display:flex;flex-direction:column">
+        <div style="background:#eef2f1;padding:11px 14px;display:flex;align-items:center;gap:8px;flex:none;border-bottom:1px solid #e0e7e5">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="#1a8f57" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="7" width="9" height="6.2" rx="1.6"></rect><path d="M5.6 7V5.2a2.4 2.4 0 0 1 4.8 0V7"></path></svg>
+          <div style="flex:1;background:#fff;border-radius:99px;padding:5px 12px;font-family:'Spline Sans Mono';font-size:11px;color:#5c706e">traxium.com.br/convite/8f3a</div>
+        </div>
+        <div style="padding:22px 24px;background:#fff;border-bottom:1px solid #eef2f1;flex:none">
+          <div style="display:flex;gap:5px">
+            <sc-for list="{{ barra3 }}" as="b3" hint-placeholder-count="6"><div style="flex:1;height:6px;border-radius:99px;background:{{ b3.bg }}"></div></sc-for>
+          </div>
+          <div style="font-size:12.5px;color:#5c706e;margin-top:10px;font-weight:600">Passo 3 de 6</div>
+          <div style="font-size:23px;font-weight:800;margin-top:3px">O caminhão</div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:22px 24px;display:flex;flex-direction:column;gap:18px">
+          <div>
+            <div style="font-size:13.5px;font-weight:700;margin-bottom:7px">Placa do cavalo</div>
+            <div style="background:#fff;border:1.5px solid #d5e5e3;border-radius:15px;padding:15px 16px;font-family:'Spline Sans Mono';font-size:19px;font-weight:600;letter-spacing:1.5px">QAS 7C31</div>
+            <div style="font-size:12px;color:#5c706e;margin-top:6px;line-height:1.45">O cavalo só puxa. O histórico da carga não fica nele.</div>
+          </div>
+          <div>
+            <div style="font-size:13.5px;font-weight:700;margin-bottom:7px">Placa da carreta</div>
+            <div style="background:#fff;border:1.5px solid #d5e5e3;border-radius:15px;padding:15px 16px;font-family:'Spline Sans Mono';font-size:19px;font-weight:600;letter-spacing:1.5px">SQT 7D22</div>
+          </div>
+          <div>
+            <div style="font-size:13.5px;font-weight:700;margin-bottom:7px">Que tipo de carreta</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <sc-for list="{{ tiposImpl }}" as="ti" hint-placeholder-count="4">
+                <span style="font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 16px;border:1.5px solid {{ ti.bd }};background:{{ ti.bg }};color:{{ ti.c }}">{{ ti.n }}</span>
+              </sc-for>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:13.5px;font-weight:700;margin-bottom:7px">Quantas bocas ela tem</div>
+            <div style="display:flex;align-items:center;gap:14px;background:#fff;border:1.5px solid #d5e5e3;border-radius:15px;padding:11px 15px">
+              <span style="width:40px;height:40px;border-radius:99px;background:#f0f4f3;color:#3c4f4e;font-size:20px;font-weight:700;display:flex;align-items:center;justify-content:center">−</span>
+              <div style="flex:1;text-align:center"><div style="font-size:26px;font-weight:800;line-height:1">2</div><div style="font-size:11.5px;color:#5c706e">compartimentos</div></div>
+              <span style="width:40px;height:40px;border-radius:99px;background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;font-size:20px;font-weight:700;display:flex;align-items:center;justify-content:center">+</span>
+            </div>
+            <div style="background:#eef7f6;border:1px solid #d5e5e3;border-radius:15px;padding:14px 15px;margin-top:10px">
+              <div style="font-size:12.5px;color:#0C5862;line-height:1.55">Cada boca guarda o próprio histórico. Se uma levou calcário e a outra levou milho, elas não são iguais para a próxima carga.</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:18px 24px;background:#fff;border-top:1px solid #eef2f1;flex:none">
+          <div style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;border-radius:99px;padding:16px;text-align:center;font-size:16px;font-weight:800;box-shadow:0 10px 22px rgba(18,118,112,.3)">Continuar</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 · T-3 -->
+    <div style="width:393px;flex:none">
+      <div style="font-size:12px;font-weight:800;letter-spacing:1.4px;color:#5c706e;margin-bottom:10px">4 · AS TRÊS ÚLTIMAS CARGAS · INTERATIVO</div>
+      <div style="width:393px;height:812px;border-radius:32px;background:#f7faf9;box-shadow:0 24px 60px rgba(9,34,36,.18);border:1px solid #d6dedc;overflow:hidden;display:flex;flex-direction:column">
+        <div style="background:#eef2f1;padding:11px 14px;display:flex;align-items:center;gap:8px;flex:none;border-bottom:1px solid #e0e7e5">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="#1a8f57" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="7" width="9" height="6.2" rx="1.6"></rect><path d="M5.6 7V5.2a2.4 2.4 0 0 1 4.8 0V7"></path></svg>
+          <div style="flex:1;background:#fff;border-radius:99px;padding:5px 12px;font-family:'Spline Sans Mono';font-size:11px;color:#5c706e">traxium.com.br/convite/8f3a</div>
+        </div>
+        <div style="padding:22px 24px;background:#fff;border-bottom:1px solid #eef2f1;flex:none">
+          <div style="display:flex;gap:5px">
+            <sc-for list="{{ barra4 }}" as="b4" hint-placeholder-count="6"><div style="flex:1;height:6px;border-radius:99px;background:{{ b4.bg }}"></div></sc-for>
+          </div>
+          <div style="font-size:12.5px;color:#5c706e;margin-top:10px;font-weight:600">Passo 4 de 6 · boca 1 de 2</div>
+          <div style="font-size:23px;font-weight:800;margin-top:3px;line-height:1.25">O que essa boca levou nas últimas 3 viagens</div>
+          <div style="font-size:13.5px;color:#5c706e;margin-top:6px;line-height:1.5">É a pergunta mais importante do cadastro. O que veio antes decide o que pode subir agora.</div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:18px 24px;display:flex;flex-direction:column;gap:14px">
+          <sc-for list="{{ t3 }}" as="tc" hint-placeholder-count="3">
+            <div style="background:#fff;border:1.5px solid {{ tc.bd }};border-radius:18px;padding:15px 16px">
+              <div style="display:flex;align-items:center;gap:9px">
+                <span style="font-family:'Spline Sans Mono';font-size:12px;font-weight:600;color:#0C5862;background:#e9f3f2;border-radius:99px;padding:3px 10px">{{ tc.tag }}</span>
+                <span style="font-size:12.5px;color:#5c706e">{{ tc.quando }}</span>
+              </div>
+              <div style="font-size:16.5px;font-weight:800;margin-top:9px;color:{{ tc.pc }}">{{ tc.produto }}</div>
+              <div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:11px">
+                <sc-for list="{{ tc.opcoes }}" as="op" hint-placeholder-count="4">
+                  <span onClick="{{ op.onClick }}" style="font-size:13px;font-weight:600;border-radius:99px;padding:8px 14px;cursor:pointer;border:1.5px solid {{ op.bd }};background:{{ op.bg }};color:{{ op.c }};transition:all .15s">{{ op.n }}</span>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+          <div style="background:#fffdf8;border:1px solid #f0debb;border-radius:16px;padding:14px 15px;display:flex;gap:11px;align-items:flex-start">
+            <span style="width:22px;height:22px;border-radius:99px;flex:none;background:linear-gradient(135deg,#f4c15d,#e8a33d);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:1px">!</span>
+            <div style="font-size:12.5px;color:#b97514;line-height:1.55">{{ t3Aviso }}</div>
+          </div>
+        </div>
+        <div style="padding:18px 24px;background:#fff;border-top:1px solid #eef2f1;flex:none">
+          <div style="background:{{ t3Bg }};color:{{ t3C }};border-radius:99px;padding:16px;text-align:center;font-size:16px;font-weight:800;box-shadow:{{ t3Sh }}">{{ t3Cta }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 · LIMPEZAS -->
+    <div style="width:393px;flex:none">
+      <div style="font-size:12px;font-weight:800;letter-spacing:1.4px;color:#5c706e;margin-bottom:10px">5 · A LIMPEZA · INTERATIVO</div>
+      <div style="width:393px;height:812px;border-radius:32px;background:#f7faf9;box-shadow:0 24px 60px rgba(9,34,36,.18);border:1px solid #d6dedc;overflow:hidden;display:flex;flex-direction:column">
+        <div style="background:#eef2f1;padding:11px 14px;display:flex;align-items:center;gap:8px;flex:none;border-bottom:1px solid #e0e7e5">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="#1a8f57" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="7" width="9" height="6.2" rx="1.6"></rect><path d="M5.6 7V5.2a2.4 2.4 0 0 1 4.8 0V7"></path></svg>
+          <div style="flex:1;background:#fff;border-radius:99px;padding:5px 12px;font-family:'Spline Sans Mono';font-size:11px;color:#5c706e">traxium.com.br/convite/8f3a</div>
+        </div>
+        <div style="padding:22px 24px;background:#fff;border-bottom:1px solid #eef2f1;flex:none">
+          <div style="display:flex;gap:5px">
+            <sc-for list="{{ barra5 }}" as="b5" hint-placeholder-count="6"><div style="flex:1;height:6px;border-radius:99px;background:{{ b5.bg }}"></div></sc-for>
+          </div>
+          <div style="font-size:12.5px;color:#5c706e;margin-top:10px;font-weight:600">Passo 5 de 6</div>
+          <div style="font-size:23px;font-weight:800;margin-top:3px;line-height:1.25">Depois da última carga, o que você fez na boca</div>
+          <div style="font-size:13.5px;color:#5c706e;margin-top:6px;line-height:1.5">Sem julgamento. Responder certo aqui evita você chegar no pátio e não poder carregar.</div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:18px 24px;display:flex;flex-direction:column;gap:9px">
+          <sc-for list="{{ limpezas }}" as="lp" hint-placeholder-count="5">
+            <div onClick="{{ lp.onClick }}" style="display:flex;align-items:center;gap:13px;background:{{ lp.bg }};border:1.5px solid {{ lp.bd }};border-radius:16px;padding:15px 16px;cursor:pointer;transition:all .15s">
+              <span style="width:21px;height:21px;border-radius:99px;border:2.5px solid {{ lp.dotBd }};background:{{ lp.dot }};flex:none"></span>
+              <div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:700">{{ lp.n }}</div><div style="font-size:12.5px;color:#5c706e;margin-top:2px;line-height:1.4">{{ lp.sub }}</div></div>
+              <sc-if value="{{ lp.temLetra }}" hint-placeholder-val="{{ true }}"><span style="width:28px;height:28px;border-radius:9px;flex:none;background:linear-gradient(135deg,{{ lp.g1 }},{{ lp.g2 }});color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ lp.letra }}</span></sc-if>
+            </div>
+          </sc-for>
+          <div style="background:{{ limpAviBg }};border:1px solid {{ limpAviBd }};border-radius:16px;padding:14px 15px;margin-top:4px">
+            <div style="font-size:12.5px;color:{{ limpAviC }};line-height:1.55">{{ limpAviso }}</div>
+          </div>
+        </div>
+        <div style="padding:18px 24px;background:#fff;border-top:1px solid #eef2f1;flex:none">
+          <div style="background:{{ limpBg }};color:{{ limpC }};border-radius:99px;padding:16px;text-align:center;font-size:16px;font-weight:800;box-shadow:{{ limpSh }}">Continuar</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6 · REGRAS E ASSINATURA -->
+    <div style="width:393px;flex:none">
+      <div style="font-size:12px;font-weight:800;letter-spacing:1.4px;color:#5c706e;margin-bottom:10px">6 · AS REGRAS E O ACEITE · INTERATIVO</div>
+      <div style="width:393px;height:812px;border-radius:32px;background:#f7faf9;box-shadow:0 24px 60px rgba(9,34,36,.18);border:1px solid #d6dedc;overflow:hidden;display:flex;flex-direction:column">
+        <div style="background:#eef2f1;padding:11px 14px;display:flex;align-items:center;gap:8px;flex:none;border-bottom:1px solid #e0e7e5">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="#1a8f57" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="7" width="9" height="6.2" rx="1.6"></rect><path d="M5.6 7V5.2a2.4 2.4 0 0 1 4.8 0V7"></path></svg>
+          <div style="flex:1;background:#fff;border-radius:99px;padding:5px 12px;font-family:'Spline Sans Mono';font-size:11px;color:#5c706e">traxium.com.br/convite/8f3a</div>
+        </div>
+        <div style="padding:22px 24px;background:#fff;border-bottom:1px solid #eef2f1;flex:none">
+          <div style="display:flex;gap:5px">
+            <sc-for list="{{ barra6 }}" as="b6" hint-placeholder-count="6"><div style="flex:1;height:6px;border-radius:99px;background:{{ b6.bg }}"></div></sc-for>
+          </div>
+          <div style="font-size:12.5px;color:#5c706e;margin-top:10px;font-weight:600">Passo 6 de 6</div>
+          <div style="font-size:23px;font-weight:800;margin-top:3px">As regras da carga de ração</div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:18px 24px;display:flex;flex-direction:column;gap:10px">
+          <sc-for list="{{ regras }}" as="rg" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #e4eae8;border-radius:16px;padding:14px 15px;display:flex;gap:12px;align-items:flex-start">
+              <span style="width:30px;height:30px;border-radius:10px;flex:none;background:linear-gradient(135deg,{{ rg.g1 }},{{ rg.g2 }});color:#fff;display:flex;align-items:center;justify-content:center">
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="{{ rg.d }}"></path></svg>
+              </span>
+              <div style="flex:1"><div style="font-size:14px;font-weight:800">{{ rg.t }}</div><div style="font-size:12.5px;color:#5c706e;margin-top:3px;line-height:1.5">{{ rg.sub }}</div></div>
+            </div>
+          </sc-for>
+          <div onClick="{{ toggleAceite }}" style="display:flex;align-items:flex-start;gap:12px;background:{{ aceiteBg }};border:1.5px solid {{ aceiteBd }};border-radius:16px;padding:15px 16px;cursor:pointer;margin-top:4px">
+            <span style="width:23px;height:23px;border-radius:8px;flex:none;border:2.5px solid {{ aceiteBd2 }};background:{{ aceiteCk }};color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:1px">{{ aceiteIcon }}</span>
+            <div style="flex:1;font-size:13.5px;font-weight:600;line-height:1.5">Li e entendi as regras acima, e sei que informação errada aqui pode contaminar ração de animal.</div>
+          </div>
+          <div>
+            <div style="font-size:13.5px;font-weight:700;margin-bottom:8px">Sua assinatura</div>
+            <div onClick="{{ assinar }}" style="background:#fff;border:1.5px dashed {{ assinaBd }};border-radius:16px;height:118px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;cursor:pointer">
+              <sc-if value="{{ assinado }}" hint-placeholder-val="{{ false }}">
+                <svg width="150" height="46" viewBox="0 0 150 46" fill="none"><path d="M8 33c9-13 14-20 19-19 5 1 3 15 9 16 6 1 9-16 15-15 6 1 4 14 10 14 7 0 11-19 18-18 6 1 5 13 11 13 6 0 10-9 16-13 5-3 10-4 15-3" stroke="#0b2224" stroke-width="2.4" stroke-linecap="round"></path></svg>
+                <div style="font-size:12px;color:#5c706e">Ivan Prado · 6 ago, 09:14</div>
+              </sc-if>
+              <sc-if value="{{ naoAssinado }}" hint-placeholder-val="{{ true }}">
+                <svg width="26" height="26" viewBox="0 0 16 16" fill="none" stroke="#9db0ae" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12.5 11 4l2.4 2.4L5 15H2.5z"></path></svg>
+                <div style="font-size:13.5px;font-weight:700;color:#7c8f8d">Toque para assinar com o dedo</div>
+              </sc-if>
+            </div>
+          </div>
+        </div>
+        <div style="padding:18px 24px;background:#fff;border-top:1px solid #eef2f1;flex:none">
+          <div style="font-size:12.5px;color:#5c706e;margin-bottom:11px;line-height:1.45">{{ finalDica }}</div>
+          <div style="background:{{ finalBg }};color:{{ finalC }};border-radius:99px;padding:16px;text-align:center;font-size:16px;font-weight:800;box-shadow:{{ finalSh }}">Enviar cadastro</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7 · CONCLUSÃO -->
+    <div style="width:393px;flex:none">
+      <div style="font-size:12px;font-weight:800;letter-spacing:1.4px;color:#5c706e;margin-bottom:10px">7 · O QUE ACONTECE DEPOIS</div>
+      <div style="width:393px;height:812px;border-radius:32px;background:#fff;box-shadow:0 24px 60px rgba(9,34,36,.18);border:1px solid #d6dedc;overflow:hidden;display:flex;flex-direction:column">
+        <div style="background:#eef2f1;padding:11px 14px;display:flex;align-items:center;gap:8px;flex:none;border-bottom:1px solid #e0e7e5">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="#1a8f57" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="7" width="9" height="6.2" rx="1.6"></rect><path d="M5.6 7V5.2a2.4 2.4 0 0 1 4.8 0V7"></path></svg>
+          <div style="flex:1;background:#fff;border-radius:99px;padding:5px 12px;font-family:'Spline Sans Mono';font-size:11px;color:#5c706e">traxium.com.br/convite/8f3a</div>
+        </div>
+        <div style="flex:1;overflow:auto;padding:34px 24px;display:flex;flex-direction:column">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+            <span style="width:70px;height:70px;border-radius:99px;background:linear-gradient(135deg,#48c78e,#127670);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 6px rgba(26,143,87,.13)"><svg width="30" height="30" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 6.5 12 13 4.5"></path></svg></span>
+            <div style="font-size:24px;font-weight:800;text-align:center">Cadastro enviado</div>
+          </div>
+          <div style="background:#f7faf9;border:1px solid #e4eae8;border-radius:18px;padding:18px;margin-top:24px">
+            <div style="font-size:11px;letter-spacing:1.3px;font-weight:700;color:#7c8f8d">SUA SITUAÇÃO AGORA</div>
+            <div style="display:flex;align-items:center;gap:11px;margin-top:10px">
+              <span style="width:11px;height:11px;border-radius:99px;flex:none;background:linear-gradient(135deg,#9fc9c6,#6ba8a4);box-shadow:0 0 0 4px rgba(107,168,164,.18)"></span>
+              <div style="font-size:18px;font-weight:800">Pré-cadastrado</div>
+            </div>
+            <div style="font-size:13.5px;color:#5c706e;margin-top:9px;line-height:1.6">Isso ainda não libera carga. É honesto dizer agora em vez de te deixar viajar até o pátio para descobrir lá.</div>
+          </div>
+          <div style="font-size:13px;font-weight:800;letter-spacing:.6px;color:#3c4f4e;margin-top:22px">O QUE FALTA PARA VOCÊ CARREGAR</div>
+          <div style="display:flex;flex-direction:column;margin-top:11px">
+            <sc-for list="{{ falta }}" as="fa" hint-placeholder-count="3">
+              <div style="display:flex;gap:13px">
+                <div style="display:flex;flex-direction:column;align-items:center;width:30px;flex:none">
+                  <span style="width:30px;height:30px;border-radius:99px;background:{{ fa.iBg }};color:{{ fa.iC }};font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ fa.i }}</span>
+                  <span style="flex:1;width:2px;background:{{ fa.linha }};margin:4px 0"></span>
+                </div>
+                <div style="padding-bottom:18px;flex:1"><div style="font-size:14px;font-weight:800">{{ fa.t }}</div><div style="font-size:12.5px;color:#5c706e;margin-top:3px;line-height:1.5">{{ fa.sub }}</div></div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="background:#eef7f6;border:1px solid #d5e5e3;border-radius:16px;padding:15px 16px;margin-top:6px">
+            <div style="font-size:12.5px;color:#0C5862;line-height:1.55">Ninguém vai marcar você como apto na mão. Assim que as três coisas acima existirem, o sistema recalcula sozinho e a Cerrado Cargas já pode te chamar.</div>
+          </div>
+          <div style="margin-top:auto;padding-top:22px">
+            <div style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;border-radius:99px;padding:16px;text-align:center;font-size:16px;font-weight:800;box-shadow:0 10px 22px rgba(18,118,112,.3)">Enviar meu certificado agora</div>
+            <div style="background:#f0f4f3;color:#0b2224;border-radius:99px;padding:15px;text-align:center;font-size:15px;font-weight:700;margin-top:9px">Fazer isso depois pelo WhatsApp</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { vinculo: null, t3: {}, limpeza: null, aceite: false, assinado: false };
+
+  barra(passo) {
+    return [1, 2, 3, 4, 5, 6].map(i => ({ bg: i < passo ? '#48c78e' : i === passo ? 'linear-gradient(90deg,#127670,#0E78B5)' : '#e4eae8' }));
+  }
+  renderVals() {
+    const s = this.state;
+    const T3 = [
+      { k: 'a', tag: 'Última', quando: 'a que saiu agora', produto: 'Milho a granel' },
+      { k: 'b', tag: 'Antes dela', quando: 'a viagem anterior', produto: 'Casca de soja' },
+      { k: 'c', tag: 'Mais atrás', quando: 'a terceira de trás para frente', produto: null }
+    ];
+    const OPC = ['Farelo de soja', 'Milho', 'Calcário', 'Ureia pecuária', 'Não lembro'];
+    const escolhidas = T3.map(t => t.produto || s.t3[t.k]).filter(Boolean);
+    const temNaoLembro = Object.values(s.t3).includes('Não lembro');
+    const temUreia = Object.values(s.t3).includes('Ureia pecuária');
+    const t3Completo = escolhidas.length === 3;
+
+    const VIN = [
+      { k: 'propria', n: 'Sou da frota da empresa', sub: 'o caminhão é da transportadora que te chamou' },
+      { k: 'agregado', n: 'Sou agregado', sub: 'caminhão seu, rodando fixo para uma empresa' },
+      { k: 'tac', n: 'Sou autônomo, TAC', sub: 'caminhão seu, você pega frete de quem aparecer' },
+      { k: 'sub_cert', n: 'Tenho empresa com certificado GMP+', sub: 'sua transportadora já é certificada' },
+      { k: 'sub_gate', n: 'Tenho empresa, sem certificado', sub: 'você roda sob a certificação de quem contrata' },
+      { k: 'afret', n: 'Faço afretamento', sub: 'você contrata outros para levar a carga' },
+      { k: 'coop', n: 'Sou de cooperativa', sub: 'a cooperativa responde pelo seu vínculo' }
+    ];
+    const LIMP = [
+      { k: 'a', n: 'Só varri e soprei', sub: 'sem água', letra: 'A', g1: '#48c78e', g2: '#127670' },
+      { k: 'b', n: 'Lavei com água', sub: 'mangueira ou jato, sem produto', letra: 'B', g1: '#f0d95e', g2: '#c9a70e' },
+      { k: 'c', n: 'Lavei com água e detergente', sub: 'produto próprio para alimento', letra: 'C', g1: '#f4c15d', g2: '#e8a33d' },
+      { k: 'd', n: 'Lavei e desinfetei', sub: 'em estação, com comprovante', letra: 'D', g1: '#e46969', g2: '#c43d3d' },
+      { k: 'nada', n: 'Não fui eu que fiz', sub: 'ou não sei dizer o que foi feito', semLetra: true }
+    ];
+    const sel = (on, cor) => ({
+      bg: on ? (cor || '#eef7f6') : '#fff', bd: on ? (cor ? '#c43d3d' : '#127670') : '#e0e7e5',
+      dot: on ? (cor ? '#c43d3d' : 'linear-gradient(135deg,#127670,#0E78B5)') : '#fff',
+      dotBd: on ? (cor ? '#c43d3d' : '#127670') : '#c9d5d3'
+    });
+    const podeEnviar = s.aceite && s.assinado;
+
+    return {
+      resumoPassos: [
+        { i: '1', t: 'Seus documentos' },
+        { i: '2', t: 'Como você trabalha' },
+        { i: '3', t: 'O caminhão e as bocas' },
+        { i: '4', t: 'As três últimas cargas' },
+        { i: '5', t: 'A limpeza que foi feita' },
+        { i: '6', t: 'As regras e sua assinatura' }
+      ],
+      barra1: this.barra(1), barra2: this.barra(2), barra3: this.barra(3),
+      barra4: this.barra(4), barra5: this.barra(5), barra6: this.barra(6),
+
+      campos1: [
+        { rot: 'CPF', v: '842.115.330-07', ok: true, f: 'Spline Sans Mono', fw: '600', c: '#0b2224', bd: '#d5e5e3' },
+        { rot: 'Nome completo', v: 'Ivan Prado da Silveira', ok: true, f: 'Hanken Grotesk', fw: '600', c: '#0b2224', bd: '#d5e5e3', dica: true, dicaTxt: 'Puxamos do seu CPF. Confira se está certo.' },
+        { rot: 'Número da CNH', v: '04829116370', ok: true, f: 'Spline Sans Mono', fw: '600', c: '#0b2224', bd: '#d5e5e3' },
+        { rot: 'Categoria', v: 'E', ok: true, f: 'Hanken Grotesk', fw: '700', c: '#0b2224', bd: '#d5e5e3' },
+        { rot: 'Vencimento da CNH', v: '14/03/2029', ok: true, f: 'Spline Sans Mono', fw: '600', c: '#0b2224', bd: '#d5e5e3' }
+      ],
+
+      vinculos: VIN.map(v => ({ ...v, ...sel(s.vinculo === v.k), onClick: () => this.setState({ vinculo: v.k }) })),
+      vinculoDica: !s.vinculo ? 'Escolha uma opção para continuar.'
+        : (s.vinculo === 'sub_gate' ? 'Sem certificado próprio você roda sob a certificação de quem contrata, e vamos pedir um treinamento a mais no fim.'
+        : (s.vinculo === 'sub_cert' ? 'Vamos pedir o número do seu certificado GMP+ e conferir na base da certificadora.'
+        : 'Certo. O que pedimos daqui para frente segue essa escolha.')),
+      vinculoC: s.vinculo ? '#5c706e' : '#b97514',
+      vinculoBg: s.vinculo ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#eef2f1',
+      vinculoBtC: s.vinculo ? '#fff' : '#9db0ae',
+      vinculoSh: s.vinculo ? '0 10px 22px rgba(18,118,112,.3)' : 'none',
+
+      tiposImpl: ['Graneleiro', 'Tanque', 'Baú', 'Caçamba'].map((n, i) => ({ n,
+        bd: i === 0 ? '#127670' : '#e0e7e5', bg: i === 0 ? '#eef7f6' : '#fff', c: i === 0 ? '#0C5862' : '#3c4f4e' })),
+
+      t3: T3.map(t => {
+        const v = t.produto || s.t3[t.k];
+        return { ...t,
+          produto: v || 'toque para escolher',
+          pc: v ? '#0b2224' : '#9db0ae',
+          bd: v ? '#d5e5e3' : '#e0e7e5',
+          opcoes: t.produto ? [] : OPC.map(n => {
+            const on = s.t3[t.k] === n;
+            const risco = n === 'Ureia pecuária' || n === 'Não lembro';
+            return { n, ...sel(on, on && risco ? '#fdf6f6' : null),
+              c: on ? (risco ? '#c43d3d' : '#0C5862') : '#5c706e',
+              onClick: () => this.setState({ t3: { ...s.t3, [t.k]: n } }) };
+          }) };
+      }),
+      t3Aviso: temUreia ? 'Ureia pecuária é carga pesada de resolver. Não tem problema ter levado, mas a próxima carga de ração vai exigir procedimento antes de subir.'
+        : (temNaoLembro ? 'Sem saber o que veio antes, essa boca não recebe carga sensível até alguém inspecionar. Não lembrar é resposta válida, e é melhor que chutar.'
+        : (t3Completo ? 'Pronto. Com as três cargas, o sistema já sabe dizer o que essa boca pode receber e que limpeza pedir.'
+        : 'Se não lembrar de alguma, marque "não lembro". Chutar aqui é pior do que não saber.')),
+      t3Cta: t3Completo ? 'Continuar' : 'Falta a terceira carga',
+      t3Bg: t3Completo ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#eef2f1',
+      t3C: t3Completo ? '#fff' : '#9db0ae',
+      t3Sh: t3Completo ? '0 10px 22px rgba(18,118,112,.3)' : 'none',
+
+      limpezas: LIMP.map(l => ({ ...l, ...sel(s.limpeza === l.k), temLetra: !l.semLetra })),
+      limpAviso: !s.limpeza ? 'Escolha o que foi feito. Cada nível de limpeza libera cargas diferentes.'
+        : (s.limpeza === 'nada' ? 'Sem saber a limpeza, a boca entra como não verificada e vai precisar de inspeção no pátio antes de carregar.'
+        : (s.limpeza === 'd' ? 'Desinfecção é o nível mais alto. Vamos pedir o comprovante da estação depois, sem pressa agora.'
+        : 'Anotado. Se a próxima carga pedir mais que isso, avisamos antes de você sair.')),
+      limpAviBg: s.limpeza === 'nada' ? '#fffdf8' : '#eef7f6',
+      limpAviBd: s.limpeza === 'nada' ? '#f0debb' : '#d5e5e3',
+      limpAviC: s.limpeza === 'nada' ? '#b97514' : '#0C5862',
+      limpBg: s.limpeza ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#eef2f1',
+      limpC: s.limpeza ? '#fff' : '#9db0ae',
+      limpSh: s.limpeza ? '0 10px 22px rgba(18,118,112,.3)' : 'none',
+
+      regras: [
+        { t: 'Carga de ração é comida de animal', sub: 'o que fica na boca da carreta chega no prato de alguém, no fim da linha.', d: 'M2 6.3 8 3.4l6 2.9-6 2.9z M4.6 8.4v2.6c0 .9 1.5 1.8 3.4 1.8s3.4-.9 3.4-1.8V8.4', g1: '#48c78e', g2: '#127670' },
+        { t: 'Você nunca libera uma carga travada', sub: 'se der problema, registre pelo app e peça análise. Quem libera é a qualidade da empresa, nunca o motorista.', d: 'M3.5 7h9v6.2h-9z M5.6 7V5.2a2.4 2.4 0 0 1 4.8 0V7', g1: '#e46969', g2: '#c43d3d' },
+        { t: 'Foto é pela câmera do app', sub: 'não vale foto da galeria para evidência. É o que prova que você estava lá.', d: 'M2.5 5.5h2l1.2-1.7h4.6L11.5 5.5h2v7h-11z M10.2 8.4a2.2 2.2 0 1 1-4.4 0 2.2 2.2 0 0 1 4.4 0z', g1: '#5b8def', g2: '#4c5bc0' },
+        { t: 'Sem sinal também funciona', sub: 'preencha do mesmo jeito. Quando pegar sinal, o aparelho manda sozinho.', d: 'M2 11.5c3.4-3.4 8.6-3.4 12 0 M4.4 8.6c2.1-2 5.1-2 7.2 0 M8 13.4v.1', g1: '#e8a33d', g2: '#d97544' }
+      ],
+      toggleAceite: () => this.setState({ aceite: !s.aceite }),
+      aceiteBg: s.aceite ? '#eef7f6' : '#fff', aceiteBd: s.aceite ? '#127670' : '#e0e7e5',
+      aceiteBd2: s.aceite ? '#127670' : '#c9d5d3',
+      aceiteCk: s.aceite ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#fff',
+      aceiteIcon: s.aceite ? '✓' : '',
+      assinar: () => this.setState({ assinado: !s.assinado }),
+      assinado: s.assinado, naoAssinado: !s.assinado,
+      assinaBd: s.assinado ? '#127670' : '#cdd9d7',
+      finalDica: !s.aceite ? 'Marque que você leu as regras.' : (!s.assinado ? 'Falta assinar com o dedo.' : 'Tudo certo. Seu cadastro vai para a Cerrado Cargas com data e hora.'),
+      finalBg: podeEnviar ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#eef2f1',
+      finalC: podeEnviar ? '#fff' : '#9db0ae',
+      finalSh: podeEnviar ? '0 10px 22px rgba(18,118,112,.3)' : 'none',
+
+      falta: [
+        { i: '1', t: 'O certificado da sua empresa', sub: 'ou o aviso de que você roda sob a certificação de quem contrata. Conferimos direto na base da certificadora.', iBg: '#f0f4f3', iC: '#7c8f8d' },
+        { i: '2', t: 'O acordo de qualidade assinado', sub: 'um documento curto com as regras de segurança da ração. Chega no seu WhatsApp para assinar pelo celular.', iBg: '#f0f4f3', iC: '#7c8f8d' },
+        { i: '3', t: 'Um treinamento de 40 minutos', sub: 'no celular, pode parar e voltar. Sem ele você não aparece como disponível para carga de ração.', iBg: '#f0f4f3', iC: '#7c8f8d', ultimo: true }
+      ].map(f => ({ ...f, linha: f.ultimo ? 'transparent' : '#e4eae8' }))
+    };
+  }
+}
+</script>
+</body>
+</html>

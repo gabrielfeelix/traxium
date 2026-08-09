@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<script src="./prototype-shell.js" defer></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f2f5f4;font-family:'Hanken Grotesk',sans-serif;color:#0b2224;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0C5862;text-decoration:none}a:hover{color:#127670}
+input{font-family:'Hanken Grotesk',sans-serif}
+input::placeholder{color:#8ba09e}
+@keyframes subir{from{transform:translateY(14px);opacity:0}to{transform:translateY(0);opacity:1}}
+</style>
+</helmet>
+<div style="display:flex;min-height:100vh;min-width:1560px" data-screen-label="Motor IDTF">
+  <!-- SIDEBAR -->
+  <div style="width:{{ navW }};flex:none;background:linear-gradient(178deg,#093D44,#0A4650);color:#fff;display:flex;flex-direction:column;padding:24px {{ navPad }};position:sticky;top:0;height:100vh;transition:width .25s ease;overflow-x:hidden;overflow-y:auto">
+    <div style="display:flex;align-items:center;gap:10px;padding:4px 8px 22px">
+      <svg width="34" height="34" viewBox="0 0 32 32"><defs><linearGradient id="lgT" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1a9e93"></stop><stop offset="1" stop-color="#0E78B5"></stop></linearGradient></defs><polygon points="16,2.5 27.5,9 27.5,23 16,29.5 4.5,23 4.5,9" fill="url(#lgT)"></polygon><polyline points="9,20 13,13 18,17 23,10" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></polyline><circle cx="9" cy="20" r="1.6" fill="#fff"></circle><circle cx="13" cy="13" r="1.6" fill="#fff"></circle><circle cx="18" cy="17" r="1.6" fill="#fff"></circle><circle cx="23" cy="10" r="1.6" fill="#fff"></circle></svg>
+      <div style="display:{{ navL }}"><div style="font-weight:800;font-size:17px;letter-spacing:.2px">Traxium</div><div style="font-size:10.5px;letter-spacing:2.2px;color:rgba(255,255,255,.5);text-transform:uppercase">Compliance</div></div>
+    </div>
+    <a href="Torre de Controle v2.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;font-size:14px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="5.6"></circle><circle cx="8" cy="8" r="1.4" fill="currentColor" stroke="none"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Torre de Controle</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">7</span></a>
+    <div style="font-size:10.5px;letter-spacing:1.8px;color:rgba(255,255,255,.38);padding:20px 12px 8px;font-weight:700;display:{{ navSec }}">OPERAÇÃO</div>
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:14px;color:rgba(255,255,255,.66)">
+      <a href="Viagens.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 8h9"></path><path d="M8 4.5 11.5 8 8 11.5"></path></svg><span style="display:{{ navL }};white-space:nowrap">Viagens</span></a>
+      <a href="Excecoes.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6"></circle><line x1="8" y1="4.8" x2="8" y2="8.6"></line><circle cx="8" cy="11.2" r=".9" fill="currentColor" stroke="none"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Exceções e liberações</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">5</span></a>
+      <a href="Inspecoes.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 6.5 12 13 4.5"></path></svg><span style="display:{{ navL }};white-space:nowrap">Inspeções</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">3</span></a>
+      <a href="Limpezas.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.8c2.4 2.8 3.7 4.6 3.7 6.5a3.7 3.7 0 1 1-7.4 0c0-1.9 1.3-3.7 3.7-6.5z"></path></svg><span style="display:{{ navL }};white-space:nowrap">Limpezas</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">3</span></a>
+    </div>
+    <div style="font-size:10.5px;letter-spacing:1.8px;color:rgba(255,255,255,.38);padding:20px 12px 8px;font-weight:700;display:{{ navSec }}">PILARES</div>
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:14px;color:rgba(255,255,255,.66)">
+      <div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px;background:linear-gradient(90deg,rgba(26,158,147,.35),rgba(14,120,181,.28));border:1px solid rgba(255,255,255,.14);font-weight:700;color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="2.5" width="11" height="11" rx="3"></rect><line x1="8" y1="2.5" x2="8" y2="13.5"></line></svg><span style="display:{{ navL }};white-space:nowrap">Motor IDTF</span><span style="margin-left:auto;display:{{ navL }};background:#fff;color:#0C5862;font-size:11.5px;font-weight:800;padding:1px 8px;border-radius:99px">3</span></div>
+      <a href="Subcontratados.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5.4" cy="6.2" r="2.4"></circle><circle cx="10.8" cy="6.2" r="2.4"></circle><path d="M2.5 13c.6-2 1.7-3 3-3s2.3 1 2.9 3" stroke-linecap="round"></path></svg><span style="display:{{ navL }};white-space:nowrap">Subcontratados</span></a>
+      <a href="Motoristas.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="5.4" r="2.6"></circle><path d="M3 13.4c.8-2.6 2.6-3.9 5-3.9s4.2 1.3 5 3.9"></path></svg><span style="display:{{ navL }};white-space:nowrap">Motoristas</span></a>
+      <a href="Acessos Externos.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.4 8.6a3.2 3.2 0 1 0 0-.01z"></path><path d="M9 7.2 14 2.2M12 4.2l1.6 1.6M10.6 5.6l1.6 1.6"></path></svg><span style="display:{{ navL }};white-space:nowrap">Acessos externos</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">2</span></a>
+      <a href="Academy.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M2 6.3 8 3.4l6 2.9-6 2.9z"></path><path d="M4.6 8.4v2.6c0 .9 1.5 1.8 3.4 1.8s3.4-.9 3.4-1.8V8.4" stroke-linecap="round"></path></svg><span style="display:{{ navL }};white-space:nowrap">Academy</span></a>
+      <a href="Ativos e Frota.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="4.5" width="8" height="5.5" rx="1.4"></rect><path d="M10 6.5h2.4l1.6 2v1.5h-4z" stroke-linejoin="round"></path><circle cx="5" cy="11.8" r="1.4"></circle><circle cx="11.6" cy="11.8" r="1.4"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Ativos e frota</span></a>
+    </div>
+    <div style="font-size:10.5px;letter-spacing:1.8px;color:rgba(255,255,255,.38);padding:20px 12px 8px;font-weight:700;display:{{ navSec }}">PROVA</div>
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:14px;color:rgba(255,255,255,.66)">
+      <a href="Dossie.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3.2" y="2.5" width="9.6" height="11" rx="2"></rect><line x1="6" y1="6" x2="10" y2="6"></line><line x1="6" y1="9" x2="10" y2="9"></line></svg><span style="display:{{ navL }};white-space:nowrap">Dossiê de auditoria</span></a>
+      <a href="Indicadores.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="4" y1="13" x2="4" y2="8.5"></line><line x1="8" y1="13" x2="8" y2="3.5"></line><line x1="12" y1="13" x2="12" y2="10"></line></svg><span style="display:{{ navL }};white-space:nowrap">Indicadores</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">11/15</span></a>
+      <a href="Nao Conformidades.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="5.8" stroke-dasharray="2.4 2.4"></circle><circle cx="8" cy="8" r="2.2"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Não conformidades</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">4</span></a>
+    </div>
+    <a href="Configuracoes.dc.html" style="margin-top:auto;display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="2.3"></circle><path d="M8 1.8v1.9M8 12.3v1.9M14.2 8h-1.9M3.7 8H1.8M12.4 3.6l-1.3 1.3M4.9 11.1l-1.3 1.3M12.4 12.4l-1.3-1.3M4.9 4.9 3.6 3.6" stroke-linecap="round"></path></svg><span style="display:{{ navL }};white-space:nowrap">Configurações</span></a>
+    <a href="Onboarding Publico.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13V3.8c0-.7.5-1.2 1.2-1.2h5.6c.7 0 1.2.5 1.2 1.2V13"></path><path d="M6 8h7M10.5 5.5 13 8l-2.5 2.5"></path></svg><span style="display:{{ navL }};white-space:nowrap">Onboarding público</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">6 passos</span></a>
+      <a href="App de Campo.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="1.8" width="9" height="12.4" rx="2"></rect><line x1="6.5" y1="4" x2="9.5" y2="4"></line><circle cx="8" cy="11.7" r=".65" fill="currentColor" stroke="none"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Protótipo mobile</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">12 telas</span></a>
+      <div onClick="{{ navToggle }}" title="Recolher ou expandir o menu" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;cursor:pointer;font-size:13px;font-weight:600;color:rgba(255,255,255,.6)" style-hover="background:rgba(255,255,255,.08);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="transform:{{ navFlip }};transition:transform .25s;flex:none"><path d="M9.5 3 4.5 8l5 5"></path><line x1="12" y1="3" x2="12" y2="13"></line></svg><span style="display:{{ navL }};white-space:nowrap">Recolher menu</span></div><div style="display:{{ navCard }};margin-top:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px">
+      <div style="font-size:12px;color:rgba(255,255,255,.55);margin-bottom:8px">Base IDTF Brasil</div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600"><span style="width:8px;height:8px;border-radius:99px;background:#3ddc97;box-shadow:0 0 0 4px rgba(61,220,151,.18)"></span>v2026.07 vigente</div>
+      <div style="font-size:11.5px;color:rgba(255,255,255,.45);margin-top:4px">1.240 produtos · 8.900 sinônimos</div>
+    </div>
+  </div>
+  <!-- CONTENT -->
+  <div style="flex:1;display:flex;flex-direction:column;padding:26px 32px 48px;gap:20px;min-width:0">
+    <div style="display:flex;align-items:center;gap:16px">
+      <div><div style="font-size:24px;font-weight:800">Motor IDTF</div><div style="font-size:13.5px;color:#5c706e;margin-top:2px">a camada brasileira de consulta: fale como o pátio fala, o motor acha o produto oficial</div></div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+        <div onClick="{{ abrirCatalogo }}" style="display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;border-radius:11px;padding:9px 14px;font-size:13.5px;font-weight:700;cursor:pointer;box-shadow:0 7px 16px rgba(18,118,112,.22)" style-hover="transform:translateY(-1px);box-shadow:0 10px 22px rgba(18,118,112,.3)">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="2.5" y="2.5" width="11" height="11" rx="2.5"></rect><path d="M5.3 6h5.4M5.3 9h3.3"></path></svg>
+          Catálogo e matriz
+        </div>
+        <div data-tx-pop style="position:relative">
+          <div onClick="{{ onVersao }}" style="background:#fff;border:1px solid #e0e7e5;border-radius:11px;padding:9px 14px;font-size:13.5px;font-weight:600;cursor:pointer" style-hover="border-color:#127670">Base v2026.07 ▾</div>
+          <sc-if value="{{ versaoOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;right:0;top:46px;background:#fff;border:1px solid #e4eae8;border-radius:16px;box-shadow:0 16px 40px rgba(9,61,68,.16);padding:6px;width:300px;z-index:80;display:flex;flex-direction:column">
+              <sc-for list="{{ versoes }}" as="vv" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px" style-hover="background:#f6f9f8">
+                  <span style="width:8px;height:8px;border-radius:99px;background:{{ vv.dot }};box-shadow:0 0 0 3px {{ vv.glow }};flex:none"></span>
+                  <div style="flex:1"><div style="font-family:'Spline Sans Mono';font-size:12.5px;font-weight:600">{{ vv.v }}</div><div style="font-size:11px;color:#5c706e">{{ vv.sub }}</div></div>
+                  <span style="display:inline-block;font-size:10.5px;font-weight:700;color:{{ vv.tagC }};background:{{ vv.tagBg }};border-radius:99px;padding:2px 9px;white-space:nowrap">{{ vv.tag }}</span>
+                </div>
+              </sc-for>
+              <div style="font-size:11px;color:#7c8f8d;padding:8px 12px;line-height:1.45;border-top:1px solid #f0f4f3;margin-top:4px">Cada decisão grava a versão usada. Consultar versão antiga não altera nada.</div>
+            </div>
+          </sc-if>
+        </div>
+        <div data-tx-pop style="position:relative">
+          <div onClick="{{ onPerfil }}" style="width:38px;height:38px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13.5px;box-shadow:0 0 0 3px #fff,0 0 0 4.5px #d8e4e2;cursor:pointer" style-hover="box-shadow:0 0 0 3px #fff,0 0 0 4.5px #127670">RA</div>
+          <sc-if value="{{ perfilOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;right:0;top:48px;background:#fff;border:1px solid #e4eae8;border-radius:16px;box-shadow:0 16px 40px rgba(9,61,68,.16);padding:6px;width:250px;z-index:60;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;gap:11px;padding:11px 12px;border-bottom:1px solid #f0f4f3;margin-bottom:4px">
+                <span style="width:38px;height:38px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none">RA</span>
+                <div><div style="font-size:13.5px;font-weight:800">Rafael Antunes</div><div style="font-size:11.5px;color:#5c706e">Gestor de qualidade · GMP+</div></div>
+              </div>
+              <div onClick="{{ abrirPerfil }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer" style-hover="background:#f6f9f8">Meu perfil</div>
+              <div onClick="{{ abrirPrefs }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer" style-hover="background:#f6f9f8">Preferências e notificações</div>
+              <div onClick="{{ abrirPapel }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px" style-hover="background:#f6f9f8">Papel ativo<span style="display:inline-block;font-size:10.5px;font-weight:700;color:#0C5862;background:#e9f3f2;border-radius:99px;padding:2px 9px;white-space:nowrap">{{ papelBadge }}</span></div>
+              <div style="height:1px;background:#f0f4f3;margin:5px 8px"></div>
+              <div onClick="{{ abrirSair }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;color:#c43d3d" style-hover="background:#fdf6f6">Sair</div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 392px;gap:20px;align-items:start">
+      <!-- CONSULTA -->
+      <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:24px">
+          <div style="font-size:15.5px;font-weight:800">Consultar produto</div>
+          <div style="font-size:12.5px;color:#5c706e;margin-top:2px">tente "casquinha", "soybean hulls", "adubo", "farelo"…</div>
+          <div style="margin-top:14px;background:#f7faf9;border:1.5px solid #e0e7e5;border-radius:14px;padding:0 18px;display:flex;gap:10px;align-items:center" style-focus="border-color:#127670">
+            <svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="#7c8f8d" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.6"></circle><line x1="10.5" y1="10.5" x2="13.5" y2="13.5"></line></svg>
+            <input value="{{ q }}" onInput="{{ onQ }}" placeholder="Nome popular, comercial, em inglês ou código IDTF…" style="border:none;outline:none;background:transparent;font-size:15px;padding:14px 0;flex:1;color:#0b2224;font-weight:600">
+            <sc-if value="{{ temQ }}" hint-placeholder-val="{{ false }}"><span onClick="{{ limparQ }}" style="width:24px;height:24px;border-radius:99px;background:#e4ebe9;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;color:#3c4f4e">✕</span></sc-if>
+          </div>
+          <div style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap">
+            <span style="font-size:11.5px;color:#7c8f8d;font-weight:700;align-self:center">populares:</span>
+            <sc-for list="{{ sugestoes }}" as="sg" hint-placeholder-count="6">
+              <span onClick="{{ sg.onClick }}" style="font-size:12px;font-weight:700;color:#0C5862;background:#e9f3f2;border-radius:99px;padding:5px 13px;cursor:pointer;white-space:nowrap;transition:all .15s" style-hover="background:#d8ebe9">{{ sg.t }}</span>
+            </sc-for>
+          </div>
+        </div>
+        <!-- RESULTADOS -->
+        <sc-if value="{{ semResultado }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:36px 24px;display:flex;flex-direction:column;align-items:center;gap:10px;animation:subir .3s ease-out both">
+            <span style="width:52px;height:52px;border-radius:99px;background:#fdf3e2;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 16 16" fill="none" stroke="#b97514" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.6"></circle><line x1="10.5" y1="10.5" x2="13.5" y2="13.5"></line></svg></span>
+            <div style="font-size:16px;font-weight:800">Produto não reconhecido</div>
+            <div style="font-size:13px;color:#5c706e;max-width:460px;text-align:center;line-height:1.55">"{{ q }}" não corresponde a nenhum produto, sinônimo ou nome comercial da base. Ninguém classifica na mão: o registro entra na fila técnica e fica bloqueado até a Qualidade definir.</div>
+            <span onClick="{{ enviarFila }}" style="margin-top:6px;background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;font-size:13px;font-weight:700;border-radius:99px;padding:9px 20px;cursor:pointer;white-space:nowrap;box-shadow:0 6px 14px rgba(18,118,112,.3)" style-hover="transform:translateY(-1px)">Enviar para a fila técnica</span>
+          </div>
+        </sc-if>
+        <sc-for list="{{ resultados }}" as="rs" hint-placeholder-count="2">
+          <div style="position:relative;z-index:{{ rs.z }};background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:22px 24px;animation:subir .3s ease-out both;transition:box-shadow .2s" style-hover="box-shadow:0 12px 32px rgba(9,61,68,.09)">
+            <div style="display:flex;align-items:flex-start;gap:14px">
+              <div style="min-width:0;flex:1">
+                <div style="display:flex;gap:9px;align-items:baseline;flex-wrap:wrap"><span style="font-size:17px;font-weight:800">{{ rs.canonico }}</span><span style="font-family:'Spline Sans Mono';font-size:11.5px;font-weight:600;color:#7c8f8d;background:#f0f4f3;border-radius:7px;padding:2px 9px;white-space:nowrap">IDTF {{ rs.codigo }}</span></div>
+                <div style="font-size:12.5px;color:#5c706e;margin-top:3px">{{ rs.oficial }} · {{ rs.categoria }} · {{ rs.estado }}</div>
+                <div style="display:flex;gap:5px;margin-top:10px;flex-wrap:wrap">
+                  <span style="font-size:11px;color:#7c8f8d;font-weight:700;align-self:center">também chamado:</span>
+                  <sc-for list="{{ rs.sinonimos }}" as="sn"><span style="font-size:11.5px;font-weight:600;color:{{ sn.c }};background:{{ sn.bg }};border-radius:99px;padding:3px 10px;white-space:nowrap">{{ sn.t }}</span></sc-for>
+                </div>
+              </div>
+              <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+              <div style="text-align:center;background:{{ rs.verBg }};border:1px solid {{ rs.verBd }};border-radius:16px;padding:12px 18px;min-width:150px">
+                <span style="display:inline-flex;width:30px;height:30px;border-radius:10px;background:{{ rs.regBg }};color:{{ rs.regC }};font-size:14px;font-weight:800;align-items:center;justify-content:center">{{ rs.regIcon }}</span>
+                <div style="font-size:12.5px;font-weight:800;color:{{ rs.verC }};margin-top:6px;line-height:1.3">{{ rs.veredito }}</div>
+                <div style="font-size:10.5px;color:#7c8f8d;margin-top:2px">{{ rs.verSub }}</div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <span onClick="{{ rs.abrirFicha }}" style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;font-size:12.5px;font-weight:700;border-radius:99px;padding:8px 16px;cursor:pointer;box-shadow:0 5px 12px rgba(18,118,112,.28);transition:transform .15s;white-space:nowrap" style-hover="transform:translateY(-1px)">Ficha completa</span>
+                <div data-tx-pop style="position:relative">
+                  <span onClick="{{ rs.abrirMais }}" title="mais ações" style="width:32px;height:32px;border-radius:99px;background:#f0f4f3;color:#3c4f4e;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;cursor:pointer;flex:none" style-hover="background:#e4ebe9">⋯</span>
+                  <sc-if value="{{ maisOpen }}" hint-placeholder-val="{{ false }}">
+                    <div style="position:absolute;right:0;top:38px;background:#fff;border:1px solid #e4eae8;border-radius:14px;box-shadow:0 16px 40px rgba(9,61,68,.16);padding:6px;width:230px;z-index:60;display:flex;flex-direction:column">
+                      <sc-for list="{{ maisAcoes }}" as="ma" hint-placeholder-count="3">
+                        <div onClick="{{ ma.onClick }}" style="font-size:12.5px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;color:{{ ma.c }}" style-hover="background:#f6f9f8">{{ ma.n }}</div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                </div>
+              </div>
+              </div>
+            </div>
+            <div style="border-top:1px dashed #e4eae8;margin-top:16px;padding-top:14px;display:flex;align-items:center;gap:14px">
+              <div style="font-size:12.5px;color:#3c4f4e;flex:1;line-height:1.5"><strong>Contra o {{ compSel }}</strong> ({{ compT3 }}): {{ rs.contraT3 }}</div>
+              <div style="position:relative">
+                <span onClick="{{ rs.simular }}" style="font-size:12.5px;font-weight:700;color:#0C5862;cursor:pointer;white-space:nowrap" style-hover="color:#127670">Simular outro compartimento ▾</span>
+                <sc-if value="{{ rs.simOpen }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute;right:0;top:28px;background:#fff;border:1px solid #e4eae8;border-radius:14px;box-shadow:0 16px 40px rgba(9,61,68,.18);padding:6px;width:280px;z-index:80;display:flex;flex-direction:column">
+                    <sc-for list="{{ compartimentos }}" as="cp" hint-placeholder-count="3">
+                      <div onClick="{{ cp.onClick }}" style="display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;cursor:pointer;background:{{ cp.bg }}" style-hover="background:#f6f9f8">
+                        <span style="font-family:'Spline Sans Mono';font-size:11px;font-weight:600;color:#0C5862;background:#e9f3f2;border-radius:7px;padding:2px 7px;flex:none">{{ cp.tag }}</span>
+                        <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700">{{ cp.n }}</div><div style="font-size:10.5px;color:#5c706e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ cp.t3 }}</div></div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+        <!-- COMO O MOTOR DECIDE -->
+        <sc-if value="{{ mostraLegenda }}" hint-placeholder-val="{{ true }}">
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:22px 24px">
+            <div style="font-size:14px;font-weight:800">Os nove vereditos possíveis</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px 14px;margin-top:12px">
+              <sc-for list="{{ vereditos }}" as="vd" hint-placeholder-count="9">
+                <div style="display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:10px" style-hover="background:#f7faf9"><span style="width:24px;height:24px;border-radius:8px;flex:none;background:{{ vd.bg }};color:{{ vd.c }};font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ vd.icon }}</span><span style="font-size:12px;font-weight:600">{{ vd.l }}</span></div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+      <!-- RAIL: FILA TÉCNICA + GOVERNANÇA -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:22px">
+          <div style="display:flex;align-items:center"><div style="font-size:15.5px;font-weight:800">Fila técnica <span style="color:#8ba09e;font-weight:700">(3)</span></div><span style="margin-left:auto;font-size:12px;font-weight:700;color:#b97514;background:#fdf3e2;border-radius:99px;padding:4px 12px;white-space:nowrap">bloqueados até definição</span></div>
+          <div style="font-size:12.5px;color:#5c706e;margin-top:2px">produtos não reconhecidos aguardando a Qualidade</div>
+          <div style="display:flex;flex-direction:column;margin-top:10px">
+            <sc-for list="{{ fila }}" as="ft" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:11px;padding:11px 2px;border-bottom:1px solid #f0f4f3;border-radius:8px;cursor:pointer" style-hover="background:#f7faf9">
+                <span style="width:32px;height:32px;border-radius:11px;flex:none;background:#fdf3e2;color:#b97514;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800">?</span>
+                <div style="min-width:0;flex:1"><div style="font-size:13px;font-weight:700">"{{ ft.termo }}"</div><div style="font-size:11px;color:#5c706e">{{ ft.quem }} · {{ ft.quando }}</div></div>
+                <span onClick="{{ ft.classificar }}" style="font-size:11.5px;font-weight:700;color:#0C5862;cursor:pointer;white-space:nowrap" style-hover="color:#127670">Classificar →</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font-size:12px;color:#5c706e;margin-top:10px;line-height:1.5">A viagem que citou o termo fica bloqueada até a definição formal. Definido, todas reavaliam sozinhas.</div>
+        </div>
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:22px">
+          <div style="font-size:15.5px;font-weight:800">Governança da base</div>
+          <div style="display:flex;flex-direction:column;gap:7px;margin-top:12px">
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;background:#f7faf9;border-radius:99px;padding:8px 14px"><span style="color:#5c706e">Fonte oficial</span><span style="font-weight:700">IDTF · GMP+ International</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;background:#f7faf9;border-radius:99px;padding:8px 14px"><span style="color:#5c706e">Versão vigente</span><span style="font-family:'Spline Sans Mono';font-weight:600">v2026.07 · 28 jul</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;background:#f7faf9;border-radius:99px;padding:8px 14px"><span style="color:#5c706e">Sinônimos aprovados</span><span style="font-weight:700">8.900 · revisão da Qualidade</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;background:#f7faf9;border-radius:99px;padding:8px 14px"><span style="color:#5c706e">Decisões carimbadas</span><span style="font-weight:700">versão gravada em cada viagem</span></div>
+          </div>
+          <div style="font-size:12px;color:#5c706e;margin-top:12px;line-height:1.5">Mudar a base não muda decisão histórica: a VG-2455 foi decidida na v2026.06 e assim permanece no dossiê.</div>
+        </div>
+        <div style="background:linear-gradient(115deg,#093D44,#0C5862 60%,#0E78B5 140%);color:#fff;border-radius:20px;padding:22px;position:relative;overflow:hidden">
+          <div style="position:absolute;right:-50px;top:-70px;width:220px;height:220px;border-radius:99em;background:radial-gradient(circle,rgba(255,255,255,.13),transparent 65%)"></div>
+          <div style="font-size:14px;font-weight:800">O motor no fluxo</div>
+          <div style="font-size:12.5px;color:rgba(255,255,255,.75);line-height:1.6;margin-top:8px">A consulta isolada responde pouco. O veredito de verdade cruza produto × T-3 do compartimento × limpeza × certificados. É o que roda em cada viagem, sozinho.</div>
+          <a href="Viagens.dc.html" style="display:inline-block;margin-top:14px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:12.5px;font-weight:700;border-radius:99px;padding:8px 16px;white-space:nowrap" style-hover="background:rgba(255,255,255,.24);color:#fff">Ver decisões nas viagens →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- GESTÃO DO CATÁLOGO E DA MATRIZ -->
+  <sc-if value="{{ catalogoAberto }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharCatalogo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.52);backdrop-filter:blur(4px);z-index:1600;display:flex;align-items:center;justify-content:center;padding:24px">
+      <div onClick="{{ pararClique }}" style="width:1120px;max-width:calc(100vw - 48px);height:min(790px,calc(100vh - 48px));background:#f7faf9;border:1px solid #d9e4e2;border-radius:24px;box-shadow:0 42px 120px rgba(4,31,36,.48);overflow:hidden;display:flex;flex-direction:column">
+        <div style="background:linear-gradient(118deg,#093D44,#0C5862 58%,#0E78B5 145%);color:#fff;padding:20px 24px;display:flex;align-items:center;gap:18px;flex:none">
+          <div style="width:42px;height:42px;border-radius:14px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;flex:none">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3" y="3" width="14" height="14" rx="3"></rect><path d="M6.5 7.3h7M6.5 10.3h7M6.5 13.3h4"></path></svg>
+          </div>
+          <div style="min-width:0"><div style="font-size:18px;font-weight:800">Catálogo de produtos e matriz de limpeza</div><div style="font-size:12.5px;color:rgba(255,255,255,.7);margin-top:2px">a Qualidade define o produto oficial e o que cada carga anterior exige antes da próxima</div></div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:9px">
+            <span style="font-size:11px;font-weight:700;color:#8fe8d8;background:rgba(72,199,142,.12);border:1px solid rgba(143,232,216,.2);border-radius:99px;padding:5px 11px;white-space:nowrap">alterações entram na próxima versão</span>
+            <span onClick="{{ fecharCatalogo }}" title="Fechar" style="width:34px;height:34px;border-radius:99px;background:rgba(255,255,255,.11);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px" style-hover="background:rgba(255,255,255,.2)">✕</span>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:330px 1fr;min-height:0;flex:1">
+          <div style="background:#fff;border-right:1px solid #e1e9e7;padding:18px;display:flex;flex-direction:column;min-height:0">
+            <div style="display:flex;align-items:center;gap:10px"><div><div style="font-size:14px;font-weight:800">Produtos oficiais</div><div style="font-size:11px;color:#7c8f8d;margin-top:1px">{{ catalogoTotal }} nesta amostra</div></div><span onClick="{{ novoProduto }}" style="margin-left:auto;background:#0C5862;color:#fff;border-radius:10px;padding:8px 11px;font-size:11.5px;font-weight:750;cursor:pointer;white-space:nowrap" style-hover="background:#127670">＋ Novo produto</span></div>
+            <div style="margin-top:13px;border:1px solid #dce6e4;background:#f7faf9;border-radius:12px;padding:0 11px;display:flex;align-items:center;gap:8px">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#7c8f8d" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.6"></circle><line x1="10.5" y1="10.5" x2="13.5" y2="13.5"></line></svg>
+              <input value="{{ catalogoBusca }}" onInput="{{ onCatalogoBusca }}" placeholder="Buscar nome ou código…" style="border:0;outline:0;background:transparent;padding:10px 0;font-size:12.5px;min-width:0;flex:1;color:#0b2224">
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;margin-top:12px;overflow:auto;min-height:0;padding-right:3px">
+              <sc-for list="{{ catalogoProdutos }}" as="pd" hint-placeholder-count="6">
+                <div onClick="{{ pd.onClick }}" style="border:1px solid {{ pd.bd }};background:{{ pd.bg }};border-radius:13px;padding:11px 12px;cursor:pointer;display:flex;align-items:center;gap:10px" style-hover="border-color:#76aaa5">
+                  <span style="width:31px;height:31px;border-radius:10px;background:{{ pd.iconBg }};color:{{ pd.iconC }};font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none">{{ pd.reg }}</span>
+                  <div style="min-width:0;flex:1"><div style="font-size:12.5px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ pd.canonico }}</div><div style="font-family:'Spline Sans Mono';font-size:10px;color:#7c8f8d;margin-top:2px">IDTF {{ pd.codigo }}</div></div>
+                  <span style="width:7px;height:7px;border-radius:99px;background:{{ pd.dot }};flex:none"></span>
+                </div>
+              </sc-for>
+              <sc-if value="{{ catalogoVazio }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:#7c8f8d;text-align:center;padding:28px 8px">nenhum produto com esse nome</div></sc-if>
+            </div>
+          </div>
+          <div style="padding:20px 24px;overflow:auto;min-width:0">
+            <div style="display:flex;align-items:flex-start;gap:16px">
+              <div><div style="display:flex;align-items:center;gap:9px"><div style="font-size:16px;font-weight:800">{{ produtoTitulo }}</div><span style="font-size:10.5px;font-weight:700;color:{{ produtoStatusC }};background:{{ produtoStatusBg }};border-radius:99px;padding:3px 9px">{{ produtoStatus }}</span></div><div style="font-size:12px;color:#5c706e;margin-top:3px">Campos oficiais e regras de compatibilidade usadas automaticamente nas viagens.</div></div>
+              <div style="margin-left:auto;text-align:right"><div style="font-size:10px;letter-spacing:1px;font-weight:800;color:#8ba09e">RESPONSÁVEL</div><div style="font-size:12px;font-weight:700;margin-top:2px">Helena Duarte · Qualidade</div></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1.15fr .85fr;gap:12px;margin-top:16px">
+              <label style="display:flex;flex-direction:column;gap:5px;font-size:11px;font-weight:750;color:#5c706e">Nome usado no Brasil<input value="{{ produtoNome }}" onInput="{{ onProdutoNome }}" placeholder="ex.: Farelo de soja" style="border:1px solid #dce6e4;background:#fff;border-radius:11px;padding:10px 12px;font-size:13px;font-weight:650;color:#0b2224;outline:none"></label>
+              <label style="display:flex;flex-direction:column;gap:5px;font-size:11px;font-weight:750;color:#5c706e">Código IDTF<input value="{{ produtoCodigo }}" onInput="{{ onProdutoCodigo }}" disabled="{{ produtoCodigoTravado }}" placeholder="ex.: 10021" style="border:1px solid #dce6e4;background:{{ produtoCodigoBg }};border-radius:11px;padding:10px 12px;font-family:'Spline Sans Mono';font-size:12.5px;color:#0b2224;outline:none"></label>
+              <label style="display:flex;flex-direction:column;gap:5px;font-size:11px;font-weight:750;color:#5c706e">Nome oficial / internacional<input value="{{ produtoOficial }}" onInput="{{ onProdutoOficial }}" placeholder="ex.: Soybean meal" style="border:1px solid #dce6e4;background:#fff;border-radius:11px;padding:10px 12px;font-size:13px;color:#0b2224;outline:none"></label>
+              <label style="display:flex;flex-direction:column;gap:5px;font-size:11px;font-weight:750;color:#5c706e">Categoria<input value="{{ produtoCategoria }}" onInput="{{ onProdutoCategoria }}" placeholder="ex.: farelo proteico" style="border:1px solid #dce6e4;background:#fff;border-radius:11px;padding:10px 12px;font-size:13px;color:#0b2224;outline:none"></label>
+              <label style="display:flex;flex-direction:column;gap:5px;font-size:11px;font-weight:750;color:#5c706e">Estado físico<input value="{{ produtoEstado }}" onInput="{{ onProdutoEstado }}" placeholder="ex.: sólido granel" style="border:1px solid #dce6e4;background:#fff;border-radius:11px;padding:10px 12px;font-size:13px;color:#0b2224;outline:none"></label>
+              <label style="display:flex;flex-direction:column;gap:5px;font-size:11px;font-weight:750;color:#5c706e">Sinônimos usados no pátio<input value="{{ produtoSinonimos }}" onInput="{{ onProdutoSinonimos }}" placeholder="farelo, soja farelo, torta de soja" style="border:1px solid #dce6e4;background:#fff;border-radius:11px;padding:10px 12px;font-size:13px;color:#0b2224;outline:none"></label>
+            </div>
+            <div style="margin-top:18px;border-top:1px solid #e1e9e7;padding-top:16px">
+              <div style="display:flex;align-items:center;gap:12px"><div><div style="font-size:14px;font-weight:800">Matriz: carga anterior → limpeza exigida</div><div style="font-size:11.5px;color:#5c706e;margin-top:2px">Escolha o tratamento mínimo antes deste produto entrar no compartimento.</div></div><span style="margin-left:auto;font-size:10.5px;color:#7c8f8d;background:#eef2f1;border-radius:8px;padding:5px 9px">A seca · B água · C detergente · D desinfecção · ⊘ proibido</span></div>
+              <div style="display:flex;flex-direction:column;gap:7px;margin-top:12px">
+                <sc-for list="{{ produtoRegras }}" as="pr" hint-placeholder-count="5">
+                  <div style="background:#fff;border:1px solid #e1e9e7;border-radius:13px;padding:9px 11px;display:flex;align-items:center;gap:12px">
+                    <div style="width:205px;min-width:205px"><div style="font-size:12.5px;font-weight:750">{{ pr.nome }}</div><div style="font-size:10.5px;color:#7c8f8d;margin-top:1px">{{ pr.exemplos }}</div></div>
+                    <div style="display:flex;gap:5px;flex:1;justify-content:flex-end">
+                      <sc-for list="{{ pr.opcoes }}" as="ro" hint-placeholder-count="5"><span onClick="{{ ro.onClick }}" title="{{ ro.titulo }}" style="width:42px;height:32px;border-radius:9px;border:1px solid {{ ro.bd }};background:{{ ro.bg }};color:{{ ro.c }};display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:800;cursor:pointer">{{ ro.valor }}</span></sc-for>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid #e1e9e7">
+              <div style="font-size:11.5px;color:#5c706e;line-height:1.45;max-width:480px"><strong>Governança:</strong> salvar prepara uma revisão da base. Decisões antigas continuam presas à versão que as gerou.</div>
+              <span onClick="{{ fecharCatalogo }}" style="margin-left:auto;background:#eef2f1;border-radius:99px;padding:10px 17px;font-size:12.5px;font-weight:700;cursor:pointer">Cancelar</span>
+              <span onClick="{{ salvarProduto }}" style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;border-radius:99px;padding:10px 19px;font-size:12.5px;font-weight:800;cursor:pointer;box-shadow:0 7px 17px rgba(18,118,112,.28)">{{ produtoSalvarLabel }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <!-- DRAWER FICHA DO PRODUTO -->
+  <sc-if value="{{ fcAberto }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fcFechar }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;justify-content:flex-end">
+      <div onClick="{{ pararClique }}" style="width:560px;background:#f7faf9;height:100vh;overflow:auto;box-shadow:-30px 0 80px rgba(9,34,36,.35);animation:deslizar .3s ease-out both">
+        <div style="background:linear-gradient(130deg,#093D44,#0C5862 55%,#0E78B5 130%);color:#fff;padding:24px 26px">
+          <div style="display:flex;align-items:center"><span style="font-size:10.5px;letter-spacing:2.4px;font-weight:700;color:rgba(255,255,255,.6)">FICHA DO PRODUTO · BASE v2026.07</span><span onClick="{{ fcFechar }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:rgba(255,255,255,.22)">✕</span></div>
+          <div style="font-size:20px;font-weight:800;margin-top:8px">{{ fc.canonico }}</div>
+          <div style="font-size:12.5px;color:rgba(255,255,255,.72);margin-top:2px">{{ fc.oficial }} · <span style="font-family:'Spline Sans Mono'">{{ fc.codigo }}</span></div>
+          <div style="display:flex;gap:8px;margin-top:14px">
+            <div style="flex:1;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);border-radius:13px;padding:9px 11px"><div style="font-size:15px;font-weight:800">{{ fc.regime }}</div><div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:2px">regime após carga</div></div>
+            <div style="flex:1;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);border-radius:13px;padding:9px 11px"><div style="font-size:15px;font-weight:800;color:{{ fc.riscoC }}">{{ fc.risco }}</div><div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:2px">risco feed safety</div></div>
+            <div style="flex:1;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);border-radius:13px;padding:9px 11px"><div style="font-size:15px;font-weight:800">{{ fc.usos }}</div><div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:2px">viagens em 2026</div></div>
+          </div>
+        </div>
+        <div style="padding:18px 22px;display:flex;flex-direction:column;gap:12px">
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:16px;padding:16px">
+            <div style="font-size:13px;font-weight:800">Restrições e combinações</div>
+            <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px">
+              <sc-for list="{{ fc.restricoes }}" as="fr" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;gap:10px;background:#f7faf9;border-radius:11px;padding:9px 12px"><span style="width:22px;height:22px;border-radius:8px;flex:none;background:{{ fr.bg }};color:{{ fr.c }};font-size:10.5px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ fr.icon }}</span><span style="font-size:12.5px;font-weight:600;flex:1">{{ fr.t }}</span></div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:16px;padding:16px">
+            <div style="font-size:13px;font-weight:800">Nomes comerciais e regionais</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">
+              <sc-for list="{{ fc.nomes }}" as="fn" hint-placeholder-count="5"><span style="font-size:11.5px;font-weight:600;color:#3c4f4e;background:#f0f4f3;border-radius:99px;padding:4px 11px">{{ fn.n }} <span style="color:#9db0ae">· {{ fn.reg }}</span></span></sc-for>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:16px;padding:16px">
+            <div style="font-size:13px;font-weight:800">Fonte e governança</div>
+            <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px">
+              <div style="display:flex;justify-content:space-between;font-size:12px;background:#f7faf9;border-radius:10px;padding:8px 12px"><span style="color:#7c8f8d">fonte</span><span style="font-weight:700">IDTF internacional + tradução validada</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;background:#f7faf9;border-radius:10px;padding:8px 12px"><span style="color:#7c8f8d">evidência da fonte</span><span onClick="{{ fcEvidencia }}" style="font-weight:700;color:#0C5862;cursor:pointer">IDTF #{{ fc.codigoNumero }} · ver original →</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;background:#f7faf9;border-radius:10px;padding:8px 12px"><span style="color:#7c8f8d">responsável</span><span style="font-weight:700">Helena Duarte · Qualidade</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;background:#f7faf9;border-radius:10px;padding:8px 12px"><span style="color:#7c8f8d">última atualização</span><span style="font-family:'Spline Sans Mono';font-weight:600">28 jul 2026 · v2026.07</span></div>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:16px;padding:16px">
+            <div style="font-size:13px;font-weight:800">Histórico de alterações</div>
+            <div style="display:flex;flex-direction:column;margin-top:10px">
+              <sc-for list="{{ fc.hist }}" as="fh" hint-placeholder-count="3">
+                <div style="display:flex;gap:11px">
+                  <div style="display:flex;flex-direction:column;align-items:center;width:14px;flex:none"><span style="width:8px;height:8px;border-radius:99px;background:{{ fh.c }};box-shadow:0 0 0 3px {{ fh.glow }};margin-top:4px"></span><span style="flex:1;width:2px;background:{{ fh.line }};margin-top:4px"></span></div>
+                  <div style="padding-bottom:12px;flex:1"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><span style="font-size:12.5px;font-weight:700">{{ fh.t }}</span><span style="font-family:'Spline Sans Mono';font-size:10.5px;color:#7c8f8d">{{ fh.quando }}</span></div><div style="font-size:11.5px;color:#5c706e;margin-top:1px">{{ fh.sub }}</div></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:linear-gradient(90deg,#fdfaf3,#fff);border:1px dashed #e5d9b8;border-radius:14px;padding:12px 15px">
+            <div style="font-size:12px;font-weight:800">Colisões e recusas de sinônimo</div>
+            <div style="font-size:11.5px;color:#5c706e;margin-top:5px;line-height:1.55">{{ fc.colisoes }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <!-- MODAL CLASSIFICAR -->
+  <sc-if value="{{ clAberto }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ clFechar }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:560px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Classificar "{{ clTermo }}"</div><span onClick="{{ clFechar }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:3px">decisão da Qualidade, registrada com responsável e versão da base. 1 viagem aguarda esta definição.</div>
+        <div style="display:flex;align-items:center;gap:11px;background:linear-gradient(90deg,#eef7f6,#f0f6fa);border:1px solid #d8e8e6;border-radius:14px;padding:12px 15px;margin-top:16px">
+          <span style="width:34px;height:34px;border-radius:11px;flex:none;background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800">✦</span>
+          <div style="flex:1"><div style="font-size:13px;font-weight:800">Sugestão do motor: {{ clSugestao }}</div><div style="font-size:11.5px;color:#5c706e">{{ clSugestaoSub }}</div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:12px">
+          <sc-for list="{{ clOpts }}" as="op" hint-placeholder-count="3">
+            <div onClick="{{ op.onClick }}" style="display:flex;align-items:center;gap:10px;border:1.5px solid {{ op.bd }};background:{{ op.bg }};border-radius:12px;padding:11px 14px;cursor:pointer" style-hover="border-color:#127670">
+              <span style="width:15px;height:15px;border-radius:99px;border:2px solid {{ op.dotBd }};background:{{ op.dot }};flex:none"></span>
+              <div><div style="font-size:13px;font-weight:700">{{ op.t }}</div><div style="font-size:11px;color:#5c706e">{{ op.sub }}</div></div>
+            </div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ clBuscaAtiva }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:10px;background:#f7faf9;border:1.5px solid #d8e8e6;border-radius:14px;padding:12px 14px">
+            <div style="display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #e0e7e5;border-radius:11px;padding:0 12px">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="#7c8f8d" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.6"></circle><line x1="10.5" y1="10.5" x2="13.5" y2="13.5"></line></svg>
+              <input value="{{ clBusca }}" onInput="{{ clOnBusca }}" placeholder="Buscar produto oficial na base…" style="border:none;outline:none;background:transparent;font-size:13px;padding:9px 0;flex:1;color:#0b2224">
+            </div>
+            <div style="display:flex;flex-direction:column;gap:5px;margin-top:8px">
+              <sc-for list="{{ clResultados }}" as="cr" hint-placeholder-count="3">
+                <div onClick="{{ cr.onClick }}" style="display:flex;align-items:center;gap:10px;background:{{ cr.bg }};border:1px solid {{ cr.bd }};border-radius:10px;padding:8px 11px;cursor:pointer" style-hover="border-color:#127670">
+                  <span style="font-family:'Spline Sans Mono';font-size:10.5px;font-weight:600;color:#0C5862;background:#e9f3f2;border-radius:6px;padding:2px 7px;flex:none">{{ cr.codigo }}</span>
+                  <div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:700">{{ cr.n }}</div><div style="font-size:10.5px;color:#5c706e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ cr.of }}</div></div>
+                  <span style="width:14px;height:14px;border-radius:99px;border:2px solid {{ cr.dotBd }};background:{{ cr.dot }};flex:none"></span>
+                </div>
+              </sc-for>
+              <sc-if value="{{ clBuscaVazia }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px;color:#7c8f8d;padding:6px 4px">nada na base com esse nome</div><div onClick="{{ clCriar }}" style="display:flex;align-items:center;gap:11px;border:1.5px dashed #cdd9d7;background:#fbfdfc;border-radius:13px;padding:12px 14px;cursor:pointer;margin-top:4px" style-hover="border-color:#127670;background:#f6fbfa"><span style="width:28px;height:28px;border-radius:9px;flex:none;background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center">+</span><div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:800">Criar produto na base</div><div style="font-size:11px;color:#5c706e;margin-top:1px">quando o produto existe na operação e a norma internacional não cataloga</div></div></div></sc-if>
+            </div>
+          </div>
+        </sc-if>
+        <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+          <span onClick="{{ clFechar }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer;white-space:nowrap" style-hover="background:#e4ebe9">Cancelar</span>
+          <span onClick="{{ clConfirmar }}" style="font-size:13.5px;font-weight:800;border-radius:99px;padding:10px 22px;cursor:{{ clCur }};background:{{ clBg }};color:{{ clC }};white-space:nowrap;box-shadow:{{ clSh }}">Registrar classificação</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:2000;background:#0b2224;color:#fff;border-radius:99px;padding:12px 22px;font-size:13.5px;font-weight:600;box-shadow:0 16px 40px rgba(9,34,36,.35);display:flex;align-items:center;gap:10px"><span style="width:20px;height:20px;border-radius:99px;background:linear-gradient(135deg,#48c78e,#127670);display:flex;align-items:center;justify-content:center;font-size:11px">✓</span>{{ toastMsg }}</div>
+  </sc-if>
+  <sc-if value="{{ modalPerfil }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePerfil }}" style="background:#fff;border-radius:24px;width:460px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Meu perfil</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:16px">
+          <span style="width:76px;height:76px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:26px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #fff,0 0 0 6px #f0debb">RA</span>
+          <div style="font-size:17px;font-weight:800;margin-top:4px">Rafael Antunes</div>
+          <div style="font-size:12.5px;color:#5c706e">rafael.antunes@traxium.com.br</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-top:18px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Papel</span><span style="font-weight:700">Gestor de qualidade</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Autoridade na matriz</span><span style="font-weight:700">nível 3 · Gestor</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Filiais</span><span style="font-weight:700">Rondonópolis, Sorriso</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Liberações assinadas em 2026</span><span style="font-family:'Spline Sans Mono';font-weight:600">14</span></div>
+        </div>
+        <div style="font-size:12px;color:#5c706e;margin-top:12px;line-height:1.5">Toda assinatura sua fica no registro lacrado da viagem. O papel define o que a matriz permite; ninguém assina acima do próprio nível.</div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalPrefs }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePerfil }}" style="background:#fff;border-radius:24px;width:520px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Preferências e notificações</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:16px">
+          <sc-for list="{{ prefs }}" as="pf" hint-placeholder-count="4">
+            <div onClick="{{ pf.onClick }}" style="display:flex;align-items:center;gap:12px;border:1px solid #eef2f1;border-radius:14px;padding:12px 14px;cursor:pointer" style-hover="border-color:#c9d5d3">
+              <div style="flex:1"><div style="font-size:13.5px;font-weight:700">{{ pf.t }}</div><div style="font-size:11.5px;color:#5c706e">{{ pf.sub }}</div></div>
+              <span style="width:40px;height:23px;border-radius:99px;background:{{ pf.swBg }};position:relative;flex:none;transition:background .2s"><span style="position:absolute;top:2.5px;left:{{ pf.swPos }};width:18px;height:18px;border-radius:99px;background:#fff;box-shadow:0 1px 4px rgba(9,34,36,.25);transition:left .2s"></span></span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:12px;color:#5c706e;margin-top:12px">O alerta de bloqueio técnico não pode ser desligado: é requisito da certificação.</div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalPapel }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePop }}" style="background:#fff;border-radius:24px;width:540px;max-height:86vh;overflow:auto;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Papel ativo</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:3px;line-height:1.55">O papel define o que a matriz de autoridade permite assinar. A autoridade escala para cima, nunca para baixo, e ninguém assina acima do próprio nível.</div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-top:16px">
+          <sc-for list="{{ papeisLista }}" as="pp" hint-placeholder-count="5">
+            <div onClick="{{ pp.onClick }}" style="display:flex;align-items:center;gap:13px;border:1.5px solid {{ pp.bd }};background:{{ pp.bg }};border-radius:15px;padding:13px 15px;cursor:pointer;transition:all .15s" style-hover="border-color:#127670">
+              <span style="width:19px;height:19px;border-radius:99px;border:2.5px solid {{ pp.dotBd }};background:{{ pp.dot }};flex:none"></span>
+              <span style="width:34px;height:34px;border-radius:11px;flex:none;background:linear-gradient(135deg,{{ pp.g1 }},{{ pp.g2 }});color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ pp.nivel }}</span>
+              <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:800">{{ pp.n }}</div><div style="font-size:11.5px;color:#5c706e;margin-top:2px;line-height:1.4">{{ pp.resolve }}</div></div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#f7faf9;border-radius:14px;padding:12px 15px;margin-top:14px;font-size:12px;color:#5c706e;line-height:1.55">Nível 0 é técnico: é o nível de autoridade de ninguém. Contaminação não se aprova, se regulariza.</div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalSair }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePop }}" style="background:#fff;border-radius:24px;width:440px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Sair da conta</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;align-items:center;gap:12px;background:#f7faf9;border-radius:15px;padding:13px 15px;margin-top:16px">
+          <span style="width:40px;height:40px;border-radius:99px;flex:none;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">RA</span>
+          <div><div style="font-size:13.5px;font-weight:800">Rafael Antunes</div><div style="font-size:11.5px;color:#5c706e">{{ papelBadge }} · nível {{ papelNivel }} na matriz</div></div>
+        </div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:14px;line-height:1.6">Nada é perdido ao sair. Registro lacrado continua lacrado, e o que estava em preenchimento não foi gravado em lugar nenhum.</div>
+        <div style="display:flex;gap:8px;margin-top:18px;justify-content:flex-end">
+          <span onClick="{{ fecharModalTopo }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer" style-hover="background:#e4ebe9">Cancelar</span>
+          <span onClick="{{ confirmarSair }}" style="background:linear-gradient(135deg,#e46969,#c43d3d);color:#fff;font-size:13.5px;font-weight:800;border-radius:99px;padding:10px 22px;cursor:pointer;box-shadow:0 8px 18px rgba(196,61,61,.3);transition:transform .15s" style-hover="transform:translateY(-1px)">Sair</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ npAberto }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ npFechar }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePop }}" style="background:#fff;border-radius:24px;width:640px;max-height:88vh;overflow:auto;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center;gap:10px"><div style="font-size:16px;font-weight:800">Criar produto na base</div><span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;color:#b97514;background:#fdf3e2;border-radius:99px;padding:3px 10px">GOVERNANÇA</span><span onClick="{{ npFechar }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:3px;line-height:1.55">A base nasce da norma internacional e o Brasil tem coproduto que ela não cataloga. Produto criado aqui entra como proposta e só passa a decidir carga depois de aprovado.</div>
+        <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e;margin-top:18px">NOME OFICIAL</div>
+        <input value="{{ npNome }}" onInput="{{ npOnNome }}" placeholder="como a norma ou a fonte técnica nomeia" style="width:100%;margin-top:8px;border:1.5px solid #e0e7e5;border-radius:14px;padding:13px 15px;font-size:14.5px;outline:none;color:#0b2224">
+        <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e;margin-top:16px">FONTE DO NOME</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">
+          <sc-for list="{{ npFontes }}" as="nf" hint-placeholder-count="4">
+            <span onClick="{{ nf.onClick }}" style="font-size:12.5px;font-weight:600;border-radius:99px;padding:7px 14px;cursor:pointer;border:1.5px solid {{ nf.bd }};background:{{ nf.bg }};color:{{ nf.c }};transition:all .15s">{{ nf.n }}</span>
+          </sc-for>
+        </div>
+        <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e;margin-top:16px">REGIME MÍNIMO QUE ELE EXIGE DE QUEM VEM DEPOIS</div>
+        <div style="display:flex;gap:7px;margin-top:8px">
+          <sc-for list="{{ npRegimes }}" as="nr" hint-placeholder-count="5">
+            <div onClick="{{ nr.onClick }}" style="flex:1;text-align:center;border:1.5px solid {{ nr.bd }};background:{{ nr.bg }};border-radius:13px;padding:10px 6px;cursor:pointer;transition:all .15s" style-hover="border-color:#127670">
+              <div style="font-size:17px;font-weight:800;color:{{ nr.c }}">{{ nr.n }}</div>
+              <div style="font-size:10.5px;color:#5c706e;margin-top:2px">{{ nr.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e;margin-top:16px">SINÔNIMOS REGIONAIS QUE APONTAM PARA ELE</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">
+          <sc-for list="{{ npSinonimos }}" as="ns" hint-placeholder-count="4">
+            <span onClick="{{ ns.onClick }}" style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;border-radius:99px;padding:7px 13px;cursor:pointer;border:1.5px solid {{ ns.bd }};background:{{ ns.bg }};color:{{ ns.c }}"><span style="font-size:10px;font-weight:800">{{ ns.icon }}</span>{{ ns.n }}</span>
+          </sc-for>
+        </div>
+        <sc-if value="{{ npColide }}" hint-placeholder-val="{{ false }}">
+          <div style="border:1px solid #f3d4d4;background:#fdf6f6;border-radius:15px;padding:14px 16px;margin-top:11px">
+            <div style="display:flex;align-items:center;gap:9px"><span style="width:22px;height:22px;border-radius:99px;background:linear-gradient(135deg,#e46969,#c43d3d);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center">!</span><div style="font-size:13px;font-weight:800;color:#c43d3d">Colisão de apelido</div></div>
+            <div style="font-size:12.5px;color:#5c706e;margin-top:7px;line-height:1.5">{{ npColideTxt }}</div>
+          </div>
+        </sc-if>
+        <div style="background:#f7faf9;border-radius:15px;padding:14px 16px;margin-top:16px">
+          <div style="font-size:11px;letter-spacing:1.2px;font-weight:700;color:#7c8f8d">O QUE ACONTECE AO ENVIAR</div>
+          <div style="font-size:12.5px;color:#5c706e;margin-top:8px;line-height:1.55">{{ npEfeito }}</div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:18px;justify-content:flex-end;align-items:center">
+          <span style="margin-right:auto;font-size:11.5px;color:#5c706e;max-width:310px;line-height:1.45">{{ npDica }}</span>
+          <span onClick="{{ npFechar }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer" style-hover="background:#e4ebe9">Cancelar</span>
+          <span onClick="{{ npEnviar }}" style="background:{{ npBg }};color:{{ npC }};font-size:13.5px;font-weight:800;border-radius:99px;padding:10px 22px;cursor:{{ npCur }};box-shadow:{{ npSh }};transition:transform .15s">Enviar para aprovação</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { q: '', toast: null, versaoOpen: false, simOpen: null, comp: 'c1' };
+  matrizDoProduto(p) {
+    if (p.matriz) return { ...p.matriz };
+    if (p.reg === '⊘') return { graos: '⊘', minerais: '⊘', oleos: '⊘', criticos: '⊘', proibidos: '⊘' };
+    if (p.codigo === '10021') return { graos: 'B', minerais: 'B', oleos: 'C', criticos: 'D', proibidos: '⊘' };
+    if (p.codigo === '10034') return { graos: 'A', minerais: 'B', oleos: 'C', criticos: 'D', proibidos: '⊘' };
+    return { graos: p.reg || 'A', minerais: 'B', oleos: 'C', criticos: 'D', proibidos: '⊘' };
+  }
+  formDoProduto(p, novo = false) {
+    return {
+      novo,
+      original: p.codigo || '',
+      canonico: p.canonico || '',
+      oficial: p.oficial || '',
+      codigo: p.codigo || '',
+      categoria: p.categoria || '',
+      estado: p.estado || 'sólido granel',
+      sinonimos: (p.sin || []).join(', '),
+      regras: this.matrizDoProduto(p)
+    };
+  }
+  abrirEditorProduto(p) {
+    this.setState({ catalogoOpen: true, catalogoSel: p.codigo, prodForm: this.formDoProduto(p), simOpen: null, versaoOpen: false });
+  }
+  catalogoPersistido() {
+    try {
+      const salvo = JSON.parse(localStorage.getItem('tx-prototype-catalogo') || '{}');
+      return { edits: salvo.edits || {}, novos: Array.isArray(salvo.novos) ? salvo.novos : [] };
+    } catch {
+      return { edits: {}, novos: [] };
+    }
+  }
+  persistirCatalogo(edits, novos) {
+    try { localStorage.setItem('tx-prototype-catalogo', JSON.stringify({ edits, novos })); } catch { /* protótipo sem armazenamento */ }
+  }
+  comps() {
+    return {
+      c1: { tag: 'C1', n: 'SQT 9E18 · C1', t3: 'milho · casca de soja · farelo de soja', t3Label: 'T-3: milho · casca de soja · farelo de soja' },
+      c2: { tag: 'C2', n: 'SQT 9E18 · C2', t3: 'sorgo · milheto · soja em grãos', t3Label: 'T-3: sorgo · milheto · soja em grãos' },
+      c3: { tag: 'C1', n: 'SQT 7D22 · C1', t3: 'ureia pecuária no T-1: proibido', t3Label: 'T-1 com ureia pecuária' }
+    };
+  }
+  vereditoPara(p, compKey) {
+    if (compKey === 'c3') return { reg: '⊘', veredito: 'Carga anterior proibida', verSub: 'compartimento travado', contraT3: 'a ureia no T-1 trava o compartimento para feed até o procedimento formal, independente do produto consultado.' };
+    if (compKey === 'c2' && p.reg === 'B') return { reg: 'A', veredito: 'Liberado após limpeza A', verSub: 'limpeza seca', contraT3: 'histórico só de grãos limpos; a matriz rebaixa a exigência para regime A.' };
+    return null;
+  }
+  avisar(msg) { this.setState({ toast: msg }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 4200); }
+  base() {
+    const padrao = [
+      { canonico: 'Casca de soja', oficial: 'Soybean hulls', codigo: '10034', categoria: 'subproduto vegetal', estado: 'sólido granel',
+        sin: ['casquinha', 'casca soja', 'soja casca', 'soybean hulls', 'casquinha de soja'],
+        reg: 'A', veredito: 'Liberado após limpeza A', verSub: 'limpeza seca', contraT3: 'compatível com o histórico; regime A pela matriz, limpeza seca com inspeção visual.' },
+      { canonico: 'Farelo de soja', oficial: 'Soybean meal', codigo: '10021', categoria: 'farelo proteico', estado: 'sólido granel',
+        sin: ['farelo', 'soja farelo', 'torta de soja', 'soybean meal', 'farelo hipro'],
+        reg: 'B', veredito: 'Liberado após limpeza B', verSub: 'água sob pressão', contraT3: 'milho no T-1 pede remoção úmida de resíduos; regime B, com os 7 campos de evidência.' },
+      { canonico: 'Ureia agrícola', oficial: 'Urea (feed grade excluded)', codigo: '20411', categoria: 'fertilizante nitrogenado', estado: 'sólido granel',
+        sin: ['adubo', 'ureia', 'fertilizante', 'NPK (ver item próprio)'],
+        reg: '⊘', veredito: 'Carga anterior proibida', verSub: 'para o próximo feed', contraT3: 'transportar ureia aqui tornaria o compartimento proibido para feed até procedimento formal de liberação. Não existe botão de "lavado".' },
+      { canonico: 'DDGS de milho', oficial: 'Distillers dried grains with solubles', codigo: '10142', categoria: 'subproduto de etanol', estado: 'sólido granel',
+        sin: ['DDG', 'DDGS', 'grãos secos de destilaria'],
+        reg: 'B', veredito: 'Liberado após limpeza B', verSub: 'água sob pressão', contraT3: 'resíduo gorduroso do DDGS pede lavagem antes do próximo feed sensível.' },
+      { canonico: 'Óleo de soja degomado', oficial: 'Degummed soybean oil', codigo: '30208', categoria: 'óleo vegetal', estado: 'líquido',
+        sin: ['óleo degomado', 'degomado', 'óleo de soja bruto'],
+        reg: 'C', veredito: 'Liberado após limpeza C', verSub: 'com detergente', contraT3: 'exige tanque; num graneleiro o veredito é não elegível pelo equipamento.' },
+      { canonico: 'Calcário calcítico', oficial: 'Limestone (calcium carbonate)', codigo: '40033', categoria: 'mineral', estado: 'sólido granel',
+        sin: ['calcário', 'pedra moída', 'carbonato de cálcio'],
+        reg: 'A', veredito: 'Liberado após limpeza A', verSub: 'limpeza seca', contraT3: 'mineral inerte; regime A resolve sobre este histórico.' }
+    ];
+    const persistido = this.catalogoPersistido();
+    const edits = this.state.catalogoEdits || persistido.edits;
+    const novos = this.state.produtosNovos || persistido.novos;
+    return padrao.map(p => edits[p.codigo] ? { ...p, ...edits[p.codigo] } : p).concat(novos.map(p => edits[p.codigo] ? { ...p, ...edits[p.codigo] } : p));
+  }
+
+  catalogoVals() {
+    const s = this.state;
+    const todos = this.base();
+    const busca = (s.catalogoBusca || '').trim().toLowerCase();
+    const selecionado = todos.find(p => p.codigo === s.catalogoSel) || todos.find(p => p.codigo === '10021') || todos[0];
+    const form = s.prodForm || this.formDoProduto(selecionado);
+    const corReg = {
+      A: { bg: '#e9f7ef', c: '#1a8f57' }, B: { bg: '#faf3d4', c: '#8a7410' },
+      C: { bg: '#fdf3e2', c: '#b97514' }, D: { bg: '#fdecec', c: '#c43d3d' },
+      '⊘': { bg: '#fdecec', c: '#c43d3d' }
+    };
+    const grupos = [
+      { k: 'graos', nome: 'Grãos e farelos', exemplos: 'milho, soja, cascas e farelos' },
+      { k: 'minerais', nome: 'Minerais e calcários', exemplos: 'calcário, sal e fosfatos' },
+      { k: 'oleos', nome: 'Óleos e gorduras', exemplos: 'óleo vegetal e gordura técnica' },
+      { k: 'criticos', nome: 'Produtos críticos', exemplos: 'alto risco microbiológico ou químico' },
+      { k: 'proibidos', nome: 'Ureia, adubos e tratados', exemplos: 'cargas incompatíveis com feed' }
+    ];
+    const titulos = { A: 'A · limpeza seca', B: 'B · água sob pressão', C: 'C · água e detergente', D: 'D · limpeza e desinfecção', '⊘': 'Combinação proibida' };
+    const lista = todos.filter(p => !busca || (p.canonico + ' ' + p.oficial + ' ' + p.codigo).toLowerCase().includes(busca));
+    const salvar = () => {
+      const f = this.state.prodForm || form;
+      const nome = (f.canonico || '').trim(), codigo = (f.codigo || '').trim();
+      if (!nome || !codigo) { this.avisar('Preencha o nome do produto e o código IDTF antes de salvar.'); return; }
+      if (f.novo && todos.some(p => p.codigo === codigo)) { this.avisar('Esse código IDTF já existe. Abra o produto existente para editar.'); return; }
+      const reg = (f.regras || {}).graos || 'A';
+      const textoReg = reg === '⊘' ? ['Carga anterior proibida', 'combinação proibida'] : ['Liberado após limpeza ' + reg, titulos[reg].split('· ')[1]];
+      const produto = {
+        canonico: nome,
+        oficial: (f.oficial || '').trim() || nome,
+        codigo,
+        categoria: (f.categoria || '').trim() || 'a classificar',
+        estado: (f.estado || '').trim() || 'sólido granel',
+        sin: (f.sinonimos || '').split(',').map(v => v.trim()).filter(Boolean),
+        matriz: { ...f.regras }, reg, veredito: textoReg[0], verSub: textoReg[1],
+        contraT3: 'a exigência é calculada pela matriz vigente conforme o grupo da carga anterior.'
+      };
+      if (f.novo) {
+        const persistido = this.catalogoPersistido();
+        const edits = s.catalogoEdits || persistido.edits;
+        const novos = [...(s.produtosNovos || persistido.novos), produto];
+        this.persistirCatalogo(edits, novos);
+        this.setState({ produtosNovos: novos, catalogoEdits: edits, catalogoOpen: false, catalogoSel: codigo, prodForm: null });
+        this.avisar(nome + ' cadastrado como rascunho da próxima versão da base.');
+      } else {
+        const persistido = this.catalogoPersistido();
+        const edits = { ...(s.catalogoEdits || persistido.edits), [f.original]: produto };
+        const novos = s.produtosNovos || persistido.novos;
+        this.persistirCatalogo(edits, novos);
+        this.setState({ catalogoEdits: edits, produtosNovos: novos, catalogoOpen: false, catalogoSel: codigo, prodForm: null });
+        this.avisar('Matriz de ' + nome + ' atualizada para a próxima versão.');
+      }
+    };
+    return {
+      catalogoAberto: !!s.catalogoOpen,
+      abrirCatalogo: () => this.abrirEditorProduto(selecionado),
+      fecharCatalogo: () => this.setState({ catalogoOpen: false, prodForm: null }),
+      catalogoTotal: todos.length,
+      catalogoBusca: s.catalogoBusca || '', onCatalogoBusca: e => this.setState({ catalogoBusca: e.target.value }),
+      catalogoVazio: lista.length === 0,
+      catalogoProdutos: lista.map(p => {
+        const ativo = (s.catalogoSel || '10021') === p.codigo;
+        const cr = corReg[p.reg] || corReg.A;
+        return { ...p, bg: ativo ? '#eef7f6' : '#fff', bd: ativo ? '#127670' : '#e1e9e7', iconBg: cr.bg, iconC: cr.c, dot: ativo ? '#127670' : '#c9d5d3', onClick: () => this.abrirEditorProduto(p) };
+      }),
+      novoProduto: () => {
+        const vazio = { canonico: '', oficial: '', codigo: '', categoria: '', estado: 'sólido granel', sin: [], reg: 'A', matriz: { graos: 'A', minerais: 'B', oleos: 'C', criticos: 'D', proibidos: '⊘' } };
+        this.setState({ catalogoSel: '__novo__', prodForm: this.formDoProduto(vazio, true) });
+      },
+      produtoTitulo: form.novo ? 'Cadastrar novo produto' : 'Editar ' + form.canonico,
+      produtoStatus: form.novo ? 'novo rascunho' : 'vigente · v2026.07', produtoStatusC: form.novo ? '#b97514' : '#1a8f57', produtoStatusBg: form.novo ? '#fdf3e2' : '#e9f7ef',
+      produtoNome: form.canonico, produtoOficial: form.oficial, produtoCodigo: form.codigo, produtoCategoria: form.categoria, produtoEstado: form.estado, produtoSinonimos: form.sinonimos,
+      produtoCodigoTravado: !form.novo, produtoCodigoBg: form.novo ? '#fff' : '#f0f4f3',
+      onProdutoNome: e => this.setState({ prodForm: { ...form, canonico: e.target.value } }),
+      onProdutoOficial: e => this.setState({ prodForm: { ...form, oficial: e.target.value } }),
+      onProdutoCodigo: e => { if (form.novo) this.setState({ prodForm: { ...form, codigo: e.target.value.replace(/\D/g, '').slice(0, 8) } }); },
+      onProdutoCategoria: e => this.setState({ prodForm: { ...form, categoria: e.target.value } }),
+      onProdutoEstado: e => this.setState({ prodForm: { ...form, estado: e.target.value } }),
+      onProdutoSinonimos: e => this.setState({ prodForm: { ...form, sinonimos: e.target.value } }),
+      produtoRegras: grupos.map(g => ({ ...g, opcoes: ['A','B','C','D','⊘'].map(valor => {
+        const ativo = (form.regras || {})[g.k] === valor, cr = corReg[valor];
+        return { valor, titulo: titulos[valor], bg: ativo ? cr.bg : '#fff', c: ativo ? cr.c : '#7c8f8d', bd: ativo ? cr.c : '#dce6e4', onClick: () => this.setState({ prodForm: { ...form, regras: { ...form.regras, [g.k]: valor } } }) };
+      }) })),
+      produtoSalvarLabel: form.novo ? 'Cadastrar produto' : 'Salvar nova versão',
+      salvarProduto: salvar
+    };
+  }
+  fichaVals() {
+    const s = this.state;
+    const p = this.base().find(item => item.codigo === s.ficha) || this.base()[0];
+    const matriz = this.matrizDoProduto(p);
+    const limpeza = { A: 'limpeza seca', B: 'água sob pressão', C: 'água e detergente', D: 'limpeza e desinfecção', '⊘': 'combinação proibida' };
+    const cores = { A: ['#1a8f57','#e9f7ef'], B: ['#8a7410','#faf3d4'], C: ['#b97514','#fdf3e2'], D: ['#c43d3d','#fdecec'], '⊘': ['#c43d3d','#fdecec'] };
+    const grupos = [
+      ['graos', 'Após grãos e farelos'], ['minerais', 'Após minerais e calcários'], ['oleos', 'Após óleos e gorduras'],
+      ['criticos', 'Após produtos críticos'], ['proibidos', 'Após ureia, adubos e tratados']
+    ];
+    const riscos = { A: ['baixo','#8ff0bb'], B: ['controlado','#f4df73'], C: ['atenção','#ffc26d'], D: ['alto','#ff8b86'], '⊘': ['proibido','#ff8b86'] };
+    const risco = riscos[p.reg] || riscos.A;
+    const fc = {
+      canonico: p.canonico, oficial: p.oficial, codigo: 'IDTF ' + p.codigo, codigoNumero: p.codigo,
+      regime: p.reg, risco: risco[0], riscoC: risco[1], usos: ({ '10034':'112','10021':'184','20411':'39','10142':'67','30208':'43','40033':'91' })[p.codigo] || 'novo',
+      restricoes: grupos.map(([k, nome]) => { const reg = matriz[k] || 'A', cor = cores[reg]; return { icon: reg, c: cor[0], bg: cor[1], t: nome + ': ' + limpeza[reg] }; }),
+      nomes: (p.sin || []).map(n => ({ n, reg: 'sinônimo aprovado' })),
+      hist: [
+        { t: 'Matriz revisada pela Qualidade', quando: '28 jul 26 · v2026.07', sub: 'regras de limpeza e incompatibilidades validadas por Helena Duarte', c: '#127670', glow: 'rgba(18,118,112,.14)', line: '#e4eae8' },
+        { t: 'Tradução e sinônimos consolidados', quando: '14 jun 26 · v2026.06', sub: 'nomes usados no pátio ligados à entrada oficial', c: '#5b8def', glow: 'rgba(91,141,239,.15)', line: '#e4eae8' },
+        { t: 'Produto incluído na base Brasil', quando: '02 abr 26 · v2026.04', sub: 'entrada internacional validada para uso operacional', c: '#9db0ae', glow: 'rgba(157,176,174,.2)', line: 'transparent' }],
+      colisoes: p.codigo === '10021' ? '"farelinho" aguarda decisão porque também pode significar farelo de trigo. Termos ambíguos nunca entram automaticamente.' : 'Sinônimos ambíguos ou que colidem com outro produto ficam na fila técnica até a decisão formal da Qualidade.'
+    };
+    return {
+      maisOpen: !!s.maisOpen,
+      maisAcoes: [
+        { n: "Copiar o veredito", c: "#0b2224", onClick: () => { this.setState({ maisOpen: false }); this.avisar("Veredito copiado com a versão da base que o produziu, v2026.07."); } },
+        { n: "Histórico deste produto", c: "#0b2224", onClick: () => { this.setState({ maisOpen: false }); this.avisar("Histórico do produto: cada alteração com data, responsável e fonte da decisão."); } },
+        { n: "Sugerir correção na base", c: "#0C5862", onClick: () => { this.setState({ maisOpen: false }); this.avisar("Sugestão registrada para a governança da base. Consulta não altera a base: quem edita é a Qualidade, na seção de governança."); } }
+      ],
+      fcAberto: !!s.ficha, fcFechar: () => this.setState({ ficha: null }),
+      fc,
+      fcEvidencia: () => this.avisar('Entrada IDTF #' + p.codigo + ' aberta com a tradução validada e o diff da versão.')
+    };
+  }
+  renderVals() { return { ...this.navVals(), ...this.novoProdutoVals(), ...this.papelVals(), ...this.perfilVals(), ...this.mainVals() }; }
+  perfilVals() {
+    return {
+      perfilOpen: !!this.state.perfilOpen,
+      onPerfil: () => this.setState(s => ({ perfilOpen: !s.perfilOpen })),
+      modalPerfil: this.state.modalTopo === 'perfil', modalPrefs: this.state.modalTopo === 'prefs',
+      abrirPerfil: () => this.setState({ modalTopo: 'perfil', perfilOpen: false }),
+      abrirPrefs: () => this.setState({ modalTopo: 'prefs', perfilOpen: false }),
+      fecharModalTopo: () => this.setState({ modalTopo: null }),
+      pararCliquePerfil: e => e.stopPropagation(),
+      prefs: [
+        { k: 'bloq', t: 'Bloqueio técnico na filial', sub: 'sempre ativo: requisito da certificação', lock: true },
+        { k: 'fila', t: 'Item há mais de 2h na fila', sub: 'aviso no app e por e-mail' },
+        { k: 'cert', t: 'Certificado de terceiro a vencer', sub: 'aos 30 e aos 15 dias' },
+        { k: 'idtf', t: 'Nova versão da base IDTF', sub: 'quando a Qualidade publicar revisão' }
+      ].map(p => {
+        const on = p.lock || (this.state.prefsOn || { fila: true, cert: true, idtf: false })[p.k];
+        return { ...p, swBg: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#dde5e3', swPos: on ? '19.5px' : '2.5px',
+          onClick: () => { if (p.lock) return; const cur = this.state.prefsOn || { fila: true, cert: true, idtf: false }; this.setState({ prefsOn: { ...cur, [p.k]: !cur[p.k] } }); } };
+      })
+    };
+  }
+  papelVals() {
+    const diz = m => { if (typeof this.avisar === 'function') this.avisar(m); };
+    const PAPEIS = [
+      { n: 'Inspetor de pátio', nivel: 1, resolve: 'condição física do equipamento: checklist reprovado, foto ausente', g1: '#9fc9c6', g2: '#6ba8a4' },
+      { n: 'Tráfego', nivel: 2, resolve: 'pendência simples: certificação a vencer, sincronização pendente', g1: '#5b8def', g2: '#4c5bc0' },
+      { n: 'Gestor de qualidade', nivel: 3, resolve: 'pendência corrigível mediante evidência da correção', g1: '#127670', g2: '#0E78B5' },
+      { n: 'Diretoria e Resp. Técnico', nivel: 4, resolve: 'impacto contratual, risco residual aceito, terceiro emergencial', g1: '#e8a33d', g2: '#d97544' },
+      { n: 'Auditor interno', nivel: 0, resolve: 'somente leitura, mais abrir não conformidade', g1: '#c9d5d3', g2: '#9db0ae' }
+    ];
+    const ativo = this.state.papelAtivo || 'Gestor de qualidade';
+    const atual = PAPEIS.find(p => p.n === ativo) || PAPEIS[2];
+    return {
+      pararClique: e => e.stopPropagation(),
+      pararCliquePop: e => e.stopPropagation(),
+      papelBadge: atual.n === 'Diretoria e Resp. Técnico' ? 'Diretoria' : atual.n.split(' ')[0],
+      papelNivel: atual.nivel,
+      modalPapel: this.state.modalTopo === 'papel',
+      modalSair: this.state.modalTopo === 'sair',
+      abrirPapel: () => this.setState({ modalTopo: 'papel', perfilOpen: false }),
+      abrirSair: () => this.setState({ modalTopo: 'sair', perfilOpen: false }),
+      confirmarSair: () => { this.setState({ modalTopo: null }); diz('Sessão encerrada. Registros assinados continuam no dossiê com seu nome e a data.'); },
+      papeisLista: PAPEIS.map(p => {
+        const on = p.n === ativo;
+        return { ...p, onClick: () => { this.setState({ papelAtivo: p.n, modalTopo: null }); diz('Papel ativo agora é ' + p.n + ', nível ' + p.nivel + '. A fila e as ações de assinatura passam a refletir esta autoridade.'); },
+          bd: on ? '#127670' : '#e0e7e5', bg: on ? '#eef7f6' : '#fff',
+          dot: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#fff', dotBd: on ? '#127670' : '#c9d5d3' };
+      })
+    };
+  }
+  componentDidMount() {
+    this._txFora = ev => { if (!ev.target.closest || !ev.target.closest('[data-tx-pop]')) this.setState({ perfilOpen: false, filialOpen: false, periodoOpen: false, menuOpen: false, versaoOpen: false, notifOpen: false }); };
+    this._txEsc = ev => { if (ev.key === 'Escape') this.setState({ perfilOpen: false, filialOpen: false, periodoOpen: false, menuOpen: false, versaoOpen: false, notifOpen: false, modalTopo: null }); };
+    document.addEventListener('mousedown', this._txFora);
+    document.addEventListener('keydown', this._txEsc);
+  }
+  novoProdutoVals() {
+    const s = this.state;
+    const FONTES = ['GMP+ FSA', 'Compêndio brasileiro', 'Laudo do fabricante', 'Ainda sem fonte'];
+    const REG = [{ n: 'A', sub: 'seca' }, { n: 'B', sub: 'água' }, { n: 'C', sub: 'detergente' }, { n: 'D', sub: 'desinfecção' }, { n: '⊘', sub: 'proibido' }];
+    const SUG = ['casquinha', 'farelinho', 'raspa', 'torta'];
+    const OCUPADOS = { casquinha: 'Casca de soja peletizada', torta: 'Torta de algodão' };
+    const marcados = s.npSin || [];
+    const colisao = marcados.find(x => OCUPADOS[x]);
+    const pronto = (s.npNome || '').trim().length >= 3 && !!s.npFonte && !!s.npReg && !colisao;
+    return {
+      npAberto: !!s.np,
+      clCriar: () => this.setState({ classif: null, np: true, npNome: '', npFonte: null, npReg: null, npSin: [] }),
+      npFechar: () => this.setState({ np: false }),
+      npNome: s.npNome || '', npOnNome: e => this.setState({ npNome: e.target.value }),
+      npFontes: FONTES.map(n => { const on = s.npFonte === n; return { n, onClick: () => this.setState({ npFonte: n }), bd: on ? '#127670' : '#e0e7e5', bg: on ? '#eef7f6' : '#fff', c: on ? '#0C5862' : '#3c4f4e' }; }),
+      npRegimes: REG.map(r => { const on = s.npReg === r.n; return { ...r, onClick: () => this.setState({ npReg: r.n }), bd: on ? '#127670' : '#e0e7e5', bg: on ? '#eef7f6' : '#fff', c: on ? '#0C5862' : '#3c4f4e' }; }),
+      npSinonimos: SUG.map(n => {
+        const on = marcados.includes(n), ocupado = !!OCUPADOS[n];
+        return { n, icon: on ? '✓' : '+',
+          bd: on ? (ocupado ? '#c43d3d' : '#127670') : '#e0e7e5',
+          bg: on ? (ocupado ? '#fdf6f6' : '#eef7f6') : '#fff',
+          c: on ? (ocupado ? '#c43d3d' : '#0C5862') : '#5c706e',
+          onClick: () => this.setState({ npSin: on ? marcados.filter(x => x !== n) : marcados.concat([n]) }) };
+      }),
+      npColide: !!colisao,
+      npColideTxt: colisao ? ('"' + colisao + '" já aponta para ' + OCUPADOS[colisao] + '. Um mesmo apelido em dois produtos com regimes diferentes é o que mata a confiança na base: o motorista escreve o apelido e ninguém sabe qual limpeza vale.') : '',
+      npEfeito: 'O produto entra como proposta na governança da base, com seu nome e a data. Ele não decide carga nenhuma até a Qualidade aprovar, e a fila de classificação continua travando quem usar esse nome.',
+      npDica: colisao ? 'Resolva a colisão de apelido antes de enviar.'
+        : ((s.npNome || '').trim().length < 3 ? 'O nome oficial é o que a base vai guardar.'
+        : (!s.npFonte ? 'Declare a fonte. "Ainda sem fonte" é resposta válida e fica visível na ficha.'
+        : (!s.npReg ? 'O regime mínimo é o que este produto exige de quem carregar depois dele.'
+        : 'Pronto. Vai como proposta, não como verdade.'))),
+      npBg: pronto ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#eef2f1', npC: pronto ? '#fff' : '#9db0ae',
+      npSh: pronto ? '0 8px 18px rgba(18,118,112,.35)' : 'none', npCur: pronto ? 'pointer' : 'not-allowed',
+      npEnviar: () => {
+        if (!pronto) return;
+        const nome = s.npNome.trim();
+        this.setState({ np: false });
+        this.avisar(nome + ' enviado como proposta para a governança da base, regime mínimo ' + s.npReg + '. Não decide carga até ser aprovado.');
+      }
+    };
+  }
+  navVals() {
+    const c = this.state.navC ?? (localStorage.getItem('tx-nav') === '1');
+    return { navW: c ? '84px' : '264px', navPad: c ? '14px' : '16px', navL: c ? 'none' : 'block', navSec: c ? 'none' : 'block', navCard: c ? 'none' : 'block', navFlip: c ? 'rotate(180deg)' : 'none',
+      navToggle: () => { const n = !c; localStorage.setItem('tx-nav', n ? '1' : '0'); this.setState({ navC: n }); } };
+  }
+  mainVals() {
+    const s = this.state, q = s.q.trim().toLowerCase();
+    const regT = { A: { regBg: '#e9f7ef', regC: '#1a8f57', verC: '#1a8f57', verBg: '#f4faf6', verBd: '#cdeeda', regIcon: 'A' },
+      B: { regBg: '#faf3d4', regC: '#8a7410', verC: '#8a7410', verBg: '#fdfbf0', verBd: '#eee3ae', regIcon: 'B' },
+      C: { regBg: '#fdf3e2', regC: '#b97514', verC: '#b97514', verBg: '#fdfaf3', verBd: '#f0debb', regIcon: 'C' },
+      D: { regBg: '#fdecec', regC: '#c43d3d', verC: '#c43d3d', verBg: '#fdf6f6', verBd: '#f3d4d4', regIcon: 'D' },
+      '⊘': { regBg: '#fdecec', regC: '#c43d3d', verC: '#c43d3d', verBg: '#fdf6f6', verBd: '#f3d4d4', regIcon: '⊘' } };
+    const hits = q.length < 2 ? [] : this.base().filter(p =>
+      (p.canonico + ' ' + p.oficial + ' ' + p.codigo + ' ' + p.sin.join(' ')).toLowerCase().includes(q));
+    const comps = this.comps(), compSel = comps[s.comp];
+    const resultados = hits.slice(0, 3).map((p, i) => {
+      const override = this.vereditoPara(p, s.comp);
+      const eff = override ? { ...p, ...override } : p;
+      return { ...eff, ...regT[eff.reg],
+        z: s.simOpen === i ? 120 : 1,
+        sinonimos: p.sin.map(t => ({ t, c: t.toLowerCase().includes(q) && q.length > 1 ? '#0C5862' : '#5c706e', bg: t.toLowerCase().includes(q) && q.length > 1 ? '#d8ebe9' : '#f0f4f3' })),
+        simOpen: s.simOpen === i,
+        simular: () => this.setState({ simOpen: s.simOpen === i ? null : i }),
+        abrirFicha: () => this.setState({ ficha: p.codigo }),
+      abrirMais: () => this.setState(st => ({ maisOpen: !st.maisOpen })),
+        editarProduto: () => this.abrirEditorProduto(p) };
+    });
+    const compartimentos = Object.keys(comps).map(k => ({ ...comps[k],
+      bg: s.comp === k ? '#eef7f6' : '#fff',
+      onClick: () => { this.setState({ comp: k, simOpen: null }); this.avisar('Recalculado contra ' + comps[k].n + '. O veredito muda porque o fato (T-3) mudou.'); } }));
+    return {
+      ...this.catalogoVals(),
+      q: s.q, onQ: e => this.setState({ q: e.target.value }), temQ: q.length > 0,
+      limparQ: () => this.setState({ q: '' }),
+      sugestoes: ['casquinha', 'farelo', 'adubo', 'DDG', 'óleo degomado', 'calcário'].map(t => ({ t, onClick: () => this.setState({ q: t }) })),
+      resultados, compartimentos, compSel: compSel.n, compT3: compSel.t3Label,
+      ...this.fichaVals(),
+      semResultado: q.length >= 2 && hits.length === 0,
+      mostraLegenda: hits.length === 0 && q.length < 2,
+      vereditos: [
+        { l: 'Liberado', icon: '✓', c: '#1a8f57', bg: '#e9f7ef' },
+        { l: 'Após limpeza A', icon: 'A', c: '#1a8f57', bg: '#e9f7ef' },
+        { l: 'Após limpeza B', icon: 'B', c: '#8a7410', bg: '#faf3d4' },
+        { l: 'Após limpeza C', icon: 'C', c: '#b97514', bg: '#fdf3e2' },
+        { l: 'Após limpeza D', icon: 'D', c: '#c43d3d', bg: '#fdecec' },
+        { l: 'Procedimento especial', icon: '!', c: '#b97514', bg: '#fdf3e2' },
+        { l: 'Carga anterior proibida', icon: '⊘', c: '#c43d3d', bg: '#fdecec' },
+        { l: 'Não identificado', icon: '?', c: '#b97514', bg: '#fdf3e2' },
+        { l: 'Aguardando Qualidade', icon: '⏱', c: '#4c5bc0', bg: '#eceffa' }
+      ],
+      fila: [
+        { termo: 'bagacinho de cana peletizado', quem: 'Ana Beltrão (despachante)', quando: 'hoje, 08:14', sug: 'Sugarcane bagasse, pelleted (IDTF 10093)', sugSub: '88% de similaridade textual · mesma categoria' },
+        { termo: 'polpa cítrica', quem: 'app do motorista · VG-2499', quando: 'ontem, 16:40', sug: 'Citrus pulp, dried (IDTF 10177)', sugSub: '92% de similaridade · sinônimo já existe em inglês' },
+        { termo: 'premix fazenda', quem: 'importação de planilha', quando: 'segunda, 11:02', sug: 'termo ambíguo, sem candidato único', sugSub: 'pode ser premix mineral (40071) ou vitamínico (40088)' }
+      ].filter(f => !(s.clFeitos || []).includes(f.termo)).map(f => ({ ...f,
+        classificar: e => { e.stopPropagation(); this.setState({ classif: f, clOpt: null }); } })),
+      clAberto: !!s.classif, clFechar: () => this.setState({ classif: null }),
+      pararClique: e => e.stopPropagation(),
+      clTermo: (s.classif || {}).termo || '', clSugestao: (s.classif || {}).sug || '', clSugestaoSub: (s.classif || {}).sugSub || '',
+      clOpts: [
+        { k: 'vincular', t: 'Aceitar sugestão e criar sinônimo', sub: 'o termo passa a resolver direto nas próximas buscas' },
+        { k: 'outro', t: 'Vincular a outro produto oficial', sub: 'buscar manualmente na base IDTF' },
+        { k: 'detalhe', t: 'Pedir detalhe a quem registrou', sub: 'o termo continua bloqueado até a resposta' }
+      ].map(o => {
+        const on = s.clOpt === o.k;
+        return { ...o, onClick: () => this.setState({ clOpt: o.k }),
+          bd: on ? '#127670' : '#e0e7e5', bg: on ? '#eef7f6' : '#fff',
+          dot: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#fff', dotBd: on ? '#127670' : '#c9d5d3' };
+      }),
+      clBuscaAtiva: s.clOpt === 'outro',
+      clBusca: s.clBusca || '', clOnBusca: e => this.setState({ clBusca: e.target.value }),
+      clResultados: (() => {
+        const base = [
+          { codigo: '10093', n: 'Bagaço de cana peletizado', of: 'Sugarcane bagasse, pelleted' },
+          { codigo: '10177', n: 'Polpa cítrica seca', of: 'Citrus pulp, dried' },
+          { codigo: '40071', n: 'Premix mineral', of: 'Mineral premix' },
+          { codigo: '40088', n: 'Premix vitamínico', of: 'Vitamin premix' },
+          { codigo: '10034', n: 'Casca de soja', of: 'Soybean hulls' }
+        ];
+        const qb = (s.clBusca || '').trim().toLowerCase();
+        return (qb ? base.filter(b => (b.n + ' ' + b.of + ' ' + b.codigo).toLowerCase().includes(qb)) : base.slice(0, 3)).map(b => {
+          const on = s.clAlvo === b.codigo;
+          return { ...b, onClick: () => this.setState({ clAlvo: b.codigo }),
+            bg: on ? '#eef7f6' : '#fff', bd: on ? '#127670' : '#e8eeec',
+            dot: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#fff', dotBd: on ? '#127670' : '#c9d5d3' };
+        });
+      })(),
+      clBuscaVazia: (s.clBusca || '').trim().length > 0 && !['bagaço', 'bagaco', 'polpa', 'citrus', 'premix', 'mineral', 'vitam', 'casca', 'soja', 'soybean', 'sugarcane', '100', '400'].some(t => (s.clBusca || '').trim().toLowerCase().includes(t) || t.includes((s.clBusca || '').trim().toLowerCase())),
+      clBg: (s.clOpt && (s.clOpt !== 'outro' || s.clAlvo)) ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#eef2f1',
+      clC: (s.clOpt && (s.clOpt !== 'outro' || s.clAlvo)) ? '#fff' : '#9db0ae', clSh: (s.clOpt && (s.clOpt !== 'outro' || s.clAlvo)) ? '0 8px 18px rgba(18,118,112,.35)' : 'none',
+      clCur: (s.clOpt && (s.clOpt !== 'outro' || s.clAlvo)) ? 'pointer' : 'not-allowed',
+      clConfirmar: () => {
+        if (!s.clOpt || !s.classif || (s.clOpt === 'outro' && !s.clAlvo)) return;
+        const termo = s.classif.termo;
+        this.setState({ classif: null, clFeitos: [...(s.clFeitos || []), termo] });
+        this.avisar(s.clOpt === 'detalhe' ? 'Pedido de detalhe enviado. "' + termo + '" segue bloqueado até a resposta.' : 'Classificação registrada por Rafael Antunes na v2026.07. A viagem que citava "' + termo + '" já reavalia sozinha.');
+      },
+      enviarFila: () => { this.avisar('"' + s.q + '" entrou na fila técnica. A viagem que o citar fica bloqueada até a definição.'); this.setState({ q: '' }); },
+      versaoOpen: s.versaoOpen, onVersao: () => this.setState({ versaoOpen: !s.versaoOpen }),
+      versoes: [
+        { v: 'v2026.07', sub: 'publicada 28 jul · 1.240 produtos', tag: 'vigente', tagC: '#1a8f57', tagBg: '#e9f7ef', dot: '#1a8f57', glow: 'rgba(26,143,87,.16)' },
+        { v: 'v2026.06', sub: '14 jun · usada em 312 decisões', tag: 'arquivada', tagC: '#5c706e', tagBg: '#f0f4f3', dot: '#9db0ae', glow: 'rgba(157,176,174,.2)' },
+        { v: 'v2026.04', sub: '02 abr · usada em 489 decisões', tag: 'arquivada', tagC: '#5c706e', tagBg: '#f0f4f3', dot: '#9db0ae', glow: 'rgba(157,176,174,.2)' }
+      ],
+      toast: !!s.toast, toastMsg: s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

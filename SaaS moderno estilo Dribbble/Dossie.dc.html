@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<script src="./prototype-shell.js" defer></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f2f5f4;font-family:'Hanken Grotesk',sans-serif;color:#0b2224;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0C5862;text-decoration:none}a:hover{color:#127670}
+@keyframes txsh{from{background-position:-600px 0}to{background-position:600px 0}}
+@keyframes txbar{from{width:6%}to{width:96%}}
+</style>
+</helmet>
+<div style="display:flex;min-height:100vh;min-width:1560px" data-screen-label="Dossiê de auditoria">
+  <!-- SIDEBAR -->
+  <div style="width:{{ navW }};flex:none;background:linear-gradient(178deg,#093D44,#0A4650);color:#fff;display:flex;flex-direction:column;padding:24px {{ navPad }};position:sticky;top:0;height:100vh;transition:width .25s ease;overflow-x:hidden;overflow-y:auto">
+    <div style="display:flex;align-items:center;gap:10px;padding:4px 8px 22px">
+      <svg width="34" height="34" viewBox="0 0 32 32"><defs><linearGradient id="lgT" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1a9e93"></stop><stop offset="1" stop-color="#0E78B5"></stop></linearGradient></defs><polygon points="16,2.5 27.5,9 27.5,23 16,29.5 4.5,23 4.5,9" fill="url(#lgT)"></polygon><polyline points="9,20 13,13 18,17 23,10" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></polyline><circle cx="9" cy="20" r="1.6" fill="#fff"></circle><circle cx="13" cy="13" r="1.6" fill="#fff"></circle><circle cx="18" cy="17" r="1.6" fill="#fff"></circle><circle cx="23" cy="10" r="1.6" fill="#fff"></circle></svg>
+      <div style="display:{{ navL }}"><div style="font-weight:800;font-size:17px;letter-spacing:.2px">Traxium</div><div style="font-size:10.5px;letter-spacing:2.2px;color:rgba(255,255,255,.5);text-transform:uppercase">Compliance</div></div>
+    </div>
+    <a href="Torre de Controle v2.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;font-size:14px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="5.6"></circle><circle cx="8" cy="8" r="1.4" fill="currentColor" stroke="none"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Torre de Controle</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">7</span></a>
+    <div style="font-size:10.5px;letter-spacing:1.8px;color:rgba(255,255,255,.38);padding:20px 12px 8px;font-weight:700;display:{{ navSec }}">OPERAÇÃO</div>
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:14px;color:rgba(255,255,255,.66)">
+      <a href="Viagens.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 8h9"></path><path d="M8 4.5 11.5 8 8 11.5"></path></svg><span style="display:{{ navL }};white-space:nowrap">Viagens</span></a>
+      <a href="Excecoes.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6"></circle><line x1="8" y1="4.8" x2="8" y2="8.6"></line><circle cx="8" cy="11.2" r=".9" fill="currentColor" stroke="none"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Exceções e liberações</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">5</span></a>
+      <a href="Inspecoes.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 6.5 12 13 4.5"></path></svg><span style="display:{{ navL }};white-space:nowrap">Inspeções</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">3</span></a>
+      <a href="Limpezas.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.8c2.4 2.8 3.7 4.6 3.7 6.5a3.7 3.7 0 1 1-7.4 0c0-1.9 1.3-3.7 3.7-6.5z"></path></svg><span style="display:{{ navL }};white-space:nowrap">Limpezas</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">3</span></a>
+    </div>
+    <div style="font-size:10.5px;letter-spacing:1.8px;color:rgba(255,255,255,.38);padding:20px 12px 8px;font-weight:700;display:{{ navSec }}">PILARES</div>
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:14px;color:rgba(255,255,255,.66)">
+      <a href="Motor IDTF.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="2.5" width="11" height="11" rx="3"></rect><line x1="8" y1="2.5" x2="8" y2="13.5"></line></svg><span style="display:{{ navL }};white-space:nowrap">Motor IDTF</span></a>
+      <a href="Subcontratados.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5.4" cy="6.2" r="2.4"></circle><circle cx="10.8" cy="6.2" r="2.4"></circle><path d="M2.5 13c.6-2 1.7-3 3-3s2.3 1 2.9 3" stroke-linecap="round"></path></svg><span style="display:{{ navL }};white-space:nowrap">Subcontratados</span></a>
+      <a href="Motoristas.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="5.4" r="2.6"></circle><path d="M3 13.4c.8-2.6 2.6-3.9 5-3.9s4.2 1.3 5 3.9"></path></svg><span style="display:{{ navL }};white-space:nowrap">Motoristas</span></a>
+      <a href="Acessos Externos.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.4 8.6a3.2 3.2 0 1 0 0-.01z"></path><path d="M9 7.2 14 2.2M12 4.2l1.6 1.6M10.6 5.6l1.6 1.6"></path></svg><span style="display:{{ navL }};white-space:nowrap">Acessos externos</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">2</span></a>
+      <a href="Academy.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M2 6.3 8 3.4l6 2.9-6 2.9z"></path><path d="M4.6 8.4v2.6c0 .9 1.5 1.8 3.4 1.8s3.4-.9 3.4-1.8V8.4" stroke-linecap="round"></path></svg><span style="display:{{ navL }};white-space:nowrap">Academy</span></a>
+      <a href="Ativos e Frota.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="4.5" width="8" height="5.5" rx="1.4"></rect><path d="M10 6.5h2.4l1.6 2v1.5h-4z" stroke-linejoin="round"></path><circle cx="5" cy="11.8" r="1.4"></circle><circle cx="11.6" cy="11.8" r="1.4"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Ativos e frota</span></a>
+    </div>
+    <div style="font-size:10.5px;letter-spacing:1.8px;color:rgba(255,255,255,.38);padding:20px 12px 8px;font-weight:700;display:{{ navSec }}">PROVA</div>
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:14px;color:rgba(255,255,255,.66)">
+      <div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px;background:linear-gradient(90deg,rgba(26,158,147,.35),rgba(14,120,181,.28));border:1px solid rgba(255,255,255,.14);font-weight:700;color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3.2" y="2.5" width="9.6" height="11" rx="2"></rect><line x1="6" y1="6" x2="10" y2="6"></line><line x1="6" y1="9" x2="10" y2="9"></line></svg><span style="display:{{ navL }};white-space:nowrap">Dossiê de auditoria</span></div>
+      <a href="Indicadores.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="4" y1="13" x2="4" y2="8.5"></line><line x1="8" y1="13" x2="8" y2="3.5"></line><line x1="12" y1="13" x2="12" y2="10"></line></svg><span style="display:{{ navL }};white-space:nowrap">Indicadores</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">11/15</span></a>
+      <a href="Nao Conformidades.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="5.8" stroke-dasharray="2.4 2.4"></circle><circle cx="8" cy="8" r="2.2"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Não conformidades</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">4</span></a>
+    </div>
+    <a href="Configuracoes.dc.html" style="margin-top:auto;display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="2.3"></circle><path d="M8 1.8v1.9M8 12.3v1.9M14.2 8h-1.9M3.7 8H1.8M12.4 3.6l-1.3 1.3M4.9 11.1l-1.3 1.3M12.4 12.4l-1.3-1.3M4.9 4.9 3.6 3.6" stroke-linecap="round"></path></svg><span style="display:{{ navL }};white-space:nowrap">Configurações</span></a>
+    <a href="Onboarding Publico.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13V3.8c0-.7.5-1.2 1.2-1.2h5.6c.7 0 1.2.5 1.2 1.2V13"></path><path d="M6 8h7M10.5 5.5 13 8l-2.5 2.5"></path></svg><span style="display:{{ navL }};white-space:nowrap">Onboarding público</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">6 passos</span></a>
+      <a href="App de Campo.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="1.8" width="9" height="12.4" rx="2"></rect><line x1="6.5" y1="4" x2="9.5" y2="4"></line><circle cx="8" cy="11.7" r=".65" fill="currentColor" stroke="none"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Protótipo mobile</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">12 telas</span></a>
+      <div onClick="{{ navToggle }}" title="Recolher ou expandir o menu" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;cursor:pointer;font-size:13px;font-weight:600;color:rgba(255,255,255,.6)" style-hover="background:rgba(255,255,255,.08);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="transform:{{ navFlip }};transition:transform .25s;flex:none"><path d="M9.5 3 4.5 8l5 5"></path><line x1="12" y1="3" x2="12" y2="13"></line></svg><span style="display:{{ navL }};white-space:nowrap">Recolher menu</span></div><div style="display:{{ navCard }};margin-top:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px">
+      <div style="font-size:12px;color:rgba(255,255,255,.55);margin-bottom:8px">Critério de aceite</div>
+      <div style="font-size:12.5px;line-height:1.5;color:rgba(255,255,255,.8)">Reconstruir uma amostra de 3 a 6 meses atrás em <strong>minutos</strong>, não em dias.</div>
+    </div>
+  </div>
+  <!-- CONTENT -->
+  <div style="flex:1;display:flex;flex-direction:column;padding:26px 32px 48px;gap:20px;min-width:0">
+    <div style="display:flex;align-items:center;gap:16px">
+      <div><div style="font-size:24px;font-weight:800">Dossiê de auditoria</div><div style="font-size:13.5px;color:#5c706e;margin-top:2px">reconstrói a decisão de qualquer viagem em menos de dois minutos, sem WhatsApp</div></div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+        <div data-tx-pop style="position:relative">
+          <div onClick="{{ onPerfil }}" style="width:38px;height:38px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13.5px;box-shadow:0 0 0 3px #fff,0 0 0 4.5px #d8e4e2;cursor:pointer" style-hover="box-shadow:0 0 0 3px #fff,0 0 0 4.5px #127670">RA</div>
+          <sc-if value="{{ perfilOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;right:0;top:48px;background:#fff;border:1px solid #e4eae8;border-radius:16px;box-shadow:0 16px 40px rgba(9,61,68,.16);padding:6px;width:250px;z-index:60;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;gap:11px;padding:11px 12px;border-bottom:1px solid #f0f4f3;margin-bottom:4px">
+                <span style="width:38px;height:38px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none">RA</span>
+                <div><div style="font-size:13.5px;font-weight:800">Rafael Antunes</div><div style="font-size:11.5px;color:#5c706e">Gestor de qualidade · GMP+</div></div>
+              </div>
+              <div onClick="{{ abrirPerfil }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer" style-hover="background:#f6f9f8">Meu perfil</div>
+              <div onClick="{{ abrirPrefs }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer" style-hover="background:#f6f9f8">Preferências e notificações</div>
+              <div onClick="{{ abrirPapel }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px" style-hover="background:#f6f9f8">Papel ativo<span style="display:inline-block;font-size:10.5px;font-weight:700;color:#0C5862;background:#e9f3f2;border-radius:99px;padding:2px 9px;white-space:nowrap">{{ papelBadge }}</span></div>
+              <div style="height:1px;background:#f0f4f3;margin:5px 8px"></div>
+              <div onClick="{{ abrirSair }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;color:#c43d3d" style-hover="background:#fdf6f6">Sair</div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:440px 1fr;gap:20px;align-items:start">
+      <!-- AMOSTRA -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:22px">
+          <div style="font-size:15.5px;font-weight:800">1 · Filtrar a amostra</div>
+          <div style="display:flex;flex-direction:column;gap:7px;margin-top:14px">
+            <sc-for list="{{ filtrosAmostra }}" as="fa" hint-placeholder-count="4">
+              <div style="position:relative">
+                <div onClick="{{ fa.onClick }}" style="display:flex;justify-content:space-between;align-items:center;font-size:13px;background:{{ fa.rowBg }};border-radius:12px;padding:10px 14px;cursor:pointer;transition:background .15s" style-hover="background:#f0f4f3" data-comment-anchor="{{ fa.anchor }}"><span style="color:#5c706e">{{ fa.k }}</span><span style="font-weight:700;transition:transform .2s">{{ fa.v }} ▾</span></div>
+                <sc-if value="{{ fa.open }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute;left:0;right:0;top:44px;background:#fff;border:1px solid #e4eae8;border-radius:14px;box-shadow:0 16px 40px rgba(9,61,68,.16);padding:6px;z-index:70;display:flex;flex-direction:column">
+                    <sc-for list="{{ fa.opts }}" as="op" hint-placeholder-count="4">
+                      <div onClick="{{ op.onClick }}" style="display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;background:{{ op.bg }}" style-hover="background:#f6f9f8"><span style="width:7px;height:7px;border-radius:99px;background:{{ op.dot }}"></span>{{ op.n }}</div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:22px">
+          <div style="display:flex;align-items:center"><div style="font-size:15.5px;font-weight:800">2 · Selecionar viagens</div><span style="margin-left:auto;font-size:12px;font-weight:700;color:#0C5862;background:#e9f3f2;border-radius:99px;padding:4px 12px">{{ nSel }} de 4</span></div>
+          <div style="font-size:12.5px;color:#5c706e;margin-top:2px">a amostra que o auditor sorteou</div>
+          <div style="display:flex;flex-direction:column;gap:7px;margin-top:14px">
+            <sc-for list="{{ amostra }}" as="am" hint-placeholder-count="4">
+              <div onClick="{{ am.onClick }}" style="display:flex;align-items:center;gap:11px;border:1.5px solid {{ am.bd }};background:{{ am.bg }};border-radius:14px;padding:12px 14px;cursor:pointer;transition:all .15s" style-hover="border-color:#127670">
+                <span style="width:19px;height:19px;border-radius:6px;flex:none;border:2px solid {{ am.ckBd }};background:{{ am.ck }};display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800">{{ am.ckIcon }}</span>
+                <div style="min-width:0;flex:1"><div style="display:flex;gap:8px;align-items:baseline"><span style="font-family:'Spline Sans Mono';font-size:12px;font-weight:600;color:#0C5862">{{ am.id }}</span><span style="font-size:13.5px;font-weight:700">{{ am.produto }}</span></div><div style="font-size:11.5px;color:#5c706e">{{ am.sub }}</div></div>
+                <span style="display:inline-block;font-size:10.5px;font-weight:700;color:{{ am.decC }};background:{{ am.decBg }};border-radius:99px;padding:3px 9px;white-space:nowrap">{{ am.dec }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div onClick="{{ gerar }}" style="margin-top:16px;text-align:center;font-size:14px;font-weight:800;border-radius:99px;padding:12px 0;cursor:{{ gerarCur }};background:{{ gerarBg }};color:{{ gerarC }};box-shadow:{{ gerarSh }};transition:all .2s">{{ gerarLabel }}</div>
+        </div>
+      </div>
+      <!-- RECONSTRUÇÃO -->
+      <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+        <sc-if value="{{ estadoInicial }}" hint-placeholder-val="{{ true }}">
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:64px 20px;display:flex;flex-direction:column;align-items:center;gap:12px">
+            <span style="width:56px;height:56px;border-radius:99px;background:linear-gradient(135deg,#e9f3f2,#e6eef5);display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 16 16" fill="none" stroke="#0C5862" stroke-width="1.4" stroke-linecap="round"><rect x="3.2" y="2.5" width="9.6" height="11" rx="2"></rect><line x1="6" y1="6" x2="10" y2="6"></line><line x1="6" y1="9" x2="10" y2="9"></line></svg></span>
+            <div style="font-size:16px;font-weight:800">Nenhuma reconstrução gerada ainda</div>
+            <div style="font-size:13.5px;color:#5c706e;max-width:440px;text-align:center;line-height:1.55">Selecione as viagens da amostra à esquerda e gere. Cada viagem vira dezesseis blocos encadeados por hash, lacrados.</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ gerando }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:56px 40px;display:flex;flex-direction:column;align-items:center;gap:16px">
+            <div style="font-size:15px;font-weight:800">Reconstruindo {{ nSel }} viagens…</div>
+            <div style="width:100%;max-width:420px;height:10px;border-radius:99px;background:repeating-linear-gradient(-45deg,#eef2f1 0 5px,#e2e9e7 5px 10px);overflow:hidden"><div style="height:100%;border-radius:99px;background:linear-gradient(90deg,#48c78e,#127670,#0E78B5);animation:txbar 1.4s ease-out forwards"></div></div>
+            <div style="font-size:12.5px;color:#5c706e">lendo T-3, limpezas, inspeções, certificados como estavam na data, assinaturas…</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ gerado }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:24px">
+            <div style="display:flex;align-items:center;gap:6px;padding-bottom:12px;border-bottom:1px solid #f0f4f3;margin-bottom:4px">
+              <sc-for list="{{ vgTabs }}" as="vt" hint-placeholder-count="3">
+                <span onClick="{{ vt.onClick }}" style="display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;border-radius:99px;padding:6px 14px;cursor:pointer;background:{{ vt.bg }};color:{{ vt.c }};transition:all .15s"><span style="width:7px;height:7px;border-radius:99px;background:{{ vt.dot }}"></span>{{ vt.id }}</span>
+              </sc-for>
+              <span style="margin-left:auto;font-size:11.5px;color:#7c8f8d">navegue entre as viagens da amostra</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <div><div style="font-size:16.5px;font-weight:800">Reconstrução · {{ vgAtiva.id }} · {{ vgAtiva.produto }}</div><div style="font-size:12.5px;color:#5c706e;margin-top:2px">{{ vgAtiva.sub }}</div></div>
+              <span style="margin-left:auto;display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:{{ vgAtiva.selC }};background:{{ vgAtiva.selBg }};border:1px solid {{ vgAtiva.selBd }};border-radius:99px;padding:4px 13px"><svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="7" width="9" height="6.5" rx="1.6"></rect><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"></path></svg>{{ vgAtiva.selo }}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;background:#f7faf9;border:1px solid #e8eeec;border-radius:12px;padding:9px 14px;margin-top:12px">
+              <span style="font-size:11px;font-weight:800;letter-spacing:.8px;color:#7c8f8d;flex:none">HASH RAIZ</span>
+              <span style="font-family:'Spline Sans Mono';font-size:12px;font-weight:600;color:#0C5862;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ vgAtiva.hashRaiz }}</span>
+              <span onClick="{{ copiarHash }}" style="font-size:11.5px;font-weight:700;color:#0C5862;cursor:pointer;white-space:nowrap" style-hover="color:#127670">copiar</span>
+              <span onClick="{{ verificarHash }}" style="font-size:11.5px;font-weight:700;color:#fff;background:#0b2224;border-radius:99px;padding:5px 13px;cursor:pointer;white-space:nowrap">Verificar cadeia</span>
+            </div>
+            <sc-if value="{{ vgAtiva.parcial }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:10px;background:#fdfaf3;border:1px dashed #e5d9b8;border-radius:12px;padding:10px 14px;margin-top:10px">
+                <span style="width:9px;height:9px;border-radius:99px;background:#e8a33d;box-shadow:0 0 0 3px rgba(232,163,61,.18);flex:none"></span>
+                <span style="font-size:12.5px;color:#3c4f4e;flex:1"><strong>Reconstrução parcial:</strong> {{ vgAtiva.parcialMsg }}</span>
+                <span onClick="{{ reprocessar }}" style="font-size:11.5px;font-weight:700;color:#0C5862;cursor:pointer;white-space:nowrap" style-hover="color:#127670">Reprocessar bloco →</span>
+              </div>
+            </sc-if>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;margin-top:16px">
+              <sc-for list="{{ blocos }}" as="bl" hint-placeholder-count="16">
+                <div onClick="{{ bl.abrir }}" style="display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:11px;background:{{ bl.bg }};cursor:pointer" style-hover="background:#f6f9f8">
+                  <span style="width:26px;height:26px;border-radius:9px;flex:none;background:{{ bl.nBg }};color:{{ bl.nC }};font-family:'Spline Sans Mono';font-size:10.5px;font-weight:600;display:flex;align-items:center;justify-content:center">{{ bl.n }}</span>
+                  <div style="min-width:0;flex:1"><div style="font-size:13px;font-weight:700">{{ bl.t }}</div><div style="font-size:11px;color:{{ bl.subC }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ bl.sub }}</div></div>
+                  <span style="font-family:'Spline Sans Mono';font-size:9.5px;color:#9db0ae;white-space:nowrap">{{ bl.hash }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="background:linear-gradient(90deg,#fdfaf3,#fff);border:1px dashed #e5d9b8;border-radius:13px;padding:11px 15px;margin-top:14px;font-size:12px;color:#5c706e;line-height:1.5">Bloco sem dado mostra a <strong>ausência</strong> em vez de desaparecer: a lacuna é informação de auditoria. O bloco 14 declara a foto de teto fora do padrão de marca d'água daquela época.</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:16px;flex-wrap:wrap">
+              <span onClick="{{ expPlanilha }}" style="flex:none;white-space:nowrap;display:inline-block;background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;font-size:13px;font-weight:700;border-radius:99px;padding:9px 18px;cursor:pointer;box-shadow:0 6px 14px rgba(18,118,112,.3)" style-hover="transform:translateY(-1px)">Exportar planilha</span>
+              <span onClick="{{ expDoc }}" style="flex:none;white-space:nowrap;display:inline-block;background:#f0f4f3;font-size:13px;font-weight:700;border-radius:99px;padding:9px 18px;cursor:pointer" style-hover="background:#e4ebe9">Documento de reconstrução</span>
+              <span onClick="{{ expPacote }}" style="flex:none;white-space:nowrap;display:inline-block;background:#f0f4f3;font-size:13px;font-weight:700;border-radius:99px;padding:9px 18px;cursor:pointer" style-hover="background:#e4ebe9">Pacote completo (.zip)</span>
+              <span onClick="{{ compartilharAuditor }}" style="flex:none;white-space:nowrap;display:inline-block;background:#fff;border:1px solid #dfe7e5;font-size:13px;font-weight:700;border-radius:99px;padding:9px 18px;cursor:pointer" style-hover="border-color:#127670">Compartilhar com auditor</span>
+              <span style="margin-left:auto;font-size:12px;color:#7c8f8d">+ {{ nOutras }} outras viagens nesta amostra</span>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+  <!-- MODAL BLOCO -->
+  <sc-if value="{{ blAberto }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ blFechar }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:560px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center;gap:10px"><span style="width:30px;height:30px;border-radius:10px;background:#e9f3f2;color:#0C5862;font-family:'Spline Sans Mono';font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex:none">{{ bl.n }}</span><div style="font-size:16px;font-weight:800">{{ bl.t }}</div><span onClick="{{ blFechar }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:3px">como estava na data da viagem, não como está hoje</div>
+        <div style="display:flex;flex-direction:column;gap:5px;margin-top:14px">
+          <sc-for list="{{ bl.campos }}" as="bc" hint-placeholder-count="5"><div style="display:flex;justify-content:space-between;gap:10px;font-size:12.5px;background:#f7faf9;border-radius:11px;padding:9px 13px"><span style="color:#7c8f8d">{{ bc.k }}</span><span style="font-weight:700;text-align:right">{{ bc.v }}</span></div></sc-for>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;background:#f7faf9;border:1px solid #e8eeec;border-radius:11px;padding:9px 13px;margin-top:10px">
+          <span style="font-size:10.5px;font-weight:800;letter-spacing:.8px;color:#7c8f8d">HASH DO BLOCO</span>
+          <span style="font-family:'Spline Sans Mono';font-size:11.5px;font-weight:600;color:#0C5862;flex:1">{{ bl.hashFull }}</span>
+          <span onClick="{{ blCopiar }}" style="font-size:11px;font-weight:700;color:#0C5862;cursor:pointer" style-hover="color:#127670">copiar</span>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+          <span onClick="{{ blBaixar }}" style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;font-size:13px;font-weight:700;border-radius:99px;padding:9px 20px;cursor:pointer;white-space:nowrap;box-shadow:0 6px 14px rgba(18,118,112,.3)" style-hover="transform:translateY(-1px)">Baixar evidências do bloco</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <!-- MODAL AUDITOR -->
+  <sc-if value="{{ auAberto }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ auFechar }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:540px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Compartilhar com o auditor</div><span style="margin-left:10px;font-size:11.5px;font-weight:700;color:#0C5862;background:#e9f3f2;border-radius:99px;padding:3px 11px">visão temporária, só leitura</span><span onClick="{{ auFechar }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="border:1.5px solid #e0e7e5;border-radius:13px;padding:0 14px;margin-top:16px"><input value="{{ auEmail }}" onInput="{{ auOnEmail }}" placeholder="e-mail do auditor, ex.: auditor@qscert.com" style="border:none;outline:none;background:transparent;font-size:13px;padding:11px 0;width:100%;color:#0b2224"></div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:12px"><span style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e">EXPIRA EM</span>
+          <sc-for list="{{ auPrazos }}" as="ap" hint-placeholder-count="3"><span onClick="{{ ap.onClick }}" style="font-size:12px;font-weight:700;border-radius:99px;padding:6px 14px;cursor:pointer;border:1.5px solid {{ ap.bd }};background:{{ ap.bg }};color:{{ ap.c }}">{{ ap.n }}</span></sc-for>
+        </div>
+        <div style="font-size:11.5px;color:#7c8f8d;margin-top:12px;line-height:1.5">O auditor vê a amostra reconstruída e as evidências, sem editar nada. Cada acesso fica logado; o link morre sozinho no prazo.</div>
+        <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+          <span onClick="{{ auFechar }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer;white-space:nowrap" style-hover="background:#e4ebe9">Cancelar</span>
+          <span onClick="{{ auConfirmar }}" style="font-size:13.5px;font-weight:800;border-radius:99px;padding:10px 22px;cursor:{{ auCur }};background:{{ auBg }};color:{{ auC }};white-space:nowrap;box-shadow:{{ auSh }}">Gerar link e enviar</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:1200;background:#0b2224;color:#fff;border-radius:99px;padding:12px 22px;font-size:13.5px;font-weight:600;box-shadow:0 16px 40px rgba(9,34,36,.35);display:flex;align-items:center;gap:10px"><span style="width:20px;height:20px;border-radius:99px;background:linear-gradient(135deg,#48c78e,#127670);display:flex;align-items:center;justify-content:center;font-size:11px">✓</span>{{ toastMsg }}</div>
+  </sc-if>
+  <sc-if value="{{ modalPerfil }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePerfil }}" style="background:#fff;border-radius:24px;width:460px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Meu perfil</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:16px">
+          <span style="width:76px;height:76px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:26px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #fff,0 0 0 6px #f0debb">RA</span>
+          <div style="font-size:17px;font-weight:800;margin-top:4px">Rafael Antunes</div>
+          <div style="font-size:12.5px;color:#5c706e">rafael.antunes@traxium.com.br</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-top:18px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Papel</span><span style="font-weight:700">Gestor de qualidade</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Autoridade na matriz</span><span style="font-weight:700">nível 3 · Gestor</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Filiais</span><span style="font-weight:700">Rondonópolis, Sorriso</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Liberações assinadas em 2026</span><span style="font-family:'Spline Sans Mono';font-weight:600">14</span></div>
+        </div>
+        <div style="font-size:12px;color:#5c706e;margin-top:12px;line-height:1.5">Toda assinatura sua fica no registro lacrado da viagem. O papel define o que a matriz permite; ninguém assina acima do próprio nível.</div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalPrefs }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePerfil }}" style="background:#fff;border-radius:24px;width:520px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Preferências e notificações</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:16px">
+          <sc-for list="{{ prefs }}" as="pf" hint-placeholder-count="4">
+            <div onClick="{{ pf.onClick }}" style="display:flex;align-items:center;gap:12px;border:1px solid #eef2f1;border-radius:14px;padding:12px 14px;cursor:pointer" style-hover="border-color:#c9d5d3">
+              <div style="flex:1"><div style="font-size:13.5px;font-weight:700">{{ pf.t }}</div><div style="font-size:11.5px;color:#5c706e">{{ pf.sub }}</div></div>
+              <span style="width:40px;height:23px;border-radius:99px;background:{{ pf.swBg }};position:relative;flex:none;transition:background .2s"><span style="position:absolute;top:2.5px;left:{{ pf.swPos }};width:18px;height:18px;border-radius:99px;background:#fff;box-shadow:0 1px 4px rgba(9,34,36,.25);transition:left .2s"></span></span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:12px;color:#5c706e;margin-top:12px">O alerta de bloqueio técnico não pode ser desligado: é requisito da certificação.</div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalPapel }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePop }}" style="background:#fff;border-radius:24px;width:540px;max-height:86vh;overflow:auto;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Papel ativo</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:3px;line-height:1.55">O papel define o que a matriz de autoridade permite assinar. A autoridade escala para cima, nunca para baixo, e ninguém assina acima do próprio nível.</div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-top:16px">
+          <sc-for list="{{ papeisLista }}" as="pp" hint-placeholder-count="5">
+            <div onClick="{{ pp.onClick }}" style="display:flex;align-items:center;gap:13px;border:1.5px solid {{ pp.bd }};background:{{ pp.bg }};border-radius:15px;padding:13px 15px;cursor:pointer;transition:all .15s" style-hover="border-color:#127670">
+              <span style="width:19px;height:19px;border-radius:99px;border:2.5px solid {{ pp.dotBd }};background:{{ pp.dot }};flex:none"></span>
+              <span style="width:34px;height:34px;border-radius:11px;flex:none;background:linear-gradient(135deg,{{ pp.g1 }},{{ pp.g2 }});color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ pp.nivel }}</span>
+              <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:800">{{ pp.n }}</div><div style="font-size:11.5px;color:#5c706e;margin-top:2px;line-height:1.4">{{ pp.resolve }}</div></div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#f7faf9;border-radius:14px;padding:12px 15px;margin-top:14px;font-size:12px;color:#5c706e;line-height:1.55">Nível 0 é técnico: é o nível de autoridade de ninguém. Contaminação não se aprova, se regulariza.</div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalSair }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePop }}" style="background:#fff;border-radius:24px;width:440px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Sair da conta</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;align-items:center;gap:12px;background:#f7faf9;border-radius:15px;padding:13px 15px;margin-top:16px">
+          <span style="width:40px;height:40px;border-radius:99px;flex:none;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">RA</span>
+          <div><div style="font-size:13.5px;font-weight:800">Rafael Antunes</div><div style="font-size:11.5px;color:#5c706e">{{ papelBadge }} · nível {{ papelNivel }} na matriz</div></div>
+        </div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:14px;line-height:1.6">Nada é perdido ao sair. Registro lacrado continua lacrado, e o que estava em preenchimento não foi gravado em lugar nenhum.</div>
+        <div style="display:flex;gap:8px;margin-top:18px;justify-content:flex-end">
+          <span onClick="{{ fecharModalTopo }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer" style-hover="background:#e4ebe9">Cancelar</span>
+          <span onClick="{{ confirmarSair }}" style="background:linear-gradient(135deg,#e46969,#c43d3d);color:#fff;font-size:13.5px;font-weight:800;border-radius:99px;padding:10px 22px;cursor:pointer;box-shadow:0 8px 18px rgba(196,61,61,.3);transition:transform .15s" style-hover="transform:translateY(-1px)">Sair</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { sel: { 'VG-2455': true, 'VG-2412': true, 'VG-2344': true }, fase: 'inicial', toast: null,
+    fOpen: null, fVals: { periodo: 'maio a julho 2026', codigo: 'qualquer', produto: 'todos', status: 'concluídas' } };
+  vgDefs() {
+    return [
+      { id: 'VG-2455', produto: 'Milho a granel', sub: '31 jul 2026 · Lucas do Rio Verde MT → Uberlândia MG · gerada em 41 segundos', hashRaiz: '3f9a71c8e2d4b06f5a1e8c9d7b2f4a60d1c3e5f7', selo: 'lacrado · cadeia íntegra', selC: '#1a8f57', selBg: '#e9f7ef', selBd: '#cdeeda', dot: '#1a8f57', parcial: false },
+      { id: 'VG-2412', produto: 'Farelo de soja', sub: '24 jul 2026 · Sorriso MT → Chapecó SC · gerada em 38 segundos', hashRaiz: '8b2e40d7f1a9c35e6d0b4f8a2c7e1d5093f6a8b2', selo: 'lacrado · cadeia íntegra', selC: '#1a8f57', selBg: '#e9f7ef', selBd: '#cdeeda', dot: '#1a8f57', parcial: false },
+      { id: 'VG-2344', produto: 'Sorgo granífero', sub: '10 jul 2026 · Rondonópolis MT → Uberaba MG · gerada em 52 segundos', hashRaiz: 'c47d19f0b6e8a23d5f1c7094e2b8d6a3f50e1c94', selo: 'parcial · 15 de 16 blocos', selC: '#b97514', selBg: '#fdf3e2', selBd: '#f0debb', dot: '#e8a33d', parcial: true,
+        parcialMsg: 'o bloco 14 (fotos) não pôde ser lido do armazenamento frio; a lacuna está declarada e não quebra a cadeia dos demais.' }
+    ];
+  }
+  vgVals() {
+    const s = this.state, defs = this.vgDefs();
+    const ativa = defs.find(v => v.id === (s.vgAtiva || 'VG-2455')) || defs[0];
+    return {
+      vgTabs: defs.map(v => { const on = v.id === ativa.id; return { ...v,
+        onClick: () => this.setState({ vgAtiva: v.id }),
+        bg: on ? '#0b2224' : '#f0f4f3', c: on ? '#fff' : '#3c4f4e' }; }),
+      vgAtiva: ativa,
+      copiarHash: () => this.avisar('Hash raiz da ' + ativa.id + ' copiado. Cole no verificador público para conferir a integridade.'),
+      verificarHash: () => this.avisar('Cadeia da ' + ativa.id + ' verificada: ' + (ativa.parcial ? '15 de 16 blocos íntegros; a lacuna do bloco 14 está declarada e assinada.' : '16 blocos, nenhuma quebra. O hash raiz confere com o carimbo da geração.')),
+      reprocessar: () => this.avisar('Bloco 14 reenviado ao armazenamento frio. Se o arquivo aparecer, a cadeia regrava com evento novo; a lacuna atual fica no histórico.')
+    };
+  }
+  blocoVals() {
+    const s = this.state, b = s.bloco;
+    return {
+      blAberto: !!b, blFechar: () => this.setState({ bloco: null }),
+      bl: b || { n: '', t: '', campos: [], hashFull: '' },
+      blCopiar: () => this.avisar('Hash do bloco copiado.'),
+      blBaixar: () => { this.setState({ bloco: null }); this.avisar('Evidências do bloco baixadas num pacote com hash conferido.'); }
+    };
+  }
+  auditorVals() {
+    const s = this.state, ok = (s.auEmail || '').includes('@') && s.auPrazo;
+    return {
+      auAberto: !!s.au, auFechar: () => this.setState({ au: false }),
+      compartilharAuditor: () => this.setState({ au: true }),
+      auEmail: s.auEmail || '', auOnEmail: e => this.setState({ auEmail: e.target.value }),
+      auPrazos: ['48 horas', '7 dias', '30 dias'].map(n => { const on = s.auPrazo === n; return { n, onClick: () => this.setState({ auPrazo: n }), bd: on ? '#127670' : '#e0e7e5', bg: on ? '#eef7f6' : '#fff', c: on ? '#0C5862' : '#3c4f4e' }; }),
+      auBg: ok ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#eef2f1', auC: ok ? '#fff' : '#9db0ae',
+      auSh: ok ? '0 8px 18px rgba(18,118,112,.35)' : 'none', auCur: ok ? 'pointer' : 'not-allowed',
+      auConfirmar: () => { if (!ok) return; this.setState({ au: false }); this.avisar('Link só leitura enviado a ' + s.auEmail.trim() + ', expira em ' + s.auPrazo + '. Cada acesso fica logado.'); }
+    };
+  }
+  filtroDefs() {
+    return [
+      { key: 'periodo', k: 'Período', anchor: '67bbc7582e-div', opts: ['maio a julho 2026', 'últimos 30 dias', 'últimos 90 dias', '2026 inteiro'] },
+      { key: 'codigo', k: 'Código ou placa', anchor: '', opts: ['qualquer', 'só SQT 9E18', 'só QAS 7C31', 'digitar código…'] },
+      { key: 'produto', k: 'Produto', anchor: '', opts: ['todos', 'farelo de soja', 'milho a granel', 'casca de soja', 'sorgo granífero'] },
+      { key: 'status', k: 'Status', anchor: '', opts: ['concluídas', 'liberadas por autoridade', 'bloqueadas no período', 'todas'] }
+    ];
+  }
+  avisar(msg) { this.setState({ toast: msg }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 4200); }
+  renderVals() { return { ...this.navVals(), ...this.papelVals(), ...this.perfilVals(), ...this.mainVals() }; }
+  perfilVals() {
+    return {
+      perfilOpen: !!this.state.perfilOpen,
+      onPerfil: () => this.setState(s => ({ perfilOpen: !s.perfilOpen })),
+      modalPerfil: this.state.modalTopo === 'perfil', modalPrefs: this.state.modalTopo === 'prefs',
+      abrirPerfil: () => this.setState({ modalTopo: 'perfil', perfilOpen: false }),
+      abrirPrefs: () => this.setState({ modalTopo: 'prefs', perfilOpen: false }),
+      fecharModalTopo: () => this.setState({ modalTopo: null }),
+      pararCliquePerfil: e => e.stopPropagation(),
+      prefs: [
+        { k: 'bloq', t: 'Bloqueio técnico na filial', sub: 'sempre ativo: requisito da certificação', lock: true },
+        { k: 'fila', t: 'Item há mais de 2h na fila', sub: 'aviso no app e por e-mail' },
+        { k: 'cert', t: 'Certificado de terceiro a vencer', sub: 'aos 30 e aos 15 dias' },
+        { k: 'idtf', t: 'Nova versão da base IDTF', sub: 'quando a Qualidade publicar revisão' }
+      ].map(p => {
+        const on = p.lock || (this.state.prefsOn || { fila: true, cert: true, idtf: false })[p.k];
+        return { ...p, swBg: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#dde5e3', swPos: on ? '19.5px' : '2.5px',
+          onClick: () => { if (p.lock) return; const cur = this.state.prefsOn || { fila: true, cert: true, idtf: false }; this.setState({ prefsOn: { ...cur, [p.k]: !cur[p.k] } }); } };
+      })
+    };
+  }
+  papelVals() {
+    const diz = m => { if (typeof this.avisar === 'function') this.avisar(m); };
+    const PAPEIS = [
+      { n: 'Inspetor de pátio', nivel: 1, resolve: 'condição física do equipamento: checklist reprovado, foto ausente', g1: '#9fc9c6', g2: '#6ba8a4' },
+      { n: 'Tráfego', nivel: 2, resolve: 'pendência simples: certificação a vencer, sincronização pendente', g1: '#5b8def', g2: '#4c5bc0' },
+      { n: 'Gestor de qualidade', nivel: 3, resolve: 'pendência corrigível mediante evidência da correção', g1: '#127670', g2: '#0E78B5' },
+      { n: 'Diretoria e Resp. Técnico', nivel: 4, resolve: 'impacto contratual, risco residual aceito, terceiro emergencial', g1: '#e8a33d', g2: '#d97544' },
+      { n: 'Auditor interno', nivel: 0, resolve: 'somente leitura, mais abrir não conformidade', g1: '#c9d5d3', g2: '#9db0ae' }
+    ];
+    const ativo = this.state.papelAtivo || 'Gestor de qualidade';
+    const atual = PAPEIS.find(p => p.n === ativo) || PAPEIS[2];
+    return {
+      pararClique: e => e.stopPropagation(),
+      pararCliquePop: e => e.stopPropagation(),
+      papelBadge: atual.n === 'Diretoria e Resp. Técnico' ? 'Diretoria' : atual.n.split(' ')[0],
+      papelNivel: atual.nivel,
+      modalPapel: this.state.modalTopo === 'papel',
+      modalSair: this.state.modalTopo === 'sair',
+      abrirPapel: () => this.setState({ modalTopo: 'papel', perfilOpen: false }),
+      abrirSair: () => this.setState({ modalTopo: 'sair', perfilOpen: false }),
+      confirmarSair: () => { this.setState({ modalTopo: null }); diz('Sessão encerrada. Registros assinados continuam no dossiê com seu nome e a data.'); },
+      papeisLista: PAPEIS.map(p => {
+        const on = p.n === ativo;
+        return { ...p, onClick: () => { this.setState({ papelAtivo: p.n, modalTopo: null }); diz('Papel ativo agora é ' + p.n + ', nível ' + p.nivel + '. A fila e as ações de assinatura passam a refletir esta autoridade.'); },
+          bd: on ? '#127670' : '#e0e7e5', bg: on ? '#eef7f6' : '#fff',
+          dot: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#fff', dotBd: on ? '#127670' : '#c9d5d3' };
+      })
+    };
+  }
+  componentDidMount() {
+    this._txFora = ev => { if (!ev.target.closest || !ev.target.closest('[data-tx-pop]')) this.setState({ perfilOpen: false, filialOpen: false, periodoOpen: false, menuOpen: false, versaoOpen: false, notifOpen: false }); };
+    this._txEsc = ev => { if (ev.key === 'Escape') this.setState({ perfilOpen: false, filialOpen: false, periodoOpen: false, menuOpen: false, versaoOpen: false, notifOpen: false, modalTopo: null }); };
+    document.addEventListener('mousedown', this._txFora);
+    document.addEventListener('keydown', this._txEsc);
+  }
+  navVals() {
+    const c = this.state.navC ?? (localStorage.getItem('tx-nav') === '1');
+    return { navW: c ? '84px' : '264px', navPad: c ? '14px' : '16px', navL: c ? 'none' : 'block', navSec: c ? 'none' : 'block', navCard: c ? 'none' : 'block', navFlip: c ? 'rotate(180deg)' : 'none',
+      navToggle: () => { const n = !c; localStorage.setItem('tx-nav', n ? '1' : '0'); this.setState({ navC: n }); } };
+  }
+  mainVals() {
+    const s = this.state;
+    const viagens = [
+      { id: 'VG-2455', produto: 'Milho a granel', sub: '31 jul · QCP 8A55 · Valdir Nunes', dec: 'motor', decC: '#1a8f57', decBg: '#e9f7ef' },
+      { id: 'VG-2412', produto: 'Casca de soja', sub: '24 jul · SQT 9E18 C1 · Milton Costa', dec: 'motor', decC: '#1a8f57', decBg: '#e9f7ef' },
+      { id: 'VG-2344', produto: 'Sorgo granífero', sub: '10 jul · SQT 9E18 C1 · Ivan Prado', dec: 'autoridade', decC: '#b97514', decBg: '#fdf3e2' },
+      { id: 'VG-2301', produto: 'Milheto', sub: '28 jun · SQT 4A66 · Sérgio Ramos', dec: 'motor', decC: '#1a8f57', decBg: '#e9f7ef' }
+    ];
+    const nSel = viagens.filter(v => s.sel[v.id]).length;
+    const amostra = viagens.map(v => {
+      const on = !!s.sel[v.id];
+      return { ...v, onClick: () => this.setState({ sel: { ...s.sel, [v.id]: !on } }),
+        bd: on ? '#127670' : '#e0e7e5', bg: on ? '#eef7f6' : '#fff',
+        ck: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#fff', ckBd: on ? '#127670' : '#c9d5d3', ckIcon: on ? '✓' : '' };
+    });
+    const pronto = nSel > 0;
+    const ok = { bg: 'transparent', nBg: '#e9f3f2', nC: '#0C5862', subC: '#5c706e' };
+    const aus = { bg: '#fdfaf3', nBg: '#fdf3e2', nC: '#b97514', subC: '#a2731f' };
+    const filtrosAmostra = this.filtroDefs().map(f => ({
+      k: f.k, anchor: f.anchor, v: s.fVals[f.key], open: s.fOpen === f.key,
+      rowBg: s.fOpen === f.key ? '#f0f4f3' : '#f7faf9',
+      onClick: () => this.setState({ fOpen: s.fOpen === f.key ? null : f.key }),
+      opts: f.opts.map(n => ({ n,
+        bg: s.fVals[f.key] === n ? '#eef7f6' : '#fff', dot: s.fVals[f.key] === n ? '#127670' : '#dde5e3',
+        onClick: e => { e.stopPropagation(); this.setState({ fVals: { ...s.fVals, [f.key]: n }, fOpen: null }); this.avisar('Amostra refiltrada: ' + f.k.toLowerCase() + ' = ' + n + '.'); } }))
+    }));
+    return {
+      nSel, amostra, filtrosAmostra,
+      estadoInicial: s.fase === 'inicial', gerando: s.fase === 'gerando', gerado: s.fase === 'gerado',
+      nOutras: Math.max(nSel - 1, 0),
+      gerarLabel: s.fase === 'gerando' ? 'Reconstruindo…' : 'Gerar reconstrução',
+      gerarBg: pronto ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#eef2f1',
+      gerarC: pronto ? '#fff' : '#9db0ae', gerarSh: pronto ? '0 8px 18px rgba(18,118,112,.35)' : 'none',
+      gerarCur: pronto ? 'pointer' : 'not-allowed',
+      gerar: () => { if (!pronto || s.fase === 'gerando') return; this.setState({ fase: 'gerando' }); setTimeout(() => this.setState({ fase: 'gerado' }), 1500); },
+      blocos: [
+        { n: '01', t: 'Decisão do motor', sub: 'liberada · 12 de 12 condições · base v2026.06', hash: 'f2a1…', ...ok },
+        { n: '02', t: 'Autoridade', sub: 'nenhuma: nunca chegou à mesa de ninguém', hash: '8c3d…', ...ok },
+        { n: '03', t: 'Registro de liberação', sub: 'não se aplica: sem exceção nesta viagem', hash: '77e0…', ...ok },
+        { n: '04', t: 'Transportador', sub: 'frota própria · certificado GMP+ B4.3 vigente na data', hash: 'b19a…', ...ok },
+        { n: '05', t: 'Acordo de qualidade', sub: 'v3 · vigente · assinado por J. Lima em 02 mar', hash: '4dd8…', ...ok },
+        { n: '06', t: 'Motorista', sub: 'Valdir Nunes · CNH ****9917 · vínculo próprio', hash: 'e651…', ...ok },
+        { n: '07', t: 'Treinamentos', sub: '10 trilhas vigentes na data · nota mínima atendida', hash: '09fb…', ...ok },
+        { n: '08', t: 'Cavalo', sub: 'QCP 8A55 · só tração, sem histórico', hash: 'a3c7…', ...ok },
+        { n: '09', t: 'Implemento e compartimento', sub: 'SQT 5F31 · C1 · alumínio · conservação boa', hash: '5e92…', ...ok },
+        { n: '10', t: 'Produto e classificação IDTF', sub: 'milho a granel · HS 1005.90 · regime B pelo T-3', hash: 'c604…', ...ok },
+        { n: '11', t: 'Histórico T-3', sub: 'farelo de trigo · soja em grãos · milheto', hash: '1b8e…', ...ok },
+        { n: '12', t: 'Limpeza', sub: 'regime B · Estação Higitrans · 7 de 7 campos', hash: 'd27f…', ...ok },
+        { n: '13', t: 'Inspeção', sub: 'aprovada · Jorge Mattos · assinada no app', hash: '63aa…', ...ok },
+        { n: '14', t: 'Fotos', sub: 'ausência declarada: teto sem marca d\u2019água (padrão antigo)', hash: 'f0b5…', ...aus },
+        { n: '15', t: 'Assinaturas', sub: 'motorista + inspetor · hash e geolocalização conferem', hash: '92cd…', ...ok },
+        { n: '16', t: 'Documentos', sub: 'ordem, registro de limpeza, relatório lacrado', hash: '7a44…', ...ok }
+      ].map(b => ({ ...b,
+        abrir: () => this.setState({ bloco: { n: b.n, t: b.t, hashFull: b.hash.replace('…', '') + '9e2d51c7b8a04f6e3d1c9b7a5f2e8d04',
+          campos: [
+            { k: 'conteúdo', v: b.sub },
+            { k: 'capturado de', v: 'estado real na data · nunca digitado' },
+            { k: 'gravado em', v: '31 jul 2026 · junto com a decisão' },
+            { k: 'fonte', v: b.n === '14' ? 'app do motorista · padrão antigo' : 'registro lacrado da viagem' },
+            { k: 'encadeamento', v: 'aponta o hash do bloco ' + (b.n === '01' ? 'raiz' : String(parseInt(b.n, 10) - 1).padStart(2, '0')) }
+          ] } }) })),
+      ...this.vgVals(), ...this.blocoVals(), ...this.auditorVals(),
+      expPlanilha: () => this.avisar('Planilha da amostra exportada: ' + nSel + ' viagens, 16 blocos por viagem, hash raiz no rodapé.'),
+      expDoc: () => this.avisar('Documento de reconstrução gerado com carimbo de 6 ago, pronto para o auditor.'),
+      expPacote: () => this.avisar('Pacote completo em preparação: evidências, fotos e cadeia de hashes. Você recebe o link em instantes.'),
+      toast: !!s.toast, toastMsg: s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

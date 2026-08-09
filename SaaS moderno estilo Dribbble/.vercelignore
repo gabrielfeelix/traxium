@@ -1,0 +1,9 @@
+uploads/
+HANDOFF.md
+CLAUDE.md
+.image-slots.state.json
+.thumbnail
+*.Zone.Identifier
+REVISAO-FLUXOS.md
+.vercel.4yu-antigo/
+.env.local

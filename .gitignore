@@ -42,3 +42,7 @@ next-env.d.ts
 
 # windows zone identifier junk
 *:Zone.Identifier
+
+# lixo do WSL e vinculos locais da Vercel
+*:Zone.Identifier
+.vercel.4yu-antigo/

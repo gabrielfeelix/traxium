@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<script src="./prototype-shell.js" defer></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#e3e9e7;font-family:'Hanken Grotesk',sans-serif;color:#0b2224;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0C5862;text-decoration:none}a:hover{color:#127670}
+@keyframes girar{to{transform:rotate(360deg)}}
+@keyframes subir{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulsar{0%,100%{box-shadow:0 0 0 4px rgba(232,163,61,.18)}50%{box-shadow:0 0 0 8px rgba(232,163,61,.06)}}
+</style>
+<script src="./image-slot.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</helmet>
+<section style="padding:64px;display:flex;flex-direction:column;gap:32px">
+<div>
+  <div style="font-size:26px;font-weight:800">App de campo · motorista</div>
+  <div style="font-size:15px;color:#5c706e;margin-top:4px">Android de entrada, sinal instável, uma ação principal por vez. Offline-first é requisito de conformidade. O checklist da tela 3 é interativo: toque nos itens.</div>
+</div>
+<div style="display:flex;gap:48px;align-items:flex-start">
+
+  <!-- 1 MINHAS VIAGENS -->
+  <div style="flex:none;display:flex;flex-direction:column;gap:12px" data-screen-label="App 1 · Minhas viagens">
+    <div style="font-size:14px;font-weight:700;color:#3c4f4e">1 · Minhas viagens</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="393px,830px">
+      <div style="padding:16px 16px 10px;display:flex;flex-direction:column;gap:12px;background:linear-gradient(180deg,#eef5f3,#f2f5f4 30%);min-height:100%;position:relative">
+        <div style="display:flex;align-items:center;gap:12px;animation:subir .5s ease-out both">
+          <span style="width:46px;height:46px;border-radius:99px;background:linear-gradient(135deg,#0C5862,#0E78B5);color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2.5px #fff,0 0 0 4.5px #b9d6d3">IP</span>
+          <div style="flex:1"><div style="font-size:17px;font-weight:800;letter-spacing:-.2px">Boa tarde, Ivan</div><div style="font-size:11.5px;color:#5c706e">1 viagem hoje · tudo salvo no aparelho</div></div>
+          <span onClick="{{ onNotif }}" style="position:relative;width:40px;height:40px;border-radius:99px;background:#fff;border:1px solid #e4eae8;display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="border-color:#127670"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#3c4f4e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 6.5a4.5 4.5 0 0 0-9 0c0 3-1.2 4-1.2 4h11.4s-1.2-1-1.2-4z"></path><path d="M6.8 13a1.4 1.4 0 0 0 2.4 0"></path></svg><span style="position:absolute;top:8px;right:9px;width:8px;height:8px;border-radius:99px;background:linear-gradient(135deg,#e46969,#c43d3d);box-shadow:0 0 0 2px #fff"></span></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #f0e6cf;border-radius:99px;padding:9px 15px;box-shadow:0 4px 14px rgba(9,61,68,.05);animation:subir .5s .06s ease-out both">
+          <span style="width:10px;height:10px;border-radius:99px;background:linear-gradient(135deg,#f4c15d,#e8a33d);animation:pulsar 2s infinite;flex:none"></span>
+          <div style="flex:1;font-size:12.5px;font-weight:700">Salvo no aparelho · esperando sinal</div>
+          <span style="font-family:'Spline Sans Mono';font-size:11.5px;font-weight:600;background:#fdf3e2;color:#b97514;border-radius:99px;padding:2px 9px">2</span>
+        </div>
+        <sc-if value="{{ tab1Viagens }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:12px;font-weight:800;letter-spacing:1px;color:#7c8f8d;padding:4px 2px 0;animation:subir .5s .1s ease-out both">HOJE</div>
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:16px;box-shadow:0 14px 32px rgba(9,61,68,.09);animation:subir .5s .14s ease-out both;position:relative;overflow:hidden"><div style="position:absolute;left:0;top:0;right:0;height:4px;background:linear-gradient(90deg,#48c78e,#127670,#0E78B5)"></div>
+          <div style="display:flex;align-items:center;gap:8px"><span style="font-family:'Spline Sans Mono';font-size:12px;font-weight:600;color:#0C5862">VG-2490</span><span style="margin-left:auto;font-size:11px;font-weight:700;color:#b97514;background:#fdf3e2;border-radius:99px;padding:3px 10px">checklist pendente</span></div>
+          <div style="font-size:17px;font-weight:800;margin-top:6px">Farelo de soja · 37 t</div>
+          <div style="font-size:12.5px;color:#5c706e;margin-top:2px">Sorriso MT → Uberlândia MG · carrega amanhã, 06:30</div>
+          <div style="display:flex;gap:6px;margin-top:10px"><span style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;background:#faf3d4;color:#8a7410;border-radius:99px;padding:4px 11px"><span style="width:16px;height:16px;border-radius:6px;background:linear-gradient(135deg,#f7e08a,#e3c235);color:#6b5a10;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center">B</span>limpeza com água</span><span style="font-size:11.5px;font-weight:700;background:#f0f4f3;color:#3c4f4e;border-radius:99px;padding:4px 11px">compart. C1</span></div>
+          <div style="margin-top:14px;background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;border-radius:99px;padding:14px 0;text-align:center;font-size:15px;font-weight:800;box-shadow:0 8px 18px rgba(18,118,112,.35)">Começar checklist</div>
+        </div>
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:16px;opacity:.8;animation:subir .5s .18s ease-out both">
+          <div style="display:flex;align-items:center;gap:8px"><span style="font-family:'Spline Sans Mono';font-size:12px;font-weight:600;color:#0C5862">VG-2496</span><span style="margin-left:auto;font-size:11px;font-weight:700;color:#7c8f8d;background:#f0f4f3;border-radius:99px;padding:3px 10px">amanhã</span></div>
+          <div style="font-size:16px;font-weight:800;margin-top:6px">Calcário calcítico · 28 t</div>
+          <div style="font-size:12.5px;color:#5c706e;margin-top:2px">Nobres MT → Sinop MT · 08:00</div>
+        </div>
+        <div onClick="{{ goLavagem }}" style="background:linear-gradient(115deg,#0C5862,#0E78B5);border-radius:20px;padding:15px 16px;display:flex;align-items:center;gap:12px;color:#fff;box-shadow:0 10px 24px rgba(12,88,98,.3);animation:subir .5s .22s ease-out both;position:relative;overflow:hidden;cursor:pointer;transition:transform .15s" style-hover="transform:translateY(-2px)">
+          <div style="position:absolute;right:-30px;top:-50px;width:150px;height:150px;border-radius:99em;background:radial-gradient(circle,rgba(255,255,255,.16),transparent 65%)"></div>
+          <span style="width:38px;height:38px;border-radius:12px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;flex:none"><svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.8c2.4 2.8 3.7 4.6 3.7 6.5a3.7 3.7 0 1 1-7.4 0c0-1.9 1.3-3.7 3.7-6.5z"></path></svg></span>
+          <div style="flex:1"><div style="font-size:13.5px;font-weight:800">Lavagem perto de você</div><div style="font-size:11.5px;color:rgba(255,255,255,.75)">Higitrans a 12 km · aberta agora</div></div>
+          <span style="font-size:16px;color:rgba(255,255,255,.8)">›</span>
+        </div>
+        </div>
+        </sc-if>
+        <sc-if value="{{ tab1Lavagem }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="height:200px;border-radius:20px;overflow:hidden;border:1px solid #e4eae8;box-shadow:0 8px 20px rgba(9,61,68,.08);animation:subir .4s ease-out both;position:relative">
+            <div id="mapa-lavagem" style="position:absolute;inset:0;background:#eef2f1"></div>
+            <span style="position:absolute;top:10px;left:10px;z-index:500;font-size:10.5px;font-weight:700;background:rgba(255,255,255,.92);backdrop-filter:blur(4px);border-radius:99px;padding:4px 11px;display:flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(9,61,68,.12)"><span style="width:6px;height:6px;border-radius:99px;background:#127670"></span>3 pontos num raio de 45 km</span>
+          </div>
+          <div style="font-size:12px;font-weight:800;letter-spacing:1px;color:#7c8f8d;padding:4px 2px 0;animation:subir .4s ease-out both">MAIS PERTO PRIMEIRO</div>
+          <sc-for list="{{ lavagens }}" as="lv" hint-placeholder-count="3">
+            <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 14px rgba(9,61,68,.05);animation:subir .4s ease-out both">
+              <span style="width:42px;height:42px;border-radius:14px;flex:none;background:linear-gradient(135deg,#0C5862,#0E78B5);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px rgba(12,88,98,.25)"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.8c2.4 2.8 3.7 4.6 3.7 6.5a3.7 3.7 0 1 1-7.4 0c0-1.9 1.3-3.7 3.7-6.5z"></path></svg></span>
+              <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:800">{{ lv.n }}</div><div style="font-size:11.5px;color:#5c706e">{{ lv.meta }}</div><div style="display:flex;gap:5px;margin-top:5px"><span style="display:inline-block;font-size:10px;font-weight:800;color:{{ lv.regC }};background:{{ lv.regBg }};border-radius:6px;padding:2px 7px;white-space:nowrap">regime {{ lv.reg }}</span><span style="display:inline-block;font-size:10px;font-weight:700;color:{{ lv.stC }};background:{{ lv.stBg }};border-radius:6px;padding:2px 7px;white-space:nowrap">{{ lv.st }}</span></div></div>
+              <a href="https://www.google.com/maps/search/lava+jato+Rondon%C3%B3polis+MT" target="_blank" rel="noopener" style="background:#f0f4f3;color:#0C5862;font-size:12px;font-weight:800;border-radius:99px;padding:8px 14px;white-space:nowrap;display:inline-block" style-hover="background:#e4ebe9;color:#0C5862">Rota ›</a>
+            </div>
+          </sc-for>
+          <div style="background:linear-gradient(90deg,#f7faf9,#fff);border:1px dashed #d8e2e0;border-radius:14px;padding:11px 14px;font-size:11.5px;color:#5c706e;line-height:1.5;animation:subir .4s .1s ease-out both">Para a VG-2490 (regime B), qualquer uma das três serve. O comprovante da estação entra direto no registro da limpeza.</div>
+        </div>
+        </sc-if>
+        <sc-if value="{{ tab1Perfil }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:20px;display:flex;flex-direction:column;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(9,61,68,.06);animation:subir .4s ease-out both">
+            <span style="width:72px;height:72px;border-radius:99px;background:linear-gradient(135deg,#0C5862,#0E78B5);color:#fff;font-size:24px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #fff,0 0 0 6px #b9d6d3">IP</span>
+            <div style="font-size:17px;font-weight:800;margin-top:4px">Ivan Prado</div>
+            <div style="font-size:12px;color:#5c706e">motorista · Lima Logística · CNH ****4407</div>
+            <div style="display:flex;gap:6px;margin-top:6px"><span style="display:inline-block;font-size:11px;font-weight:700;color:#1a8f57;background:#e9f7ef;border-radius:99px;padding:4px 11px">✓ 10 trilhas vigentes</span><span style="display:inline-block;font-size:11px;font-weight:700;color:#1a8f57;background:#e9f7ef;border-radius:99px;padding:4px 11px">✓ elegível</span></div>
+          </div>
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:14px 16px;animation:subir .4s .06s ease-out both">
+            <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:13px;font-weight:800">Minhas trilhas</span><span style="font-size:11px;color:#b97514;font-weight:700">1 vence em 40 dias</span></div>
+            <div style="margin-top:9px;height:10px;border-radius:99px;overflow:hidden;display:flex;background:repeating-linear-gradient(-45deg,#eef2f1 0 5px,#e2e9e7 5px 10px)"><div style="width:90%;background:linear-gradient(90deg,#48c78e,#127670)"></div></div>
+            <div style="font-size:11px;color:#5c706e;margin-top:6px">9 vigentes · Regimes de limpeza vence em 14 set</div>
+          </div>
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:6px 16px;animation:subir .4s .1s ease-out both">
+            <div style="display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #f0f4f3;font-size:13.5px;font-weight:700;min-height:48px">Meus documentos<span style="margin-left:auto;color:#9db0ae">›</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #f0f4f3;font-size:13.5px;font-weight:700;min-height:48px">Trocar usuário<span style="margin-left:auto;font-size:10.5px;font-weight:600;color:#7c8f8d">aparelho compartilhado</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:12px 0;font-size:13.5px;font-weight:700;color:#c43d3d;min-height:48px">Sair</div>
+          </div>
+        </div>
+        </sc-if>
+        <div style="margin-top:auto;display:flex;background:#fff;border:1px solid #e4eae8;border-radius:99px;padding:6px;box-shadow:0 6px 18px rgba(9,61,68,.07)">
+          <sc-for list="{{ tabs1 }}" as="tb" hint-placeholder-count="3">
+            <span onClick="{{ tb.onClick }}" style="flex:1;text-align:center;background:{{ tb.bg }};color:{{ tb.c }};border-radius:99px;padding:10px 0;font-size:12px;font-weight:800;cursor:pointer;transition:all .2s">{{ tb.n }}</span>
+          </sc-for>
+        </div>
+        <sc-if value="{{ notifOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:12px;right:12px;top:66px;background:#fff;border:1px solid #e4eae8;border-radius:18px;box-shadow:0 24px 60px rgba(9,34,36,.25);padding:8px;z-index:60;animation:subir .25s ease-out both">
+            <div style="display:flex;align-items:center;padding:8px 10px 4px"><span style="font-size:13px;font-weight:800">Notificações</span><span onClick="{{ onNotif }}" style="margin-left:auto;font-size:11.5px;font-weight:700;color:#0C5862;cursor:pointer">fechar</span></div>
+            <div onClick="{{ notifGoViagem }}" style="display:flex;gap:10px;padding:10px;border-radius:12px;cursor:pointer" style-hover="background:#f6f9f8"><span style="width:32px;height:32px;border-radius:11px;flex:none;background:#fdecec;display:flex;align-items:center;justify-content:center;color:#c43d3d;font-weight:800;font-size:13px">!</span><div style="flex:1"><div style="font-size:12.5px;font-weight:700">VG-2490 aguarda decisão da Qualidade</div><div style="font-size:11px;color:#5c706e">sua ocorrência foi recebida · há 1h</div></div><span style="color:#9db0ae;align-self:center">›</span></div>
+            <div onClick="{{ notifGoPerfil }}" style="display:flex;gap:10px;padding:10px;border-radius:12px;cursor:pointer" style-hover="background:#f6f9f8"><span style="width:32px;height:32px;border-radius:11px;flex:none;background:#fdf3e2;display:flex;align-items:center;justify-content:center;color:#b97514;font-weight:800;font-size:13px">⏱</span><div style="flex:1"><div style="font-size:12.5px;font-weight:700">Trilha "Regimes de limpeza" vence em 40 dias</div><div style="font-size:11px;color:#5c706e">reciclagem de 45 min disponível offline · ontem</div></div><span style="color:#9db0ae;align-self:center">›</span></div>
+          </div>
+        </sc-if>
+      </div>
+    </x-import>
+  </div>
+
+  <!-- 2 VIAGEM DE HOJE -->
+  <div style="flex:none;display:flex;flex-direction:column;gap:12px" data-screen-label="App 2 · Viagem de hoje">
+    <div style="font-size:14px;font-weight:700;color:#3c4f4e">2 · A viagem de hoje</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="393px,830px">
+      <div style="padding:16px;display:flex;flex-direction:column;gap:12px;background:linear-gradient(180deg,#eef5f3,#f2f5f4 30%);min-height:100%;position:relative">
+        <div style="display:flex;align-items:center;gap:10px"><span style="width:36px;height:36px;border-radius:99px;background:#fff;border:1px solid #e4eae8;display:flex;align-items:center;justify-content:center;font-size:16px;color:#3c4f4e;flex:none;box-shadow:0 2px 8px rgba(9,61,68,.05)">‹</span><span style="font-size:16.5px;font-weight:800;flex:1">VG-2490</span><span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#1a8f57;background:#e9f7ef;border-radius:99px;padding:4px 11px"><span style="width:6px;height:6px;border-radius:99px;background:#1a8f57"></span>salvo</span></div><div style="background:linear-gradient(115deg,#093D44,#0C5862 60%,#0E78B5 140%);color:#fff;border-radius:20px;padding:18px;box-shadow:0 14px 30px rgba(9,61,68,.28);position:relative;overflow:hidden;animation:subir .5s ease-out both"><div style="position:absolute;right:-40px;top:-70px;width:190px;height:190px;border-radius:99em;background:radial-gradient(circle,rgba(255,255,255,.15),transparent 65%)"></div>
+          <div style="font-size:12px;color:rgba(255,255,255,.65)">o que você leva</div>
+          <div style="font-size:19px;font-weight:800;margin-top:2px">Farelo de soja · 37 t</div>
+          <div style="font-size:12.5px;color:rgba(255,255,255,.75);margin-top:2px">para NutriMax Rações, Uberlândia MG</div>
+          <div style="display:flex;gap:6px;margin-top:12px"><span style="font-size:11.5px;font-weight:700;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);border-radius:99px;padding:4px 11px">carrega amanhã 06:30</span><span style="font-size:11.5px;font-weight:700;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);border-radius:99px;padding:4px 11px">compartimento C1</span></div>
+        </div>
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:16px">
+          <div style="font-size:12px;font-weight:800;letter-spacing:1px;color:#7c8f8d">ANTES DE CARREGAR</div>
+          <div style="display:flex;flex-direction:column;gap:2px;margin-top:10px">
+            <div style="display:flex;align-items:center;gap:11px;padding:11px 4px;border-bottom:1px solid #f0f4f3"><span style="width:26px;height:26px;border-radius:99px;background:#e9f7ef;color:#1a8f57;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none">✓</span><div style="flex:1"><div style="font-size:14px;font-weight:700">Limpeza B feita</div><div style="font-size:11.5px;color:#5c706e">Higitrans · ontem 17:40</div></div></div>
+            <div onClick="{{ abrirSheetCk }}" style="display:flex;align-items:center;gap:11px;padding:11px 4px;border-bottom:1px solid #f0f4f3;cursor:pointer" style-hover="background:#f9fbfa"><span style="width:26px;height:26px;border-radius:99px;background:#fdf3e2;color:#b97514;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none">2</span><div style="flex:1"><div style="font-size:14px;font-weight:700">Checklist do compartimento</div><div style="font-size:11.5px;color:#5c706e">8 itens · 3 a 5 minutos</div></div><span style="color:#9db0ae">›</span></div>
+            <div style="display:flex;align-items:center;gap:11px;padding:11px 4px"><span style="width:26px;height:26px;border-radius:99px;background:#f0f4f3;color:#7c8f8d;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none">3</span><div style="flex:1"><div style="font-size:14px;font-weight:700;color:#9db0ae">Fotos e assinatura</div><div style="font-size:11.5px;color:#9db0ae">libera depois do checklist</div></div></div>
+          </div>
+        </div>
+        <div onClick="{{ abrirSheetT3 }}" style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:14px 16px;display:flex;align-items:center;gap:11px;cursor:pointer;transition:transform .15s" style-hover="transform:translateY(-1px)">
+          <span style="width:38px;height:38px;border-radius:99px;background:linear-gradient(135deg,#0C5862,#0E78B5);color:#fff;font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none">C1</span>
+          <div style="flex:1"><div style="font-size:13.5px;font-weight:700">Últimas cargas deste compartimento</div><div style="font-size:11.5px;color:#5c706e">milho · casca de soja · farelo de soja</div></div>
+          <span style="color:#9db0ae">›</span>
+        </div>
+        <div style="margin-top:auto;background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;border-radius:99px;padding:15px 0;text-align:center;font-size:15px;font-weight:800;box-shadow:0 8px 18px rgba(18,118,112,.35)">Continuar · checklist</div>
+        <sc-if value="{{ sheetAberta }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ fecharSheet }}" style="position:absolute;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(2px);z-index:50;display:flex;align-items:flex-end">
+            <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px 24px 0 0;width:100%;padding:10px 18px 22px;box-shadow:0 -20px 50px rgba(9,34,36,.3);animation:subir .3s ease-out both">
+              <div style="width:44px;height:5px;border-radius:99px;background:#dde5e3;margin:4px auto 14px"></div>
+              <sc-if value="{{ sheetT3 }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:16px;font-weight:800">Últimas cargas · C1</div>
+                <div style="font-size:11.5px;color:#5c706e;margin-top:2px">as três últimas definem a limpeza de hoje</div>
+                <div style="display:flex;flex-direction:column;gap:7px;margin-top:14px">
+                  <div style="display:flex;align-items:center;gap:11px;background:#f7faf9;border-radius:14px;padding:11px 14px"><span style="font-family:'Spline Sans Mono';font-size:10.5px;font-weight:600;color:#0C5862;background:#e9f3f2;border-radius:7px;padding:2px 7px;flex:none">T-1</span><div style="flex:1"><div style="font-size:13.5px;font-weight:700">Milho a granel</div><div style="font-size:11px;color:#5c706e">31 jul · descarga Uberlândia MG</div></div><span style="width:22px;height:22px;border-radius:8px;background:#faf3d4;color:#8a7410;font-size:10.5px;font-weight:800;display:flex;align-items:center;justify-content:center">B</span></div>
+                  <div style="display:flex;align-items:center;gap:11px;background:#f7faf9;border-radius:14px;padding:11px 14px"><span style="font-family:'Spline Sans Mono';font-size:10.5px;font-weight:600;color:#0C5862;background:#e9f3f2;border-radius:7px;padding:2px 7px;flex:none">T-2</span><div style="flex:1"><div style="font-size:13.5px;font-weight:700">Casca de soja</div><div style="font-size:11px;color:#5c706e">24 jul · descarga Rio Verde GO</div></div><span style="width:22px;height:22px;border-radius:8px;background:#e9f7ef;color:#1a8f57;font-size:10.5px;font-weight:800;display:flex;align-items:center;justify-content:center">A</span></div>
+                  <div style="display:flex;align-items:center;gap:11px;background:#f7faf9;border-radius:14px;padding:11px 14px"><span style="font-family:'Spline Sans Mono';font-size:10.5px;font-weight:600;color:#0C5862;background:#e9f3f2;border-radius:7px;padding:2px 7px;flex:none">T-3</span><div style="flex:1"><div style="font-size:13.5px;font-weight:700">Farelo de soja</div><div style="font-size:11px;color:#5c706e">18 jul · descarga Chapecó SC</div></div><span style="width:22px;height:22px;border-radius:8px;background:#e9f7ef;color:#1a8f57;font-size:10.5px;font-weight:800;display:flex;align-items:center;justify-content:center">A</span></div>
+                </div>
+                <div style="background:linear-gradient(90deg,#fdfaf3,#fff);border:1px dashed #e5d9b8;border-radius:13px;padding:10px 13px;margin-top:12px;font-size:11.5px;color:#5c706e;line-height:1.5">Milho antes de farelo de soja pede <strong>limpeza com água (B)</strong>. Já registrada ontem na Higitrans.</div>
+              </sc-if>
+              <sc-if value="{{ sheetCk }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:16px;font-weight:800">Checklist do C1 · 8 itens</div>
+                <div style="font-size:11.5px;color:#5c706e;margin-top:2px">itens do graneleiro; tanque teria válvula e mangote</div>
+                <div style="display:flex;flex-direction:column;margin-top:12px">
+                  <div style="display:flex;align-items:center;gap:9px;padding:8px 2px;font-size:13px;font-weight:600;border-bottom:1px solid #f0f4f3"><span style="width:7px;height:7px;border-radius:99px;background:#c43d3d;flex:none"></span>Sem resíduos visíveis<span style="margin-left:auto;font-size:10px;color:#c43d3d;font-weight:700">crítico</span></div>
+                  <div style="display:flex;align-items:center;gap:9px;padding:8px 2px;font-size:13px;font-weight:600;border-bottom:1px solid #f0f4f3"><span style="width:7px;height:7px;border-radius:99px;background:#c43d3d;flex:none"></span>Sem odores estranhos<span style="margin-left:auto;font-size:10px;color:#c43d3d;font-weight:700">crítico</span></div>
+                  <div style="display:flex;align-items:center;gap:9px;padding:8px 2px;font-size:13px;font-weight:600;border-bottom:1px solid #f0f4f3"><span style="width:7px;height:7px;border-radius:99px;background:#c43d3d;flex:none"></span>Sem pragas<span style="margin-left:auto;font-size:10px;color:#c43d3d;font-weight:700">crítico</span></div>
+                  <div style="display:flex;align-items:center;gap:9px;padding:8px 2px;font-size:13px;font-weight:600;border-bottom:1px solid #f0f4f3"><span style="width:7px;height:7px;border-radius:99px;background:#9db0ae;flex:none"></span>Lona íntegra e limpa</div>
+                  <div style="display:flex;align-items:center;gap:9px;padding:8px 2px;font-size:13px;font-weight:600;border-bottom:1px solid #f0f4f3"><span style="width:7px;height:7px;border-radius:99px;background:#c43d3d;flex:none"></span>Bica de descarga limpa<span style="margin-left:auto;font-size:10px;color:#c43d3d;font-weight:700">crítico</span></div>
+                  <div style="display:flex;align-items:center;gap:9px;padding:8px 2px;font-size:13px;font-weight:600"><span style="width:7px;height:7px;border-radius:99px;background:#9db0ae;flex:none"></span>Vedações e borrachas · + 2 itens</div>
+                </div>
+                <div style="margin-top:14px;background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;border-radius:99px;padding:13px 0;text-align:center;font-size:14px;font-weight:800;box-shadow:0 8px 18px rgba(18,118,112,.35)">Começar agora · 3 a 5 min</div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </x-import>
+  </div>
+
+  <!-- 3 CHECKLIST INTERATIVO -->
+  <div style="flex:none;display:flex;flex-direction:column;gap:12px" data-screen-label="App 3 · Checklist">
+    <div style="font-size:14px;font-weight:700;color:#3c4f4e">3 · Checklist (interativo: toque nos itens)</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="393px,830px">
+      <div style="padding:16px;display:flex;flex-direction:column;gap:12px;background:linear-gradient(180deg,#eef5f3,#f2f5f4 30%);min-height:100%">
+        <div style="display:flex;align-items:center;gap:10px"><span style="width:36px;height:36px;border-radius:99px;background:#fff;border:1px solid #e4eae8;display:flex;align-items:center;justify-content:center;font-size:16px;color:#3c4f4e;flex:none;box-shadow:0 2px 8px rgba(9,61,68,.05)">‹</span><span style="font-size:16.5px;font-weight:800;flex:1">Checklist · compartimento C1</span><span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#1a8f57;background:#e9f7ef;border-radius:99px;padding:4px 11px"><span style="width:6px;height:6px;border-radius:99px;background:#1a8f57"></span>salvo</span></div><div style="background:{{ ckBanBg }};border:1px solid {{ ckBanBd }};border-radius:16px;padding:13px 16px;display:flex;align-items:center;gap:11px;transition:all .3s">
+          <span style="width:12px;height:12px;border-radius:99px;background:{{ ckBanDot }};box-shadow:0 0 0 4px {{ ckBanGlow }};flex:none;transition:all .3s"></span>
+          <div><div style="font-size:14px;font-weight:800;color:{{ ckBanC }}">{{ ckBanT }}</div><div style="font-size:11.5px;color:#5c706e">{{ ckBanSub }}</div></div>
+        </div>
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:8px 12px">
+          <sc-for list="{{ ckItens }}" as="ci" hint-placeholder-count="6">
+            <div onClick="{{ ci.onClick }}" style="display:flex;align-items:center;gap:11px;padding:12px 4px;border-bottom:1px solid #f0f4f3;cursor:pointer;min-height:52px" style-hover="background:#f9fbfa">
+              <span style="width:30px;height:30px;border-radius:10px;flex:none;background:{{ ci.bg }};color:{{ ci.c }};font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:{{ ci.sh }}">{{ ci.icon }}</span>
+              <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700">{{ ci.n }}</div><div style="font-size:11px;color:{{ ci.critC }};font-weight:600">{{ ci.crit }}</div></div>
+              <span style="display:inline-block;font-size:10.5px;font-weight:700;color:{{ ci.c }};background:{{ ci.bg }};border-radius:99px;padding:3px 10px;white-space:nowrap;transition:all .2s">{{ ci.st }}</span>
+            </div>
+          </sc-for>
+          <div style="font-size:10.5px;color:#7c8f8d;padding:9px 4px">toque para alternar: conforme → não conforme → não se aplica</div>
+        </div>
+        <div style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
+          <div style="background:{{ ckBtnBg }};color:{{ ckBtnC }};border-radius:99px;padding:15px 0;text-align:center;font-size:15px;font-weight:800;box-shadow:{{ ckBtnSh }};transition:all .3s;cursor:pointer">{{ ckBtnT }}</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <!-- 4 CÂMERA -->
+  <div style="flex:none;display:flex;flex-direction:column;gap:12px" data-screen-label="App 4 · Câmera antifraude">
+    <div style="font-size:14px;font-weight:700;color:#3c4f4e">4 · Câmera antifraude</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="393px,830px">
+      <div style="background:#080d0c;min-height:100%;display:flex;flex-direction:column;padding:14px;color:#fff"><div style="display:flex;align-items:center;gap:10px;padding:0 2px 12px"><span style="width:34px;height:34px;border-radius:99px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:15px;flex:none">‹</span><span style="font-size:15px;font-weight:800;flex:1">Foto 5 de 6 · bica de descarga</span></div>
+        <div style="flex:1;border-radius:22px;position:relative;overflow:hidden;background:radial-gradient(120% 90% at 50% 30%,#20302d,#0b1413 70%)">
+          <div style="position:absolute;inset:0"><image-slot id="app-camera-bica" shape="rect" placeholder="arraste uma foto do compartimento aqui"></image-slot></div>
+          <div style="position:absolute;inset:0;pointer-events:none">
+            <div style="position:absolute;inset:0;background:radial-gradient(120% 100% at 50% 45%,transparent 55%,rgba(0,0,0,.55))"></div>
+            <span style="position:absolute;top:44px;left:26px;width:26px;height:26px;border-left:2.5px solid #4fe3c1;border-top:2.5px solid #4fe3c1;border-radius:6px 0 0 0"></span>
+            <span style="position:absolute;top:44px;right:26px;width:26px;height:26px;border-right:2.5px solid #4fe3c1;border-top:2.5px solid #4fe3c1;border-radius:0 6px 0 0"></span>
+            <span style="position:absolute;bottom:96px;left:26px;width:26px;height:26px;border-left:2.5px solid #4fe3c1;border-bottom:2.5px solid #4fe3c1;border-radius:0 0 0 6px"></span>
+            <span style="position:absolute;bottom:96px;right:26px;width:26px;height:26px;border-right:2.5px solid #4fe3c1;border-bottom:2.5px solid #4fe3c1;border-radius:0 0 6px 0"></span>
+            <span style="position:absolute;top:12px;left:12px;font-size:10.5px;font-weight:700;background:rgba(8,13,12,.65);backdrop-filter:blur(6px);border-radius:99px;padding:5px 12px;display:flex;align-items:center;gap:7px;white-space:nowrap"><span style="width:7px;height:7px;border-radius:99px;background:#3ddc97;box-shadow:0 0 8px #3ddc97"></span>GPS ✓</span>
+            <span style="position:absolute;top:12px;right:12px;font-family:'Spline Sans Mono';font-size:10.5px;font-weight:600;background:rgba(8,13,12,.65);backdrop-filter:blur(6px);border-radius:99px;padding:5px 12px">06 ago · 10:52</span>
+            <div style="position:absolute;left:0;right:0;bottom:106px;display:flex;flex-direction:column;align-items:center;gap:4px"><span style="font-size:15px;font-weight:800;text-shadow:0 2px 10px rgba(0,0,0,.6)">Bica de descarga</span><span style="font-size:11.5px;color:rgba(255,255,255,.85);text-shadow:0 1px 6px rgba(0,0,0,.6)">enquadre a bica aberta dentro das marcas</span></div>
+            <div style="position:absolute;left:0;right:0;bottom:54px;display:flex;justify-content:center;gap:6px"><span style="font-size:11px;font-weight:800;background:#fff;color:#0b1413;border-radius:99px;padding:4px 12px">1x</span><span style="font-size:11px;font-weight:700;background:rgba(8,13,12,.65);border-radius:99px;padding:4px 12px">2x</span><span style="font-size:11px;font-weight:700;background:rgba(8,13,12,.65);border-radius:99px;padding:4px 12px">⚡ auto</span></div>
+            <span style="position:absolute;left:0;right:0;bottom:16px;text-align:center"><span style="font-size:10px;color:rgba(255,255,255,.7);background:rgba(8,13,12,.65);border-radius:99px;padding:4px 12px">galeria bloqueada · hash + marca d'água automáticos</span></span>
+          </div>
+        </div>
+        <div style="position:relative;height:96px;display:flex;align-items:center;padding:14px 10px 4px">
+          <div style="position:relative;width:54px;height:54px;flex:none">
+            <span style="position:absolute;inset:0;border-radius:14px;background:linear-gradient(135deg,#1f3a36,#12211f);border:1.5px solid #2aa876;transform:rotate(-6deg)"></span>
+            <span style="position:absolute;inset:0;border-radius:14px;background:linear-gradient(135deg,#24443f,#16302c);border:1.5px solid #2aa876;transform:rotate(4deg);display:flex;align-items:center;justify-content:center;color:#3ddc97;font-weight:800;font-size:12px">✓</span>
+            <span style="position:absolute;right:-6px;top:-6px;min-width:20px;height:20px;border-radius:99px;background:#3ddc97;color:#0b1413;font-size:10.5px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2.5px #080d0c;padding:0 4px">4</span>
+          </div>
+          <span style="position:absolute;left:50%;transform:translateX(-50%);width:72px;height:72px;border-radius:99px;background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.22),0 10px 30px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s" style-hover="transform:translateX(-50%) scale(1.06)"><span style="width:60px;height:60px;border-radius:99px;border:3px solid #080d0c;background:linear-gradient(135deg,#1a9e93,#0E78B5)"></span></span>
+          <span style="margin-left:auto;display:flex;flex-direction:column;align-items:center;gap:2px;width:54px;flex:none"><span style="font-family:'Spline Sans Mono';font-size:13px;font-weight:600;color:#fff">5<span style="color:rgba(255,255,255,.45)">/6</span></span><span style="font-size:9.5px;color:rgba(255,255,255,.5);font-weight:700">restam 2</span></span>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <!-- 5 BLOQUEIO -->
+  <div style="flex:none;display:flex;flex-direction:column;gap:12px" data-screen-label="App 5 · Bloqueio explicativo">
+    <div style="font-size:14px;font-weight:700;color:#3c4f4e">5 · Bloqueio que explica</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="393px,830px">
+      <div style="padding:16px;display:flex;flex-direction:column;gap:12px;background:linear-gradient(180deg,#eef5f3,#f2f5f4 30%);min-height:100%">
+        <div style="display:flex;align-items:center;gap:10px"><span style="width:36px;height:36px;border-radius:99px;background:#fff;border:1px solid #e4eae8;display:flex;align-items:center;justify-content:center;font-size:16px;color:#3c4f4e;flex:none;box-shadow:0 2px 8px rgba(9,61,68,.05)">‹</span><span style="font-size:16.5px;font-weight:800;flex:1">VG-2487 · bloqueada</span><span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#c43d3d;background:#fdecec;border-radius:99px;padding:4px 11px"><span style="width:6px;height:6px;border-radius:99px;background:#c43d3d"></span>bloqueio</span></div><div style="background:#fff;border:1px solid #f3d4d4;border-radius:20px;padding:20px;text-align:center;box-shadow:0 14px 32px rgba(196,61,61,.12);animation:subir .5s ease-out both">
+          <span style="width:56px;height:56px;border-radius:99px;background:linear-gradient(135deg,#e46969,#c43d3d);display:inline-flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(196,61,61,.3)"><svg width="24" height="24" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round"><circle cx="8" cy="8" r="6"></circle><line x1="8" y1="4.8" x2="8" y2="8.6"></line><circle cx="8" cy="11.2" r=".9" fill="#fff" stroke="none"></circle></svg></span>
+          <div style="font-size:18px;font-weight:800;margin-top:12px">Esta carga não pode seguir</div>
+          <div style="font-size:13px;color:#5c706e;line-height:1.55;margin-top:6px">O compartimento C2 levou <strong>ureia pecuária</strong> na última viagem. Farelo de amendoim depois de ureia é combinação proibida. Não é multa sua: é a regra que protege a ração.</div>
+        </div>
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:16px">
+          <div style="font-size:12px;font-weight:800;letter-spacing:1px;color:#7c8f8d">O QUE FAZER AGORA</div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px">
+            <div style="display:flex;gap:10px;align-items:center"><span style="width:24px;height:24px;border-radius:99px;background:#e9f3f2;color:#0C5862;font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none">1</span><span style="font-size:13.5px;font-weight:600">Registrar a ocorrência (2 toques, já preenchida)</span></div>
+            <div style="display:flex;gap:10px;align-items:center"><span style="width:24px;height:24px;border-radius:99px;background:#e9f3f2;color:#0C5862;font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none">2</span><span style="font-size:13.5px;font-weight:600">Levar a uma estação de limpeza qualificada</span></div>
+            <div style="display:flex;gap:10px;align-items:center"><span style="width:24px;height:24px;border-radius:99px;background:#e9f3f2;color:#0C5862;font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none">3</span><span style="font-size:13.5px;font-weight:600">A Qualidade acompanha; você não precisa ligar</span></div>
+          </div>
+        </div>
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:16px">
+          <div style="font-size:12px;font-weight:800;letter-spacing:1px;color:#7c8f8d">LAVAGEM PERTO DE VOCÊ</div>
+          <div style="display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid #f0f4f3"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="#127670" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 14s4.5-4 4.5-7.5a4.5 4.5 0 1 0-9 0C3.5 10 8 14 8 14z"></path><circle cx="8" cy="6.5" r="1.6"></circle></svg><div style="flex:1"><div style="font-size:13.5px;font-weight:700">Higitrans · Rondonópolis</div><div style="font-size:11.5px;color:#5c706e">regime D credenciada · 12 km · aberta</div></div><span style="font-size:12px;font-weight:700;color:#0C5862">Rota ›</span></div>
+          <div style="display:flex;align-items:center;gap:11px;padding:10px 0"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="#127670" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 14s4.5-4 4.5-7.5a4.5 4.5 0 1 0-9 0C3.5 10 8 14 8 14z"></path><circle cx="8" cy="6.5" r="1.6"></circle></svg><div style="flex:1"><div style="font-size:13.5px;font-weight:700">LavaMax BR-364</div><div style="font-size:11.5px;color:#5c706e">regime D credenciada · 31 km · aberta</div></div><span style="font-size:12px;font-weight:700;color:#0C5862">Rota ›</span></div>
+        </div>
+        <div style="margin-top:auto;background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;border-radius:99px;padding:15px 0;text-align:center;font-size:15px;font-weight:800;box-shadow:0 8px 18px rgba(18,118,112,.35)">Registrar ocorrência</div>
+      </div>
+    </x-import>
+  </div>
+
+  <!-- 6 SINCRONIZAÇÃO -->
+  <div style="flex:none;display:flex;flex-direction:column;gap:12px" data-screen-label="App 6 · Fila de sincronização">
+    <div style="font-size:14px;font-weight:700;color:#3c4f4e">6 · Fila de sincronização</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="393px,830px">
+      <div style="padding:16px;display:flex;flex-direction:column;gap:12px;background:linear-gradient(180deg,#eef5f3,#f2f5f4 30%);min-height:100%">
+        <div style="display:flex;align-items:center;gap:10px"><span style="width:36px;height:36px;border-radius:99px;background:#fff;border:1px solid #e4eae8;display:flex;align-items:center;justify-content:center;font-size:16px;color:#3c4f4e;flex:none;box-shadow:0 2px 8px rgba(9,61,68,.05)">‹</span><span style="font-size:16.5px;font-weight:800;flex:1">Sincronização</span></div><div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:16px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="width:10px;height:10px;border-radius:99px;background:#3ddc97;box-shadow:0 0 0 4px rgba(61,220,151,.18)"></span><div style="font-size:14px;font-weight:800">Sinal voltou · subindo registros</div></div>
+          <div style="margin-top:12px;height:10px;border-radius:99px;background:repeating-linear-gradient(-45deg,#eef2f1 0 5px,#e2e9e7 5px 10px);overflow:hidden"><div style="height:100%;width:64%;border-radius:99px;background:linear-gradient(90deg,#48c78e,#127670)"></div></div>
+          <div style="font-size:11.5px;color:#5c706e;margin-top:7px">2 de 3 enviados · 480 KB restantes</div>
+        </div>
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:8px 14px">
+          <div style="display:flex;align-items:center;gap:11px;padding:12px 0;border-bottom:1px solid #f0f4f3"><span style="width:28px;height:28px;border-radius:99px;background:#e9f7ef;color:#1a8f57;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none">✓</span><div style="flex:1"><div style="font-size:13.5px;font-weight:700">Checklist VG-2490</div><div style="font-size:11px;color:#5c706e">sincronizado 10:58 · edição travada</div></div></div>
+          <div style="display:flex;align-items:center;gap:11px;padding:12px 0;border-bottom:1px solid #f0f4f3"><span style="width:28px;height:28px;border-radius:99px;background:#e9f7ef;color:#1a8f57;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none">✓</span><div style="flex:1"><div style="font-size:13.5px;font-weight:700">6 fotos do compartimento C1</div><div style="font-size:11px;color:#5c706e">sincronizadas 10:59 · hash conferido</div></div></div>
+          <div style="display:flex;align-items:center;gap:11px;padding:12px 0;border-bottom:1px solid #f0f4f3"><span style="width:28px;height:28px;border-radius:99px;background:#e6f0fa;color:#0E78B5;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none">↑</span><div style="flex:1"><div style="font-size:13.5px;font-weight:700">Assinatura + geolocalização</div><div style="font-size:11px;color:#5c706e">sincronizando…</div></div><span style="width:16px;height:16px;border-radius:99px;border:2.5px solid #d5e6f2;border-top-color:#0E78B5;animation:girar 1s linear infinite"></span></div>
+          <div style="display:flex;align-items:center;gap:11px;padding:12px 0"><span style="width:28px;height:28px;border-radius:99px;background:#fdecec;color:#c43d3d;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none">!</span><div style="flex:1"><div style="font-size:13.5px;font-weight:700">Limpeza VG-2481 · divergente</div><div style="font-size:11px;color:#a54545">o servidor discorda do carimbo local · toque para resolver</div></div><span style="color:#9db0ae">›</span></div>
+        </div>
+        <div style="background:linear-gradient(90deg,#f7faf9,#fff);border:1px dashed #d8e2e0;border-radius:14px;padding:12px 15px;font-size:11.5px;color:#5c706e;line-height:1.5">Divergência é um estado próprio, nunca um erro silencioso. Depois de sincronizado, o registro trava: correção vira evento novo.</div>
+      </div>
+    </x-import>
+  </div>
+
+  <!-- 7 SUCESSO -->
+  <div style="flex:none;display:flex;flex-direction:column;gap:12px" data-screen-label="App 7 · Liberada">
+    <div style="font-size:14px;font-weight:700;color:#3c4f4e">7 · Fim do ciclo: liberada</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="393px,830px">
+      <div style="padding:16px;display:flex;flex-direction:column;gap:12px;background:linear-gradient(180deg,#e9f6ef,#f2f5f4 40%);min-height:100%">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:34px 0 8px;animation:subir .5s ease-out both">
+          <span style="width:96px;height:96px;border-radius:99px;background:linear-gradient(135deg,#48c78e,#127670);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 10px rgba(72,199,142,.16),0 0 0 22px rgba(72,199,142,.06),0 20px 44px rgba(18,118,112,.35)"><svg width="42" height="42" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 6.5 12 13 4.5"></path></svg></span>
+          <div style="font-size:22px;font-weight:800;letter-spacing:-.3px;margin-top:8px">Carga liberada!</div>
+          <div style="font-size:13px;color:#5c706e;text-align:center;line-height:1.55;max-width:270px">O motor conferiu as 12 condições e liberou às <strong>11:04</strong>, sem precisar de ninguém. Boa viagem, Ivan.</div>
+        </div>
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:8px 16px;box-shadow:0 8px 24px rgba(9,61,68,.06);animation:subir .5s .08s ease-out both">
+          <div style="display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid #f0f4f3"><span style="width:26px;height:26px;border-radius:99px;background:#e9f7ef;color:#1a8f57;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none">✓</span><span style="font-size:13.5px;font-weight:700;flex:1">Checklist aprovado</span><span style="font-family:'Spline Sans Mono';font-size:11px;color:#7c8f8d">10:58</span></div>
+          <div style="display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid #f0f4f3"><span style="width:26px;height:26px;border-radius:99px;background:#e9f7ef;color:#1a8f57;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none">✓</span><span style="font-size:13.5px;font-weight:700;flex:1">6 fotos com hash e marca d'água</span><span style="font-family:'Spline Sans Mono';font-size:11px;color:#7c8f8d">10:59</span></div>
+          <div style="display:flex;align-items:center;gap:11px;padding:11px 0"><span style="width:26px;height:26px;border-radius:99px;background:#e9f7ef;color:#1a8f57;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none">✓</span><span style="font-size:13.5px;font-weight:700;flex:1">Assinatura sincronizada</span><span style="font-family:'Spline Sans Mono';font-size:11px;color:#7c8f8d">11:02</span></div>
+        </div>
+        <div style="background:linear-gradient(90deg,#f7faf9,#fff);border:1px dashed #d8e2e0;border-radius:14px;padding:12px 15px;font-size:11.5px;color:#5c706e;line-height:1.5;animation:subir .5s .14s ease-out both">Siga para a doca 4 do armazém Boa Safra. Quando a viagem concluir, esta carga vira o T-1 do compartimento.</div>
+        <div style="margin-top:auto;display:flex;flex-direction:column;gap:8px;animation:subir .5s .2s ease-out both">
+          <div style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;border-radius:99px;padding:15px 0;text-align:center;font-size:15px;font-weight:800;box-shadow:0 8px 18px rgba(18,118,112,.35)">Ir para o carregamento</div>
+          <div style="text-align:center;font-size:13px;font-weight:700;color:#5c706e;padding:8px 0">Ver resumo da viagem</div>
+        </div>
+      </div>
+    </x-import>
+  </div>
+
+  <!-- 8 PÓS-CAPTURA -->
+  <div style="flex:none;display:flex;flex-direction:column;gap:12px" data-screen-label="App 8 · Pós-captura">
+    <div style="font-size:14px;font-weight:700;color:#3c4f4e">8 · Pós-captura (interativo: refazer / confirmar)</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="393px,830px">
+      <div style="background:#101817;min-height:100%;display:flex;flex-direction:column;padding:16px;color:#fff">
+        <div style="font-size:14px;font-weight:800;padding:2px 2px 10px">Revise a foto · bica de descarga</div>
+        <div style="flex:1;border-radius:20px;position:relative;background:repeating-linear-gradient(-45deg,rgba(255,255,255,.05) 0 12px,rgba(255,255,255,.09) 12px 24px);display:flex;align-items:center;justify-content:center">
+          <svg width="46" height="46" viewBox="0 0 16 16" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 5.5h2l1.2-1.7h4.6L11.5 5.5h2v7h-11z"></path><circle cx="8" cy="8.4" r="2.2"></circle></svg>
+          <span style="position:absolute;top:12px;left:12px;font-size:10.5px;font-weight:700;background:rgba(0,0,0,.55);border-radius:99px;padding:4px 11px;display:flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:99px;background:#3ddc97"></span>GPS e hora carimbados</span>
+          <span style="position:absolute;bottom:12px;left:12px;right:12px;font-family:'Spline Sans Mono';font-size:9.5px;color:rgba(255,255,255,.55);background:rgba(0,0,0,.55);border-radius:10px;padding:6px 10px">hash 7c1f…a940 · marca d'água VG-2490 · 06 ago 10:52</span>
+          <sc-if value="{{ pcNitidezBaixa }}" hint-placeholder-val="{{ true }}">
+            <span style="position:absolute;top:12px;right:12px;font-size:10.5px;font-weight:700;background:rgba(232,163,61,.9);color:#3a2a08;border-radius:99px;padding:4px 11px">nitidez baixa detectada</span>
+          </sc-if>
+        </div>
+        <div style="display:flex;gap:8px;padding:16px 0 6px">
+          <div onClick="{{ pcRefazer }}" style="flex:1;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:99px;padding:14px 0;text-align:center;font-size:14px;font-weight:800;cursor:pointer" style-hover="background:rgba(255,255,255,.16)">Refazer</div>
+          <div onClick="{{ pcConfirmar }}" style="flex:1.4;background:linear-gradient(135deg,#127670,#0E78B5);border-radius:99px;padding:14px 0;text-align:center;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 8px 18px rgba(18,118,112,.4)" style-hover="transform:translateY(-1px)">{{ pcBtn }}</div>
+        </div>
+        <div style="text-align:center;font-size:10.5px;color:rgba(255,255,255,.5)">{{ pcNota }}</div>
+      </div>
+    </x-import>
+  </div>
+
+  <!-- 9 ASSINATURA -->
+  <div style="flex:none;display:flex;flex-direction:column;gap:12px" data-screen-label="App 9 · Assinatura">
+    <div style="font-size:14px;font-weight:700;color:#3c4f4e">9 · Assinatura (interativo: toque no quadro)</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="393px,830px">
+      <div style="padding:16px;display:flex;flex-direction:column;gap:12px;background:#f2f5f4;min-height:100%">
+        <div><div style="font-size:17px;font-weight:800">Assine para fechar o checklist</div><div style="font-size:12px;color:#5c706e;margin-top:3px">VG-2490 · farelo de soja · compartimento C1</div></div>
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:16px;padding:13px 15px">
+          <div style="font-size:11px;font-weight:800;letter-spacing:1px;color:#7c8f8d">VOCÊ DECLARA</div>
+          <div style="font-size:12.5px;color:#3c4f4e;line-height:1.55;margin-top:6px">Que executou o checklist do C1 pessoalmente, que as 6 fotos retratam o estado real do compartimento e que não houve carga não declarada desde a última limpeza.</div>
+        </div>
+        <div onClick="{{ asAssinar }}" style="flex:1;background:#fff;border:2px dashed {{ asBd }};border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all .3s;position:relative">
+          <sc-if value="{{ asVazia }}" hint-placeholder-val="{{ true }}">
+            <svg width="34" height="34" viewBox="0 0 16 16" fill="none" stroke="#9db0ae" stroke-width="1.3" stroke-linecap="round"><path d="M2.5 12.5c2-.5 3-4.5 4.5-4.5s1 3 2.5 3 1.5-5 3-5"></path></svg>
+            <div style="font-size:13px;font-weight:700;color:#7c8f8d">toque e assine com o dedo</div>
+          </sc-if>
+          <sc-if value="{{ asFeita }}" hint-placeholder-val="{{ false }}">
+            <svg width="150" height="60" viewBox="0 0 150 60" fill="none" stroke="#0b2224" stroke-width="2.2" stroke-linecap="round"><path d="M10 42c12-24 18 10 30-14s10 22 24 6 14-18 24-4 16-12 26-2 18-6 26 4"></path></svg>
+            <div style="font-size:11.5px;color:#5c706e">Ivan Prado · assinado agora</div>
+            <span style="position:absolute;top:10px;right:12px;font-family:'Spline Sans Mono';font-size:9.5px;color:#9db0ae">GPS -12.5453, -55.7211 · 11:02</span>
+          </sc-if>
+        </div>
+        <div onClick="{{ asEnviar }}" style="background:{{ asBtnBg }};color:{{ asBtnC }};border-radius:99px;padding:15px 0;text-align:center;font-size:15px;font-weight:800;box-shadow:{{ asBtnSh }};cursor:pointer;transition:all .3s">{{ asBtnT }}</div>
+      </div>
+    </x-import>
+  </div>
+
+  <!-- 10 DIVERGÊNCIA -->
+  <div style="flex:none;display:flex;flex-direction:column;gap:12px" data-screen-label="App 10 · Resolver divergência">
+    <div style="font-size:14px;font-weight:700;color:#3c4f4e">10 · Resolver divergência (interativo)</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="393px,830px">
+      <div style="padding:16px;display:flex;flex-direction:column;gap:12px;background:#f2f5f4;min-height:100%">
+        <div style="background:#fff;border:1px solid #f0debb;border-radius:18px;padding:16px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="width:10px;height:10px;border-radius:99px;background:#e8a33d;box-shadow:0 0 0 4px rgba(232,163,61,.18)"></span><div style="font-size:15px;font-weight:800">Limpeza VG-2481 · divergente</div></div>
+          <div style="font-size:12.5px;color:#5c706e;line-height:1.55;margin-top:8px">O carimbo salvo no seu aparelho diz <strong>17:40</strong>; o servidor recebeu da estação <strong>18:05</strong>. Os dois registros existem; escolha qual vale, com justificativa.</div>
+        </div>
+        <sc-for list="{{ dvOpts }}" as="dv" hint-placeholder-count="2">
+          <div onClick="{{ dv.onClick }}" style="background:#fff;border:1.5px solid {{ dv.bd }};border-radius:16px;padding:13px 15px;cursor:pointer;transition:all .15s" style-hover="border-color:#127670">
+            <div style="display:flex;align-items:center;gap:10px"><span style="width:16px;height:16px;border-radius:99px;border:2px solid {{ dv.dotBd }};background:{{ dv.dot }};flex:none"></span><div style="flex:1"><div style="font-size:13.5px;font-weight:800">{{ dv.t }}</div><div style="font-size:11.5px;color:#5c706e;margin-top:2px">{{ dv.sub }}</div></div><span style="font-family:'Spline Sans Mono';font-size:13px;font-weight:600;color:#0C5862">{{ dv.hora }}</span></div>
+          </div>
+        </sc-for>
+        <div style="background:#fff;border:1.5px solid #e0e7e5;border-radius:14px;padding:0 14px"><input value="{{ dvJust }}" onInput="{{ dvOnJust }}" placeholder="justificativa, ex.: fila na estação atrasou o carimbo" style="border:none;outline:none;background:transparent;font-size:13px;padding:12px 0;width:100%;color:#0b2224"></div>
+        <div style="font-size:11px;color:#7c8f8d;line-height:1.5;padding:0 2px">Nenhum registro é apagado: a resolução vira um terceiro evento apontando para os dois, com autor e hora.</div>
+        <div onClick="{{ dvResolver }}" style="margin-top:auto;background:{{ dvBtnBg }};color:{{ dvBtnC }};border-radius:99px;padding:15px 0;text-align:center;font-size:15px;font-weight:800;box-shadow:{{ dvBtnSh }};cursor:pointer;transition:all .3s">{{ dvBtnT }}</div>
+      </div>
+    </x-import>
+  </div>
+
+  <!-- 11 CONTINGÊNCIA + CÓDIGO -->
+  <div style="flex:none;display:flex;flex-direction:column;gap:12px" data-screen-label="App 11 · Contingência e código">
+    <div style="font-size:14px;font-weight:700;color:#3c4f4e">11 · Contingência: entrada por código</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="393px,830px">
+      <div style="padding:16px;display:flex;flex-direction:column;gap:12px;background:#f2f5f4;min-height:100%">
+        <div style="background:#0b2224;color:#fff;border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:11px">
+          <span style="width:10px;height:10px;border-radius:99px;background:#e8a33d;box-shadow:0 0 0 4px rgba(232,163,61,.25);flex:none"></span>
+          <div><div style="font-size:13.5px;font-weight:800">Sistema central indisponível</div><div style="font-size:11px;color:rgba(255,255,255,.6)">modo contingência: tudo salva no aparelho e reconcilia depois</div></div>
+        </div>
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:18px;text-align:center">
+          <div style="font-size:14px;font-weight:800">Entre com o código da viagem</div>
+          <div style="font-size:11.5px;color:#5c706e;margin-top:3px">está impresso na ordem de carregamento e no QR da balança</div>
+          <div style="display:flex;justify-content:center;gap:7px;margin-top:14px">
+            <sc-for list="{{ cgDigitos }}" as="cd" hint-placeholder-count="6">
+              <span style="width:40px;height:48px;border-radius:12px;border:1.5px solid {{ cd.bd }};background:{{ cd.bg }};display:flex;align-items:center;justify-content:center;font-family:'Spline Sans Mono';font-size:19px;font-weight:600;color:#0b2224">{{ cd.d }}</span>
+            </sc-for>
+          </div>
+          <div onClick="{{ cgDigitar }}" style="margin-top:12px;display:inline-block;background:#f0f4f3;border-radius:99px;padding:8px 18px;font-size:12.5px;font-weight:700;cursor:pointer" style-hover="background:#e4ebe9">{{ cgBtn }}</div>
+        </div>
+        <sc-if value="{{ cgOk }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border:1px solid #cdeeda;border-radius:18px;padding:16px;animation:subir .3s ease-out both">
+            <div style="display:flex;align-items:center;gap:9px"><span style="width:24px;height:24px;border-radius:99px;background:#e9f7ef;color:#1a8f57;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center">✓</span><div style="font-size:13.5px;font-weight:800">VG-2490 encontrada no cache</div></div>
+            <div style="font-size:12px;color:#5c706e;line-height:1.5;margin-top:6px">Checklist, fotos e assinatura funcionam offline. A decisão do motor sai quando o sistema voltar; até lá a carga não segue sem a última decisão válida.</div>
+          </div>
+        </sc-if>
+        <div style="margin-top:auto;background:linear-gradient(90deg,#f7faf9,#fff);border:1px dashed #d8e2e0;border-radius:14px;padding:12px 15px;font-size:11.5px;color:#5c706e;line-height:1.5">Papel nunca substitui o registro: a contingência captura tudo com carimbo local e reconcilia como evento, nunca por edição.</div>
+      </div>
+    </x-import>
+  </div>
+
+  <!-- 12 INSPETOR -->
+  <div style="flex:none;display:flex;flex-direction:column;gap:12px" data-screen-label="App 12 · Inspetor de pátio">
+    <div style="font-size:14px;font-weight:700;color:#3c4f4e">12 · Versão do inspetor de pátio</div>
+    <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="393px,830px">
+      <div style="padding:16px;display:flex;flex-direction:column;gap:12px;background:#f2f5f4;min-height:100%">
+        <div style="display:flex;align-items:center;gap:11px">
+          <span style="width:42px;height:42px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #fff,0 0 0 4.5px #f0debb">JM</span>
+          <div><div style="font-size:16px;font-weight:800">Jorge Mattos</div><div style="font-size:11.5px;color:#5c706e">inspetor de pátio · Rondonópolis</div></div>
+          <span style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#1a8f57;background:#e9f7ef;border-radius:99px;padding:4px 11px"><span style="width:6px;height:6px;border-radius:99px;background:#1a8f57"></span>trilha 6 vigente</span>
+        </div>
+        <div style="font-size:12px;font-weight:800;letter-spacing:1px;color:#7c8f8d;padding:4px 2px 0">FILA DO PÁTIO · 3</div>
+        <div style="background:#fff;border:1px solid #f0debb;border-radius:18px;padding:15px">
+          <div style="display:flex;align-items:center;gap:8px"><span style="font-family:'Spline Sans Mono';font-size:12px;font-weight:600;color:#0C5862">VG-2494</span><span style="margin-left:auto;font-size:10.5px;font-weight:700;color:#b97514;background:#fdf3e2;border-radius:99px;padding:3px 9px">falta 1 ângulo</span></div>
+          <div style="font-size:14.5px;font-weight:800;margin-top:5px">Capturar: bica de descarga · C1</div>
+          <div style="font-size:11.5px;color:#5c706e;margin-top:2px">RXQ 4B19 · doca 2 · a viagem reavalia sozinha após a foto</div>
+          <div style="margin-top:12px;background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;border-radius:99px;padding:12px 0;text-align:center;font-size:14px;font-weight:800;box-shadow:0 8px 18px rgba(18,118,112,.35)">Abrir câmera</div>
+        </div>
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:15px">
+          <div style="display:flex;align-items:center;gap:8px"><span style="font-family:'Spline Sans Mono';font-size:12px;font-weight:600;color:#0C5862">SQT 1C55</span><span style="margin-left:auto;font-size:10.5px;font-weight:700;color:#4c5bc0;background:#eceffa;border-radius:99px;padding:3px 9px">8 ago · 07:30</span></div>
+          <div style="font-size:14px;font-weight:800;margin-top:5px">Inspeção estrutural agendada</div>
+          <div style="font-size:11.5px;color:#5c706e;margin-top:2px">caçamba · 1 compartimento · checklist de 8 itens</div>
+        </div>
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:15px;opacity:.8">
+          <div style="display:flex;align-items:center;gap:8px"><span style="font-family:'Spline Sans Mono';font-size:12px;font-weight:600;color:#0C5862">VG-2487</span><span style="margin-left:auto;font-size:10.5px;font-weight:700;color:#7c8f8d;background:#f0f4f3;border-radius:99px;padding:3px 9px">aguarda limpeza D</span></div>
+          <div style="font-size:14px;font-weight:800;margin-top:5px">Inspeção pós-limpeza · C2</div>
+          <div style="font-size:11.5px;color:#5c706e;margin-top:2px">libera para captura quando a Higitrans concluir amanhã, 14:00</div>
+        </div>
+        <div style="margin-top:auto;background:linear-gradient(90deg,#f7faf9,#fff);border:1px dashed #d8e2e0;border-radius:14px;padding:12px 15px;font-size:11.5px;color:#5c706e;line-height:1.5">O inspetor só vê o que exige olho qualificado. Captura assinada entra lacrada no registro da viagem.</div>
+      </div>
+    </x-import>
+  </div>
+
+</div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { ck: { residuos: 0, odores: 0, pragas: 2, lona: 0, bica: 1, vedacao: 0 }, tab1: 'viagens', notif: false, sheet: null,
+    pcTent: 1, asOk: false, asEnviada: false, dvOpt: null, dvJust: '', dvOkFeito: false, cgFase: 0 };
+  novosVals() {
+    const s = this.state;
+    const dvPronto = s.dvOpt && s.dvJust.trim().length >= 10;
+    const codigos = ['', 'V', 'VG', 'VG2', 'VG24', 'VG249', 'VG2490'];
+    const dig = codigos[Math.min(s.cgFase, 6)].padEnd(6, ' ').split('');
+    return {
+      pcNitidezBaixa: s.pcTent === 1,
+      pcBtn: s.pcTent === 1 ? 'Usar mesmo assim' : 'Confirmar foto 5 de 6',
+      pcNota: s.pcTent === 1 ? 'a nitidez baixa fica declarada no registro se você confirmar' : 'refeita: nitidez ok · hash novo gerado, o anterior fica no histórico',
+      pcRefazer: () => this.setState({ pcTent: 2 }),
+      pcConfirmar: () => this.setState({ pcTent: s.pcTent === 1 ? 1 : 2 }),
+      asVazia: !s.asOk, asFeita: s.asOk, asBd: s.asOk ? '#127670' : '#c9d5d3',
+      asAssinar: () => this.setState({ asOk: true }),
+      asBtnT: s.asEnviada ? '✓ Assinatura enviada' : s.asOk ? 'Enviar assinatura' : 'Assine antes de enviar',
+      asBtnBg: s.asEnviada ? '#e9f7ef' : s.asOk ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#e4ebe9',
+      asBtnC: s.asEnviada ? '#1a8f57' : s.asOk ? '#fff' : '#9db0ae',
+      asBtnSh: s.asOk && !s.asEnviada ? '0 8px 18px rgba(18,118,112,.35)' : 'none',
+      asEnviar: () => { if (s.asOk) this.setState({ asEnviada: true }); },
+      dvOpts: [
+        { k: 'local', t: 'Vale o carimbo do aparelho', sub: 'registrado por você, no local, offline', hora: '17:40' },
+        { k: 'estacao', t: 'Vale o carimbo da estação', sub: 'enviado pela Higitrans ao servidor', hora: '18:05' }
+      ].map(o => { const on = s.dvOpt === o.k; return { ...o, onClick: () => this.setState({ dvOpt: o.k }),
+        bd: on ? '#127670' : '#eef2f1', dot: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#fff', dotBd: on ? '#127670' : '#c9d5d3' }; }),
+      dvJust: s.dvJust, dvOnJust: e => this.setState({ dvJust: e.target.value }),
+      dvBtnT: s.dvOkFeito ? '✓ Divergência resolvida' : 'Resolver divergência',
+      dvBtnBg: s.dvOkFeito ? '#e9f7ef' : dvPronto ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#e4ebe9',
+      dvBtnC: s.dvOkFeito ? '#1a8f57' : dvPronto ? '#fff' : '#9db0ae',
+      dvBtnSh: dvPronto && !s.dvOkFeito ? '0 8px 18px rgba(18,118,112,.35)' : 'none',
+      dvResolver: () => { if (dvPronto) this.setState({ dvOkFeito: true }); },
+      cgDigitos: dig.map((d, i) => ({ d: d.trim(), bd: i < s.cgFase ? '#127670' : '#e0e7e5', bg: i < s.cgFase ? '#eef7f6' : '#fff' })),
+      cgBtn: s.cgFase >= 6 ? 'Código completo ✓' : 'Simular digitação',
+      cgOk: s.cgFase >= 6,
+      cgDigitar: () => this.setState({ cgFase: Math.min(s.cgFase + 2, 6) })
+    };
+  }
+  componentDidMount() { this.initMapaLav(); }
+  componentDidUpdate() { this.initMapaLav(); }
+  initMapaLav() {
+    if (this.state.tab1 !== 'lavagem' || this._mapLav || !window.L) return;
+    const el = document.getElementById('mapa-lavagem');
+    if (!el) return;
+    const L = window.L;
+    const map = L.map(el, { zoomControl: false, scrollWheelZoom: true, attributionControl: false });
+    this._mapLav = map;
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 18 }).addTo(map);
+    const eu = L.divIcon({ className: '', iconSize: [34, 34], iconAnchor: [17, 17], html: '<div style="width:34px;height:34px;border-radius:99px;background:linear-gradient(135deg,#0C5862,#0E78B5);color:#fff;display:flex;align-items:center;justify-content:center;font:700 10px Hanken Grotesk,sans-serif;box-shadow:0 0 0 3px #fff,0 0 0 5.5px rgba(18,118,112,.3)">IP</div>' });
+    L.marker([-12.63, -55.85], { icon: eu }).addTo(map).bindPopup('Você está aqui');
+    const pin = cor => L.divIcon({ className: '', iconSize: [26, 26], iconAnchor: [13, 13], html: '<div style="width:26px;height:26px;border-radius:99px 99px 99px 4px;transform:rotate(-45deg);background:' + cor + ';box-shadow:0 4px 10px rgba(9,61,68,.35);display:flex;align-items:center;justify-content:center"><span style="transform:rotate(45deg);color:#fff;font:800 11px Hanken Grotesk,sans-serif">💧</span></div>' });
+    L.marker([-12.545, -55.721], { icon: pin('#127670') }).addTo(map).bindPopup('<b>Higitrans</b><br>regime D · 12 km · aberta');
+    L.marker([-12.79, -55.99], { icon: pin('#127670') }).addTo(map).bindPopup('<b>LavaMax BR-364</b><br>regime D · 31 km · aberta');
+    L.marker([-13.08, -56.09], { icon: pin('#e8a33d') }).addTo(map).bindPopup('<b>Posto Trevo</b><br>regime B · 44 km · fecha 18h');
+    map.fitBounds([[-13.08, -56.09], [-12.545, -55.721]], { padding: [26, 26] });
+    setTimeout(() => map.invalidateSize(), 150);
+  }
+  renderVals() {
+    const extra = this.novosVals();
+    const defs = [
+      { k: 'residuos', n: 'Sem resíduos visíveis', critico: true },
+      { k: 'odores', n: 'Sem odores estranhos', critico: true },
+      { k: 'pragas', n: 'Sem pragas', critico: true },
+      { k: 'lona', n: 'Lona íntegra e limpa', critico: false },
+      { k: 'bica', n: 'Bica de descarga limpa', critico: true },
+      { k: 'vedacao', n: 'Vedações e borrachas', critico: false }
+    ];
+    const est = [
+      { st: 'conforme', icon: '✓', c: '#1a8f57', bg: '#e9f7ef', sh: 'none' },
+      { st: 'não conforme', icon: '✕', c: '#c43d3d', bg: '#fdecec', sh: '0 0 0 3px rgba(196,61,61,.12)' },
+      { st: 'não se aplica', icon: '·', c: '#7c8f8d', bg: '#f0f4f3', sh: 'none' }
+    ];
+    const ckItens = defs.map(d => {
+      const v = this.state.ck[d.k];
+      return { n: d.n, ...est[v],
+        crit: d.critico ? 'crítico: reprova sozinho' : 'não crítico: vira pendência',
+        critC: d.critico ? '#c43d3d' : '#7c8f8d',
+        onClick: () => this.setState(s => ({ ck: { ...s.ck, [d.k]: (s.ck[d.k] + 1) % 3 } })) };
+    });
+    const falhaCrit = defs.some(d => d.critico && this.state.ck[d.k] === 1);
+    const pend = defs.filter(d => !d.critico && this.state.ck[d.k] === 1).length;
+    const ban = falhaCrit
+      ? { ckBanT: 'Reprovada', ckBanSub: 'item crítico não conforme: a carga não segue', ckBanC: '#c43d3d', ckBanDot: '#c43d3d', ckBanGlow: 'rgba(196,61,61,.16)', ckBanBg: '#fdf6f6', ckBanBd: '#f3d4d4' }
+      : pend > 0
+        ? { ckBanT: 'Aprovada com pendência', ckBanSub: pend + ' item não crítico para corrigir', ckBanC: '#b97514', ckBanDot: '#e8a33d', ckBanGlow: 'rgba(232,163,61,.16)', ckBanBg: '#fdfaf3', ckBanBd: '#f0debb' }
+        : { ckBanT: 'Aprovada', ckBanSub: 'resultado calculado ao vivo enquanto você preenche', ckBanC: '#1a8f57', ckBanDot: '#1a8f57', ckBanGlow: 'rgba(26,143,87,.16)', ckBanBg: '#f4faf6', ckBanBd: '#cdeeda' };
+    const tab1 = this.state.tab1;
+    const tabs1 = [['viagens', 'Viagens'], ['lavagem', 'Lavagem'], ['perfil', 'Perfil']].map(([k, n]) => ({
+      n, onClick: () => this.setState({ tab1: k, notif: false }),
+      bg: tab1 === k ? 'linear-gradient(135deg,#127670,#0E78B5)' : 'transparent',
+      c: tab1 === k ? '#fff' : '#7c8f8d' }));
+    return { ...ban, ckItens,
+      tab1Viagens: tab1 === 'viagens', tab1Lavagem: tab1 === 'lavagem', tab1Perfil: tab1 === 'perfil',
+      tabs1, goLavagem: () => this.setState({ tab1: 'lavagem' }),
+      notifOpen: this.state.notif, onNotif: () => this.setState(s => ({ notif: !s.notif })),
+      notifGoViagem: () => this.setState({ notif: false, tab1: 'viagens' }),
+      notifGoPerfil: () => this.setState({ notif: false, tab1: 'perfil' }),
+      sheetAberta: !!this.state.sheet, sheetT3: this.state.sheet === 't3', sheetCk: this.state.sheet === 'ck',
+      abrirSheetT3: () => this.setState({ sheet: 't3' }),
+      abrirSheetCk: () => this.setState({ sheet: 'ck' }),
+      fecharSheet: () => this.setState({ sheet: null }),
+      pararClique: e => e.stopPropagation(),
+      lavagens: [
+        { n: 'Higitrans', meta: 'BR-163, km 118 · Sorriso MT · 12 km', reg: 'D', regC: '#c43d3d', regBg: '#fdecec', st: 'aberta agora', stC: '#1a8f57', stBg: '#e9f7ef' },
+        { n: 'LavaMax BR-364', meta: 'Rondonópolis MT · 31 km', reg: 'D', regC: '#c43d3d', regBg: '#fdecec', st: 'aberta agora', stC: '#1a8f57', stBg: '#e9f7ef' },
+        { n: 'Posto Trevo · box de lavagem', meta: 'Nova Mutum MT · 44 km', reg: 'B', regC: '#8a7410', regBg: '#faf3d4', st: 'fecha às 18h', stC: '#b97514', stBg: '#fdf3e2' }
+      ],
+      ckBtnT: falhaCrit ? 'Registrar ocorrência' : 'Fotos e assinatura →',
+      ckBtnBg: falhaCrit ? '#0b2224' : 'linear-gradient(135deg,#127670,#0E78B5)',
+      ckBtnC: '#fff', ckBtnSh: falhaCrit ? 'none' : '0 8px 18px rgba(18,118,112,.35)', ...extra };
+  }
+}
+</script>
+</body>
+</html>

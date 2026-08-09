@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<script src="./prototype-shell.js" defer></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f2f5f4;font-family:'Hanken Grotesk',sans-serif;color:#0b2224;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0C5862;text-decoration:none}a:hover{color:#127670}
+input{font-family:'Hanken Grotesk',sans-serif}
+input::placeholder{color:#8ba09e}
+@keyframes txsh{from{background-position:-600px 0}to{background-position:600px 0}}
+@keyframes deslizar{from{transform:translateX(40px);opacity:0}to{transform:translateX(0);opacity:1}}
+</style>
+</helmet>
+<div style="display:flex;min-height:100vh;min-width:1560px" data-screen-label="Subcontratados (Gatekeeper)">
+  <!-- SIDEBAR -->
+  <div style="width:{{ navW }};flex:none;background:linear-gradient(178deg,#093D44,#0A4650);color:#fff;display:flex;flex-direction:column;padding:24px {{ navPad }};position:sticky;top:0;height:100vh;transition:width .25s ease;overflow-x:hidden;overflow-y:auto">
+    <div style="display:flex;align-items:center;gap:10px;padding:4px 8px 22px">
+      <svg width="34" height="34" viewBox="0 0 32 32"><defs><linearGradient id="lgT" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1a9e93"></stop><stop offset="1" stop-color="#0E78B5"></stop></linearGradient></defs><polygon points="16,2.5 27.5,9 27.5,23 16,29.5 4.5,23 4.5,9" fill="url(#lgT)"></polygon><polyline points="9,20 13,13 18,17 23,10" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></polyline><circle cx="9" cy="20" r="1.6" fill="#fff"></circle><circle cx="13" cy="13" r="1.6" fill="#fff"></circle><circle cx="18" cy="17" r="1.6" fill="#fff"></circle><circle cx="23" cy="10" r="1.6" fill="#fff"></circle></svg>
+      <div style="display:{{ navL }}"><div style="font-weight:800;font-size:17px;letter-spacing:.2px">Traxium</div><div style="font-size:10.5px;letter-spacing:2.2px;color:rgba(255,255,255,.5);text-transform:uppercase">Compliance</div></div>
+    </div>
+    <a href="Torre de Controle v2.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;font-size:14px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="5.6"></circle><circle cx="8" cy="8" r="1.4" fill="currentColor" stroke="none"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Torre de Controle</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">7</span></a>
+    <div style="font-size:10.5px;letter-spacing:1.8px;color:rgba(255,255,255,.38);padding:20px 12px 8px;font-weight:700;display:{{ navSec }}">OPERAÇÃO</div>
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:14px;color:rgba(255,255,255,.66)">
+      <a href="Viagens.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 8h9"></path><path d="M8 4.5 11.5 8 8 11.5"></path></svg><span style="display:{{ navL }};white-space:nowrap">Viagens</span></a>
+      <a href="Excecoes.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6"></circle><line x1="8" y1="4.8" x2="8" y2="8.6"></line><circle cx="8" cy="11.2" r=".9" fill="currentColor" stroke="none"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Exceções e liberações</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">5</span></a>
+      <a href="Inspecoes.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 6.5 12 13 4.5"></path></svg><span style="display:{{ navL }};white-space:nowrap">Inspeções</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">3</span></a>
+      <a href="Limpezas.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.8c2.4 2.8 3.7 4.6 3.7 6.5a3.7 3.7 0 1 1-7.4 0c0-1.9 1.3-3.7 3.7-6.5z"></path></svg><span style="display:{{ navL }};white-space:nowrap">Limpezas</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">3</span></a>
+    </div>
+    <div style="font-size:10.5px;letter-spacing:1.8px;color:rgba(255,255,255,.38);padding:20px 12px 8px;font-weight:700;display:{{ navSec }}">PILARES</div>
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:14px;color:rgba(255,255,255,.66)">
+      <a href="Motor IDTF.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="2.5" width="11" height="11" rx="3"></rect><line x1="8" y1="2.5" x2="8" y2="13.5"></line></svg><span style="display:{{ navL }};white-space:nowrap">Motor IDTF</span></a>
+      <div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px;background:linear-gradient(90deg,rgba(26,158,147,.35),rgba(14,120,181,.28));border:1px solid rgba(255,255,255,.14);font-weight:700;color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5.4" cy="6.2" r="2.4"></circle><circle cx="10.8" cy="6.2" r="2.4"></circle><path d="M2.5 13c.6-2 1.7-3 3-3s2.3 1 2.9 3" stroke-linecap="round"></path></svg><span style="display:{{ navL }};white-space:nowrap">Subcontratados</span><span style="margin-left:auto;display:{{ navL }};background:#fff;color:#0C5862;font-size:11.5px;font-weight:800;padding:1px 8px;border-radius:99px">3</span></div>
+      <a href="Motoristas.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="5.4" r="2.6"></circle><path d="M3 13.4c.8-2.6 2.6-3.9 5-3.9s4.2 1.3 5 3.9"></path></svg><span style="display:{{ navL }};white-space:nowrap">Motoristas</span></a>
+      <a href="Acessos Externos.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.4 8.6a3.2 3.2 0 1 0 0-.01z"></path><path d="M9 7.2 14 2.2M12 4.2l1.6 1.6M10.6 5.6l1.6 1.6"></path></svg><span style="display:{{ navL }};white-space:nowrap">Acessos externos</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">2</span></a>
+      <a href="Academy.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M2 6.3 8 3.4l6 2.9-6 2.9z"></path><path d="M4.6 8.4v2.6c0 .9 1.5 1.8 3.4 1.8s3.4-.9 3.4-1.8V8.4" stroke-linecap="round"></path></svg><span style="display:{{ navL }};white-space:nowrap">Academy</span></a>
+      <a href="Ativos e Frota.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="4.5" width="8" height="5.5" rx="1.4"></rect><path d="M10 6.5h2.4l1.6 2v1.5h-4z" stroke-linejoin="round"></path><circle cx="5" cy="11.8" r="1.4"></circle><circle cx="11.6" cy="11.8" r="1.4"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Ativos e frota</span></a>
+    </div>
+    <div style="font-size:10.5px;letter-spacing:1.8px;color:rgba(255,255,255,.38);padding:20px 12px 8px;font-weight:700;display:{{ navSec }}">PROVA</div>
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:14px;color:rgba(255,255,255,.66)">
+      <a href="Dossie.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3.2" y="2.5" width="9.6" height="11" rx="2"></rect><line x1="6" y1="6" x2="10" y2="6"></line><line x1="6" y1="9" x2="10" y2="9"></line></svg><span style="display:{{ navL }};white-space:nowrap">Dossiê de auditoria</span></a>
+      <a href="Indicadores.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="4" y1="13" x2="4" y2="8.5"></line><line x1="8" y1="13" x2="8" y2="3.5"></line><line x1="12" y1="13" x2="12" y2="10"></line></svg><span style="display:{{ navL }};white-space:nowrap">Indicadores</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">11/15</span></a>
+      <a href="Nao Conformidades.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="5.8" stroke-dasharray="2.4 2.4"></circle><circle cx="8" cy="8" r="2.2"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Não conformidades</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">4</span></a>
+    </div>
+    <a href="Configuracoes.dc.html" style="margin-top:auto;display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="2.3"></circle><path d="M8 1.8v1.9M8 12.3v1.9M14.2 8h-1.9M3.7 8H1.8M12.4 3.6l-1.3 1.3M4.9 11.1l-1.3 1.3M12.4 12.4l-1.3-1.3M4.9 4.9 3.6 3.6" stroke-linecap="round"></path></svg><span style="display:{{ navL }};white-space:nowrap">Configurações</span></a>
+    <a href="Onboarding Publico.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13V3.8c0-.7.5-1.2 1.2-1.2h5.6c.7 0 1.2.5 1.2 1.2V13"></path><path d="M6 8h7M10.5 5.5 13 8l-2.5 2.5"></path></svg><span style="display:{{ navL }};white-space:nowrap">Onboarding público</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">6 passos</span></a>
+      <a href="App de Campo.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="1.8" width="9" height="12.4" rx="2"></rect><line x1="6.5" y1="4" x2="9.5" y2="4"></line><circle cx="8" cy="11.7" r=".65" fill="currentColor" stroke="none"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Protótipo mobile</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">12 telas</span></a>
+      <div onClick="{{ navToggle }}" title="Recolher ou expandir o menu" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;cursor:pointer;font-size:13px;font-weight:600;color:rgba(255,255,255,.6)" style-hover="background:rgba(255,255,255,.08);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="transform:{{ navFlip }};transition:transform .25s;flex:none"><path d="M9.5 3 4.5 8l5 5"></path><line x1="12" y1="3" x2="12" y2="13"></line></svg><span style="display:{{ navL }};white-space:nowrap">Recolher menu</span></div><div style="display:{{ navCard }};margin-top:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px">
+      <div style="font-size:12px;color:rgba(255,255,255,.55);margin-bottom:8px">Safra 2026/27</div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600"><span style="width:8px;height:8px;border-radius:99px;background:#3ddc97;box-shadow:0 0 0 4px rgba(61,220,151,.18)"></span>212 terceiros na rede</div>
+      <div style="font-size:11.5px;color:rgba(255,255,255,.45);margin-top:4px">87% aptos · cadastro sem atrito</div>
+    </div>
+  </div>
+  <!-- CONTENT -->
+  <div style="flex:1;display:flex;flex-direction:column;padding:26px 32px 48px;gap:20px;min-width:0">
+    <div style="display:flex;align-items:center;gap:16px">
+      <div><div style="font-size:24px;font-weight:800">Subcontratados</div><div style="font-size:13.5px;color:#5c706e;margin-top:2px">Gatekeeper: quem pode transportar por você, e a prova disso · 212 na rede</div></div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+        <div style="background:#fff;border:1px solid #e0e7e5;border-radius:11px;padding:0 14px;display:flex;gap:8px;align-items:center">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#7c8f8d" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.6"></circle><line x1="10.5" y1="10.5" x2="13.5" y2="13.5"></line></svg>
+          <input value="{{ busca }}" onInput="{{ onBusca }}" placeholder="CPF, CNPJ, placa, telefone ou nome…" style="border:none;outline:none;background:transparent;font-size:13.5px;padding:10px 0;width:250px;color:#0b2224">
+        </div>
+        <div onClick="{{ abrirAdicionar }}" style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;border-radius:99px;padding:10px 20px;font-size:13.5px;font-weight:800;cursor:pointer;box-shadow:0 6px 14px rgba(18,118,112,.3);transition:transform .15s" style-hover="transform:translateY(-1px)">+ Adicionar terceiro</div>
+        <div data-tx-pop style="position:relative">
+          <div onClick="{{ onPerfil }}" style="width:38px;height:38px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13.5px;box-shadow:0 0 0 3px #fff,0 0 0 4.5px #d8e4e2;cursor:pointer" style-hover="box-shadow:0 0 0 3px #fff,0 0 0 4.5px #127670">RA</div>
+          <sc-if value="{{ perfilOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;right:0;top:48px;background:#fff;border:1px solid #e4eae8;border-radius:16px;box-shadow:0 16px 40px rgba(9,61,68,.16);padding:6px;width:250px;z-index:60;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;gap:11px;padding:11px 12px;border-bottom:1px solid #f0f4f3;margin-bottom:4px">
+                <span style="width:38px;height:38px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none">RA</span>
+                <div><div style="font-size:13.5px;font-weight:800">Rafael Antunes</div><div style="font-size:11.5px;color:#5c706e">Gestor de qualidade · GMP+</div></div>
+              </div>
+              <div onClick="{{ abrirPerfil }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer" style-hover="background:#f6f9f8">Meu perfil</div>
+              <div onClick="{{ abrirPrefs }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer" style-hover="background:#f6f9f8">Preferências e notificações</div>
+              <div onClick="{{ abrirPapel }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px" style-hover="background:#f6f9f8">Papel ativo<span style="display:inline-block;font-size:10.5px;font-weight:700;color:#0C5862;background:#e9f3f2;border-radius:99px;padding:2px 9px;white-space:nowrap">{{ papelBadge }}</span></div>
+              <div style="height:1px;background:#f0f4f3;margin:5px 8px"></div>
+              <div onClick="{{ abrirSair }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;color:#c43d3d" style-hover="background:#fdf6f6">Sair</div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+    <!-- FUNIL DE ESTADOS -->
+    <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:20px 22px">
+      <div style="display:flex;align-items:baseline;gap:10px"><div style="font-size:15.5px;font-weight:800">Estados de qualificação</div><div style="font-size:12.5px;color:#5c706e">clique para filtrar · o estado deriva dos fatos, ninguém digita</div></div>
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <sc-for list="{{ estados }}" as="es" hint-placeholder-count="9">
+          <div onClick="{{ es.onClick }}" style="flex:{{ es.flex }};min-width:86px;border:1.5px solid {{ es.bd }};background:{{ es.bg }};border-radius:14px;padding:10px 12px;cursor:pointer;transition:all .2s" style-hover="transform:translateY(-2px);box-shadow:0 8px 18px rgba(9,61,68,.08)">
+            <div style="display:flex;align-items:center;gap:7px"><span style="width:8px;height:8px;border-radius:99px;background:{{ es.dot }};box-shadow:0 0 0 3px {{ es.glow }}"></span><span style="font-family:'Spline Sans Mono';font-size:15px;font-weight:600;font-variant-numeric:tabular-nums">{{ es.n }}</span></div>
+            <div style="font-size:11px;font-weight:700;color:{{ es.tc }};margin-top:5px;line-height:1.25">{{ es.nome }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <!-- LISTA -->
+    <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:8px 8px 10px">
+      <div style="display:grid;grid-template-columns:1.5fr 120px 1fr 1fr 150px 96px 44px;gap:14px;padding:12px 18px 10px;font-size:11px;letter-spacing:1.1px;font-weight:700;color:#7c8f8d">
+        <span>TERCEIRO</span><span>VÍNCULO</span><span>CERTIFICADO / ACORDO</span><span>FROTA VINCULADA</span><span>ESTADO</span><span>VÁLIDO ATÉ</span><span></span>
+      </div>
+      <sc-if value="{{ vazio }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:48px 20px;display:flex;flex-direction:column;align-items:center;gap:10px">
+          <span style="width:48px;height:48px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="#7c8f8d" stroke-width="1.6"><circle cx="5.4" cy="6.2" r="2.4"></circle><circle cx="10.8" cy="6.2" r="2.4"></circle><path d="M2.5 13c.6-2 1.7-3 3-3s2.3 1 2.9 3" stroke-linecap="round"></path></svg></span>
+          <div style="font-size:15px;font-weight:800">Nenhum terceiro neste filtro</div>
+          <div style="font-size:13px;color:#5c706e">Ajuste a busca ou o estado selecionado no funil acima.</div>
+        </div>
+      </sc-if>
+      <sc-for list="{{ rows }}" as="r" hint-placeholder-count="7">
+        <div onClick="{{ r.abrir }}" style="display:grid;grid-template-columns:1.5fr 120px 1fr 1fr 150px 96px 44px;gap:14px;align-items:center;padding:13px 18px;border-top:1px solid #f0f4f3;border-radius:12px;cursor:pointer;transition:background .15s" style-hover="background:#f6f9f8">
+          <div style="display:flex;align-items:center;gap:11px;min-width:0">
+            <span style="width:40px;height:40px;border-radius:99px;flex:none;background:linear-gradient(135deg,{{ r.a1 }},{{ r.a2 }});color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2.5px #fff,0 0 0 4px {{ r.ring }}">{{ r.ini }}</span>
+            <div style="min-width:0"><div style="font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.nome }}</div><div style="font-family:'Spline Sans Mono';font-size:11px;color:#7c8f8d">{{ r.doc }}</div></div>
+          </div>
+          <span style="display:inline-block;font-size:11.5px;font-weight:700;color:#3c4f4e;background:#f0f4f3;border-radius:99px;padding:4px 11px;justify-self:start;white-space:nowrap">{{ r.vinculo }}</span>
+          <div style="font-size:12.5px;line-height:1.45"><span style="font-weight:700;color:{{ r.certC }}">{{ r.cert }}</span><br><span style="color:#5c706e">{{ r.acordo }}</span></div>
+          <div style="font-size:12.5px;color:#3c4f4e;line-height:1.45">{{ r.frota }}<br><span style="color:#7c8f8d;font-size:11.5px">{{ r.motoristas }}</span></div>
+          <span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:{{ r.stTc }};background:{{ r.stBg }};border:1px solid {{ r.stBd }};border-radius:99px;padding:5px 12px;justify-self:start;white-space:nowrap"><span style="width:7px;height:7px;border-radius:99px;background:{{ r.stDot }}"></span>{{ r.estado }}</span>
+          <span style="font-family:'Spline Sans Mono';font-size:12.5px;font-weight:600;color:{{ r.valC }}">{{ r.validade }}</span>
+          <div style="position:relative;justify-self:end">
+            <span onClick="{{ r.menu }}" style="width:32px;height:32px;border-radius:99px;background:{{ r.menuBg }};color:#3c4f4e;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:800;letter-spacing:1px" style-hover="background:#e4ebe9">⋯</span>
+            <sc-if value="{{ r.menuOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;right:0;top:38px;background:#fff;border:1px solid #e4eae8;border-radius:14px;box-shadow:0 16px 40px rgba(9,61,68,.18);padding:6px;width:236px;z-index:80;display:flex;flex-direction:column">
+                <span onClick="{{ r.acExportar }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer" style-hover="background:#f6f9f8">Exportar passaporte</span>
+                <span onClick="{{ r.acRenovar }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer" style-hover="background:#f6f9f8">Renovar acordo</span>
+                <span onClick="{{ r.acTrilha }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer" style-hover="background:#f6f9f8">Enviar trilha ou aviso</span>
+                <span style="height:1px;background:#f0f4f3;margin:5px 8px"></span>
+                <span onClick="{{ r.acSuspender }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;color:#b97514" style-hover="background:#fdfaf3">Suspender manualmente…</span>
+                <span onClick="{{ r.acArquivar }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;color:#c43d3d" style-hover="background:#fdf6f6">Arquivar (inativar)</span>
+                <span style="font-size:11px;color:#7c8f8d;padding:7px 12px 8px;line-height:1.45">Não existe excluir: o histórico sustenta o dossiê. Arquivar preserva tudo.</span>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-for>
+        <sc-if value="{{ temPaginacao }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 4px 2px">
+            <div style="font-size:12.5px;color:#5c706e">{{ pagInfo }}</div>
+            <div style="margin-left:auto;display:flex;gap:6px;align-items:center">
+              <span onClick="{{ pagAnterior }}" style="font-size:12.5px;font-weight:700;border-radius:99px;padding:7px 15px;cursor:{{ pagAntCur }};background:#fff;color:{{ pagAntC }};border:1px solid #e0e7e5" style-hover="border-color:#127670">Anterior</span>
+              <sc-for list="{{ txPaginas }}" as="txp" hint-placeholder-count="3">
+                <span onClick="{{ txp.onClick }}" style="font-size:12.5px;font-weight:800;border-radius:99px;padding:7px 14px;cursor:pointer;background:{{ txp.bg }};color:{{ txp.c }};border:1px solid {{ txp.bd }};min-width:36px;text-align:center" style-hover="border-color:#127670">{{ txp.n }}</span>
+              </sc-for>
+              <span onClick="{{ pagProxima }}" style="font-size:12.5px;font-weight:700;border-radius:99px;padding:7px 15px;cursor:{{ pagProxCur }};background:#fff;color:{{ pagProxC }};border:1px solid #e0e7e5" style-hover="border-color:#127670">Próxima</span>
+            </div>
+          </div>
+        </sc-if>
+
+    </div>
+    <div style="font-size:12.5px;color:#5c706e;padding:0 6px">Estado nunca é editado à mão: deriva de certificado, acordo, trilhas e inspeções. Quem quiser mudar o estado, muda o fato.</div>
+  </div>
+  <!-- DRAWER PASSAPORTE -->
+  <sc-if value="{{ drawerAberto }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharDrawer }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;justify-content:flex-end">
+      <div onClick="{{ pararClique }}" style="width:560px;background:#f7faf9;height:100vh;overflow:auto;box-shadow:-30px 0 80px rgba(9,34,36,.35);animation:deslizar .3s ease-out both">
+        <!-- capa do passaporte -->
+        <div style="background:linear-gradient(130deg,#093D44,#0C5862 55%,#0E78B5 130%);color:#fff;padding:26px 28px 22px;position:relative;overflow:hidden">
+          <div style="position:absolute;right:-60px;top:-90px;width:280px;height:280px;border-radius:99em;background:radial-gradient(circle,rgba(255,255,255,.13),transparent 65%)"></div>
+          <div style="display:flex;align-items:center;gap:10px"><span style="font-size:10.5px;letter-spacing:2.4px;font-weight:700;color:rgba(255,255,255,.6)">PASSAPORTE FEED SAFETY</span><span onClick="{{ fecharDrawer }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:rgba(255,255,255,.22)">✕</span></div>
+          <div style="display:flex;align-items:center;gap:16px;margin-top:16px">
+            <span style="width:76px;height:76px;border-radius:99px;flex:none;background:linear-gradient(135deg,{{ p.a1 }},{{ p.a2 }});color:#fff;font-size:26px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px rgba(255,255,255,.9),0 0 0 7px rgba(255,255,255,.25)">{{ p.ini }}</span>
+            <div style="min-width:0">
+              <div style="font-size:20px;font-weight:800">{{ p.nome }}</div>
+              <div style="font-family:'Spline Sans Mono';font-size:12px;color:rgba(255,255,255,.7);margin-top:2px">{{ p.doc }}</div>
+              <div style="display:flex;gap:6px;margin-top:8px"><span style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;background:{{ p.heroBg }};color:{{ p.heroC }};border-radius:99px;padding:4px 12px"><span style="width:7px;height:7px;border-radius:99px;background:currentColor"></span>{{ p.estado }}</span><span style="display:inline-block;font-size:11.5px;font-weight:700;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);border-radius:99px;padding:4px 12px">{{ p.vinculo }}</span></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:18px">
+            <sc-for list="{{ p.selos }}" as="sl" hint-placeholder-count="4">
+              <div style="flex:1;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);border-radius:13px;padding:9px 11px;backdrop-filter:blur(4px)"><div style="font-size:15px;font-weight:800;display:flex;align-items:center;gap:6px">{{ sl.v }}<span style="font-size:10px;font-weight:700;color:{{ sl.c }}">{{ sl.tag }}</span></div><div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:2px">{{ sl.l }}</div></div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="padding:20px 24px;display:flex;flex-direction:column;gap:14px">
+          <!-- apto para -->
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:18px">
+            <div style="font-size:14px;font-weight:800">Apto para</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">
+              <sc-for list="{{ p.aptoPara }}" as="ap" hint-placeholder-count="4"><span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:{{ ap.c }};background:{{ ap.bg }};border-radius:99px;padding:5px 12px;white-space:nowrap">{{ ap.icon }} {{ ap.l }}</span></sc-for>
+            </div>
+          </div>
+          <!-- o que falta (se houver) -->
+          <sc-if value="{{ p.temPendencias }}" hint-placeholder-val="{{ false }}">
+            <div style="background:linear-gradient(90deg,#fdfaf3,#fff);border:1px dashed #e5d9b8;border-radius:18px;padding:18px">
+              <div style="font-size:14px;font-weight:800">O que falta para ficar apto</div>
+              <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
+                <sc-for list="{{ p.pendencias }}" as="pd" hint-placeholder-count="2">
+                  <div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;border-radius:99px;background:#fdf3e2;color:#b97514;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none">{{ pd.n }}</span><span style="font-size:13px;font-weight:600;flex:1">{{ pd.t }}</span><span onClick="{{ pd.acao }}" style="font-size:12px;font-weight:700;color:#0C5862;cursor:pointer;white-space:nowrap" style-hover="color:#127670">{{ pd.cta }} →</span></div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+          <!-- certificado e acordo -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:16px">
+              <div style="font-size:11px;letter-spacing:1.2px;font-weight:700;color:#7c8f8d">CERTIFICADO GMP+</div>
+              <div style="font-size:13.5px;font-weight:800;margin-top:7px;color:{{ p.certC }}">{{ p.cert }}</div>
+              <div style="font-size:11.5px;color:#5c706e;margin-top:3px">{{ p.certSub }}</div>
+              <div style="display:flex;flex-direction:column;gap:4px;margin-top:9px">
+                <div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:#7c8f8d">número</span><span style="font-family:'Spline Sans Mono';font-weight:600">GMP059814</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:#7c8f8d">válido até</span><span style="font-family:'Spline Sans Mono';font-weight:600;color:{{ p.certC }}">{{ p.certVal }}</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:#7c8f8d">sites cobertos</span><span style="font-weight:700;text-align:right">matriz Sorriso + filial Rondonópolis</span></div>
+              </div>
+              <span onClick="{{ p.verDoc }}" style="display:inline-block;margin-top:9px;font-size:11.5px;font-weight:700;color:#0C5862;cursor:pointer" style-hover="color:#127670">Ver documento original →</span>
+              <div style="font-size:11px;color:#7c8f8d;margin-top:7px">consulta automática à base pública, 2× ao dia</div>
+            </div>
+            <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:16px">
+              <div style="font-size:11px;letter-spacing:1.2px;font-weight:700;color:#7c8f8d">ACORDO DE QUALIDADE</div>
+              <div style="font-size:13.5px;font-weight:800;margin-top:7px;color:{{ p.acordoC }}">{{ p.acordo }}</div>
+              <div style="font-size:11.5px;color:#5c706e;margin-top:3px">{{ p.acordoSub }}</div>
+              <div style="font-size:11px;color:#7c8f8d;margin-top:7px">v3 · assinatura eletrônica · aparelho registrado</div>
+            </div>
+          </div>
+          <!-- frota -->
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:18px">
+            <div style="display:flex;align-items:baseline;gap:10px"><div style="font-size:14px;font-weight:800">Frota e motoristas vinculados</div><span style="margin-left:auto;font-size:11.5px;color:#7c8f8d">vínculos com data</span><span onClick="{{ p.vincular }}" style="font-size:11.5px;font-weight:700;color:#0C5862;cursor:pointer;white-space:nowrap" style-hover="color:#127670">+ Vincular</span></div>
+            <div style="display:flex;flex-direction:column;gap:7px;margin-top:12px">
+              <sc-for list="{{ p.frotaList }}" as="fr" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;gap:11px;background:#f7faf9;border-radius:13px;padding:10px 13px">
+                  <span style="width:30px;height:30px;border-radius:10px;flex:none;background:#e9f3f2;color:#0C5862;display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="4.5" width="8" height="5.5" rx="1.4"></rect><path d="M10 6.5h2.4l1.6 2v1.5h-4z" stroke-linejoin="round"></path><circle cx="5" cy="11.8" r="1.4"></circle><circle cx="11.6" cy="11.8" r="1.4"></circle></svg></span>
+                  <div style="flex:1;min-width:0"><div style="font-family:'Spline Sans Mono';font-size:12.5px;font-weight:600">{{ fr.placa }}</div><div style="font-size:11px;color:#5c706e">{{ fr.sub }}</div></div>
+                  <span style="display:inline-block;font-size:10.5px;font-weight:700;color:{{ fr.stC }};background:{{ fr.stBg }};border-radius:99px;padding:3px 9px;white-space:nowrap">{{ fr.st }}</span>
+                  <span onClick="{{ fr.desvincular }}" title="Desvincular com data; histórico preservado" style="width:26px;height:26px;border-radius:99px;background:#fff;border:1px solid #e4eae8;color:#7c8f8d;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;flex:none" style-hover="border-color:#c43d3d;color:#c43d3d">✕</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <!-- trilha de eventos -->
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:18px">
+            <div style="font-size:14px;font-weight:800">Últimos eventos</div>
+            <div style="display:flex;flex-direction:column;margin-top:12px">
+              <sc-for list="{{ p.eventos }}" as="ev" hint-placeholder-count="4">
+                <div style="display:flex;gap:12px">
+                  <div style="display:flex;flex-direction:column;align-items:center;width:16px;flex:none"><span style="width:9px;height:9px;border-radius:99px;background:{{ ev.c }};box-shadow:0 0 0 3px {{ ev.glow }};margin-top:4px"></span><span style="flex:1;width:2px;background:{{ ev.line }};margin-top:4px"></span></div>
+                  <div style="padding-bottom:14px"><div style="display:flex;gap:8px;align-items:baseline"><span style="font-size:12.5px;font-weight:700">{{ ev.t }}</span><span style="font-family:'Spline Sans Mono';font-size:10.5px;color:#7c8f8d">{{ ev.quando }}</span></div><div style="font-size:11.5px;color:#5c706e;margin-top:1px">{{ ev.sub }}</div></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;padding-bottom:8px">
+            <span onClick="{{ toastPassaporte }}" style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;font-size:13px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer;box-shadow:0 6px 14px rgba(18,118,112,.3)" style-hover="transform:translateY(-1px)">Exportar passaporte</span>
+            <span onClick="{{ toastRenova }}" style="background:#fff;border:1px solid #dfe7e5;font-size:13px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer" style-hover="border-color:#127670">Renovar acordo</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <!-- MODAL SUSPENDER -->
+  <sc-if value="{{ suspAberto }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharSusp }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:520px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Suspender {{ suspNome }}</div><span onClick="{{ fecharSusp }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:3px">suspensão manual é decisão registrada: motivo, responsável, vigência. Viagens futuras deste terceiro bloqueiam na hora.</div>
+        <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e;margin-top:16px">MOTIVO PADRONIZADO <span style="color:#c43d3d">*</span></div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:9px">
+          <sc-for list="{{ suspMotivos }}" as="op" hint-placeholder-count="4">
+            <div onClick="{{ op.onClick }}" style="display:flex;align-items:center;gap:10px;border:1.5px solid {{ op.bd }};background:{{ op.bg }};border-radius:12px;padding:10px 14px;cursor:pointer" style-hover="border-color:#127670"><span style="width:15px;height:15px;border-radius:99px;border:2px solid {{ op.dotBd }};background:{{ op.dot }};flex:none"></span><span style="font-size:13px;font-weight:600">{{ op.label }}</span></div>
+          </sc-for>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:14px"><span style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e">VIGÊNCIA <span style="color:#c43d3d">*</span></span>
+          <sc-for list="{{ suspVigencias }}" as="sv" hint-placeholder-count="3"><span onClick="{{ sv.onClick }}" style="font-size:12px;font-weight:700;border-radius:99px;padding:6px 13px;cursor:pointer;border:1.5px solid {{ sv.bd }};background:{{ sv.bg }};color:{{ sv.c }}">{{ sv.n }}</span></sc-for>
+        </div>
+        <div style="background:#f7faf9;border-radius:12px;padding:10px 14px;margin-top:12px;display:flex;justify-content:space-between;font-size:12.5px"><span style="color:#5c706e">Responsável e assinatura</span><span style="font-weight:700">Rafael Antunes · Gestor</span></div>
+        <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+          <span onClick="{{ fecharSusp }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer;white-space:nowrap" style-hover="background:#e4ebe9">Cancelar</span>
+          <span onClick="{{ confirmarSusp }}" style="font-size:13.5px;font-weight:800;border-radius:99px;padding:10px 22px;cursor:{{ suspCur }};background:{{ suspBg }};color:{{ suspC }};white-space:nowrap;box-shadow:{{ suspSh }}">Suspender e registrar</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <!-- MODAL IMPORTAR PLANILHA -->
+  <sc-if value="{{ impAberto }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharImp }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:640px;max-height:92vh;overflow:auto;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Importar planilha</div><span onClick="{{ fecharImp }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <sc-if value="{{ impFase1 }}" hint-placeholder-val="{{ true }}">
+          <div style="font-size:12.5px;color:#5c706e;margin-top:3px">CSV ou XLSX · colunas: nome, CPF/CNPJ, telefone, vínculo, placas · <a href="#" onClick="{{ baixarModelo }}">baixar modelo</a></div>
+          <div onClick="{{ processarImp }}" style="margin-top:16px;border:2px dashed #c9d5d3;border-radius:16px;padding:34px 20px;display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer;transition:border-color .15s" style-hover="border-color:#127670">
+            <span style="width:44px;height:44px;border-radius:99px;background:#e9f3f2;display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="#0C5862" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 10.5v-8"></path><path d="M4.8 5.5 8 2.3l3.2 3.2"></path><path d="M3 13.5h10"></path></svg></span>
+            <div style="font-size:13.5px;font-weight:700">Arraste a planilha ou toque para escolher</div>
+            <div style="font-size:11.5px;color:#7c8f8d">simular com terceiros-safra.xlsx (demonstração)</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ impFase2 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:14px;margin-top:14px">
+            <div style="flex:1;background:#f4faf6;border:1px solid #cdeeda;border-radius:14px;padding:12px 16px"><div style="font-size:20px;font-weight:800;color:#1a8f57;font-variant-numeric:tabular-nums">37</div><div style="font-size:11.5px;color:#3c4f4e;font-weight:600">novos, prontos para entrar</div></div>
+            <div style="flex:1;background:#fdfaf3;border:1px solid #f0debb;border-radius:14px;padding:12px 16px"><div style="font-size:20px;font-weight:800;color:#b97514;font-variant-numeric:tabular-nums">4</div><div style="font-size:11.5px;color:#3c4f4e;font-weight:600">duplicados, serão reaproveitados</div></div>
+            <div style="flex:1;background:#fdf6f6;border:1px solid #f3d4d4;border-radius:14px;padding:12px 16px"><div style="font-size:20px;font-weight:800;color:#c43d3d;font-variant-numeric:tabular-nums">2</div><div style="font-size:11.5px;color:#3c4f4e;font-weight:600">com erro, ficam de fora</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:14px">
+            <sc-for list="{{ impLinhas }}" as="li" hint-placeholder-count="5">
+              <div style="display:flex;align-items:center;gap:11px;border:1px solid #eef2f1;border-radius:13px;padding:10px 13px">
+                <span style="width:26px;height:26px;border-radius:99px;flex:none;background:{{ li.bg }};color:{{ li.c }};font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ li.icon }}</span>
+                <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700">{{ li.nome }}</div><div style="font-family:'Spline Sans Mono';font-size:10.5px;color:#7c8f8d">{{ li.doc }}</div></div>
+                <span style="display:inline-block;font-size:11px;font-weight:700;color:{{ li.c }};background:{{ li.bg }};border-radius:99px;padding:3px 10px;white-space:nowrap">{{ li.st }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font-size:11.5px;color:#7c8f8d;margin-top:10px">Duplicidade detectada por CPF, CNPJ e placa. Erros: CPF inválido na linha 12, telefone ausente na linha 29.</div>
+          <div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end">
+            <span onClick="{{ fecharImp }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer;white-space:nowrap" style-hover="background:#e4ebe9">Cancelar</span>
+            <span onClick="{{ confirmarImp }}" style="font-size:13.5px;font-weight:800;border-radius:99px;padding:10px 22px;cursor:pointer;background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;white-space:nowrap;box-shadow:0 8px 18px rgba(18,118,112,.35)" style-hover="transform:translateY(-1px)">Importar 41 terceiros</span>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+  <!-- MODAL CONVITE -->
+  <sc-if value="{{ conviteAberto }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharConvite }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:520px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Convidar terceiro</div><span style="margin-left:10px;display:inline-block;font-size:11.5px;font-weight:700;color:#0C5862;background:#e9f3f2;border-radius:99px;padding:3px 11px;white-space:nowrap">sem conta, sem app obrigatório</span><span onClick="{{ fecharConvite }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:3px">o motorista abre um link, informa CPF, CNH, placas e T-3, e assina o aceite. Pronto.</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:16px">
+          <sc-for list="{{ canais }}" as="cn" hint-placeholder-count="3">
+            <div onClick="{{ cn.onClick }}" style="display:flex;align-items:center;gap:12px;border:1.5px solid {{ cn.bd }};background:{{ cn.bg }};border-radius:14px;padding:13px 15px;cursor:pointer;transition:all .15s" style-hover="border-color:#127670">
+              <span style="width:38px;height:38px;border-radius:12px;flex:none;background:{{ cn.iBg }};color:{{ cn.iC }};display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800">{{ cn.icon }}</span>
+              <div style="flex:1"><div style="font-size:13.5px;font-weight:800">{{ cn.t }}</div><div style="font-size:11.5px;color:#5c706e">{{ cn.sub }}</div></div>
+              <span style="width:15px;height:15px;border-radius:99px;border:2px solid {{ cn.dotBd }};background:{{ cn.dot }};flex:none"></span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+          <div style="background:#f7faf9;border:1.5px solid #e0e7e5;border-radius:12px;padding:0 14px"><input value="{{ cvNome }}" onInput="{{ cvOnNome }}" placeholder="nome do destinatário" style="border:none;outline:none;background:transparent;font-size:13px;padding:10px 0;width:100%;color:#0b2224"></div>
+          <div style="background:#f7faf9;border:1.5px solid #e0e7e5;border-radius:12px;padding:0 14px"><input value="{{ cvFone }}" onInput="{{ cvOnFone }}" placeholder="telefone, ex.: (66) 99812-4407" style="border:none;outline:none;background:transparent;font-family:'Spline Sans Mono';font-size:12.5px;font-weight:600;padding:10px 0;width:100%;color:#0b2224"></div>
+        </div>
+        <div style="background:#f7faf9;border-radius:14px;padding:12px 15px;margin-top:10px;display:flex;align-items:center;gap:10px">
+          <span style="font-family:'Spline Sans Mono';font-size:12.5px;font-weight:600;color:#0C5862;flex:1">traxium.app/c/RD-7K2M</span>
+          <span onClick="{{ copiarLink }}" style="font-size:12px;font-weight:700;color:#0C5862;cursor:pointer" style-hover="color:#127670">copiar</span>
+        </div>
+        <div style="font-size:11.5px;color:#7c8f8d;margin-top:10px;line-height:1.5">Se o CPF já existir na rede, o cadastro é reaproveitado: nada de duplicidade. Acesso temporário por código para o eventual de safra.</div>
+        <div style="display:flex;justify-content:flex-end;margin-top:14px">
+          <span onClick="{{ enviarConvite }}" style="font-size:13.5px;font-weight:800;border-radius:99px;padding:11px 24px;cursor:pointer;white-space:nowrap;background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;box-shadow:0 8px 18px rgba(18,118,112,.35)" style-hover="transform:translateY(-1px)">Enviar convite</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:1200;background:#0b2224;color:#fff;border-radius:99px;padding:12px 22px;font-size:13.5px;font-weight:600;box-shadow:0 16px 40px rgba(9,34,36,.35);display:flex;align-items:center;gap:10px"><span style="width:20px;height:20px;border-radius:99px;background:linear-gradient(135deg,#48c78e,#127670);display:flex;align-items:center;justify-content:center;font-size:11px">✓</span>{{ toastMsg }}</div>
+  </sc-if>
+  <sc-if value="{{ modalPerfil }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePerfil }}" style="background:#fff;border-radius:24px;width:460px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Meu perfil</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:16px">
+          <span style="width:76px;height:76px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:26px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #fff,0 0 0 6px #f0debb">RA</span>
+          <div style="font-size:17px;font-weight:800;margin-top:4px">Rafael Antunes</div>
+          <div style="font-size:12.5px;color:#5c706e">rafael.antunes@traxium.com.br</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-top:18px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Papel</span><span style="font-weight:700">Gestor de qualidade</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Autoridade na matriz</span><span style="font-weight:700">nível 3 · Gestor</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Filiais</span><span style="font-weight:700">Rondonópolis, Sorriso</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Liberações assinadas em 2026</span><span style="font-family:'Spline Sans Mono';font-weight:600">14</span></div>
+        </div>
+        <div style="font-size:12px;color:#5c706e;margin-top:12px;line-height:1.5">Toda assinatura sua fica no registro lacrado da viagem. O papel define o que a matriz permite; ninguém assina acima do próprio nível.</div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalPrefs }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePerfil }}" style="background:#fff;border-radius:24px;width:520px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Preferências e notificações</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:16px">
+          <sc-for list="{{ prefs }}" as="pf" hint-placeholder-count="4">
+            <div onClick="{{ pf.onClick }}" style="display:flex;align-items:center;gap:12px;border:1px solid #eef2f1;border-radius:14px;padding:12px 14px;cursor:pointer" style-hover="border-color:#c9d5d3">
+              <div style="flex:1"><div style="font-size:13.5px;font-weight:700">{{ pf.t }}</div><div style="font-size:11.5px;color:#5c706e">{{ pf.sub }}</div></div>
+              <span style="width:40px;height:23px;border-radius:99px;background:{{ pf.swBg }};position:relative;flex:none;transition:background .2s"><span style="position:absolute;top:2.5px;left:{{ pf.swPos }};width:18px;height:18px;border-radius:99px;background:#fff;box-shadow:0 1px 4px rgba(9,34,36,.25);transition:left .2s"></span></span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:12px;color:#5c706e;margin-top:12px">O alerta de bloqueio técnico não pode ser desligado: é requisito da certificação.</div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalPapel }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePop }}" style="background:#fff;border-radius:24px;width:540px;max-height:86vh;overflow:auto;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Papel ativo</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:3px;line-height:1.55">O papel define o que a matriz de autoridade permite assinar. A autoridade escala para cima, nunca para baixo, e ninguém assina acima do próprio nível.</div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-top:16px">
+          <sc-for list="{{ papeisLista }}" as="pp" hint-placeholder-count="5">
+            <div onClick="{{ pp.onClick }}" style="display:flex;align-items:center;gap:13px;border:1.5px solid {{ pp.bd }};background:{{ pp.bg }};border-radius:15px;padding:13px 15px;cursor:pointer;transition:all .15s" style-hover="border-color:#127670">
+              <span style="width:19px;height:19px;border-radius:99px;border:2.5px solid {{ pp.dotBd }};background:{{ pp.dot }};flex:none"></span>
+              <span style="width:34px;height:34px;border-radius:11px;flex:none;background:linear-gradient(135deg,{{ pp.g1 }},{{ pp.g2 }});color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ pp.nivel }}</span>
+              <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:800">{{ pp.n }}</div><div style="font-size:11.5px;color:#5c706e;margin-top:2px;line-height:1.4">{{ pp.resolve }}</div></div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#f7faf9;border-radius:14px;padding:12px 15px;margin-top:14px;font-size:12px;color:#5c706e;line-height:1.55">Nível 0 é técnico: é o nível de autoridade de ninguém. Contaminação não se aprova, se regulariza.</div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalSair }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePop }}" style="background:#fff;border-radius:24px;width:440px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Sair da conta</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;align-items:center;gap:12px;background:#f7faf9;border-radius:15px;padding:13px 15px;margin-top:16px">
+          <span style="width:40px;height:40px;border-radius:99px;flex:none;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">RA</span>
+          <div><div style="font-size:13.5px;font-weight:800">Rafael Antunes</div><div style="font-size:11.5px;color:#5c706e">{{ papelBadge }} · nível {{ papelNivel }} na matriz</div></div>
+        </div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:14px;line-height:1.6">Nada é perdido ao sair. Registro lacrado continua lacrado, e o que estava em preenchimento não foi gravado em lugar nenhum.</div>
+        <div style="display:flex;gap:8px;margin-top:18px;justify-content:flex-end">
+          <span onClick="{{ fecharModalTopo }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer" style-hover="background:#e4ebe9">Cancelar</span>
+          <span onClick="{{ confirmarSair }}" style="background:linear-gradient(135deg,#e46969,#c43d3d);color:#fff;font-size:13.5px;font-weight:800;border-radius:99px;padding:10px 22px;cursor:pointer;box-shadow:0 8px 18px rgba(196,61,61,.3);transition:transform .15s" style-hover="transform:translateY(-1px)">Sair</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ adAberto }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ adFechar }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePop }}" style="background:#fff;border-radius:24px;width:620px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Adicionar terceiro</div><span onClick="{{ adFechar }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:3px;line-height:1.55">Os três caminhos abaixo diferem em uma coisa só: quem digita os dados. Nenhum deles decide se a empresa opera.</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px">
+          <sc-for list="{{ adOpcoes }}" as="ao" hint-placeholder-count="3">
+            <div onClick="{{ ao.onClick }}" style="display:flex;align-items:flex-start;gap:14px;border:1.5px solid #eef2f1;border-radius:16px;padding:15px 17px;cursor:pointer;transition:all .15s" style-hover="border-color:#127670;box-shadow:0 6px 16px rgba(9,61,68,.08)">
+              <span style="width:38px;height:38px;border-radius:12px;flex:none;background:linear-gradient(135deg,{{ ao.g1 }},{{ ao.g2 }});color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 5px 12px {{ ao.glow }}"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="{{ ao.d }}"></path></svg></span>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:14.5px;font-weight:800">{{ ao.n }}</div>
+                <div style="font-size:12.5px;color:#5c706e;margin-top:3px;line-height:1.5">{{ ao.quando }}</div>
+                <div style="font-size:11.5px;color:#0C5862;font-weight:700;margin-top:6px">quem digita: {{ ao.quem }}</div>
+              </div>
+              <span style="font-size:16px;color:#c9d5d3;flex:none;margin-top:8px">→</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;background:#f7faf9;border-radius:15px;padding:14px 16px;margin-top:16px">
+          <span style="width:34px;height:34px;border-radius:99px;flex:none;background:linear-gradient(135deg,#9fc9c6,#6ba8a4);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">=</span>
+          <div style="font-size:12.5px;color:#5c706e;line-height:1.55"><span style="font-weight:800;color:#0b2224">Os três terminam em Pré-cadastrado</span>, que não opera. A aptidão vem depois, do certificado, da base pública, do acordo e do treinamento. A forma como o registro nasceu não muda o estado dele.</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ ncAberto }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ ncFechar }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePop }}" style="background:#fff;border-radius:24px;width:600px;max-height:88vh;overflow:auto;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center;gap:10px"><div style="font-size:16px;font-weight:800">Cadastrar terceiro</div><span style="font-size:10.5px;font-weight:800;letter-spacing:.4px;color:#0C5862;background:#e9f3f2;border-radius:99px;padding:3px 10px">VOCÊ DIGITA</span><span onClick="{{ ncFechar }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:3px">para quando os dados já chegaram por WhatsApp ou e-mail e não vale a pena mandar link para uma empresa só.</div>
+        <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e;margin-top:18px">CNPJ</div>
+        <input value="{{ ncCnpj }}" onInput="{{ ncOnCnpj }}" placeholder="00.000.000/0000-00" style="width:100%;margin-top:8px;border:1.5px solid {{ ncCnpjBd }};border-radius:14px;padding:13px 15px;font-family:'Spline Sans Mono';font-size:15px;font-weight:600;outline:none;color:#0b2224">
+        <div style="font-size:12px;color:{{ ncCnpjC }};margin-top:7px;line-height:1.45">{{ ncCnpjMsg }}</div>
+        <sc-if value="{{ ncDup }}" hint-placeholder-val="{{ false }}">
+          <div style="border:1px solid #f3d4d4;background:#fdf6f6;border-radius:15px;padding:14px 16px;margin-top:10px">
+            <div style="display:flex;align-items:center;gap:9px"><span style="width:22px;height:22px;border-radius:99px;background:linear-gradient(135deg,#e46969,#c43d3d);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center">!</span><div style="font-size:13px;font-weight:800;color:#c43d3d">Já existe cadastro com esses dígitos</div></div>
+            <div style="font-size:12.5px;color:#5c706e;margin-top:7px;line-height:1.5">{{ ncDupTxt }}</div>
+            <span onClick="{{ ncVerDup }}" style="display:inline-block;margin-top:11px;background:#f0f4f3;color:#0b2224;font-size:12.5px;font-weight:700;border-radius:99px;padding:8px 16px;cursor:pointer" style-hover="background:#e4ebe9">Abrir o cadastro existente</span>
+          </div>
+        </sc-if>
+        <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e;margin-top:16px">RAZÃO SOCIAL</div>
+        <input value="{{ ncNome }}" onInput="{{ ncOnNome }}" placeholder="como está no cartão CNPJ" style="width:100%;margin-top:8px;border:1.5px solid #e0e7e5;border-radius:14px;padding:13px 15px;font-size:14.5px;outline:none;color:#0b2224">
+        <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e;margin-top:16px">TIPO DE VÍNCULO</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">
+          <sc-for list="{{ ncVinculos }}" as="nv" hint-placeholder-count="7">
+            <span onClick="{{ nv.onClick }}" style="font-size:12.5px;font-weight:600;border-radius:99px;padding:7px 14px;cursor:pointer;border:1.5px solid {{ nv.bd }};background:{{ nv.bg }};color:{{ nv.c }};transition:all .15s">{{ nv.n }}</span>
+          </sc-for>
+        </div>
+        <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e;margin-top:16px">CONTATO PARA O QUE VIER DEPOIS</div>
+        <input value="{{ ncContato }}" onInput="{{ ncOnContato }}" placeholder="WhatsApp ou e-mail de quem responde pela empresa" style="width:100%;margin-top:8px;border:1.5px solid #e0e7e5;border-radius:14px;padding:13px 15px;font-size:14.5px;outline:none;color:#0b2224">
+        <div style="background:#f7faf9;border-radius:15px;padding:14px 16px;margin-top:16px">
+          <div style="font-size:11px;letter-spacing:1.2px;font-weight:700;color:#7c8f8d">O QUE ACONTECE AO SALVAR</div>
+          <div style="font-size:12.5px;color:#5c706e;margin-top:8px;line-height:1.55">A empresa nasce <span style="font-weight:800;color:#0b2224">Pré-cadastrada</span> e não recebe viagem. Nenhum certificado é presumido a partir daqui. O passo seguinte é o convite para ela anexar certificado, assinar o acordo e concluir o treinamento.</div>
+          <div onClick="{{ ncToggleConvite }}" style="display:flex;align-items:center;gap:11px;background:#fff;border:1.5px solid {{ ncCvBd }};border-radius:13px;padding:11px 13px;margin-top:11px;cursor:pointer" style-hover="border-color:#127670">
+            <span style="width:20px;height:20px;border-radius:6px;flex:none;border:2px solid {{ ncCvBd2 }};background:{{ ncCvCk }};color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ ncCvIcon }}</span>
+            <span style="font-size:13px;font-weight:600;flex:1">Já mandar o convite do portal para esse contato</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:18px;justify-content:flex-end;align-items:center">
+          <span style="margin-right:auto;font-size:11.5px;color:#5c706e;max-width:300px;line-height:1.45">{{ ncDica }}</span>
+          <span onClick="{{ ncFechar }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer" style-hover="background:#e4ebe9">Cancelar</span>
+          <span onClick="{{ ncSalvar }}" style="background:{{ ncBg }};color:{{ ncC }};font-size:13.5px;font-weight:800;border-radius:99px;padding:10px 22px;cursor:{{ ncCur }};box-shadow:{{ ncSh }};transition:transform .15s">Cadastrar</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { filtro: 'all', busca: '', drawer: null, convite: false, canal: 'whats', toast: null, menu: null, susp: null, suspMotivo: null, imp: null };
+  avisar(msg) { this.setState({ toast: msg }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 4200); }
+  estadosDef() {
+    return {
+      apto: { nome: 'Apto', dot: '#1a8f57', glow: 'rgba(26,143,87,.16)', tc: '#1a8f57', bgOn: '#e9f7ef', bdOn: '#1a8f57' },
+      restrito: { nome: 'Apto com restrição', dot: '#e3c235', glow: 'rgba(227,194,53,.2)', tc: '#8a7410', bgOn: '#faf3d4', bdOn: '#c9ac2a' },
+      pendDoc: { nome: 'Pendente documental', dot: '#e8a33d', glow: 'rgba(232,163,61,.18)', tc: '#b97514', bgOn: '#fdf3e2', bdOn: '#e8a33d' },
+      pendTrein: { nome: 'Pendente treinamento', dot: '#e8a33d', glow: 'rgba(232,163,61,.18)', tc: '#b97514', bgOn: '#fdf3e2', bdOn: '#e8a33d' },
+      pendInsp: { nome: 'Pendente inspeção', dot: '#5b8def', glow: 'rgba(91,141,239,.18)', tc: '#4c5bc0', bgOn: '#eceffa', bdOn: '#5b8def' },
+      preCad: { nome: 'Pré-cadastrado', dot: '#9db0ae', glow: 'rgba(157,176,174,.2)', tc: '#5c706e', bgOn: '#f0f4f3', bdOn: '#9db0ae' },
+      bloq: { nome: 'Bloqueado', dot: '#c43d3d', glow: 'rgba(196,61,61,.16)', tc: '#c43d3d', bgOn: '#fdecec', bdOn: '#c43d3d' },
+      susp: { nome: 'Suspenso', dot: '#93313f', glow: 'rgba(147,49,63,.16)', tc: '#93313f', bgOn: '#fdecec', bdOn: '#93313f' },
+      inativo: { nome: 'Inativo', dot: '#c9d5d3', glow: 'rgba(201,213,211,.3)', tc: '#7c8f8d', bgOn: '#f0f4f3', bdOn: '#c9d5d3' }
+    };
+  }
+  dados() {
+    return [
+      { id: 'lima', nome: 'Lima Logística Ltda', doc: 'CNPJ 08.412.977/0001-31', vinculo: 'ETC', est: 'susp',
+        cert: 'GMP+ B4.3 suspenso', certC: '#c43d3d', acordo: 'acordo v3 vigente', frota: '3 conjuntos · 5 compart.', motoristas: '4 motoristas', validade: 'suspenso', valC: '#c43d3d',
+        ini: 'LL', a1: '#c43d3d', a2: '#93313f' },
+      { id: 'transrocha', nome: 'Transrocha Transportes', doc: 'CNPJ 21.007.554/0001-90', vinculo: 'ETC', est: 'restrito',
+        cert: 'GMP+ B4.3 vence em 12 dias', certC: '#b97514', acordo: 'acordo v3 vigente', frota: '6 conjuntos · 9 compart.', motoristas: '8 motoristas', validade: '18 ago', valC: '#b97514',
+        ini: 'TR', a1: '#e8a33d', a2: '#d97544' },
+      { id: 'bortolini', nome: 'João Bortolini', doc: 'CPF ***.882.441-** · TAC', vinculo: 'TAC', est: 'apto',
+        cert: 'condição Gatekeeper', certC: '#0C5862', acordo: 'acordo v3 + aceite vigentes', frota: '1 conjunto · 2 compart.', motoristas: 'ele mesmo', validade: '02 fev 27', valC: '#3c4f4e',
+        ini: 'JB', a1: '#127670', a2: '#0E78B5' },
+      { id: 'cerrado', nome: 'Cerrado Cargas', doc: 'CNPJ 33.410.208/0001-77', vinculo: 'ETC', est: 'apto',
+        cert: 'GMP+ B4.3 vigente', certC: '#1a8f57', acordo: 'acordo v3 vigente', frota: '11 conjuntos · 18 compart.', motoristas: '14 motoristas', validade: '19 set 27', valC: '#3c4f4e',
+        ini: 'CC', a1: '#127670', a2: '#0E78B5' },
+      { id: 'valdomiro', nome: 'Valdomiro Sanches', doc: 'CPF ***.204.118-** · TAC', vinculo: 'TAC', est: 'pendTrein',
+        cert: 'condição Gatekeeper', certC: '#0C5862', acordo: 'acordo assinado ontem', frota: '1 conjunto · 1 compart.', motoristas: 'ele mesmo', validade: 'aguarda trilha', valC: '#b97514',
+        ini: 'VS', a1: '#e8a33d', a2: '#b97514' },
+      { id: 'agrolima', nome: 'AgroLima Ltda', doc: 'CNPJ 12.220.410/0001-05', vinculo: 'agregado', est: 'pendDoc',
+        cert: 'acordo vence em 27 dias', certC: '#b97514', acordo: 'renovação enviada', frota: '2 conjuntos · 3 compart.', motoristas: '2 motoristas', validade: '02 set', valC: '#b97514',
+        ini: 'AL', a1: '#e8a33d', a2: '#d97544' },
+      { id: 'rocha', nome: 'Marcos Rocha', doc: 'CPF ***.556.902-** · TAC', vinculo: 'TAC', est: 'preCad',
+        cert: 'aguardando documentos', certC: '#7c8f8d', acordo: 'link aberto há 2h', frota: 'placas informadas', motoristas: 'ele mesmo', validade: 'em cadastro', valC: '#7c8f8d',
+        ini: 'MR', a1: '#9db0ae', a2: '#5c706e' },
+      { id: 'pantanal', nome: 'Pantanal Granéis', doc: 'CNPJ 40.118.762/0001-22', vinculo: 'ETC', est: 'bloq',
+        cert: 'reincidência: resíduo em inspeção', certC: '#c43d3d', acordo: 'acordo vigente', frota: '4 conjuntos · 6 compart.', motoristas: '5 motoristas', validade: 'bloqueado', valC: '#c43d3d',
+        ini: 'PG', a1: '#c43d3d', a2: '#93313f' },
+      { id: 'sindona', nome: 'Sindona Transportes', doc: 'CNPJ 55.902.331/0001-14', vinculo: 'ETC', est: 'pendInsp',
+        cert: 'GMP+ B4.3 vigente', certC: '#1a8f57', acordo: 'acordo v3 vigente', frota: '2 conjuntos · 4 compart.', motoristas: '3 motoristas', validade: 'inspeção 8 ago', valC: '#4c5bc0',
+        ini: 'ST', a1: '#5b8def', a2: '#4c5bc0' },
+      { id: 'oliveira', nome: 'Oliveira e Filhos', doc: 'CNPJ 07.581.440/0001-63', vinculo: 'agregado', est: 'inativo',
+        cert: 'arquivado em jun 26', certC: '#7c8f8d', acordo: 'histórico preservado', frota: 'sem vínculo ativo', motoristas: 'sem vínculo', validade: 'inativo', valC: '#7c8f8d',
+        ini: 'OF', a1: '#9db0ae', a2: '#c9d5d3' }
+    ];
+  }
+  renderVals() { return { ...this.navVals(), ...this.adicionarVals(), ...this.papelVals(), ...this.perfilVals(), ...this.mainVals() }; }
+  perfilVals() {
+    return {
+      perfilOpen: !!this.state.perfilOpen,
+      onPerfil: () => this.setState(s => ({ perfilOpen: !s.perfilOpen })),
+      modalPerfil: this.state.modalTopo === 'perfil', modalPrefs: this.state.modalTopo === 'prefs',
+      abrirPerfil: () => this.setState({ modalTopo: 'perfil', perfilOpen: false }),
+      abrirPrefs: () => this.setState({ modalTopo: 'prefs', perfilOpen: false }),
+      fecharModalTopo: () => this.setState({ modalTopo: null }),
+      pararCliquePerfil: e => e.stopPropagation(),
+      prefs: [
+        { k: 'bloq', t: 'Bloqueio técnico na filial', sub: 'sempre ativo: requisito da certificação', lock: true },
+        { k: 'fila', t: 'Item há mais de 2h na fila', sub: 'aviso no app e por e-mail' },
+        { k: 'cert', t: 'Certificado de terceiro a vencer', sub: 'aos 30 e aos 15 dias' },
+        { k: 'idtf', t: 'Nova versão da base IDTF', sub: 'quando a Qualidade publicar revisão' }
+      ].map(p => {
+        const on = p.lock || (this.state.prefsOn || { fila: true, cert: true, idtf: false })[p.k];
+        return { ...p, swBg: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#dde5e3', swPos: on ? '19.5px' : '2.5px',
+          onClick: () => { if (p.lock) return; const cur = this.state.prefsOn || { fila: true, cert: true, idtf: false }; this.setState({ prefsOn: { ...cur, [p.k]: !cur[p.k] } }); } };
+      })
+    };
+  }
+  papelVals() {
+    const diz = m => { if (typeof this.avisar === 'function') this.avisar(m); };
+    const PAPEIS = [
+      { n: 'Inspetor de pátio', nivel: 1, resolve: 'condição física do equipamento: checklist reprovado, foto ausente', g1: '#9fc9c6', g2: '#6ba8a4' },
+      { n: 'Tráfego', nivel: 2, resolve: 'pendência simples: certificação a vencer, sincronização pendente', g1: '#5b8def', g2: '#4c5bc0' },
+      { n: 'Gestor de qualidade', nivel: 3, resolve: 'pendência corrigível mediante evidência da correção', g1: '#127670', g2: '#0E78B5' },
+      { n: 'Diretoria e Resp. Técnico', nivel: 4, resolve: 'impacto contratual, risco residual aceito, terceiro emergencial', g1: '#e8a33d', g2: '#d97544' },
+      { n: 'Auditor interno', nivel: 0, resolve: 'somente leitura, mais abrir não conformidade', g1: '#c9d5d3', g2: '#9db0ae' }
+    ];
+    const ativo = this.state.papelAtivo || 'Gestor de qualidade';
+    const atual = PAPEIS.find(p => p.n === ativo) || PAPEIS[2];
+    return {
+      pararClique: e => e.stopPropagation(),
+      pararCliquePop: e => e.stopPropagation(),
+      papelBadge: atual.n === 'Diretoria e Resp. Técnico' ? 'Diretoria' : atual.n.split(' ')[0],
+      papelNivel: atual.nivel,
+      modalPapel: this.state.modalTopo === 'papel',
+      modalSair: this.state.modalTopo === 'sair',
+      abrirPapel: () => this.setState({ modalTopo: 'papel', perfilOpen: false }),
+      abrirSair: () => this.setState({ modalTopo: 'sair', perfilOpen: false }),
+      confirmarSair: () => { this.setState({ modalTopo: null }); diz('Sessão encerrada. Registros assinados continuam no dossiê com seu nome e a data.'); },
+      papeisLista: PAPEIS.map(p => {
+        const on = p.n === ativo;
+        return { ...p, onClick: () => { this.setState({ papelAtivo: p.n, modalTopo: null }); diz('Papel ativo agora é ' + p.n + ', nível ' + p.nivel + '. A fila e as ações de assinatura passam a refletir esta autoridade.'); },
+          bd: on ? '#127670' : '#e0e7e5', bg: on ? '#eef7f6' : '#fff',
+          dot: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#fff', dotBd: on ? '#127670' : '#c9d5d3' };
+      })
+    };
+  }
+  componentDidMount() {
+    this._txFora = ev => { if (!ev.target.closest || !ev.target.closest('[data-tx-pop]')) this.setState({ perfilOpen: false, filialOpen: false, periodoOpen: false, menuOpen: false, versaoOpen: false, notifOpen: false }); };
+    this._txEsc = ev => { if (ev.key === 'Escape') this.setState({ perfilOpen: false, filialOpen: false, periodoOpen: false, menuOpen: false, versaoOpen: false, notifOpen: false, modalTopo: null }); };
+    document.addEventListener('mousedown', this._txFora);
+    document.addEventListener('keydown', this._txEsc);
+  }
+  adicionarVals() {
+    const s = this.state;
+    const cnpj = (s.ncCnpj || '').replace(/\D/g, '');
+    const valido = cnpj.length === 14;
+    const BASE = { '08441220000173': 'Lima Logística', '42118556000109': 'Transrocha Transportes' };
+    const dup = valido ? BASE[cnpj] : null;
+    const VINC = ['Frota própria', 'Agregado', 'TAC autônomo', 'Subcontratado certificado', 'Subcontratado Gatekeeper', 'Afretamento', 'Cooperado'];
+    const pronto = valido && !dup && (s.ncNome || '').trim().length >= 3 && !!s.ncVinculo && (s.ncContato || '').trim().length >= 6;
+    return {
+      adAberto: !!s.ad,
+      abrirAdicionar: () => this.setState({ ad: true }),
+      adFechar: () => this.setState({ ad: false }),
+      adOpcoes: [
+        { n: 'Cadastrar eu mesmo', quem: 'você', g1: '#127670', g2: '#0E78B5', glow: 'rgba(18,118,112,.28)',
+          d: 'M8 3.2v9.6M3.2 8h9.6',
+          quando: 'Os dados já chegaram por WhatsApp ou e-mail e é uma empresa só. Não faz sentido montar planilha de uma linha.',
+          onClick: () => this.setState({ ad: false, nc: true, ncCnpj: '', ncNome: '', ncVinculo: null, ncContato: '', ncConvite: true }) },
+        { n: 'Convidar para preencher', quem: 'o próprio terceiro', g1: '#e8a33d', g2: '#d97544', glow: 'rgba(232,163,61,.28)',
+          d: 'M2.5 4.2h11v7.6h-11z M2.5 4.2 8 8.6l5.5-4.4',
+          quando: 'Você não tem os dados na mão. Digitar por ele produz dado errado, e errado aqui vira decisão errada de carga.',
+          onClick: () => this.setState({ ad: false, convite: true }) },
+        { n: 'Importar planilha', quem: 'você, em massa', g1: '#5b8def', g2: '#4c5bc0', glow: 'rgba(91,141,239,.28)',
+          d: 'M2.6 2.8h10.8v10.4H2.6z M2.6 6.2h10.8 M6.2 6.2v7',
+          quando: 'Migração de base ou entrada de uma filial inteira. Detecta duplicidade antes de gravar e não dispara convite sozinho.',
+          onClick: () => { this.setState({ ad: false }); this.toastImportar(); } }
+      ],
+      ncAberto: !!s.nc,
+      ncFechar: () => this.setState({ nc: false }),
+      ncCnpj: s.ncCnpj || '', ncOnCnpj: e => this.setState({ ncCnpj: e.target.value }),
+      ncCnpjBd: dup ? '#c43d3d' : (valido ? '#127670' : '#e0e7e5'),
+      ncCnpjC: dup ? '#c43d3d' : (valido ? '#1a8f57' : '#5c706e'),
+      ncCnpjMsg: !cnpj.length ? 'A checagem de duplicidade compara só os dígitos, então grafia diferente não engana.'
+        : (!valido ? 'Faltam ' + (14 - cnpj.length) + ' dígitos.' : (dup ? 'Documento já cadastrado nesta base.' : 'Documento livre nesta base.')),
+      ncDup: !!dup, ncDupTxt: dup ? ('Os mesmos 14 dígitos já pertencem a "' + dup + '". Criar outro registro dividiria o histórico de viagens entre dois cadastros e quebraria a reconstrução de dossiê da empresa.') : '',
+      ncVerDup: () => { this.setState({ nc: false }); this.avisar('Abrindo o cadastro de ' + dup + '. Se for a mesma empresa, o caminho é atualizar este registro, não criar outro.'); },
+      ncNome: s.ncNome || '', ncOnNome: e => this.setState({ ncNome: e.target.value }),
+      ncContato: s.ncContato || '', ncOnContato: e => this.setState({ ncContato: e.target.value }),
+      ncVinculos: VINC.map(n => {
+        const on = s.ncVinculo === n;
+        return { n, onClick: () => this.setState({ ncVinculo: n }), bd: on ? '#127670' : '#e0e7e5', bg: on ? '#eef7f6' : '#fff', c: on ? '#0C5862' : '#3c4f4e' };
+      }),
+      ncToggleConvite: () => this.setState({ ncConvite: !(s.ncConvite ?? true) }),
+      ncCvBd: (s.ncConvite ?? true) ? '#127670' : '#e0e7e5',
+      ncCvBd2: (s.ncConvite ?? true) ? '#127670' : '#c9d5d3',
+      ncCvCk: (s.ncConvite ?? true) ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#fff',
+      ncCvIcon: (s.ncConvite ?? true) ? '✓' : '',
+      ncDica: dup ? 'Resolva a duplicidade antes de continuar.'
+        : (!valido ? 'O CNPJ é o que identifica a empresa em tudo depois.'
+        : (!(s.ncNome || '').trim() ? 'Falta a razão social.'
+        : (!s.ncVinculo ? 'Falta o tipo de vínculo: ele muda o que será exigido.'
+        : (!(s.ncContato || '').trim() ? 'Falta o contato de quem responde pela empresa.'
+        : 'Pronto. Nasce Pré-cadastrada, como as outras duas portas.')))),
+      ncBg: pronto ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#eef2f1', ncC: pronto ? '#fff' : '#9db0ae',
+      ncSh: pronto ? '0 8px 18px rgba(18,118,112,.35)' : 'none', ncCur: pronto ? 'pointer' : 'not-allowed',
+      ncSalvar: () => {
+        if (!pronto) return;
+        const nome = s.ncNome.trim(), comConvite = s.ncConvite ?? true;
+        this.setState({ nc: false });
+        this.avisar(nome + ' cadastrada como Pré-cadastrada.' + (comConvite ? ' Convite do portal enviado ao contato informado.' : ' Sem convite: ela não consegue anexar certificado sozinha até receber um.'));
+      }
+    };
+  }
+  _pagN() { return 7; }
+  _pagFatia(arr) { const pp = this._pagN(); const n = Math.max(1, Math.ceil(arr.length / pp)); const p = Math.min(this.state.pag || 1, n); return arr.slice((p - 1) * pp, p * pp); }
+  _pagVals(total, rotulo) {
+    const pp = this._pagN(); const n = Math.max(1, Math.ceil(total / pp)); const p = Math.min(this.state.pag || 1, n);
+    const ini = (p - 1) * pp, fim = Math.min(p * pp, total);
+    return {
+      temPaginacao: n > 1,
+      pagInfo: total === 0 ? 'nenhum registro' : ('mostrando ' + (ini + 1) + ' a ' + fim + ' de ' + total + ' ' + rotulo),
+      txPaginas: Array.from({ length: n }, (_, i) => i + 1).map(x => ({ n: x,
+        onClick: () => this.setState({ pag: x }),
+        bg: x === p ? '#0b2224' : '#fff', c: x === p ? '#fff' : '#3c4f4e', bd: x === p ? '#0b2224' : '#e0e7e5' })),
+      pagAnterior: () => { if (p > 1) this.setState({ pag: p - 1 }); },
+      pagProxima: () => { if (p < n) this.setState({ pag: p + 1 }); },
+      pagAntCur: p > 1 ? 'pointer' : 'not-allowed', pagAntC: p > 1 ? '#3c4f4e' : '#c9d5d3',
+      pagProxCur: p < n ? 'pointer' : 'not-allowed', pagProxC: p < n ? '#3c4f4e' : '#c9d5d3'
+    };
+  }
+  navVals() {
+    const c = this.state.navC ?? (localStorage.getItem('tx-nav') === '1');
+    return { navW: c ? '84px' : '264px', navPad: c ? '14px' : '16px', navL: c ? 'none' : 'block', navSec: c ? 'none' : 'block', navCard: c ? 'none' : 'block', navFlip: c ? 'rotate(180deg)' : 'none',
+      navToggle: () => { const n = !c; localStorage.setItem('tx-nav', n ? '1' : '0'); this.setState({ navC: n }); } };
+  }
+  mainVals() {
+    const s = this.state, defs = this.estadosDef(), all = this.dados();
+    const contagem = { apto: 184, restrito: 6, pendDoc: 8, pendTrein: 4, pendInsp: 3, preCad: 3, bloq: 2, susp: 1, inativo: 1 };
+    const estados = Object.keys(defs).map(k => {
+      const d = defs[k], on = s.filtro === k;
+      return { nome: d.nome, n: contagem[k], dot: d.dot, glow: d.glow, tc: on ? d.tc : '#3c4f4e',
+        flex: k === 'apto' ? '1.2' : '1',
+        bd: on ? d.bdOn : '#eef2f1', bg: on ? d.bgOn : '#fff',
+        onClick: () => this.setState({ filtro: on ? 'all' : k }) };
+    });
+    const q = s.busca.trim().toLowerCase();
+    const view = all.filter(r => {
+      if (s.filtro !== 'all' && r.est !== s.filtro) return false;
+      if (q && !(r.nome + ' ' + r.doc + ' ' + r.vinculo).toLowerCase().includes(q)) return false;
+      return true;
+    });
+    const rows = view.map(r => {
+      const d = defs[r.est];
+      const menuOpen = s.menu === r.id;
+      const stop = fn => e => { e.stopPropagation(); fn(); };
+      return { ...r, estado: d.nome, stDot: d.dot, stTc: d.tc, stBg: d.bgOn, stBd: '#fff0',
+        ring: d.glow.replace('.16', '.35').replace('.18', '.35').replace('.2', '.35').replace('.3', '.4'),
+        abrir: () => { if (!menuOpen) this.setState({ drawer: r.id, menu: null }); },
+        menuOpen, menuBg: menuOpen ? '#e4ebe9' : '#f0f4f3',
+        menu: stop(() => this.setState({ menu: menuOpen ? null : r.id })),
+        acExportar: stop(() => { this.setState({ menu: null }); this.avisar('Passaporte de ' + r.nome + ' exportado com carimbo de 6 ago.'); }),
+        acRenovar: stop(() => { this.setState({ menu: null }); this.avisar('Renovação do acordo enviada a ' + r.nome + ' para assinatura eletrônica.'); }),
+        acTrilha: stop(() => { this.setState({ menu: null }); this.avisar('Envio para ' + r.nome + ': escolha trilha ou aviso na próxima tela (Academy, em construção).'); }),
+        acSuspender: stop(() => this.setState({ menu: null, susp: r.id, suspMotivo: null })),
+        acArquivar: stop(() => { this.setState({ menu: null }); this.avisar(r.nome + ' arquivado. Histórico e dossiês preservados; reativação a um clique.'); }) };
+    });
+    const sel = all.find(r => r.id === s.drawer) || all[0];
+    const dSel = defs[sel.est];
+    const isLima = sel.id === 'lima';
+    const ok = l => ({ l, icon: '✓', c: '#1a8f57', bg: '#e9f7ef' });
+    const no = l => ({ l, icon: '✕', c: '#c43d3d', bg: '#fdecec' });
+    const p = {
+      ...sel, estado: dSel.nome,
+      heroBg: sel.est === 'apto' ? 'rgba(72,199,142,.25)' : sel.est === 'susp' || sel.est === 'bloq' ? 'rgba(228,105,105,.3)' : 'rgba(244,193,93,.28)',
+      heroC: '#fff',
+      selos: [
+        { v: isLima ? '4' : '10', tag: '', l: 'motoristas ativos', c: '#fff' },
+        { v: isLima ? '92%' : '100%', tag: '', l: 'trilhas vigentes', c: '#fff' },
+        { v: isLima ? '31' : '58', tag: '', l: 'viagens em 2026', c: '#fff' },
+        { v: isLima ? '2' : '0', tag: isLima ? '↑' : '', l: 'ocorrências 12m', c: isLima ? '#ffb3b3' : '#fff' }
+      ],
+      aptoPara: isLima
+        ? [no('grãos e farelos'), no('minerais'), no('operação Gatekeeper'), ok('cadastro e consulta')]
+        : [ok('grãos e farelos'), ok('minerais'), ok('operação Gatekeeper'), no('líquidos (sem tanque)')],
+      temPendencias: sel.est !== 'apto' && sel.est !== 'inativo',
+      pendencias: isLima
+        ? [{ n: '1', t: 'Certificado GMP+ regularizado na base pública', cta: 'Reavaliar agora', acao: () => this.avisar('Consulta feita agora: certificado segue suspenso na base da certificadora.') },
+           { n: '2', t: 'Reavaliação automática ao constar vigente', cta: 'Ver regra', acao: () => this.avisar('Regra R-06: subcontratado apto deriva do certificado. Sem edição manual.') }]
+        : [{ n: '1', t: 'Concluir trilha "Regimes de limpeza" (45 min)', cta: 'Enviar trilha', acao: () => this.avisar('Trilha enviada por WhatsApp. A elegibilidade recalcula na conclusão.') },
+           { n: '2', t: 'Inspeção do implemento agendada', cta: 'Ver agenda', acao: () => this.avisar('Inspeção marcada para 8 ago, 07:30, pátio Rondonópolis.') }],
+      cert: sel.cert, certC: sel.certC,
+      certVal: isLima ? 'suspenso desde 4 ago 26' : '19 set 2027',
+      verDoc: () => this.avisar('Documento original do certificado aberto: PDF emitido pela QSCert, com QR de verificação na base pública.'),
+      vincular: () => this.avisar('Vínculo novo: informe a placa ou o CPF; o vínculo nasce com data de hoje e o histórico anterior fica intacto.'),
+      certSub: isLima ? 'escopo Road Transport · certificadora QSCert' : 'escopo Road Transport · vigente',
+      acordo: sel.acordo, acordoC: '#0b2224',
+      acordoSub: 'vigência 12 meses · renovação coletiva na safra',
+      frotaList: isLima
+        ? [{ placa: 'QAS 7C31 + SQT 9E18', sub: 'graneleiro · 2 compartimentos · vínculo desde mar 24', st: 'inspeção ok', stC: '#1a8f57', stBg: '#e9f7ef' },
+           { placa: 'RTQ 2F09 + SQT 4B77', sub: 'graneleiro · 2 compartimentos · vínculo desde jan 25', st: 'inspeção ok', stC: '#1a8f57', stBg: '#e9f7ef' },
+           { placa: 'QKX 8A12 + SQT 1C55', sub: 'caçamba · 1 compartimento · vínculo desde jun 26', st: 'pend. inspeção', stC: '#4c5bc0', stBg: '#eceffa' }]
+        : [{ placa: 'QBB 4D18 + SQT 3A90', sub: 'graneleiro · 2 compartimentos · vínculo desde set 23', st: 'inspeção ok', stC: '#1a8f57', stBg: '#e9f7ef' },
+           { placa: 'QCF 9E44 + SQT 8B21', sub: 'tanque · 1 compartimento · vínculo desde fev 26', st: 'inspeção ok', stC: '#1a8f57', stBg: '#e9f7ef' }],
+
+      eventos: isLima
+        ? [{ t: 'Suspensão detectada na base pública', quando: '4 ago, 06:12', sub: 'consulta automática · estado recalculado para Suspenso', c: '#c43d3d', glow: 'rgba(196,61,61,.15)', line: '#e4eae8' },
+           { t: 'VG-2490 bloqueada pelo motor', quando: '4 ago, 06:12', sub: 'derivado: subcontratado não apto', c: '#c43d3d', glow: 'rgba(196,61,61,.15)', line: '#e4eae8' },
+           { t: 'Protocolo de renovação anexado', quando: '5 ago, 09:40', sub: 'pela própria Lima, via link', c: '#e8a33d', glow: 'rgba(232,163,61,.16)', line: '#e4eae8' },
+           { t: 'Acordo de qualidade v3 renovado', quando: '02 mar, 14:20', sub: 'assinatura eletrônica · J. Lima', c: '#127670', glow: 'rgba(18,118,112,.14)', line: 'transparent' }]
+        : [{ t: 'Inspeção aprovada · QBB 4D18', quando: '1 ago, 08:15', sub: 'Jorge Mattos · 6 fotos', c: '#1a8f57', glow: 'rgba(26,143,87,.15)', line: '#e4eae8' },
+           { t: '12ª viagem do trimestre concluída', quando: '28 jul', sub: 'sem ocorrências', c: '#127670', glow: 'rgba(18,118,112,.14)', line: '#e4eae8' },
+           { t: 'Trilha "Proteção da carga" concluída', quando: '15 jul', sub: 'nota 9,0 · 1ª tentativa', c: '#127670', glow: 'rgba(18,118,112,.14)', line: 'transparent' }]
+    };
+    const canais = [
+      { k: 'whats', t: 'WhatsApp', sub: 'link direto no telefone do motorista', icon: '✆', iBg: '#e9f7ef', iC: '#1a8f57' },
+      { k: 'sms', t: 'SMS', sub: 'para aparelho sem WhatsApp', icon: '✉', iBg: '#eceffa', iC: '#4c5bc0' },
+      { k: 'qr', t: 'QR Code no pátio', sub: 'imprime e cola na balança ou portaria', icon: '▦', iBg: '#fdf3e2', iC: '#b97514' }
+    ].map(c => {
+      const on = s.canal === c.k;
+      return { ...c, onClick: () => this.setState({ canal: c.k }),
+        bd: on ? '#127670' : '#e0e7e5', bg: on ? '#eef7f6' : '#fff',
+        dot: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#fff', dotBd: on ? '#127670' : '#c9d5d3' };
+    });
+    p.frotaList = p.frotaList.map(fr => ({ ...fr,
+      desvincular: e => { e.stopPropagation(); this.avisar('Vínculo de ' + fr.placa.split(' + ')[0] + ' encerrado com data de hoje. O histórico do compartimento fica com o conjunto.'); } }));
+    return {
+      estados, rows: this._pagFatia(rows), ...this._pagVals(rows.length, "empresas"), vazio: rows.length === 0,
+      busca: s.busca, onBusca: e => this.setState({ busca: e.target.value, pag: 1 }),
+      drawerAberto: !!s.drawer, fecharDrawer: () => this.setState({ drawer: null }),
+      pararClique: e => e.stopPropagation(), p,
+      conviteAberto: s.convite, abrirConvite: () => this.setState({ convite: true }),
+      fecharConvite: () => this.setState({ convite: false }), canais,
+      copiarLink: () => this.avisar('Link copiado. Vale por 7 dias; CPF repetido reaproveita o cadastro.'),
+      cvNome: s.cvNome || '', cvOnNome: e => this.setState({ cvNome: e.target.value }),
+      cvFone: s.cvFone || '', cvOnFone: e => this.setState({ cvFone: e.target.value }),
+      suspVigencias: ['até regularizar', '30 dias', '90 dias'].map(n => {
+        const on = s.suspVig === n;
+        return { n, onClick: () => this.setState({ suspVig: n }), bd: on ? '#c43d3d' : '#e0e7e5', bg: on ? '#fdf6f6' : '#fff', c: on ? '#c43d3d' : '#3c4f4e' };
+      }),
+      enviarConvite: () => { if (!((s.cvNome || '').trim() && (s.cvFone || '').trim())) { this.avisar('Informe nome e telefone do destinatário antes de enviar.'); return; } this.setState({ convite: false, cvNome: '', cvFone: '' }); this.avisar('Convite enviado a ' + s.cvNome.trim() + ' por ' + (s.canal === 'whats' ? 'WhatsApp' : s.canal === 'sms' ? 'SMS' : 'QR Code') + '. O terceiro entra como Pré-cadastrado.'); },
+      suspAberto: !!s.susp, suspNome: (all.find(r => r.id === s.susp) || {}).nome || '',
+      fecharSusp: () => this.setState({ susp: null }),
+      suspMotivos: ['Ocorrência grave em apuração', 'Determinação da Qualidade', 'Solicitação do próprio terceiro', 'Pendência contratual com a Diretoria'].map(label => {
+        const on = s.suspMotivo === label;
+        return { label, onClick: () => this.setState({ suspMotivo: label }),
+          bd: on ? '#127670' : '#e0e7e5', bg: on ? '#eef7f6' : '#fff',
+          dot: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#fff', dotBd: on ? '#127670' : '#c9d5d3' };
+      }),
+      suspBg: (s.suspMotivo && s.suspVig) ? 'linear-gradient(135deg,#b97514,#c43d3d)' : '#eef2f1',
+      suspC: (s.suspMotivo && s.suspVig) ? '#fff' : '#9db0ae', suspSh: (s.suspMotivo && s.suspVig) ? '0 8px 18px rgba(196,61,61,.3)' : 'none',
+      suspCur: (s.suspMotivo && s.suspVig) ? 'pointer' : 'not-allowed',
+      confirmarSusp: () => { if (!(s.suspMotivo && s.suspVig)) return; const nome = (all.find(r => r.id === s.susp) || {}).nome; this.setState({ susp: null, suspVig: null }); this.avisar(nome + ' suspenso por ' + s.suspVig + '. Registro com motivo, responsável e hora; viagens futuras bloqueiam já.'); },
+      impAberto: !!s.imp, impFase1: s.imp === 1, impFase2: s.imp === 2,
+      fecharImp: () => this.setState({ imp: null }),
+      processarImp: () => this.setState({ imp: 2 }),
+      baixarModelo: e => { e.stopPropagation(); this.avisar('Modelo de planilha baixado: 6 colunas, uma linha por terceiro.'); },
+      impLinhas: [
+        { nome: 'Ederson Palma', doc: 'CPF ***.402.118-** · TAC', st: 'novo', icon: '＋', c: '#1a8f57', bg: '#e9f7ef' },
+        { nome: 'Rotas do Cerrado Ltda', doc: 'CNPJ 51.209.884/0001-40 · ETC', st: 'novo', icon: '＋', c: '#1a8f57', bg: '#e9f7ef' },
+        { nome: 'João Bortolini', doc: 'CPF ***.882.441-** · já existe', st: 'reaproveitado', icon: '↺', c: '#b97514', bg: '#fdf3e2' },
+        { nome: 'Marcos Rocha', doc: 'placa QJX 2B44 já vinculada', st: 'reaproveitado', icon: '↺', c: '#b97514', bg: '#fdf3e2' },
+        { nome: 'linha 12', doc: 'CPF inválido (dígito verificador)', st: 'erro', icon: '✕', c: '#c43d3d', bg: '#fdecec' }
+      ],
+      confirmarImp: () => { this.setState({ imp: null }); this.avisar('41 terceiros importados: 37 novos como Pré-cadastrados, 4 reaproveitados. Convites em massa disponíveis.'); },
+      toastImport: () => this.setState({ imp: 1 }),
+      toastPassaporte: () => this.avisar('Passaporte Feed Safety exportado com carimbo de 6 ago. Credencial viva: reflete o estado de agora.'),
+      toastRenova: () => this.avisar('Renovação do acordo v3 enviada para assinatura eletrônica.'),
+      toast: !!s.toast, toastMsg: s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

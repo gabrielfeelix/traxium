@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<script src="./prototype-shell.js" defer></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#e3e9e7;font-family:'Hanken Grotesk',sans-serif;color:#0b2224;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0C5862;text-decoration:none}a:hover{color:#127670}
+</style>
+</helmet>
+<section style="padding:72px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;align-items:baseline;gap:16px">
+  <div style="font-size:26px;font-weight:800">Torre de Controle: 3 direções</div>
+  <div style="font-size:15px;color:#5c706e">1a · sidebar teal profunda &nbsp;·&nbsp; 1b · claro flutuante &nbsp;·&nbsp; 1c · hero escuro. Clique nos itens da fila para expandir.</div>
+</div>
+<div style="display:flex;gap:80px;align-items:flex-start">
+
+<!-- ============ OPTION 1A ============ -->
+<div id="1a" style="width:1920px;flex:none;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:center;gap:12px"><span style="background:#093D44;color:#fff;font-size:13px;font-weight:700;padding:4px 12px;border-radius:99px">1a</span><span style="font-size:15px;font-weight:600;color:#3c4f4e">Sidebar teal profunda</span></div>
+<div style="background:#f2f5f4;border-radius:24px;box-shadow:0 24px 60px rgba(9,61,68,.14);overflow:hidden;display:flex;min-height:1120px">
+  <!-- sidebar -->
+  <div style="width:264px;flex:none;background:linear-gradient(178deg,#093D44,#0A4650);color:#fff;display:flex;flex-direction:column;padding:24px 16px">
+    <div style="display:flex;align-items:center;gap:10px;padding:4px 8px 22px">
+      <svg width="34" height="34" viewBox="0 0 32 32"><defs><linearGradient id="lgA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1a9e93"></stop><stop offset="1" stop-color="#0E78B5"></stop></linearGradient></defs><polygon points="16,2.5 27.5,9 27.5,23 16,29.5 4.5,23 4.5,9" fill="url(#lgA)"></polygon><polyline points="9,20 13,13 18,17 23,10" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></polyline><circle cx="9" cy="20" r="1.6" fill="#fff"></circle><circle cx="13" cy="13" r="1.6" fill="#fff"></circle><circle cx="18" cy="17" r="1.6" fill="#fff"></circle><circle cx="23" cy="10" r="1.6" fill="#fff"></circle></svg>
+      <div><div style="font-weight:800;font-size:17px;letter-spacing:.2px">Traxium</div><div style="font-size:10.5px;letter-spacing:2.2px;color:rgba(255,255,255,.5);text-transform:uppercase">Compliance</div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px;background:linear-gradient(90deg,rgba(26,158,147,.35),rgba(14,120,181,.28));border:1px solid rgba(255,255,255,.14);font-size:14px;font-weight:700"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="5.6"></circle><circle cx="8" cy="8" r="1.4" fill="currentColor" stroke="none"></circle></svg>Torre de Controle<span style="margin-left:auto;background:#fff;color:#0C5862;font-size:11.5px;font-weight:800;padding:1px 8px;border-radius:99px">7</span></div>
+    </div>
+    <div style="font-size:10.5px;letter-spacing:1.8px;color:rgba(255,255,255,.38);padding:20px 12px 8px;font-weight:700">OPERAÇÃO</div>
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:14px;color:rgba(255,255,255,.66)">
+      <div style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 8h9"></path><path d="M8 4.5 11.5 8 8 11.5"></path></svg>Viagens</div>
+      <div style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6"></circle><line x1="8" y1="4.8" x2="8" y2="8.6"></line><circle cx="8" cy="11.2" r=".9" fill="currentColor" stroke="none"></circle></svg>Exceções e liberações<span style="margin-left:auto;background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">5</span></div>
+      <div style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 6.5 12 13 4.5"></path></svg>Inspeções</div>
+      <div style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.8c2.4 2.8 3.7 4.6 3.7 6.5a3.7 3.7 0 1 1-7.4 0c0-1.9 1.3-3.7 3.7-6.5z"></path></svg>Limpezas</div>
+    </div>
+    <div style="font-size:10.5px;letter-spacing:1.8px;color:rgba(255,255,255,.38);padding:20px 12px 8px;font-weight:700">PILARES</div>
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:14px;color:rgba(255,255,255,.66)">
+      <div style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="2.5" width="11" height="11" rx="3"></rect><line x1="8" y1="2.5" x2="8" y2="13.5"></line></svg>Motor IDTF</div>
+      <div style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5.4" cy="6.2" r="2.4"></circle><circle cx="10.8" cy="6.2" r="2.4"></circle><path d="M2.5 13c.6-2 1.7-3 3-3s2.3 1 2.9 3" stroke-linecap="round"></path></svg>Subcontratados</div>
+      <div style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M2 6.3 8 3.4l6 2.9-6 2.9z"></path><path d="M4.6 8.4v2.6c0 .9 1.5 1.8 3.4 1.8s3.4-.9 3.4-1.8V8.4" stroke-linecap="round"></path></svg>Academy</div>
+      <div style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="4.5" width="8" height="5.5" rx="1.4"></rect><path d="M10 6.5h2.4l1.6 2v1.5h-4z" stroke-linejoin="round"></path><circle cx="5" cy="11.8" r="1.4"></circle><circle cx="11.6" cy="11.8" r="1.4"></circle></svg>Ativos e frota</div>
+    </div>
+    <div style="font-size:10.5px;letter-spacing:1.8px;color:rgba(255,255,255,.38);padding:20px 12px 8px;font-weight:700">PROVA</div>
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:14px;color:rgba(255,255,255,.66)">
+      <div style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3.2" y="2.5" width="9.6" height="11" rx="2"></rect><line x1="6" y1="6" x2="10" y2="6"></line><line x1="6" y1="9" x2="10" y2="9"></line></svg>Dossiê de auditoria</div>
+      <div style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="4" y1="13" x2="4" y2="8.5"></line><line x1="8" y1="13" x2="8" y2="3.5"></line><line x1="12" y1="13" x2="12" y2="10"></line></svg>Indicadores</div>
+      <div style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="5.8" stroke-dasharray="2.4 2.4"></circle><circle cx="8" cy="8" r="2.2"></circle></svg>Não conformidades</div>
+    </div>
+    <div style="margin-top:auto;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px">
+      <div style="font-size:12px;color:rgba(255,255,255,.55);margin-bottom:8px">Base IDTF Brasil</div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600"><span style="width:8px;height:8px;border-radius:99px;background:#3ddc97;box-shadow:0 0 0 4px rgba(61,220,151,.18)"></span>v2026.07 vigente</div>
+      <div style="font-size:11.5px;color:rgba(255,255,255,.45);margin-top:4px">Revisada em 28 jul · Qualidade</div>
+    </div>
+  </div>
+  <!-- content -->
+  <div style="flex:1;display:flex;flex-direction:column;padding:26px 32px;gap:22px;min-width:0">
+    <div style="display:flex;align-items:center;gap:16px">
+      <div><div style="font-size:24px;font-weight:800">Torre de Controle</div><div style="font-size:13.5px;color:#5c706e;margin-top:2px">Terça, 5 ago · Filial Rondonópolis MT · 44 viagens no dia</div></div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+        <div style="background:#fff;border:1px solid #e0e7e5;border-radius:11px;padding:9px 14px;font-size:13.5px;color:#5c706e;display:flex;gap:8px;align-items:center"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#7c8f8d" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.6"></circle><line x1="10.5" y1="10.5" x2="13.5" y2="13.5"></line></svg>Buscar viagem, placa, CNPJ…<span style="font-family:'Spline Sans Mono';font-size:11px;background:#f0f4f3;border-radius:6px;padding:1px 6px">⌘K</span></div>
+        <div style="background:#fff;border:1px solid #e0e7e5;border-radius:11px;padding:9px 14px;font-size:13.5px;font-weight:600">Hoje ▾</div>
+        <div style="width:38px;height:38px;border-radius:99px;background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13.5px;box-shadow:0 0 0 3px #fff,0 0 0 4.5px #d8e4e2">RA</div>
+      </div>
+    </div>
+    <!-- triage -->
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:14px">
+      <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:18px 20px">
+        <div style="font-size:13px;font-weight:600;color:#5c706e">Liberadas sem intervenção humana</div>
+        <div style="display:flex;align-items:baseline;gap:10px;margin-top:6px"><span style="font-size:36px;font-weight:800;font-variant-numeric:tabular-nums">{{ pct }}</span><span style="font-size:13px;color:#5c706e">{{ motor }} pelo motor · {{ autor }} por autoridade</span></div>
+        <div style="margin-top:12px;height:12px;border-radius:99px;overflow:hidden;display:flex;background:repeating-linear-gradient(-45deg,#eef2f1 0 5px,#e2e9e7 5px 10px)">
+          <div style="width:79%;background:linear-gradient(90deg,#48c78e,#127670)"></div>
+          <div style="width:13%;background:linear-gradient(90deg,#f4c15d,#e8a33d)"></div>
+        </div>
+        <div style="display:flex;gap:16px;margin-top:9px;font-size:12px;color:#5c706e"><span><span style="display:inline-block;width:8px;height:8px;border-radius:3px;background:#2aa876;margin-right:5px"></span>Motor</span><span><span style="display:inline-block;width:8px;height:8px;border-radius:3px;background:#e8a33d;margin-right:5px"></span>Autoridade</span><span><span style="display:inline-block;width:8px;height:8px;border-radius:3px;background:#dde5e3;margin-right:5px"></span>Em aberto</span></div>
+      </div>
+      <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:18px 20px;display:flex;flex-direction:column">
+        <div style="font-size:13px;font-weight:600;color:#5c706e">Liberadas por autoridade</div>
+        <div style="font-size:36px;font-weight:800;margin-top:6px;font-variant-numeric:tabular-nums">{{ autor }}</div>
+        <div style="margin-top:auto;font-size:12.5px;color:#b97514;background:#fdf3e2;border-radius:8px;padding:4px 9px;align-self:flex-start;font-weight:600">assinadas sobre bloqueio</div>
+      </div>
+      <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:18px 20px;display:flex;flex-direction:column">
+        <div style="font-size:13px;font-weight:600;color:#5c706e">Aguardando análise</div>
+        <div style="font-size:36px;font-weight:800;margin-top:6px;font-variant-numeric:tabular-nums">{{ analise }}</div>
+        <div style="margin-top:auto;font-size:12.5px;color:#5c706e;background:#f0f4f3;border-radius:8px;padding:4px 9px;align-self:flex-start;font-weight:600">mais antiga: 42 min</div>
+      </div>
+      <div style="background:#fff;border:1px solid #f3d4d4;border-radius:18px;padding:18px 20px;display:flex;flex-direction:column">
+        <div style="font-size:13px;font-weight:600;color:#5c706e">Bloqueadas</div>
+        <div style="font-size:36px;font-weight:800;margin-top:6px;color:#c43d3d;font-variant-numeric:tabular-nums">{{ bloq }}</div>
+        <div style="margin-top:auto;font-size:12.5px;color:#c43d3d;background:#fdecec;border-radius:8px;padding:4px 9px;align-self:flex-start;font-weight:600">1 bloqueio técnico</div>
+      </div>
+    </div>
+    <!-- main grid -->
+    <div style="display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start">
+      <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:8px 8px 14px">
+        <div style="display:flex;align-items:center;padding:14px 16px 10px">
+          <div style="font-size:16.5px;font-weight:800">Fila de decisões</div>
+          <div style="font-size:12.5px;color:#5c706e;margin-left:10px">ordenada por severidade e tempo em fila</div>
+          <div style="margin-left:auto;display:flex;gap:6px;font-size:12.5px;font-weight:600">
+            <span style="background:#0b2224;color:#fff;border-radius:99px;padding:5px 12px">Todas · 7</span>
+            <span style="background:#f0f4f3;color:#3c4f4e;border-radius:99px;padding:5px 12px">Bloqueadas · 2</span>
+            <span style="background:#f0f4f3;color:#3c4f4e;border-radius:99px;padding:5px 12px">Em análise · 5</span>
+          </div>
+        </div>
+        <sc-for list="{{ filaA }}" as="it" hint-placeholder-count="5">
+          <div style="border-top:1px solid #eef2f1;margin:0 8px">
+            <div onClick="{{ it.toggle }}" style="display:grid;grid-template-columns:110px 1.35fr 1fr 150px 120px 24px;gap:14px;align-items:center;padding:13px 10px;cursor:pointer;border-radius:12px" style-hover="background:#f6f9f8">
+              <span style="justify-self:start;font-size:11.5px;font-weight:700;color:{{ it.c }};background:{{ it.bg }};border:1px solid {{ it.bd }};border-radius:99px;padding:3px 10px">{{ it.sevLabel }}</span>
+              <div style="min-width:0"><div style="display:flex;gap:8px;align-items:baseline"><span style="font-family:'Spline Sans Mono';font-size:13px;font-weight:600;color:#0C5862">{{ it.id }}</span><span style="font-size:14px;font-weight:700">{{ it.produto }}</span></div><div style="font-size:12.5px;color:#5c706e;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.rota }} · {{ it.cliente }}</div></div>
+              <div style="display:flex;align-items:center;gap:8px;min-width:0"><span style="width:26px;height:26px;border-radius:99px;flex:none;background:linear-gradient(135deg,{{ it.avc1 }},{{ it.avc2 }});color:#fff;font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ it.mi }}</span><div style="min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.nivel }}</div><div style="font-size:11.5px;color:#5c706e">responsável pela análise</div></div></div>
+              <div><div style="font-family:'Spline Sans Mono';font-size:13.5px;font-weight:600;color:{{ it.filaC }}">{{ it.fila }}</div><div style="font-size:11.5px;color:#5c706e">em fila</div></div>
+              <div><div style="font-size:13px;font-weight:600">{{ it.prazo }}</div><div style="font-size:11.5px;color:#5c706e">carregamento</div></div>
+              <span style="color:#9db0ae;font-size:13px;transform:rotate({{ it.chev }});transition:transform .2s;display:inline-block">▾</span>
+            </div>
+            <sc-if value="{{ it.open }}" hint-placeholder-val="{{ false }}">
+              <div style="margin:2px 10px 14px;background:#f7faf9;border:1px solid #e8eeec;border-radius:14px;padding:16px 18px;display:grid;grid-template-columns:1.4fr 1fr;gap:20px">
+                <div>
+                  <div style="font-size:11px;letter-spacing:1.4px;font-weight:700;color:#7c8f8d">MOTIVO</div>
+                  <div style="font-size:14px;line-height:1.55;margin-top:5px">{{ it.motivo }}</div>
+                  <div style="font-size:11px;letter-spacing:1.4px;font-weight:700;color:#7c8f8d;margin-top:14px">AÇÃO</div>
+                  <div style="font-size:14px;line-height:1.5;margin-top:5px;color:#0C5862;font-weight:600">{{ it.acao }}</div>
+                  <div style="display:flex;gap:8px;margin-top:16px">
+                    <span style="background:#0b2224;color:#fff;font-size:13px;font-weight:700;border-radius:10px;padding:8px 16px;cursor:pointer">Abrir viagem</span>
+                    <span style="background:#fff;border:1px solid #d8e2e0;color:#0b2224;font-size:13px;font-weight:700;border-radius:10px;padding:8px 16px;cursor:pointer">{{ it.cta2 }}</span>
+                  </div>
+                </div>
+                <div>
+                  <div style="font-size:11px;letter-spacing:1.4px;font-weight:700;color:#7c8f8d">SEIS EVIDÊNCIAS ESSENCIAIS</div>
+                  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">
+                    <sc-for list="{{ it.evid }}" as="ev" hint-placeholder-count="6"><span style="font-size:12px;font-weight:600;color:{{ ev.c }};background:{{ ev.bg }};border-radius:8px;padding:4px 9px">{{ ev.icon }} {{ ev.l }}</span></sc-for>
+                  </div>
+                  <div style="font-size:11px;letter-spacing:1.4px;font-weight:700;color:#7c8f8d;margin-top:14px">PENDÊNCIAS EM ABERTO</div>
+                  <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+                    <sc-for list="{{ it.pend }}" as="p" hint-placeholder-count="2"><div style="display:flex;justify-content:space-between;font-size:12.5px;background:#fff;border:1px solid #e8eeec;border-radius:9px;padding:7px 10px"><span>{{ p.t }}</span><span style="font-family:'Spline Sans Mono';color:#b97514;font-weight:600">{{ p.age }}</span></div></sc-for>
+                  </div>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+      <!-- rail -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:20px">
+          <div style="font-size:15.5px;font-weight:800">Onde a pendência está</div>
+          <div style="font-size:12.5px;color:#5c706e;margin-top:2px">itens em aberto por pilar</div>
+          <div style="display:flex;flex-direction:column;gap:13px;margin-top:16px">
+            <sc-for list="{{ pilares }}" as="pl" hint-placeholder-count="5">
+              <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span style="font-weight:600">{{ pl.n }}</span><span style="font-family:'Spline Sans Mono';font-weight:600;color:#0C5862">{{ pl.v }}</span></div><div style="height:8px;border-radius:99px;background:#eef2f1;overflow:hidden"><div style="height:100%;width:{{ pl.w }};border-radius:99px;background:linear-gradient(90deg,#127670,#0E78B5)"></div></div></div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:20px">
+          <div style="display:flex;align-items:center"><div style="font-size:15.5px;font-weight:800">Vai travar em breve</div><span style="margin-left:auto;font-size:12.5px;font-weight:600;color:#0C5862;cursor:pointer">Ver todos</span></div>
+          <div style="display:flex;gap:8px;margin-top:14px">
+            <div style="flex:1;background:#fdecec;border-radius:12px;padding:10px;text-align:center"><div style="font-size:20px;font-weight:800;color:#c43d3d">1</div><div style="font-size:11.5px;color:#a54545;font-weight:600">≤ 15 dias</div></div>
+            <div style="flex:1;background:#fdf3e2;border-radius:12px;padding:10px;text-align:center"><div style="font-size:20px;font-weight:800;color:#b97514">3</div><div style="font-size:11.5px;color:#a2731f;font-weight:600">≤ 30 dias</div></div>
+            <div style="flex:1;background:#f0f4f3;border-radius:12px;padding:10px;text-align:center"><div style="font-size:20px;font-weight:800;color:#3c4f4e">8</div><div style="font-size:11.5px;color:#5c706e;font-weight:600">≤ 60 dias</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;margin-top:8px">
+            <sc-for list="{{ certs }}" as="ct" hint-placeholder-count="4">
+              <div style="display:flex;align-items:center;gap:11px;padding:11px 2px;border-bottom:1px solid #eef2f1"><span style="width:30px;height:30px;border-radius:99px;flex:none;background:linear-gradient(135deg,{{ ct.a1 }},{{ ct.a2 }});color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ ct.ini }}</span><div style="min-width:0;flex:1"><div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ct.e }}</div><div style="font-size:11.5px;color:#5c706e">{{ ct.t }}</div></div><span style="font-size:12px;font-weight:700;color:{{ ct.dc }};background:{{ ct.dbg }};border-radius:8px;padding:3px 8px;white-space:nowrap">{{ ct.d }}</span></div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ============ OPTION 1B ============ -->
+<div id="1b" style="width:1920px;flex:none;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:center;gap:12px"><span style="background:#093D44;color:#fff;font-size:13px;font-weight:700;padding:4px 12px;border-radius:99px">1b</span><span style="font-size:15px;font-weight:600;color:#3c4f4e">Claro flutuante: nav em pílulas</span></div>
+<div style="background:linear-gradient(165deg,#eaf2f0,#e6edf2 60%,#e9f0ec);border-radius:24px;box-shadow:0 24px 60px rgba(9,61,68,.14);min-height:1120px;padding:22px 40px 40px">
+  <!-- top nav -->
+  <div style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.85);backdrop-filter:blur(8px);border:1px solid #fff;border-radius:99px;padding:10px 12px 10px 20px;box-shadow:0 8px 24px rgba(9,61,68,.07)">
+    <svg width="30" height="30" viewBox="0 0 32 32"><defs><linearGradient id="lgB" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#127670"></stop><stop offset="1" stop-color="#0E78B5"></stop></linearGradient></defs><polygon points="16,2.5 27.5,9 27.5,23 16,29.5 4.5,23 4.5,9" fill="url(#lgB)"></polygon><polyline points="9,20 13,13 18,17 23,10" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></polyline><circle cx="9" cy="20" r="1.6" fill="#fff"></circle><circle cx="13" cy="13" r="1.6" fill="#fff"></circle><circle cx="18" cy="17" r="1.6" fill="#fff"></circle><circle cx="23" cy="10" r="1.6" fill="#fff"></circle></svg>
+    <span style="font-weight:800;font-size:16px">Traxium</span>
+    <div style="display:flex;gap:4px;margin-left:18px;font-size:14px;font-weight:600;color:#4a5e5c">
+      <span style="background:#093D44;color:#fff;border-radius:99px;padding:8px 18px">Torre de Controle</span>
+      <span style="border-radius:99px;padding:8px 16px">Viagens</span>
+      <span style="border-radius:99px;padding:8px 16px">Exceções <span style="background:#fdecec;color:#c43d3d;border-radius:99px;padding:1px 7px;font-size:11.5px;font-weight:800">5</span></span>
+      <span style="border-radius:99px;padding:8px 16px">Motor IDTF</span>
+      <span style="border-radius:99px;padding:8px 16px">Subcontratados</span>
+      <span style="border-radius:99px;padding:8px 16px">Academy</span>
+      <span style="border-radius:99px;padding:8px 16px">Dossiê</span>
+    </div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+      <div style="background:#f0f4f3;border-radius:99px;padding:8px 16px;font-size:13px;color:#5c706e;display:flex;gap:8px;align-items:center"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="#7c8f8d" stroke-width="1.8" stroke-linecap="round"><circle cx="7" cy="7" r="4.6"></circle><line x1="10.5" y1="10.5" x2="13.5" y2="13.5"></line></svg>Buscar</div>
+      <div style="width:36px;height:36px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px">RA</div>
+    </div>
+  </div>
+  <!-- header -->
+  <div style="display:flex;align-items:flex-end;margin:30px 4px 20px">
+    <div><div style="font-size:28px;font-weight:800;letter-spacing:-.3px">Bom dia, Rafael</div><div style="font-size:14px;color:#5c706e;margin-top:3px">7 decisões esperam por alguém · a mais antiga há 3h 12min</div></div>
+    <div style="margin-left:auto;display:flex;gap:10px"><span style="background:#fff;border:1px solid #fff;box-shadow:0 4px 14px rgba(9,61,68,.06);border-radius:99px;padding:9px 18px;font-size:13.5px;font-weight:600">Ter, 5 ago ▾</span><span style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;border-radius:99px;padding:9px 18px;font-size:13.5px;font-weight:700;box-shadow:0 8px 18px rgba(18,118,112,.35)">+ Nova viagem</span></div>
+  </div>
+  <!-- triage pastel tiles -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+    <div style="background:#fff;border-radius:20px;padding:6px;box-shadow:0 10px 30px rgba(9,61,68,.06)"><div style="height:64px;border-radius:15px;background:linear-gradient(120deg,#d7f2e4,#bfe9d2 55%,#d2ecf4)"></div><div style="padding:12px 14px 10px"><div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:28px;font-weight:800;font-variant-numeric:tabular-nums">{{ motor }}</span><span style="font-size:12.5px;font-weight:700;color:#1a9e5c;background:#e7f6ee;border-radius:99px;padding:2px 8px">79%</span></div><div style="font-size:13px;color:#5c706e;font-weight:600;margin-top:2px">liberadas pelo motor</div></div></div>
+    <div style="background:#fff;border-radius:20px;padding:6px;box-shadow:0 10px 30px rgba(9,61,68,.06)"><div style="height:64px;border-radius:15px;background:linear-gradient(120deg,#fdeed3,#fbe0b8 55%,#fbd9d0)"></div><div style="padding:12px 14px 10px"><div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:28px;font-weight:800;font-variant-numeric:tabular-nums">{{ autor }}</span><span style="font-size:12.5px;font-weight:700;color:#b97514;background:#fdf3e2;border-radius:99px;padding:2px 8px">sobre bloqueio</span></div><div style="font-size:13px;color:#5c706e;font-weight:600;margin-top:2px">liberadas por autoridade</div></div></div>
+    <div style="background:#fff;border-radius:20px;padding:6px;box-shadow:0 10px 30px rgba(9,61,68,.06)"><div style="height:64px;border-radius:15px;background:linear-gradient(120deg,#e4e9fb,#d3dcf7 55%,#e8dcf5)"></div><div style="padding:12px 14px 10px"><div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:28px;font-weight:800;font-variant-numeric:tabular-nums">{{ analise }}</span><span style="font-size:12.5px;font-weight:700;color:#4c5bc0;background:#eceffa;border-radius:99px;padding:2px 8px">42 min ↑</span></div><div style="font-size:13px;color:#5c706e;font-weight:600;margin-top:2px">aguardando análise</div></div></div>
+    <div style="background:#fff;border-radius:20px;padding:6px;box-shadow:0 10px 30px rgba(9,61,68,.06)"><div style="height:64px;border-radius:15px;background:linear-gradient(120deg,#fbdcd7,#f8cbc6 55%,#f3d3e2)"></div><div style="padding:12px 14px 10px"><div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:28px;font-weight:800;color:#c43d3d;font-variant-numeric:tabular-nums">{{ bloq }}</span><span style="font-size:12.5px;font-weight:700;color:#c43d3d;background:#fdecec;border-radius:99px;padding:2px 8px">1 técnico</span></div><div style="font-size:13px;color:#5c706e;font-weight:600;margin-top:2px">bloqueadas</div></div></div>
+  </div>
+  <!-- main -->
+  <div style="display:grid;grid-template-columns:1fr 400px;gap:20px;margin-top:20px;align-items:start">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;padding:2px 6px"><div style="font-size:17px;font-weight:800">Fila de decisões</div><div style="margin-left:auto;display:flex;gap:6px;font-size:12.5px;font-weight:600"><span style="background:#fff;border-radius:99px;padding:6px 14px;box-shadow:0 4px 12px rgba(9,61,68,.05)">Severidade ▾</span><span style="background:#fff;border-radius:99px;padding:6px 14px;box-shadow:0 4px 12px rgba(9,61,68,.05)">Pilar ▾</span></div></div>
+      <sc-for list="{{ filaB }}" as="it" hint-placeholder-count="5">
+        <div style="background:#fff;border-radius:20px;box-shadow:0 10px 30px rgba(9,61,68,.06)">
+          <div onClick="{{ it.toggle }}" style="display:flex;align-items:center;gap:16px;padding:16px 20px;cursor:pointer">
+            <span style="width:44px;height:44px;border-radius:99px;flex:none;background:linear-gradient(135deg,{{ it.avc1 }},{{ it.avc2 }});color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #fff,0 0 0 4.5px {{ it.bd }}">{{ it.mi }}</span>
+            <div style="min-width:0;flex:1.3"><div style="display:flex;gap:8px;align-items:baseline"><span style="font-size:15px;font-weight:800">{{ it.produto }}</span><span style="font-family:'Spline Sans Mono';font-size:12.5px;font-weight:600;color:#0C5862">{{ it.id }}</span></div><div style="font-size:12.5px;color:#5c706e;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.rota }}</div></div>
+            <span style="font-size:11.5px;font-weight:700;color:{{ it.c }};background:{{ it.bg }};border-radius:99px;padding:4px 12px;white-space:nowrap">{{ it.sevLabel }}</span>
+            <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.nivel }}</div><div style="font-size:11.5px;color:#5c706e">resolve esta pendência</div></div>
+            <div style="text-align:right"><div style="font-family:'Spline Sans Mono';font-size:13.5px;font-weight:600;color:{{ it.filaC }}">{{ it.fila }}</div><div style="font-size:11.5px;color:#5c706e">em fila</div></div>
+            <span style="width:30px;height:30px;border-radius:99px;background:#f0f4f3;color:#3c4f4e;display:flex;align-items:center;justify-content:center;font-size:12px;transform:rotate({{ it.chev }});transition:transform .2s">▾</span>
+          </div>
+          <sc-if value="{{ it.open }}" hint-placeholder-val="{{ false }}">
+            <div style="border-top:1px dashed #e4eae8;margin:0 20px;padding:16px 0 18px;display:grid;grid-template-columns:1.4fr 1fr;gap:20px">
+              <div>
+                <div style="font-size:14px;line-height:1.55">{{ it.motivo }}</div>
+                <div style="font-size:13.5px;line-height:1.5;margin-top:8px;color:#0C5862;font-weight:600">→ {{ it.acao }}</div>
+                <div style="display:flex;gap:8px;margin-top:14px"><span style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;font-size:13px;font-weight:700;border-radius:99px;padding:8px 18px;cursor:pointer">Abrir viagem</span><span style="background:#f0f4f3;color:#0b2224;font-size:13px;font-weight:700;border-radius:99px;padding:8px 18px;cursor:pointer">{{ it.cta2 }}</span></div>
+              </div>
+              <div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ it.evid }}" as="ev" hint-placeholder-count="6"><span style="font-size:12px;font-weight:600;color:{{ ev.c }};background:{{ ev.bg }};border-radius:99px;padding:4px 10px">{{ ev.icon }} {{ ev.l }}</span></sc-for></div>
+                <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px"><sc-for list="{{ it.pend }}" as="p" hint-placeholder-count="2"><div style="display:flex;justify-content:space-between;font-size:12.5px;background:#f7faf9;border-radius:99px;padding:7px 14px"><span>{{ p.t }}</span><span style="font-family:'Spline Sans Mono';color:#b97514;font-weight:600">{{ p.age }}</span></div></sc-for></div>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+    <!-- rail -->
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div style="background:#fff;border-radius:20px;padding:22px;box-shadow:0 10px 30px rgba(9,61,68,.06)">
+        <div style="font-size:15.5px;font-weight:800">Motor × autoridade</div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:2px">a razão que mede o produto</div>
+        <div style="margin-top:16px;height:16px;border-radius:99px;overflow:hidden;display:flex;background:repeating-linear-gradient(-45deg,#f0f4f3 0 6px,#e4ebe9 6px 12px)"><div style="width:79%;background:linear-gradient(90deg,#79dbaa,#127670)"></div><div style="width:13%;background:linear-gradient(90deg,#f4c15d,#e8a33d)"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:12px"><div><div style="font-size:22px;font-weight:800;font-variant-numeric:tabular-nums">34</div><div style="font-size:12px;color:#5c706e">pelo motor</div></div><div style="text-align:center"><div style="font-size:22px;font-weight:800;font-variant-numeric:tabular-nums">3</div><div style="font-size:12px;color:#5c706e">por autoridade</div></div><div style="text-align:right"><div style="font-size:22px;font-weight:800;color:#c43d3d;font-variant-numeric:tabular-nums">2</div><div style="font-size:12px;color:#5c706e">bloqueadas</div></div></div>
+      </div>
+      <div style="background:#fff;border-radius:20px;padding:22px;box-shadow:0 10px 30px rgba(9,61,68,.06)">
+        <div style="font-size:15.5px;font-weight:800">Onde a pendência está</div>
+        <div style="display:flex;gap:8px;margin-top:14px;align-items:flex-end;height:110px">
+          <sc-for list="{{ pilaresB }}" as="pl" hint-placeholder-count="5"><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end"><div style="font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums">{{ pl.v }}</div><div style="width:100%;height:{{ pl.w }};border-radius:10px;background:linear-gradient(180deg,{{ pl.c1 }},{{ pl.c2 }})"></div></div></sc-for>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px"><sc-for list="{{ pilaresB }}" as="pl" hint-placeholder-count="5"><div style="flex:1;font-size:10.5px;color:#5c706e;text-align:center;line-height:1.25;font-weight:600">{{ pl.short }}</div></sc-for></div>
+      </div>
+      <div style="background:#fff;border-radius:20px;padding:22px;box-shadow:0 10px 30px rgba(9,61,68,.06)">
+        <div style="display:flex;align-items:center"><div style="font-size:15.5px;font-weight:800">Vai travar em breve</div><span style="margin-left:auto;font-size:12px;font-weight:700;color:#0C5862">12 certificados</span></div>
+        <div style="display:flex;flex-direction:column;margin-top:6px">
+          <sc-for list="{{ certs }}" as="ct" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid #f0f4f3"><span style="width:32px;height:32px;border-radius:99px;flex:none;background:linear-gradient(135deg,{{ ct.a1 }},{{ ct.a2 }});color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ ct.ini }}</span><div style="min-width:0;flex:1"><div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ct.e }}</div><div style="font-size:11.5px;color:#5c706e">{{ ct.t }}</div></div><span style="font-size:12px;font-weight:700;color:{{ ct.dc }};background:{{ ct.dbg }};border-radius:99px;padding:3px 10px;white-space:nowrap">{{ ct.d }}</span></div></sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ============ OPTION 1C ============ -->
+<div id="1c" style="width:1920px;flex:none;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:center;gap:12px"><span style="background:#093D44;color:#fff;font-size:13px;font-weight:700;padding:4px 12px;border-radius:99px">1c</span><span style="font-size:15px;font-weight:600;color:#3c4f4e">Hero escuro: sidebar clara</span></div>
+<div style="background:#fbfcfc;border-radius:24px;box-shadow:0 24px 60px rgba(9,61,68,.14);overflow:hidden;display:flex;min-height:1120px">
+  <!-- light sidebar -->
+  <div style="width:248px;flex:none;background:#fff;border-right:1px solid #ecf1f0;display:flex;flex-direction:column;padding:24px 14px">
+    <div style="display:flex;align-items:center;gap:10px;padding:2px 10px 22px">
+      <svg width="32" height="32" viewBox="0 0 32 32"><defs><linearGradient id="lgC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#127670"></stop><stop offset="1" stop-color="#0E78B5"></stop></linearGradient></defs><polygon points="16,2.5 27.5,9 27.5,23 16,29.5 4.5,23 4.5,9" fill="url(#lgC)"></polygon><polyline points="9,20 13,13 18,17 23,10" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></polyline><circle cx="9" cy="20" r="1.6" fill="#fff"></circle><circle cx="13" cy="13" r="1.6" fill="#fff"></circle><circle cx="18" cy="17" r="1.6" fill="#fff"></circle><circle cx="23" cy="10" r="1.6" fill="#fff"></circle></svg>
+      <div><div style="font-weight:800;font-size:16px">Traxium</div><div style="font-size:10px;letter-spacing:2px;color:#8ba09e;text-transform:uppercase">Compliance</div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:14px;color:#4a5e5c;font-weight:600">
+      <div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px;background:#e9f3f2;color:#0C5862;font-weight:700"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="5.6"></circle><circle cx="8" cy="8" r="1.4" fill="currentColor" stroke="none"></circle></svg>Torre de Controle</div>
+      <div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 8h9"></path><path d="M8 4.5 11.5 8 8 11.5"></path></svg>Viagens</div>
+      <div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6"></circle><line x1="8" y1="4.8" x2="8" y2="8.6"></line><circle cx="8" cy="11.2" r=".9" fill="currentColor" stroke="none"></circle></svg>Exceções<span style="margin-left:auto;background:#fdecec;color:#c43d3d;font-size:11.5px;font-weight:800;padding:1px 8px;border-radius:99px">5</span></div>
+      <div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 6.5 12 13 4.5"></path></svg>Inspeções</div>
+      <div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.8c2.4 2.8 3.7 4.6 3.7 6.5a3.7 3.7 0 1 1-7.4 0c0-1.9 1.3-3.7 3.7-6.5z"></path></svg>Limpezas</div>
+      <div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="2.5" width="11" height="11" rx="3"></rect><line x1="8" y1="2.5" x2="8" y2="13.5"></line></svg>Motor IDTF</div>
+      <div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5.4" cy="6.2" r="2.4"></circle><circle cx="10.8" cy="6.2" r="2.4"></circle><path d="M2.5 13c.6-2 1.7-3 3-3s2.3 1 2.9 3" stroke-linecap="round"></path></svg>Subcontratados</div>
+      <div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M2 6.3 8 3.4l6 2.9-6 2.9z"></path><path d="M4.6 8.4v2.6c0 .9 1.5 1.8 3.4 1.8s3.4-.9 3.4-1.8V8.4" stroke-linecap="round"></path></svg>Academy</div>
+      <div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="4.5" width="8" height="5.5" rx="1.4"></rect><path d="M10 6.5h2.4l1.6 2v1.5h-4z" stroke-linejoin="round"></path><circle cx="5" cy="11.8" r="1.4"></circle><circle cx="11.6" cy="11.8" r="1.4"></circle></svg>Ativos e frota</div>
+      <div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3.2" y="2.5" width="9.6" height="11" rx="2"></rect><line x1="6" y1="6" x2="10" y2="6"></line><line x1="6" y1="9" x2="10" y2="9"></line></svg>Dossiê</div>
+      <div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="4" y1="13" x2="4" y2="8.5"></line><line x1="8" y1="13" x2="8" y2="3.5"></line><line x1="12" y1="13" x2="12" y2="10"></line></svg>Indicadores</div>
+    </div>
+    <div style="margin-top:auto;display:flex;align-items:center;gap:10px;background:#f4f7f6;border-radius:14px;padding:12px">
+      <span style="width:34px;height:34px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12.5px">RA</span>
+      <div><div style="font-size:13px;font-weight:700">Rafael Antunes</div><div style="font-size:11.5px;color:#5c706e">Gestor de qualidade</div></div>
+    </div>
+  </div>
+  <!-- content -->
+  <div style="flex:1;display:flex;flex-direction:column;padding:26px 32px;gap:20px;min-width:0">
+    <div style="display:flex;align-items:center"><div style="font-size:23px;font-weight:800">Torre de Controle</div><div style="margin-left:auto;display:flex;gap:10px;align-items:center"><span style="background:#fff;border:1px solid #e4eae8;border-radius:11px;padding:8px 14px;font-size:13px;font-weight:600">Filial Rondonópolis ▾</span><span style="background:#fff;border:1px solid #e4eae8;border-radius:11px;padding:8px 14px;font-size:13px;font-weight:600">Hoje ▾</span><span style="background:#093D44;color:#fff;border-radius:11px;padding:8px 16px;font-size:13px;font-weight:700">Exportar</span></div></div>
+    <!-- hero -->
+    <div style="border-radius:22px;background:linear-gradient(115deg,#093D44 0%,#0C5862 55%,#0E78B5 130%);color:#fff;padding:26px 30px;display:grid;grid-template-columns:1.2fr 1fr;gap:30px;position:relative;overflow:hidden">
+      <div style="position:absolute;right:-80px;top:-120px;width:380px;height:380px;border-radius:99em;background:radial-gradient(circle,rgba(255,255,255,.12),rgba(255,255,255,0) 65%)"></div>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:rgba(255,255,255,.65)">Liberadas sem intervenção humana · hoje</div>
+        <div style="display:flex;align-items:baseline;gap:14px;margin-top:4px"><span style="font-size:56px;font-weight:800;letter-spacing:-1px;font-variant-numeric:tabular-nums">{{ pct }}</span><span style="font-size:14px;color:rgba(255,255,255,.75)">{{ motor }} de 43 decisões saíram sem chegar à mesa de ninguém</span></div>
+        <div style="margin-top:16px;height:14px;border-radius:99px;overflow:hidden;display:flex;background:repeating-linear-gradient(-45deg,rgba(255,255,255,.10) 0 6px,rgba(255,255,255,.04) 6px 12px)"><div style="width:79%;background:linear-gradient(90deg,#5ee6a8,#9be8d8)"></div><div style="width:13%;background:linear-gradient(90deg,#f4c15d,#f0a94e)"></div></div>
+        <div style="display:flex;gap:18px;margin-top:10px;font-size:12.5px;color:rgba(255,255,255,.7)"><span><span style="display:inline-block;width:8px;height:8px;border-radius:3px;background:#5ee6a8;margin-right:6px"></span>Motor · 34</span><span><span style="display:inline-block;width:8px;height:8px;border-radius:3px;background:#f4c15d;margin-right:6px"></span>Autoridade · 3</span><span><span style="display:inline-block;width:8px;height:8px;border-radius:3px;background:rgba(255,255,255,.25);margin-right:6px"></span>Em aberto · 7</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:14px 16px;backdrop-filter:blur(4px)"><div style="font-size:26px;font-weight:800;font-variant-numeric:tabular-nums">{{ autor }}</div><div style="font-size:12px;color:rgba(255,255,255,.65);margin-top:2px">por autoridade, sobre bloqueio</div></div>
+        <div style="background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:14px 16px"><div style="font-size:26px;font-weight:800;font-variant-numeric:tabular-nums">{{ analise }}</div><div style="font-size:12px;color:rgba(255,255,255,.65);margin-top:2px">aguardando análise</div></div>
+        <div style="background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:14px 16px"><div style="font-size:26px;font-weight:800;color:#ffb3b3;font-variant-numeric:tabular-nums">{{ bloq }}</div><div style="font-size:12px;color:rgba(255,255,255,.65);margin-top:2px">bloqueadas · 1 técnico</div></div>
+        <div style="background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:14px 16px"><div style="font-size:26px;font-weight:800;font-variant-numeric:tabular-nums">12</div><div style="font-size:12px;color:rgba(255,255,255,.65);margin-top:2px">certificados vencem em ≤ 60 dias</div></div>
+      </div>
+    </div>
+    <!-- main -->
+    <div style="display:grid;grid-template-columns:1fr 372px;gap:20px;align-items:start">
+      <div style="background:#fff;border:1px solid #ecf1f0;border-radius:20px;padding:8px 8px 14px">
+        <div style="display:flex;align-items:center;padding:14px 16px 10px"><div style="font-size:16.5px;font-weight:800">Fila de decisões</div><span style="margin-left:10px;font-size:12px;font-weight:700;color:#c43d3d;background:#fdecec;border-radius:99px;padding:3px 10px">2 bloqueadas</span><span style="margin-left:6px;font-size:12px;font-weight:700;color:#b97514;background:#fdf3e2;border-radius:99px;padding:3px 10px">5 em análise</span><span style="margin-left:auto;font-size:12.5px;font-weight:600;color:#0C5862">Ver todas →</span></div>
+        <sc-for list="{{ filaC }}" as="it" hint-placeholder-count="5">
+          <div style="border-top:1px solid #f0f4f3;margin:0 8px">
+            <div onClick="{{ it.toggle }}" style="display:flex;align-items:center;gap:14px;padding:13px 10px;cursor:pointer;border-radius:12px" style-hover="background:#f7faf9">
+              <span style="width:10px;height:10px;border-radius:99px;flex:none;background:{{ it.c }};box-shadow:0 0 0 4px {{ it.bg }}"></span>
+              <div style="min-width:0;flex:1.4"><div style="display:flex;gap:8px;align-items:baseline"><span style="font-family:'Spline Sans Mono';font-size:12.5px;font-weight:600;color:#0C5862">{{ it.id }}</span><span style="font-size:14px;font-weight:700">{{ it.produto }}</span></div><div style="font-size:12px;color:#5c706e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.motivoCurto }}</div></div>
+              <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.nivel }}</div><div style="font-size:11.5px;color:#5c706e">responsável</div></div>
+              <div style="text-align:right"><div style="font-family:'Spline Sans Mono';font-size:13px;font-weight:600;color:{{ it.filaC }}">{{ it.fila }}</div><div style="font-size:11.5px;color:#5c706e">{{ it.prazo }}</div></div>
+              <span style="color:#9db0ae;font-size:13px;transform:rotate({{ it.chev }});transition:transform .2s;display:inline-block">▾</span>
+            </div>
+            <sc-if value="{{ it.open }}" hint-placeholder-val="{{ false }}">
+              <div style="margin:2px 10px 14px;border:1px solid #ecf1f0;border-radius:14px;padding:16px 18px;background:linear-gradient(180deg,#fbfdfc,#f6faf9)">
+                <div style="font-size:14px;line-height:1.55">{{ it.motivo }}</div>
+                <div style="font-size:13.5px;margin-top:8px;color:#0C5862;font-weight:600">→ {{ it.acao }}</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px"><sc-for list="{{ it.evid }}" as="ev" hint-placeholder-count="6"><span style="font-size:12px;font-weight:600;color:{{ ev.c }};background:{{ ev.bg }};border-radius:8px;padding:4px 9px">{{ ev.icon }} {{ ev.l }}</span></sc-for></div>
+                <div style="display:flex;gap:8px;margin-top:14px"><span style="background:#093D44;color:#fff;font-size:13px;font-weight:700;border-radius:10px;padding:8px 16px;cursor:pointer">Abrir viagem</span><span style="background:#fff;border:1px solid #dfe7e5;font-size:13px;font-weight:700;border-radius:10px;padding:8px 16px;cursor:pointer">{{ it.cta2 }}</span></div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:#fff;border:1px solid #ecf1f0;border-radius:20px;padding:20px">
+          <div style="font-size:15.5px;font-weight:800">Pendências por pilar</div>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:14px">
+            <sc-for list="{{ pilares }}" as="pl" hint-placeholder-count="5"><div style="display:flex;align-items:center;gap:10px"><span style="width:34px;font-family:'Spline Sans Mono';font-size:14px;font-weight:600;color:#0C5862">{{ pl.v }}</span><div style="flex:1"><div style="font-size:13px;font-weight:600;margin-bottom:4px">{{ pl.n }}</div><div style="height:6px;border-radius:99px;background:#f0f4f3"><div style="height:100%;width:{{ pl.w }};border-radius:99px;background:linear-gradient(90deg,#127670,#0E78B5)"></div></div></div></div></sc-for>
+          </div>
+        </div>
+        <div style="background:#fff;border:1px solid #ecf1f0;border-radius:20px;padding:20px">
+          <div style="font-size:15.5px;font-weight:800">Vai travar em breve</div>
+          <div style="display:flex;flex-direction:column;margin-top:6px">
+            <sc-for list="{{ certs }}" as="ct" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid #f0f4f3"><span style="width:30px;height:30px;border-radius:99px;flex:none;background:linear-gradient(135deg,{{ ct.a1 }},{{ ct.a2 }});color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ ct.ini }}</span><div style="min-width:0;flex:1"><div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ct.e }}</div><div style="font-size:11.5px;color:#5c706e">{{ ct.t }}</div></div><span style="font-size:12px;font-weight:700;color:{{ ct.dc }};background:{{ ct.dbg }};border-radius:8px;padding:3px 8px;white-space:nowrap">{{ ct.d }}</span></div></sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+</div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { openA: 'VG-2487', openB: 'VG-2490', openC: 'VG-2492' };
+  fila() {
+    const evOk = l => ({ l, ok: true }), evNo = l => ({ l, ok: false });
+    return [
+      { id: 'VG-2487', sev: 'red', produto: 'Farelo de amendoim', rota: 'Rondonópolis MT → Chapecó SC', cliente: 'Coop. Aurora',
+        motivo: 'Carga anterior proibida no compartimento C2 (T-1: ureia pecuária). Não existe regime de limpeza que libere esta combinação; a base IDTF classifica como proibida.',
+        motivoCurto: 'Carga anterior proibida no C2 · ureia pecuária (T-1)',
+        acao: 'Regularizar o fato: procedimento formal de liberação + inspeção qualificada + reavaliação pelo motor',
+        nivel: 'Bloqueio técnico: ninguém libera', mi: 'EF', avc1: '#c43d3d', avc2: '#93313f',
+        prazo: 'hoje · 14:00', fila: '3h 12min', filaOld: true, cta2: 'Plano de regularização',
+        evid: [evOk('T-3'), evNo('Limpeza'), evOk('Inspeção'), evOk('Fotos'), evOk('Certificado'), evOk('Competência')],
+        pend: [{ t: 'Ocorrência registrada pelo motorista', age: 'há 3h 05min' }, { t: 'Resposta da Qualidade', age: 'em aberto' }] },
+      { id: 'VG-2490', sev: 'red', produto: 'Farelo de soja', rota: 'Sorriso MT → Uberlândia MG', cliente: 'NutriMax Rações',
+        motivo: 'O certificado GMP+ da Lima Logística consta suspenso na base pública da certificadora; mesmo com o acordo de qualidade vigente e assinado, a suspensão bloqueia.',
+        motivoCurto: 'Certificado do subcontratado suspenso na base pública',
+        acao: 'Reatribuir a outro transportador apto ou aguardar regularização na base da certificadora',
+        nivel: 'Diretoria + Resp. Técnico', mi: 'IP', avc1: '#0C5862', avc2: '#0E78B5',
+        prazo: 'amanhã · 06:30', fila: '1h 05min', filaOld: false, cta2: 'Solicitar exceção',
+        evid: [evOk('T-3'), evOk('Limpeza'), evOk('Inspeção'), evOk('Fotos'), evNo('Certificado'), evOk('Competência')],
+        pend: [{ t: 'Consulta à base pública (automática)', age: 'há 1h 02min' }] },
+      { id: 'VG-2492', sev: 'amber', produto: 'Milho a granel', rota: 'Lucas do Rio Verde MT → Rio Verde GO', cliente: 'Granja Sto. Expedito',
+        motivo: 'Trilha "Regimes de limpeza" do motorista Valdir Nunes vencida há 6 dias. A competência é derivada da trilha vigente; não há campo para marcá-lo como apto.',
+        motivoCurto: 'Trilha do motorista vencida há 6 dias',
+        acao: 'Reatribuir motorista elegível ou concluir a reciclagem da trilha (45 min) antes do carregamento',
+        nivel: 'Gestor de qualidade', mi: 'VN', avc1: '#127670', avc2: '#0E78B5',
+        prazo: 'hoje · 17:30', fila: '42 min', filaOld: false, cta2: 'Enviar trilha ao motorista',
+        evid: [evOk('T-3'), evOk('Limpeza'), evOk('Inspeção'), evOk('Fotos'), evOk('Certificado'), evNo('Competência')],
+        pend: [{ t: 'Solicitação de análise do despachante', age: 'há 42 min' }] },
+      { id: 'VG-2494', sev: 'amber', produto: 'Casca de soja peletizada', rota: 'Rondonópolis MT → Campo Grande MS', cliente: 'Bela Vista Nutrição',
+        motivo: 'Fotos mínimas ausentes na inspeção do compartimento C1: falta o ângulo obrigatório da bica de descarga. Os demais cinco ângulos foram capturados e validados.',
+        motivoCurto: 'Falta foto obrigatória: bica de descarga (C1)',
+        acao: 'Inspetor de pátio captura o ângulo faltante pelo app e a viagem reavalia sozinha',
+        nivel: 'Inspetor de pátio', mi: 'JM', avc1: '#e8a33d', avc2: '#d97544',
+        prazo: 'hoje · 16:00', fila: '18 min', filaOld: false, cta2: 'Notificar inspetor',
+        evid: [evOk('T-3'), evOk('Limpeza'), evOk('Inspeção'), evNo('Fotos'), evOk('Certificado'), evOk('Competência')],
+        pend: [{ t: 'Captura do ângulo faltante', age: 'há 18 min' }] },
+      { id: 'VG-2496', sev: 'amber', produto: 'Calcário calcítico', rota: 'Nobres MT → Sinop MT', cliente: 'Agropec. Talismã',
+        motivo: 'Documentação do implemento SQT 7D22 (laudo de inspeção) vence em 12 dias. A regra é de alerta: permite seguir mediante justificativa registrada, e o vencimento travará sozinho.',
+        motivoCurto: 'Documentação do implemento vence em 12 dias',
+        acao: 'Registrar justificativa e disparar a renovação junto ao subcontratado',
+        nivel: 'Tráfego', mi: 'RS', avc1: '#5b8def', avc2: '#4c5bc0',
+        prazo: 'amanhã · 08:00', fila: '9 min', filaOld: false, cta2: 'Justificar e liberar',
+        evid: [evOk('T-3'), evOk('Limpeza'), evOk('Inspeção'), evOk('Fotos'), evNo('Certificado'), evOk('Competência')],
+        pend: [{ t: 'Justificativa do tráfego', age: 'há 9 min' }] }
+    ];
+  }
+  deco(key) {
+    const tones = {
+      red: { c: '#c43d3d', bg: '#fdecec', bd: '#f3d4d4', sevLabel: 'Bloqueada' },
+      amber: { c: '#b97514', bg: '#fdf3e2', bd: '#f0debb', sevLabel: 'Em análise' }
+    };
+    return this.fila().map(it => {
+      const t = tones[it.sev], open = this.state[key] === it.id;
+      return { ...it, ...t, open, chev: open ? '180deg' : '0deg',
+        filaC: it.filaOld ? '#c43d3d' : '#3c4f4e',
+        evid: it.evid.map(e => ({ ...e, icon: e.ok ? '✓' : '✕', c: e.ok ? '#1a8f57' : '#c43d3d', bg: e.ok ? '#e9f7ef' : '#fdecec' })),
+        toggle: () => this.setState(s => ({ [key]: s[key] === it.id ? null : it.id })) };
+    });
+  }
+  renderVals() {
+    const pil = [
+      { n: 'Viagens e liberação', short: 'Viagens e liberação', v: 7, w: '100%', c1: '#48c78e', c2: '#127670' },
+      { n: 'Qualificação de terceiros', short: 'Qualif. terceiros', v: 4, w: '57%', c1: '#5b8def', c2: '#0E78B5' },
+      { n: 'Competência do motorista', short: 'Competência', v: 3, w: '43%', c1: '#f4c15d', c2: '#e8a33d' },
+      { n: 'Consulta e regimes', short: 'Consulta e regimes', v: 2, w: '29%', c1: '#9db0ae', c2: '#5c706e' },
+      { n: 'Cadastro e ativos', short: 'Cadastro e ativos', v: 1, w: '14%', c1: '#c9d5d3', c2: '#9db0ae' }
+    ];
+    return {
+      motor: 34, autor: 3, analise: 5, bloq: 2, pct: '79%',
+      filaA: this.deco('openA'), filaB: this.deco('openB'), filaC: this.deco('openC'),
+      pilares: pil, pilaresB: pil,
+      certs: [
+        { e: 'Transrocha Transportes', t: 'GMP+ B4.3 · escopo transporte', d: '12 dias', dc: '#c43d3d', dbg: '#fdecec', ini: 'TR', a1: '#c43d3d', a2: '#93313f' },
+        { e: 'AgroLima Ltda', t: 'Acordo de qualidade v3', d: '27 dias', dc: '#b97514', dbg: '#fdf3e2', ini: 'AL', a1: '#e8a33d', a2: '#d97544' },
+        { e: 'Cerrado Cargas', t: 'GMP+ B4.3 · afretamento', d: '44 dias', dc: '#5c706e', dbg: '#f0f4f3', ini: 'CC', a1: '#127670', a2: '#0E78B5' },
+        { e: 'J. Bortolini · TAC', t: 'Trilha: regimes de limpeza', d: '58 dias', dc: '#5c706e', dbg: '#f0f4f3', ini: 'JB', a1: '#5b8def', a2: '#4c5bc0' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

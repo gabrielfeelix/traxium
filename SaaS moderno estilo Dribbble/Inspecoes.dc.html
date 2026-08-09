@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<script src="./prototype-shell.js" defer></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f2f5f4;font-family:'Hanken Grotesk',sans-serif;color:#0b2224;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0C5862;text-decoration:none}a:hover{color:#127670}
+input{font-family:'Hanken Grotesk',sans-serif}
+input::placeholder{color:#8ba09e}
+@keyframes txsh{from{background-position:-600px 0}to{background-position:600px 0}}
+@keyframes deslizar{from{transform:translateX(40px);opacity:.4}to{transform:translateX(0);opacity:1}}
+</style>
+</helmet>
+<div style="display:flex;min-height:100vh;min-width:1560px" data-screen-label="Inspeções">
+  <!-- SIDEBAR -->
+  <div style="width:{{ navW }};flex:none;background:linear-gradient(178deg,#093D44,#0A4650);color:#fff;display:flex;flex-direction:column;padding:24px {{ navPad }};position:sticky;top:0;height:100vh;transition:width .25s ease;overflow-x:hidden;overflow-y:auto">
+    <div style="display:flex;align-items:center;gap:10px;padding:4px 8px 22px">
+      <svg width="34" height="34" viewBox="0 0 32 32"><defs><linearGradient id="lgT" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1a9e93"></stop><stop offset="1" stop-color="#0E78B5"></stop></linearGradient></defs><polygon points="16,2.5 27.5,9 27.5,23 16,29.5 4.5,23 4.5,9" fill="url(#lgT)"></polygon><polyline points="9,20 13,13 18,17 23,10" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></polyline><circle cx="9" cy="20" r="1.6" fill="#fff"></circle><circle cx="13" cy="13" r="1.6" fill="#fff"></circle><circle cx="18" cy="17" r="1.6" fill="#fff"></circle><circle cx="23" cy="10" r="1.6" fill="#fff"></circle></svg>
+      <div style="display:{{ navL }}"><div style="font-weight:800;font-size:17px;letter-spacing:.2px">Traxium</div><div style="font-size:10.5px;letter-spacing:2.2px;color:rgba(255,255,255,.5);text-transform:uppercase">Compliance</div></div>
+    </div>
+    <a href="Torre de Controle v2.dc.html" style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="5.6"></circle><circle cx="8" cy="8" r="1.4" fill="currentColor" stroke="none"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Torre de Controle</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);color:#fff;font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px">7</span></a>
+    <div style="font-size:10.5px;letter-spacing:1.8px;color:rgba(255,255,255,.38);padding:20px 12px 8px;font-weight:700;display:{{ navSec }}">OPERAÇÃO</div>
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:14px;color:rgba(255,255,255,.66)">
+      <a href="Viagens.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 8h9"></path><path d="M8 4.5 11.5 8 8 11.5"></path></svg><span style="display:{{ navL }};white-space:nowrap">Viagens</span></a>
+      <a href="Excecoes.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6"></circle><line x1="8" y1="4.8" x2="8" y2="8.6"></line><circle cx="8" cy="11.2" r=".9" fill="currentColor" stroke="none"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Exceções e liberações</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">5</span></a>
+      <div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px;background:linear-gradient(90deg,rgba(26,158,147,.35),rgba(14,120,181,.28));border:1px solid rgba(255,255,255,.14);font-size:14px;font-weight:700;color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 6.5 12 13 4.5"></path></svg><span style="display:{{ navL }};white-space:nowrap">Inspeções</span><span style="margin-left:auto;display:{{ navL }};background:#fff;color:#0C5862;font-size:11.5px;font-weight:800;padding:1px 8px;border-radius:99px">3</span></div>
+      <a href="Limpezas.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.8c2.4 2.8 3.7 4.6 3.7 6.5a3.7 3.7 0 1 1-7.4 0c0-1.9 1.3-3.7 3.7-6.5z"></path></svg><span style="display:{{ navL }};white-space:nowrap">Limpezas</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">3</span></a>
+    </div>
+    <div style="font-size:10.5px;letter-spacing:1.8px;color:rgba(255,255,255,.38);padding:20px 12px 8px;font-weight:700;display:{{ navSec }}">PILARES</div>
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:14px;color:rgba(255,255,255,.66)">
+      <a href="Motor IDTF.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="2.5" width="11" height="11" rx="3"></rect><line x1="8" y1="2.5" x2="8" y2="13.5"></line></svg><span style="display:{{ navL }};white-space:nowrap">Motor IDTF</span></a>
+      <a href="Subcontratados.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5.4" cy="6.2" r="2.4"></circle><circle cx="10.8" cy="6.2" r="2.4"></circle><path d="M2.5 13c.6-2 1.7-3 3-3s2.3 1 2.9 3" stroke-linecap="round"></path></svg><span style="display:{{ navL }};white-space:nowrap">Subcontratados</span></a>
+      <a href="Motoristas.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="5.4" r="2.6"></circle><path d="M3 13.4c.8-2.6 2.6-3.9 5-3.9s4.2 1.3 5 3.9"></path></svg><span style="display:{{ navL }};white-space:nowrap">Motoristas</span></a>
+      <a href="Acessos Externos.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.4 8.6a3.2 3.2 0 1 0 0-.01z"></path><path d="M9 7.2 14 2.2M12 4.2l1.6 1.6M10.6 5.6l1.6 1.6"></path></svg><span style="display:{{ navL }};white-space:nowrap">Acessos externos</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">2</span></a>
+      <a href="Academy.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M2 6.3 8 3.4l6 2.9-6 2.9z"></path><path d="M4.6 8.4v2.6c0 .9 1.5 1.8 3.4 1.8s3.4-.9 3.4-1.8V8.4" stroke-linecap="round"></path></svg><span style="display:{{ navL }};white-space:nowrap">Academy</span></a>
+      <a href="Ativos e Frota.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="4.5" width="8" height="5.5" rx="1.4"></rect><path d="M10 6.5h2.4l1.6 2v1.5h-4z" stroke-linejoin="round"></path><circle cx="5" cy="11.8" r="1.4"></circle><circle cx="11.6" cy="11.8" r="1.4"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Ativos e frota</span></a>
+    </div>
+    <div style="font-size:10.5px;letter-spacing:1.8px;color:rgba(255,255,255,.38);padding:20px 12px 8px;font-weight:700;display:{{ navSec }}">PROVA</div>
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:14px;color:rgba(255,255,255,.66)">
+      <a href="Dossie.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3.2" y="2.5" width="9.6" height="11" rx="2"></rect><line x1="6" y1="6" x2="10" y2="6"></line><line x1="6" y1="9" x2="10" y2="9"></line></svg><span style="display:{{ navL }};white-space:nowrap">Dossiê de auditoria</span></a>
+      <a href="Indicadores.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="4" y1="13" x2="4" y2="8.5"></line><line x1="8" y1="13" x2="8" y2="3.5"></line><line x1="12" y1="13" x2="12" y2="10"></line></svg><span style="display:{{ navL }};white-space:nowrap">Indicadores</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">11/15</span></a>
+      <a href="Nao Conformidades.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="5.8" stroke-dasharray="2.4 2.4"></circle><circle cx="8" cy="8" r="2.2"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Não conformidades</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">4</span></a>
+    </div>
+    <a href="Configuracoes.dc.html" style="margin-top:auto;display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="2.3"></circle><path d="M8 1.8v1.9M8 12.3v1.9M14.2 8h-1.9M3.7 8H1.8M12.4 3.6l-1.3 1.3M4.9 11.1l-1.3 1.3M12.4 12.4l-1.3-1.3M4.9 4.9 3.6 3.6" stroke-linecap="round"></path></svg><span style="display:{{ navL }};white-space:nowrap">Configurações</span></a>
+    <a href="Onboarding Publico.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13V3.8c0-.7.5-1.2 1.2-1.2h5.6c.7 0 1.2.5 1.2 1.2V13"></path><path d="M6 8h7M10.5 5.5 13 8l-2.5 2.5"></path></svg><span style="display:{{ navL }};white-space:nowrap">Onboarding público</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">6 passos</span></a>
+      <a href="App de Campo.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="1.8" width="9" height="12.4" rx="2"></rect><line x1="6.5" y1="4" x2="9.5" y2="4"></line><circle cx="8" cy="11.7" r=".65" fill="currentColor" stroke="none"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Protótipo mobile</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">12 telas</span></a>
+      <div onClick="{{ navToggle }}" title="Recolher ou expandir o menu" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;cursor:pointer;font-size:13px;font-weight:600;color:rgba(255,255,255,.6)" style-hover="background:rgba(255,255,255,.08);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="transform:{{ navFlip }};transition:transform .25s;flex:none"><path d="M9.5 3 4.5 8l5 5"></path><line x1="12" y1="3" x2="12" y2="13"></line></svg><span style="display:{{ navL }};white-space:nowrap">Recolher menu</span></div>
+    <div style="display:{{ navCard }};margin-top:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px">
+      <div style="font-size:12px;color:rgba(255,255,255,.55);margin-bottom:8px">Checklist vigente</div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600"><span style="width:8px;height:8px;border-radius:99px;background:#3ddc97;box-shadow:0 0 0 4px rgba(61,220,151,.18)"></span>v4 · 3 tipos de implemento</div>
+      <div style="font-size:11.5px;color:rgba(255,255,255,.45);margin-top:4px">Publicado em 12 jul · Qualidade</div>
+    </div>
+  </div>
+  <!-- CONTENT -->
+  <div style="flex:1;display:flex;flex-direction:column;padding:26px 32px 40px;gap:22px;min-width:0">
+    <div style="display:flex;align-items:center;gap:16px">
+      <div><div style="font-size:24px;font-weight:800">Inspeções pré-carregamento</div><div style="font-size:13.5px;color:#5c706e;margin-top:2px">{{ headSub }}</div></div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+        <div style="position:relative">
+          <div style="background:#fff;border:1px solid #e0e7e5;border-radius:11px;padding:0 14px;display:flex;gap:8px;align-items:center">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#7c8f8d" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.6"></circle><line x1="10.5" y1="10.5" x2="13.5" y2="13.5"></line></svg>
+            <input value="{{ busca }}" onInput="{{ onBusca }}" placeholder="Buscar placa, compartimento, viagem…" style="border:none;outline:none;background:transparent;font-size:13.5px;padding:10px 0;width:230px;color:#0b2224">
+            <span style="font-family:'Spline Sans Mono';font-size:11px;background:#f0f4f3;border-radius:6px;padding:1px 6px;color:#5c706e">⌘K</span>
+          </div>
+        </div>
+        <div data-tx-pop style="position:relative">
+          <div onClick="{{ onFilial }}" style="background:#fff;border:1px solid #e0e7e5;border-radius:11px;padding:9px 14px;font-size:13.5px;font-weight:600;cursor:pointer" style-hover="border-color:#127670">Filial {{ filial }} ▾</div>
+          <sc-if value="{{ filialOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;right:0;top:46px;background:#fff;border:1px solid #e4eae8;border-radius:14px;box-shadow:0 16px 40px rgba(9,61,68,.16);padding:6px;width:230px;z-index:60;display:flex;flex-direction:column">
+              <sc-for list="{{ filiais }}" as="fl" hint-placeholder-count="4">
+                <div onClick="{{ fl.onClick }}" style="display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;background:{{ fl.bg }}" style-hover="background:#f6f9f8"><span style="width:7px;height:7px;border-radius:99px;background:{{ fl.dot }}"></span>{{ fl.n }}</div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+        <div onClick="{{ exportar }}" style="background:#093D44;color:#fff;border-radius:11px;padding:9px 16px;font-size:13.5px;font-weight:700;cursor:pointer" style-hover="background:#0C5862">Exportar</div>
+        <div data-tx-pop style="position:relative">
+          <div onClick="{{ onPerfil }}" style="width:38px;height:38px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13.5px;box-shadow:0 0 0 3px #fff,0 0 0 4.5px #d8e4e2;cursor:pointer" style-hover="box-shadow:0 0 0 3px #fff,0 0 0 4.5px #127670">RA</div>
+          <sc-if value="{{ perfilOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;right:0;top:48px;background:#fff;border:1px solid #e4eae8;border-radius:16px;box-shadow:0 16px 40px rgba(9,61,68,.16);padding:6px;width:250px;z-index:60;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;gap:11px;padding:11px 12px;border-bottom:1px solid #f0f4f3;margin-bottom:4px">
+                <span style="width:38px;height:38px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none">RA</span>
+                <div><div style="font-size:13.5px;font-weight:800">Rafael Antunes</div><div style="font-size:11.5px;color:#5c706e">Gestor de qualidade · GMP+</div></div>
+              </div>
+              <div onClick="{{ abrirPerfil }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer" style-hover="background:#f6f9f8">Meu perfil</div>
+              <div onClick="{{ abrirPrefs }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer" style-hover="background:#f6f9f8">Preferências e notificações</div>
+              <div onClick="{{ abrirPapel }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px" style-hover="background:#f6f9f8">Papel ativo<span style="display:inline-block;font-size:10.5px;font-weight:700;color:#0C5862;background:#e9f3f2;border-radius:99px;padding:2px 9px;white-space:nowrap">{{ papelBadge }}</span></div>
+              <div style="height:1px;background:#f0f4f3;margin:5px 8px"></div>
+              <div onClick="{{ abrirSair }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;color:#c43d3d" style-hover="background:#fdf6f6">Sair</div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+    <!-- KPIs -->
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:14px">
+      <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:18px 20px">
+        <div style="font-size:13px;font-weight:600;color:#5c706e">Aprovadas na primeira inspeção</div>
+        <div style="display:flex;align-items:baseline;gap:10px;margin-top:6px"><span style="font-size:36px;font-weight:800;font-variant-numeric:tabular-nums">{{ kPct }}</span><span style="font-size:13px;color:#5c706e">{{ kAprov }} de {{ kTotal }} inspeções do período</span></div>
+        <div style="margin-top:12px;height:12px;border-radius:99px;overflow:hidden;display:flex;background:repeating-linear-gradient(-45deg,#eef2f1 0 5px,#e2e9e7 5px 10px)">
+          <div style="width:{{ kW1 }};background:linear-gradient(90deg,#48c78e,#127670);transition:width .4s ease"></div>
+          <div style="width:{{ kW2 }};background:linear-gradient(90deg,#f4c15d,#e8a33d);transition:width .4s ease"></div>
+          <div style="width:{{ kW3 }};background:linear-gradient(90deg,#e46969,#c43d3d);transition:width .4s ease"></div>
+        </div>
+        <div style="display:flex;gap:16px;margin-top:9px;font-size:12px;color:#5c706e"><span><span style="display:inline-block;width:8px;height:8px;border-radius:3px;background:#2aa876;margin-right:5px"></span>Aprovada</span><span><span style="display:inline-block;width:8px;height:8px;border-radius:3px;background:#e8a33d;margin-right:5px"></span>Pendência corrigível</span><span><span style="display:inline-block;width:8px;height:8px;border-radius:3px;background:#c43d3d;margin-right:5px"></span>Reprovada por item crítico</span></div>
+      </div>
+      <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:18px 20px;display:flex;flex-direction:column">
+        <div style="font-size:13px;font-weight:600;color:#5c706e">Esperando o inspetor</div>
+        <div style="font-size:36px;font-weight:800;margin-top:6px;font-variant-numeric:tabular-nums">{{ kFila }}</div>
+        <div style="margin-top:auto;display:flex;align-items:center;gap:7px;font-size:12.5px;color:#5c706e;font-weight:600"><span style="width:9px;height:9px;border-radius:99px;background:linear-gradient(135deg,#5b8def,#4c5bc0);box-shadow:0 0 0 3px rgba(91,141,239,.16)"></span>{{ kFilaSub }}</div>
+      </div>
+      <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:18px 20px;display:flex;flex-direction:column">
+        <div style="font-size:13px;font-weight:600;color:#5c706e">Reprovadas no período</div>
+        <div style="font-size:36px;font-weight:800;margin-top:6px;font-variant-numeric:tabular-nums">{{ kRep }}</div>
+        <div style="margin-top:auto;display:flex;align-items:center;gap:7px;font-size:12.5px;color:#5c706e;font-weight:600"><span style="width:9px;height:9px;border-radius:99px;background:linear-gradient(135deg,#e46969,#c43d3d);box-shadow:0 0 0 3px rgba(196,61,61,.16)"></span>item crítico reprova sozinho</div>
+      </div>
+      <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:18px 20px;display:flex;flex-direction:column">
+        <div style="font-size:13px;font-weight:600;color:#5c706e">Sem sincronizar</div>
+        <div style="font-size:36px;font-weight:800;margin-top:6px;font-variant-numeric:tabular-nums">{{ kSync }}</div>
+        <div style="margin-top:auto;display:flex;align-items:center;gap:7px;font-size:12.5px;color:#5c706e;font-weight:600"><span style="width:9px;height:9px;border-radius:99px;background:linear-gradient(135deg,#f4c15d,#e8a33d);box-shadow:0 0 0 3px rgba(232,163,61,.16)"></span>{{ kSyncSub }}</div>
+      </div>
+    </div>
+    <!-- MAIN -->
+    <div style="display:grid;grid-template-columns:1fr 392px;gap:20px;align-items:start">
+      <div style="display:flex;flex-direction:column;gap:12px;min-width:0">
+        <!-- FILA DO PÁTIO -->
+        <div style="display:flex;align-items:center;gap:10px;padding:2px 4px">
+          <div style="font-size:17px;font-weight:800">No pátio, esperando inspeção</div>
+          <div style="font-size:12.5px;color:#5c706e">ordenado por prazo de carregamento</div>
+        </div>
+        <sc-if value="{{ loading }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <sc-for list="{{ skel }}" as="s" hint-placeholder-count="3">
+              <div style="background:#fff;border:1px solid #eef2f1;border-radius:20px;padding:15px 20px;display:flex;align-items:center;gap:16px">
+                <span style="width:44px;height:44px;border-radius:14px;flex:none;background:linear-gradient(90deg,#eef2f1 25%,#f7faf9 40%,#eef2f1 55%);background-size:600px 100%;animation:txsh 1.3s linear infinite"></span>
+                <div style="flex:1;display:flex;flex-direction:column;gap:9px"><span style="height:13px;width:38%;border-radius:99px;background:linear-gradient(90deg,#eef2f1 25%,#f7faf9 40%,#eef2f1 55%);background-size:600px 100%;animation:txsh 1.3s linear infinite"></span><span style="height:11px;width:60%;border-radius:99px;background:linear-gradient(90deg,#eef2f1 25%,#f7faf9 40%,#eef2f1 55%);background-size:600px 100%;animation:txsh 1.3s linear infinite"></span></div>
+                <span style="height:32px;width:132px;border-radius:99px;background:linear-gradient(90deg,#eef2f1 25%,#f7faf9 40%,#eef2f1 55%);background-size:600px 100%;animation:txsh 1.3s linear infinite"></span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ patioVazio }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:48px 20px;display:flex;flex-direction:column;align-items:center;gap:12px">
+            <span style="width:52px;height:52px;border-radius:99px;background:linear-gradient(135deg,#48c78e,#127670);color:#fff;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 6.5 12 13 4.5"></path></svg></span>
+            <div style="font-size:16px;font-weight:800">Nenhum compartimento esperando</div>
+            <div style="font-size:13.5px;color:#5c706e;text-align:center;max-width:420px">Todo conjunto com carregamento marcado já foi inspecionado. Quando o despachante vincular um compartimento a uma viagem, ele aparece aqui.</div>
+          </div>
+        </sc-if>
+        <sc-for list="{{ patio }}" as="pt" hint-placeholder-count="3">
+          <div style="background:#fff;border:1px solid #eef2f1;border-radius:20px;box-shadow:0 2px 10px rgba(9,61,68,.04);padding:15px 20px;display:flex;align-items:center;gap:16px;transition:box-shadow .2s" style-hover="box-shadow:0 12px 32px rgba(9,61,68,.10)">
+            <span style="width:46px;height:46px;border-radius:14px;flex:none;background:linear-gradient(135deg,{{ pt.c1 }},{{ pt.c2 }});color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px rgba(9,61,68,.16);letter-spacing:.4px">{{ pt.comp }}</span>
+            <div style="min-width:0;flex:1.2">
+              <div style="display:flex;gap:8px;align-items:baseline"><span style="font-family:'Spline Sans Mono';font-size:14.5px;font-weight:600">{{ pt.placa }}</span><span style="font-size:12px;color:#5c706e">{{ pt.tipo }}</span></div>
+              <div style="font-size:12.5px;color:#5c706e;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">vai subir: {{ pt.produto }}</div>
+            </div>
+            <div style="min-width:0;flex:1">
+              <div style="font-size:11px;letter-spacing:1.2px;font-weight:700;color:#7c8f8d">T-1 DO COMPARTIMENTO</div>
+              <div style="font-size:12.5px;font-weight:700;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ pt.t1 }}</div>
+            </div>
+            <span title="regime mínimo que a base IDTF exige a partir do T-3" style="display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:{{ pt.regC }};background:{{ pt.regBg }};border-radius:99px;padding:5px 13px;white-space:nowrap"><span style="width:7px;height:7px;border-radius:99px;background:{{ pt.regC }}"></span>Regime {{ pt.reg }}</span>
+            <div style="text-align:right;min-width:92px"><div style="font-family:'Spline Sans Mono';font-size:13px;font-weight:600;color:{{ pt.prazoC }}">{{ pt.prazo }}</div><div style="font-size:11px;color:#5c706e">carrega</div></div>
+            <div style="text-align:right;min-width:74px"><div style="font-family:'Spline Sans Mono';font-size:13px;font-weight:600;color:{{ pt.esperaC }}">{{ pt.espera }}</div><div style="font-size:11px;color:#5c706e">no pátio</div></div>
+            <span onClick="{{ pt.iniciar }}" style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;font-size:13px;font-weight:700;border-radius:99px;padding:9px 18px;cursor:pointer;box-shadow:0 6px 14px rgba(18,118,112,.3);transition:transform .15s;white-space:nowrap;flex:none" style-hover="transform:translateY(-1px)">Despachar inspeção</span>
+          </div>
+        </sc-for>
+        <!-- INSPEÇÕES RECENTES -->
+        <div style="display:flex;align-items:center;gap:10px;padding:14px 4px 2px">
+          <div style="font-size:17px;font-weight:800">Inspeções registradas</div>
+          <div style="margin-left:auto;display:flex;gap:6px">
+            <sc-for list="{{ filtros }}" as="f" hint-placeholder-count="4">
+              <span onClick="{{ f.onClick }}" style="font-size:12.5px;font-weight:700;border-radius:99px;padding:6px 14px;cursor:pointer;background:{{ f.bg }};color:{{ f.c }};box-shadow:{{ f.sh }};transition:all .15s">{{ f.label }}</span>
+            </sc-for>
+          </div>
+        </div>
+        <sc-if value="{{ listaVazia }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:44px 20px;display:flex;flex-direction:column;align-items:center;gap:10px">
+            <div style="font-size:15px;font-weight:800">Nada neste recorte</div>
+            <div style="font-size:13px;color:#5c706e;text-align:center;max-width:400px">{{ listaVaziaSub }}</div>
+          </div>
+        </sc-if>
+        <sc-for list="{{ lista }}" as="it" hint-placeholder-count="4">
+          <div style="background:#fff;border:1px solid #eef2f1;border-radius:20px;box-shadow:0 2px 10px rgba(9,61,68,.04);transition:box-shadow .2s" style-hover="box-shadow:0 12px 32px rgba(9,61,68,.10)">
+            <div onClick="{{ it.toggle }}" style="display:flex;align-items:center;gap:16px;padding:15px 20px;cursor:pointer">
+              <span style="width:44px;height:44px;border-radius:99px;flex:none;background:linear-gradient(135deg,{{ it.a1 }},{{ it.a2 }});color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #fff,0 0 0 4.5px {{ it.ring }}">{{ it.ini }}</span>
+              <div style="min-width:0;flex:1.3">
+                <div style="display:flex;gap:8px;align-items:baseline"><span style="font-size:15px;font-weight:800">{{ it.comp }} · {{ it.placa }}</span><a href="Viagem Detalhe.dc.html" onClick="{{ pararClique }}" style="font-family:'Spline Sans Mono';font-size:12.5px;font-weight:600;color:#0C5862">{{ it.viagem }}</a></div>
+                <div style="font-size:12.5px;color:#5c706e;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ it.quem }} · {{ it.quando }} · {{ it.tipo }}</div>
+              </div>
+              <span style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:{{ it.stC }};background:{{ it.stBg }};border-radius:99px;padding:4px 12px;white-space:nowrap"><span style="width:7px;height:7px;border-radius:99px;background:{{ it.stC }}"></span>{{ it.st }}</span>
+              <div style="text-align:right;min-width:104px"><div style="font-family:'Spline Sans Mono';font-size:13px;font-weight:600;color:{{ it.angC }}">{{ it.angN }} de 6</div><div style="font-size:11px;color:#5c706e">ângulos</div></div>
+              <div style="text-align:right;min-width:96px"><div style="font-family:'Spline Sans Mono';font-size:13px;font-weight:600;color:{{ it.ckC }}">{{ it.ckOk }} de {{ it.ckN }}</div><div style="font-size:11px;color:#5c706e">checklist</div></div>
+              <span style="width:30px;height:30px;border-radius:99px;background:#f0f4f3;color:#3c4f4e;display:flex;align-items:center;justify-content:center;font-size:12px;transform:rotate({{ it.chev }});transition:transform .2s;flex:none">▾</span>
+            </div>
+            <sc-if value="{{ it.open }}" hint-placeholder-val="{{ false }}">
+              <div style="border-top:1px dashed #e4eae8;margin:0 20px;padding:16px 0 18px">
+                <!-- PRANCHETA DE ÂNGULOS -->
+                <div style="display:flex;align-items:center;gap:8px"><div style="font-size:11px;letter-spacing:1.4px;font-weight:700;color:#7c8f8d">ÂNGULOS OBRIGATÓRIOS</div><div style="font-size:11.5px;color:#5c706e">{{ it.angDica }}</div></div>
+                <div style="display:flex;gap:9px;margin-top:10px">
+                  <sc-for list="{{ it.angulos }}" as="an" hint-placeholder-count="6">
+                    <div onClick="{{ an.onClick }}" title="{{ an.tip }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer">
+                      <span style="width:100%;height:62px;border-radius:13px;background:{{ an.bg }};border:{{ an.bd }};display:flex;align-items:center;justify-content:center;position:relative;transition:transform .15s" style-hover="transform:translateY(-2px)">
+                        <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="{{ an.c }}" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{ an.d }}"></path></svg>
+                        <span style="position:absolute;right:-4px;top:-4px;width:16px;height:16px;border-radius:99px;background:{{ an.c }};color:#fff;font-size:9.5px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2.5px #fff">{{ an.icon }}</span>
+                      </span>
+                      <span style="font-size:9.5px;font-weight:700;color:#7c8f8d;letter-spacing:.3px;text-align:center">{{ an.ab }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+                <!-- CHECKLIST + LATERAL -->
+                <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:22px;margin-top:18px">
+                  <div>
+                    <div style="font-size:11px;letter-spacing:1.4px;font-weight:700;color:#7c8f8d">CHECKLIST · {{ it.tipo }}</div>
+                    <div style="display:flex;flex-direction:column;margin-top:6px">
+                      <sc-for list="{{ it.checks }}" as="ck" hint-placeholder-count="8">
+                        <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f4f7f6">
+                          <span style="width:22px;height:22px;border-radius:7px;flex:none;background:{{ ck.bg }};color:{{ ck.c }};font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ ck.icon }}</span>
+                          <span style="font-size:13px;font-weight:600;flex:1;min-width:0">{{ ck.t }}</span>
+                          <sc-if value="{{ ck.critico }}" hint-placeholder-val="{{ true }}"><span style="font-size:10px;font-weight:800;letter-spacing:.5px;color:#c43d3d;border:1px solid #f3d4d4;border-radius:99px;padding:1px 8px;white-space:nowrap">CRÍTICO</span></sc-if>
+                          <span style="font-size:11.5px;font-weight:700;color:{{ ck.c }};white-space:nowrap;min-width:92px;text-align:right">{{ ck.st }}</span>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </div>
+                  <div>
+                    <div style="font-size:11px;letter-spacing:1.4px;font-weight:700;color:#7c8f8d">O QUE O REGISTRO CARREGA</div>
+                    <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+                      <div style="display:flex;justify-content:space-between;gap:10px;font-size:12.5px;background:#f7faf9;border-radius:12px;padding:9px 13px"><span style="color:#5c706e">Assinatura</span><span style="font-weight:700">{{ it.quem }}</span></div>
+                      <div style="display:flex;justify-content:space-between;gap:10px;font-size:12.5px;background:#f7faf9;border-radius:12px;padding:9px 13px"><span style="color:#5c706e">GPS</span><span style="font-family:'Spline Sans Mono';font-size:11.5px;font-weight:600">{{ it.gps }}</span></div>
+                      <div style="display:flex;justify-content:space-between;gap:10px;font-size:12.5px;background:#f7faf9;border-radius:12px;padding:9px 13px"><span style="color:#5c706e">Sincronização</span><span style="font-weight:700;color:{{ it.syncC }}">{{ it.sync }}</span></div>
+                      <div style="display:flex;justify-content:space-between;gap:10px;font-size:12.5px;background:#f7faf9;border-radius:12px;padding:9px 13px"><span style="color:#5c706e">Hash</span><span style="font-family:'Spline Sans Mono';font-size:11.5px;font-weight:600">{{ it.hash }}</span></div>
+                    </div>
+                    <div style="font-size:11.5px;color:#5c706e;margin-top:10px;line-height:1.5">{{ it.nota }}</div>
+                  </div>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:16px;align-items:center">
+                  <span onClick="{{ it.abrirRegistro }}" style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;font-size:13px;font-weight:700;border-radius:99px;padding:8px 18px;cursor:pointer;box-shadow:0 6px 14px rgba(18,118,112,.3);transition:transform .15s" style-hover="transform:translateY(-1px)">Abrir registro lacrado</span>
+                  <span onClick="{{ it.retificar }}" style="background:#f0f4f3;color:#0b2224;font-size:13px;font-weight:700;border-radius:99px;padding:8px 18px;cursor:pointer" style-hover="background:#e4ebe9">Retificar</span>
+                  <a href="Compartimento Detalhe.dc.html" style="background:#f0f4f3;color:#0b2224;font-size:13px;font-weight:700;border-radius:99px;padding:8px 18px;cursor:pointer;display:inline-block" style-hover="background:#e4ebe9;color:#0b2224">Ver o compartimento</a>
+                  <sc-if value="{{ it.temFalta }}" hint-placeholder-val="{{ false }}">
+                    <span onClick="{{ it.notificar }}" style="margin-left:auto;background:#fdf3e2;color:#b97514;font-size:13px;font-weight:700;border-radius:99px;padding:8px 18px;cursor:pointer;border:1px solid #f0debb" style-hover="background:#fbe9cd">Notificar o inspetor</span>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+        <sc-if value="{{ temPaginacao }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 4px 2px">
+            <div style="font-size:12.5px;color:#5c706e">{{ pagInfo }}</div>
+            <div style="margin-left:auto;display:flex;gap:6px;align-items:center">
+              <span onClick="{{ pagAnterior }}" style="font-size:12.5px;font-weight:700;border-radius:99px;padding:7px 15px;cursor:{{ pagAntCur }};background:#fff;color:{{ pagAntC }};border:1px solid #e0e7e5" style-hover="border-color:#127670">Anterior</span>
+              <sc-for list="{{ txPaginas }}" as="txp" hint-placeholder-count="3">
+                <span onClick="{{ txp.onClick }}" style="font-size:12.5px;font-weight:800;border-radius:99px;padding:7px 14px;cursor:pointer;background:{{ txp.bg }};color:{{ txp.c }};border:1px solid {{ txp.bd }};min-width:36px;text-align:center" style-hover="border-color:#127670">{{ txp.n }}</span>
+              </sc-for>
+              <span onClick="{{ pagProxima }}" style="font-size:12.5px;font-weight:700;border-radius:99px;padding:7px 15px;cursor:{{ pagProxCur }};background:#fff;color:{{ pagProxC }};border:1px solid #e0e7e5" style-hover="border-color:#127670">Próxima</span>
+            </div>
+          </div>
+        </sc-if>
+
+      </div>
+      <!-- RAIL -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:22px">
+          <div style="font-size:15.5px;font-weight:800">O checklist muda com o implemento</div>
+          <div style="font-size:12.5px;color:#5c706e;margin-top:2px">tanque pergunta de válvula e mangote; graneleiro pergunta de lona e bica</div>
+          <div style="display:flex;gap:6px;margin-top:14px">
+            <sc-for list="{{ tipos }}" as="tp" hint-placeholder-count="3">
+              <span onClick="{{ tp.onClick }}" style="flex:1;text-align:center;font-size:12.5px;font-weight:700;border-radius:99px;padding:7px 6px;cursor:pointer;border:1.5px solid {{ tp.bd }};background:{{ tp.bg }};color:{{ tp.c }};transition:all .15s">{{ tp.n }}</span>
+            </sc-for>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin-top:14px"><span style="font-size:26px;font-weight:800;font-variant-numeric:tabular-nums">{{ tipoN }}</span><span style="font-size:12.5px;color:#5c706e">itens · {{ tipoCrit }} críticos</span></div>
+          <div style="display:flex;flex-direction:column;margin-top:6px">
+            <sc-for list="{{ tipoItens }}" as="ti" hint-placeholder-count="8">
+              <div style="display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid #f4f7f6">
+                <span style="width:7px;height:7px;border-radius:99px;flex:none;background:{{ ti.dot }};box-shadow:0 0 0 3px {{ ti.glow }}"></span>
+                <span style="font-size:12.5px;font-weight:600;flex:1;min-width:0">{{ ti.t }}</span>
+                <sc-if value="{{ ti.critico }}" hint-placeholder-val="{{ true }}"><span style="font-size:9.5px;font-weight:800;letter-spacing:.5px;color:#c43d3d;white-space:nowrap">CRÍTICO</span></sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font-size:11.5px;color:#5c706e;margin-top:10px;line-height:1.5">Um item crítico reprova a inspeção sozinho. Item não crítico deixa pendência, e pendência se corrige.</div>
+        </div>
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:22px">
+          <div style="font-size:15.5px;font-weight:800">Cobertura fotográfica</div>
+          <div style="font-size:12.5px;color:#5c706e;margin-top:2px">quantas das {{ kTotal }} inspeções do período têm cada ângulo</div>
+          <div style="display:flex;flex-direction:column;gap:11px;margin-top:16px">
+            <sc-for list="{{ cobertura }}" as="cv" hint-placeholder-count="6">
+              <div>
+                <div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:12.5px;font-weight:700;flex:1">{{ cv.n }}</span><span style="font-family:'Spline Sans Mono';font-size:12px;font-weight:600;color:{{ cv.c }}">{{ cv.v }}</span></div>
+                <div style="margin-top:5px;height:8px;border-radius:99px;overflow:hidden;background:repeating-linear-gradient(-45deg,#f0f4f3 0 5px,#e4ebe9 5px 10px)">
+                  <div style="width:{{ cv.w }};height:100%;background:linear-gradient(90deg,{{ cv.g1 }},{{ cv.g2 }});transition:width .4s ease"></div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font-size:11.5px;color:#5c706e;margin-top:14px;line-height:1.5">A bica de descarga é o ângulo que mais falta: é o mais desconfortável de fotografar com o conjunto engatado.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- MODAL DESPACHAR INSPEÇÃO -->
+  <sc-if value="{{ dpAberto }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ dpFechar }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:620px;max-height:86vh;overflow:auto;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center;gap:10px"><div style="font-size:16px;font-weight:800">Despachar inspeção</div><span style="font-family:'Spline Sans Mono';font-size:12px;font-weight:600;color:#0C5862;background:#e9f3f2;border-radius:99px;padding:3px 11px">{{ dp.comp }} · {{ dp.placa }}</span><span onClick="{{ dpFechar }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:3px">a inspeção acontece no app, com foto pela câmera e GPS do aparelho. Aqui você escolhe quem executa e confere o que vai ser exigido.</div>
+        <div style="background:#f7faf9;border-radius:16px;padding:14px 16px;margin-top:16px;display:flex;gap:18px">
+          <div style="flex:1"><div style="font-size:11px;letter-spacing:1.2px;font-weight:700;color:#7c8f8d">T-1 DO COMPARTIMENTO</div><div style="font-size:13px;font-weight:700;margin-top:3px">{{ dp.t1 }}</div></div>
+          <div style="flex:1"><div style="font-size:11px;letter-spacing:1.2px;font-weight:700;color:#7c8f8d">VAI SUBIR</div><div style="font-size:13px;font-weight:700;margin-top:3px">{{ dp.produto }}</div></div>
+          <div><div style="font-size:11px;letter-spacing:1.2px;font-weight:700;color:#7c8f8d">REGIME</div><div style="font-size:13px;font-weight:700;margin-top:3px;color:{{ dp.regC }}">{{ dp.reg }}</div></div>
+        </div>
+        <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e;margin-top:18px">QUEM EXECUTA</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+          <sc-for list="{{ dpExecs }}" as="ex" hint-placeholder-count="3">
+            <div onClick="{{ ex.onClick }}" style="display:flex;align-items:center;gap:12px;border:1.5px solid {{ ex.bd }};background:{{ ex.bg }};border-radius:14px;padding:11px 14px;cursor:pointer" style-hover="border-color:#127670">
+              <span style="width:17px;height:17px;border-radius:99px;border:2px solid {{ ex.dotBd }};background:{{ ex.dot }};flex:none"></span>
+              <span style="width:34px;height:34px;border-radius:99px;flex:none;background:linear-gradient(135deg,{{ ex.a1 }},{{ ex.a2 }});color:#fff;font-size:11.5px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2.5px #fff,0 0 0 4px {{ ex.ring }}">{{ ex.ini }}</span>
+              <div style="flex:1"><div style="font-size:13.5px;font-weight:700">{{ ex.n }}</div><div style="font-size:11.5px;color:#5c706e">{{ ex.sub }}</div></div>
+              <span style="font-size:11.5px;font-weight:700;color:{{ ex.aptoC }};white-space:nowrap">{{ ex.apto }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:18px"><div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e">O CHECKLIST QUE VAI SER APLICADO</div><span style="font-size:11.5px;color:#5c706e">detectado do tipo do implemento: {{ dp.tipo }}</span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:9px">
+          <sc-for list="{{ dpChecks }}" as="dk" hint-placeholder-count="8">
+            <span style="font-size:12px;font-weight:600;border-radius:99px;padding:5px 12px;background:{{ dk.bg }};color:{{ dk.c }};border:1px solid {{ dk.bd }}">{{ dk.t }}</span>
+          </sc-for>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:16px"><div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e">FOTOS OBRIGATÓRIAS</div><span style="font-size:11.5px;color:#5c706e">seis ângulos, pela câmera do app, sem galeria</span></div>
+        <div style="display:flex;gap:8px;margin-top:9px">
+          <sc-for list="{{ dpAngulos }}" as="da" hint-placeholder-count="6">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px">
+              <span style="width:100%;height:48px;border-radius:12px;background:repeating-linear-gradient(-45deg,#f7faf9 0 5px,#eef2f1 5px 10px);border:1.5px dashed #d3ddda;display:flex;align-items:center;justify-content:center">
+                <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="#8ba09e" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{ da.d }}"></path></svg>
+              </span>
+              <span style="font-size:9.5px;font-weight:700;color:#7c8f8d;letter-spacing:.3px">{{ da.ab }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:20px;justify-content:flex-end;align-items:center">
+          <span style="margin-right:auto;font-size:11.5px;color:#5c706e;max-width:290px;line-height:1.45">{{ dpDica }}</span>
+          <span onClick="{{ dpFechar }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer;white-space:nowrap" style-hover="background:#e4ebe9">Cancelar</span>
+          <span onClick="{{ dpConfirmar }}" style="background:{{ dpBg }};color:{{ dpC }};font-size:13.5px;font-weight:800;border-radius:99px;padding:10px 22px;cursor:{{ dpCur }};white-space:nowrap;box-shadow:{{ dpSh }};transition:transform .15s">Enviar ao app</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <!-- DRAWER REGISTRO LACRADO -->
+  <sc-if value="{{ rgAberto }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ rgFechar }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;justify-content:flex-end">
+      <div onClick="{{ pararClique }}" style="width:520px;background:#f7faf9;height:100vh;overflow:auto;box-shadow:-30px 0 80px rgba(9,34,36,.35);animation:deslizar .3s">
+        <div style="background:linear-gradient(130deg,#093D44,#0C5862 55%,#0E78B5 130%);color:#fff;padding:22px 26px">
+          <div style="display:flex;align-items:center"><div style="font-size:10.5px;letter-spacing:1.6px;font-weight:700;color:rgba(255,255,255,.6)">{{ rg.tipo }}</div><span onClick="{{ rgFechar }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:rgba(255,255,255,.22)">✕</span></div>
+          <div style="font-size:18px;font-weight:800;margin-top:6px">{{ rg.titulo }}</div>
+          <div style="font-size:12.5px;color:rgba(255,255,255,.7);margin-top:3px">{{ rg.sub }}</div>
+        </div>
+        <div style="padding:18px 22px;display:flex;flex-direction:column;gap:16px">
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:16px 18px">
+            <div style="font-size:11px;letter-spacing:1.4px;font-weight:700;color:#7c8f8d">CAMPOS DO REGISTRO</div>
+            <div style="display:flex;flex-direction:column;margin-top:8px">
+              <sc-for list="{{ rg.campos }}" as="cp" hint-placeholder-count="6">
+                <div style="display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #f4f7f6;font-size:12.5px"><span style="color:#5c706e">{{ cp.k }}</span><span style="font-weight:700;text-align:right">{{ cp.v }}</span></div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:16px 18px">
+            <div style="display:flex;align-items:center"><div style="font-size:11px;letter-spacing:1.4px;font-weight:700;color:#7c8f8d">EVIDÊNCIAS · {{ rg.nEvid }}</div><span onClick="{{ rgBaixarTudo }}" style="margin-left:auto;font-size:12px;font-weight:700;color:#0C5862;cursor:pointer" style-hover="color:#127670">Baixar tudo →</span></div>
+            <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px">
+              <sc-for list="{{ rg.evids }}" as="ev" hint-placeholder-count="6">
+                <div onClick="{{ ev.baixar }}" style="display:flex;align-items:center;gap:11px;background:#f7faf9;border-radius:12px;padding:9px 13px;cursor:pointer" style-hover="background:#eef2f1">
+                  <span style="width:30px;height:30px;border-radius:9px;flex:none;background:repeating-linear-gradient(-45deg,#eef7f6 0 5px,#e4efee 5px 10px);border:1px solid #d5e5e3;display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#0C5862" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 5.5h2l1.2-1.7h4.6L11.5 5.5h2v7h-11z"></path><circle cx="8" cy="8.4" r="2.2"></circle></svg></span>
+                  <div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:700">{{ ev.n }}</div><div style="font-family:'Spline Sans Mono';font-size:10.5px;color:#7c8f8d">{{ ev.hash }}</div></div>
+                  <span style="font-size:11.5px;font-weight:700;color:#0C5862">baixar</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:16px 18px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="width:34px;height:34px;border-radius:99px;flex:none;background:linear-gradient(135deg,#48c78e,#127670);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:0 0 0 3px rgba(26,143,87,.16)">✓</span>
+              <div style="flex:1"><div style="font-size:13px;font-weight:800">Registro lacrado</div><div style="font-size:11.5px;color:#5c706e">sincronizado, não editável. Correção entra como evento novo.</div></div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:14px">
+              <span onClick="{{ rgRetificar }}" style="background:#f0f4f3;color:#0b2224;font-size:13px;font-weight:700;border-radius:99px;padding:9px 18px;cursor:pointer" style-hover="background:#e4ebe9">Iniciar retificação</span>
+              <a href="Dossie.dc.html" style="background:#f0f4f3;color:#0b2224;font-size:13px;font-weight:700;border-radius:99px;padding:9px 18px;display:inline-block" style-hover="background:#e4ebe9;color:#0b2224">Ver no dossiê</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <!-- MODAL ÂNGULO -->
+  <sc-if value="{{ agAberto }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ agFechar }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:460px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">{{ ag.titulo }}</div><span onClick="{{ agFechar }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:3px">{{ ag.sub }}</div>
+        <div style="margin-top:16px;height:170px;border-radius:18px;background:{{ ag.bg }};border:{{ ag.bd }};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px">
+          <svg width="34" height="34" viewBox="0 0 16 16" fill="none" stroke="{{ ag.c }}" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="{{ ag.d }}"></path></svg>
+          <div style="font-size:12.5px;font-weight:700;color:{{ ag.c }}">{{ ag.estado }}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:14px">
+          <sc-for list="{{ ag.campos }}" as="ac" hint-placeholder-count="3">
+            <div style="display:flex;justify-content:space-between;gap:10px;font-size:12.5px;background:#f7faf9;border-radius:12px;padding:9px 13px"><span style="color:#5c706e">{{ ac.k }}</span><span style="font-weight:700;font-family:{{ ac.f }}">{{ ac.v }}</span></div>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+          <span onClick="{{ agFechar }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer" style-hover="background:#e4ebe9">Fechar</span>
+          <span onClick="{{ agAcao }}" style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;font-size:13.5px;font-weight:800;border-radius:99px;padding:10px 22px;cursor:pointer;box-shadow:0 8px 18px rgba(18,118,112,.35);transition:transform .15s" style-hover="transform:translateY(-1px)">{{ ag.cta }}</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <!-- MODAIS DO PERFIL -->
+  <sc-if value="{{ modalPerfil }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:460px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Meu perfil</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:16px">
+          <span style="width:76px;height:76px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:26px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #fff,0 0 0 6px #f0debb">RA</span>
+          <div style="font-size:17px;font-weight:800;margin-top:4px">Rafael Antunes</div>
+          <div style="font-size:12.5px;color:#5c706e">rafael.antunes@traxium.com.br</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-top:18px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Papel</span><span style="font-weight:700">Gestor de qualidade</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Autoridade na matriz</span><span style="font-weight:700">nível 3 · Gestor</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Filiais</span><span style="font-weight:700">Rondonópolis, Sorriso</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Liberações assinadas em 2026</span><span style="font-family:'Spline Sans Mono';font-weight:600">14</span></div>
+        </div>
+        <div style="font-size:12px;color:#5c706e;margin-top:12px;line-height:1.5">Toda assinatura sua fica no registro lacrado da viagem. O papel define o que a matriz permite; ninguém assina acima do próprio nível.</div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalPrefs }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:520px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Preferências e notificações</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:16px">
+          <sc-for list="{{ prefs }}" as="pf" hint-placeholder-count="4">
+            <div onClick="{{ pf.onClick }}" style="display:flex;align-items:center;gap:12px;border:1px solid #eef2f1;border-radius:14px;padding:12px 14px;cursor:pointer" style-hover="border-color:#c9d5d3">
+              <div style="flex:1"><div style="font-size:13.5px;font-weight:700">{{ pf.t }}</div><div style="font-size:11.5px;color:#5c706e">{{ pf.sub }}</div></div>
+              <span style="width:40px;height:23px;border-radius:99px;background:{{ pf.swBg }};position:relative;flex:none;transition:background .2s"><span style="position:absolute;top:2.5px;left:{{ pf.swPos }};width:18px;height:18px;border-radius:99px;background:#fff;box-shadow:0 1px 4px rgba(9,34,36,.25);transition:left .2s"></span></span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:12px;color:#5c706e;margin-top:12px">O alerta de bloqueio técnico não pode ser desligado: é requisito da certificação.</div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:1200;background:#0b2224;color:#fff;border-radius:99px;padding:12px 22px;font-size:13.5px;font-weight:600;box-shadow:0 16px 40px rgba(9,34,36,.35);display:flex;align-items:center;gap:10px"><span style="width:20px;height:20px;border-radius:99px;background:linear-gradient(135deg,#48c78e,#127670);display:flex;align-items:center;justify-content:center;font-size:11px">✓</span>{{ toastMsg }}</div>
+  </sc-if>
+  <sc-if value="{{ modalPapel }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePop }}" style="background:#fff;border-radius:24px;width:540px;max-height:86vh;overflow:auto;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Papel ativo</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:3px;line-height:1.55">O papel define o que a matriz de autoridade permite assinar. A autoridade escala para cima, nunca para baixo, e ninguém assina acima do próprio nível.</div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-top:16px">
+          <sc-for list="{{ papeisLista }}" as="pp" hint-placeholder-count="5">
+            <div onClick="{{ pp.onClick }}" style="display:flex;align-items:center;gap:13px;border:1.5px solid {{ pp.bd }};background:{{ pp.bg }};border-radius:15px;padding:13px 15px;cursor:pointer;transition:all .15s" style-hover="border-color:#127670">
+              <span style="width:19px;height:19px;border-radius:99px;border:2.5px solid {{ pp.dotBd }};background:{{ pp.dot }};flex:none"></span>
+              <span style="width:34px;height:34px;border-radius:11px;flex:none;background:linear-gradient(135deg,{{ pp.g1 }},{{ pp.g2 }});color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ pp.nivel }}</span>
+              <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:800">{{ pp.n }}</div><div style="font-size:11.5px;color:#5c706e;margin-top:2px;line-height:1.4">{{ pp.resolve }}</div></div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#f7faf9;border-radius:14px;padding:12px 15px;margin-top:14px;font-size:12px;color:#5c706e;line-height:1.55">Nível 0 é técnico: é o nível de autoridade de ninguém. Contaminação não se aprova, se regulariza.</div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalSair }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePop }}" style="background:#fff;border-radius:24px;width:440px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Sair da conta</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;align-items:center;gap:12px;background:#f7faf9;border-radius:15px;padding:13px 15px;margin-top:16px">
+          <span style="width:40px;height:40px;border-radius:99px;flex:none;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">RA</span>
+          <div><div style="font-size:13.5px;font-weight:800">Rafael Antunes</div><div style="font-size:11.5px;color:#5c706e">{{ papelBadge }} · nível {{ papelNivel }} na matriz</div></div>
+        </div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:14px;line-height:1.6">Nada é perdido ao sair. Registro lacrado continua lacrado, e o que estava em preenchimento não foi gravado em lugar nenhum.</div>
+        <div style="display:flex;gap:8px;margin-top:18px;justify-content:flex-end">
+          <span onClick="{{ fecharModalTopo }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer" style-hover="background:#e4ebe9">Cancelar</span>
+          <span onClick="{{ confirmarSair }}" style="background:linear-gradient(135deg,#e46969,#c43d3d);color:#fff;font-size:13.5px;font-weight:800;border-radius:99px;padding:10px 22px;cursor:pointer;box-shadow:0 8px 18px rgba(196,61,61,.3);transition:transform .15s" style-hover="transform:translateY(-1px)">Sair</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;simularPatioVazio&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Fila do pátio&quot;}}">
+class Component extends DCLogic {
+  state = { loading: true, toast: null, open: 'INS-4471', filtro: 'all', busca: '', tipo: 'Graneleiro', dp: null, dpExec: null, rg: null, ag: null };
+  componentDidMount() {
+    this._txFora = ev => { if (!ev.target.closest || !ev.target.closest('[data-tx-pop]')) this.setState({ perfilOpen: false, filialOpen: false, periodoOpen: false, menuOpen: false, versaoOpen: false, notifOpen: false }); };
+    this._txEsc = ev => { if (ev.key === 'Escape') this.setState({ perfilOpen: false, filialOpen: false, periodoOpen: false, menuOpen: false, versaoOpen: false, notifOpen: false, modalTopo: null }); };
+    document.addEventListener('mousedown', this._txFora);
+    document.addEventListener('keydown', this._txEsc); setTimeout(() => this.setState({ loading: false }), 900); }
+  avisar(msg) { this.setState({ toast: msg }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 4200); }
+
+  ANG() {
+    return {
+      geral: { ab: 'GERAL', n: 'Visão geral interna', d: 'M2.2 4.2h11.6v7.6H2.2z M2.2 7.4h11.6 M8 4.2v7.6' },
+      cantos: { ab: 'CANTOS', n: 'Cantos e frestas', d: 'M2.5 2.5h4 M2.5 2.5v4 M13.5 13.5h-4 M13.5 13.5v-4 M2.5 13.5h4 M2.5 13.5v-4 M13.5 2.5h-4 M13.5 2.5v4' },
+      teto: { ab: 'TETO', n: 'Teto, lona ou tampa', d: 'M2 9.5 8 3.5l6 6 M3.6 9.5v3.4h8.8V9.5' },
+      piso: { ab: 'PISO', n: 'Piso e fundo', d: 'M2 11.5h12 M3.5 11.5 5.5 5h5l2 6.5 M6.6 8.2h2.8' },
+      bica: { ab: 'BICA', n: 'Bica de descarga', d: 'M3 3.5h10 L9.6 9.2v3.4L6.4 13.8V9.2z' },
+      placa: { ab: 'PLACA', n: 'Identificação externa', d: 'M2.2 5h11.6v6H2.2z M2.2 7.2h11.6 M4.6 9.4h2.2 M9.2 9.4h2.2' }
+    };
+  }
+  CHECKS() {
+    return {
+      Graneleiro: [
+        { t: 'Resíduo de carga anterior', critico: true },
+        { t: 'Odor estranho ou fermentado', critico: true },
+        { t: 'Estado da bica de descarga', critico: true },
+        { t: 'Integridade da lona' },
+        { t: 'Vedação das tampas e escotilhas' },
+        { t: 'Presença de água ou umidade' },
+        { t: 'Ferrugem ou solda solta' },
+        { t: 'Identificação do compartimento legível' }
+      ],
+      Tanque: [
+        { t: 'Filme ou resíduo na parede interna', critico: true },
+        { t: 'Estado do mangote', critico: true },
+        { t: 'Vedação da válvula de fundo', critico: true },
+        { t: 'Lacre íntegro', critico: true },
+        { t: 'Odor estranho' },
+        { t: 'Estado da escotilha superior' },
+        { t: 'Ausência de água residual' },
+        { t: 'Comprovante de lavagem afixado' },
+        { t: 'Identificação do tanque legível' }
+      ],
+      Baú: [
+        { t: 'Sujidade ou resíduo no piso', critico: true },
+        { t: 'Vedação das portas', critico: true },
+        { t: 'Odor estranho' },
+        { t: 'Estado do assoalho' },
+        { t: 'Sinais de praga ou infestação' },
+        { t: 'Iluminação interna funcional' },
+        { t: 'Identificação do baú legível' }
+      ]
+    };
+  }
+  inspecoes() {
+    const A = this.ANG();
+    const ok = k => ({ ...A[k], ok: true });
+    const falta = k => ({ ...A[k], ok: false });
+    return [
+      { id: 'INS-4471', comp: 'C1', placa: 'QAS 7C31', viagem: 'VG-2494', tipo: 'Graneleiro', res: 'pendencia',
+        quem: 'Jorge Mattos', ini: 'JM', a1: '#e8a33d', a2: '#d97544', ring: '#f0debb',
+        quando: 'hoje, 18:20', gps: '-16.4673, -54.6372', sync: 'sincronizada', hash: 'e91c…37ab',
+        angulos: [ok('geral'), ok('cantos'), ok('teto'), ok('piso'), falta('bica'), ok('placa')],
+        reprovado: null, naoAplic: [],
+        nota: 'Falta um ângulo obrigatório. A viagem segue na fila da Torre até a captura; nada aqui se resolve no escritório.' },
+      { id: 'INS-4470', comp: 'C1', placa: 'SQT 3A90', viagem: 'VG-2490', tipo: 'Graneleiro', res: 'aprovada',
+        quem: 'Jorge Mattos', ini: 'JM', a1: '#127670', a2: '#0E78B5', ring: '#cdeeda',
+        quando: 'hoje, 19:05', gps: '-16.4673, -54.6372', sync: 'sincronizada', hash: 'a3f8…9c2e',
+        angulos: [ok('geral'), ok('cantos'), ok('teto'), ok('piso'), ok('bica'), ok('placa')],
+        reprovado: null, naoAplic: ['Integridade da lona'],
+        nota: 'Aprovada com um item não aplicável: o implemento é de tampa rígida, sem lona. Não aplicável é resposta válida, não lacuna.' },
+      { id: 'INS-4468', comp: 'C2', placa: 'QAS 7C31', viagem: 'VG-2487', tipo: 'Graneleiro', res: 'reprovada',
+        quem: 'Edson Farias', ini: 'EF', a1: '#c43d3d', a2: '#93313f', ring: '#f3d4d4',
+        quando: 'hoje, 07:48', gps: '-16.4691, -54.6355', sync: 'sincronizada', hash: '5d20…8f14',
+        angulos: [ok('geral'), ok('cantos'), ok('teto'), ok('piso'), ok('bica'), ok('placa')],
+        reprovado: 'Resíduo de carga anterior', naoAplic: [],
+        nota: 'Reprovada por item crítico. Somada ao T-1 de ureia pecuária, virou bloqueio técnico: nenhuma autoridade libera, existe plano de regularização.' },
+      { id: 'INS-4465', comp: 'T1', placa: 'RTB 5J18', viagem: 'VG-2489', tipo: 'Tanque', res: 'aprovada',
+        quem: 'Jorge Mattos', ini: 'JM', a1: '#127670', a2: '#0E78B5', ring: '#cdeeda',
+        quando: 'ontem, 15:32', gps: '-13.4162, -56.0989', sync: 'sincronizada', hash: '7b10…44d1',
+        angulos: [ok('geral'), ok('cantos'), ok('teto'), ok('piso'), ok('bica'), ok('placa')],
+        reprovado: null, naoAplic: [],
+        nota: 'Checklist de tanque: nove itens, quatro críticos. O mangote e o lacre só existem neste tipo de implemento.' },
+      { id: 'INS-4462', comp: 'C1', placa: 'SQT 7D22', viagem: 'VG-2486', tipo: 'Graneleiro', res: 'aguardando',
+        quem: 'Jorge Mattos', ini: 'JM', a1: '#5b8def', a2: '#4c5bc0', ring: '#d5deF7',
+        quando: 'ontem, 11:14', gps: '-16.4673, -54.6372', sync: 'salva no aparelho', hash: 'pendente',
+        angulos: [ok('geral'), ok('cantos'), ok('teto'), ok('piso'), ok('bica'), ok('placa')],
+        reprovado: null, naoAplic: [],
+        nota: 'Preenchida sem sinal, com carimbo local. Enquanto não sincroniza, o motor não conta esta inspeção como evidência.' }
+    ];
+  }
+  renderVals() { return { ...this.navVals(), ...this.papelVals(), ...this.perfilVals(), ...this.mainVals() }; }
+  papelVals() {
+    const diz = m => { if (typeof this.avisar === 'function') this.avisar(m); };
+    const PAPEIS = [
+      { n: 'Inspetor de pátio', nivel: 1, resolve: 'condição física do equipamento: checklist reprovado, foto ausente', g1: '#9fc9c6', g2: '#6ba8a4' },
+      { n: 'Tráfego', nivel: 2, resolve: 'pendência simples: certificação a vencer, sincronização pendente', g1: '#5b8def', g2: '#4c5bc0' },
+      { n: 'Gestor de qualidade', nivel: 3, resolve: 'pendência corrigível mediante evidência da correção', g1: '#127670', g2: '#0E78B5' },
+      { n: 'Diretoria e Resp. Técnico', nivel: 4, resolve: 'impacto contratual, risco residual aceito, terceiro emergencial', g1: '#e8a33d', g2: '#d97544' },
+      { n: 'Auditor interno', nivel: 0, resolve: 'somente leitura, mais abrir não conformidade', g1: '#c9d5d3', g2: '#9db0ae' }
+    ];
+    const ativo = this.state.papelAtivo || 'Gestor de qualidade';
+    const atual = PAPEIS.find(p => p.n === ativo) || PAPEIS[2];
+    return {
+      pararClique: e => e.stopPropagation(),
+      pararCliquePop: e => e.stopPropagation(),
+      papelBadge: atual.n === 'Diretoria e Resp. Técnico' ? 'Diretoria' : atual.n.split(' ')[0],
+      papelNivel: atual.nivel,
+      modalPapel: this.state.modalTopo === 'papel',
+      modalSair: this.state.modalTopo === 'sair',
+      abrirPapel: () => this.setState({ modalTopo: 'papel', perfilOpen: false }),
+      abrirSair: () => this.setState({ modalTopo: 'sair', perfilOpen: false }),
+      confirmarSair: () => { this.setState({ modalTopo: null }); diz('Sessão encerrada. Registros assinados continuam no dossiê com seu nome e a data.'); },
+      papeisLista: PAPEIS.map(p => {
+        const on = p.n === ativo;
+        return { ...p, onClick: () => { this.setState({ papelAtivo: p.n, modalTopo: null }); diz('Papel ativo agora é ' + p.n + ', nível ' + p.nivel + '. A fila e as ações de assinatura passam a refletir esta autoridade.'); },
+          bd: on ? '#127670' : '#e0e7e5', bg: on ? '#eef7f6' : '#fff',
+          dot: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#fff', dotBd: on ? '#127670' : '#c9d5d3' };
+      })
+    };
+  }
+  _pagN() { return 6; }
+  _pagFatia(arr) { const pp = this._pagN(); const n = Math.max(1, Math.ceil(arr.length / pp)); const p = Math.min(this.state.pag || 1, n); return arr.slice((p - 1) * pp, p * pp); }
+  _pagVals(total, rotulo) {
+    const pp = this._pagN(); const n = Math.max(1, Math.ceil(total / pp)); const p = Math.min(this.state.pag || 1, n);
+    const ini = (p - 1) * pp, fim = Math.min(p * pp, total);
+    return {
+      temPaginacao: n > 1,
+      pagInfo: total === 0 ? 'nenhum registro' : ('mostrando ' + (ini + 1) + ' a ' + fim + ' de ' + total + ' ' + rotulo),
+      txPaginas: Array.from({ length: n }, (_, i) => i + 1).map(x => ({ n: x,
+        onClick: () => this.setState({ pag: x }),
+        bg: x === p ? '#0b2224' : '#fff', c: x === p ? '#fff' : '#3c4f4e', bd: x === p ? '#0b2224' : '#e0e7e5' })),
+      pagAnterior: () => { if (p > 1) this.setState({ pag: p - 1 }); },
+      pagProxima: () => { if (p < n) this.setState({ pag: p + 1 }); },
+      pagAntCur: p > 1 ? 'pointer' : 'not-allowed', pagAntC: p > 1 ? '#3c4f4e' : '#c9d5d3',
+      pagProxCur: p < n ? 'pointer' : 'not-allowed', pagProxC: p < n ? '#3c4f4e' : '#c9d5d3'
+    };
+  }
+  navVals() {
+    const c = this.state.navC ?? (localStorage.getItem('tx-nav') === '1');
+    return { navW: c ? '84px' : '264px', navPad: c ? '14px' : '16px', navL: c ? 'none' : 'block', navSec: c ? 'none' : 'block', navCard: c ? 'none' : 'block', navFlip: c ? 'rotate(180deg)' : 'none',
+      navToggle: () => { const n = !c; localStorage.setItem('tx-nav', n ? '1' : '0'); this.setState({ navC: n }); } };
+  }
+  perfilVals() {
+    return {
+      perfilOpen: !!this.state.perfilOpen,
+      onPerfil: () => this.setState(s => ({ perfilOpen: !s.perfilOpen })),
+      modalPerfil: this.state.modalTopo === 'perfil', modalPrefs: this.state.modalTopo === 'prefs',
+      abrirPerfil: () => this.setState({ modalTopo: 'perfil', perfilOpen: false }),
+      abrirPrefs: () => this.setState({ modalTopo: 'prefs', perfilOpen: false }),
+      fecharModalTopo: () => this.setState({ modalTopo: null }),
+      pararClique: e => e.stopPropagation(),
+      prefs: [
+        { k: 'bloq', t: 'Bloqueio técnico na filial', sub: 'sempre ativo: requisito da certificação', lock: true },
+        { k: 'fila', t: 'Item há mais de 2h na fila', sub: 'aviso no app e por e-mail' },
+        { k: 'cert', t: 'Certificado de terceiro a vencer', sub: 'aos 30 e aos 15 dias' },
+        { k: 'idtf', t: 'Nova versão da base IDTF', sub: 'quando a Qualidade publicar revisão' }
+      ].map(p => {
+        const on = p.lock || (this.state.prefsOn || { fila: true, cert: true, idtf: false })[p.k];
+        return { ...p, swBg: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#dde5e3', swPos: on ? '19.5px' : '2.5px',
+          onClick: () => { if (p.lock) return; const cur = this.state.prefsOn || { fila: true, cert: true, idtf: false }; this.setState({ prefsOn: { ...cur, [p.k]: !cur[p.k] } }); } };
+      })
+    };
+  }
+  patioVals() {
+    const A = this.ANG();
+    const regTone = { A: { regC: '#1a8f57', regBg: '#e9f7ef' }, B: { regC: '#8a7410', regBg: '#faf3d4' }, C: { regC: '#b97514', regBg: '#fdf3e2' }, D: { regC: '#c43d3d', regBg: '#fdecec' } };
+    const base = [
+      { comp: 'C1', placa: 'SQT 7D22', tipo: 'graneleiro · 2 compartimentos', tipoCk: 'Graneleiro', produto: 'Farelo de soja', t1: 'Milho a granel · 31 jul', reg: 'A', prazo: 'hoje 16:00', prazoC: '#b97514', espera: '26 min', esperaC: '#c43d3d', c1: '#127670', c2: '#0E78B5', viagem: 'VG-2498' },
+      { comp: 'C2', placa: 'QAS 7C31', tipo: 'bitrem · 3 compartimentos', tipoCk: 'Graneleiro', produto: 'Casca de soja peletizada', t1: 'Farelo de soja · 2 ago', reg: 'B', prazo: 'hoje 17:30', prazoC: '#b97514', espera: '12 min', esperaC: '#3c4f4e', c1: '#0C5862', c2: '#0E78B5', viagem: 'VG-2494' },
+      { comp: 'T1', placa: 'RTB 5J18', tipo: 'tanque · 1 compartimento', tipoCk: 'Tanque', produto: 'Óleo de soja degomado', t1: 'Óleo de palma · 28 jul', reg: 'C', prazo: 'amanhã 06:30', prazoC: '#3c4f4e', espera: '4 min', esperaC: '#3c4f4e', c1: '#5b8def', c2: '#4c5bc0', viagem: 'VG-2499' }
+    ];
+    const vazio = (this.props.simularPatioVazio ?? false);
+    const patio = (vazio || this.state.loading) ? [] : base.map(p => ({ ...p, ...regTone[p.reg], iniciar: () => this.setState({ dp: p, dpExec: null }) }));
+    const dp = this.state.dp || base[0];
+    const execs = [
+      { k: 'jm', n: 'Jorge Mattos', sub: 'inspetor de pátio · Rondonópolis', ini: 'JM', a1: '#e8a33d', a2: '#d97544', ring: '#f0debb', apto: 'trilha 6 vigente', aptoC: '#1a8f57' },
+      { k: 'ip', n: 'Ivan Prado', sub: 'motorista da viagem · app instalado', ini: 'IP', a1: '#127670', a2: '#0E78B5', ring: '#cdeeda', apto: 'trilha 6 vigente', aptoC: '#1a8f57' },
+      { k: 'vn', n: 'Valdir Nunes', sub: 'motorista · trilha de inspeção vencida', ini: 'VN', a1: '#c43d3d', a2: '#93313f', ring: '#f3d4d4', apto: 'não elegível', aptoC: '#c43d3d', bloq: true }
+    ];
+    const sel = this.state.dpExec;
+    const pronto = !!sel && sel !== 'vn';
+    const checks = this.CHECKS()[dp.tipoCk] || [];
+    return {
+      patio, patioVazio: !this.state.loading && patio.length === 0,
+      dpAberto: !!this.state.dp,
+      dpFechar: () => this.setState({ dp: null }),
+      dp: { ...dp, ...regTone[dp.reg], reg: 'Regime ' + dp.reg, tipo: dp.tipoCk.toLowerCase() },
+      dpExecs: execs.map(x => {
+        const on = sel === x.k;
+        return { ...x, onClick: () => this.setState({ dpExec: x.k }),
+          bd: on ? (x.bloq ? '#c43d3d' : '#127670') : '#e0e7e5', bg: on ? (x.bloq ? '#fdecec' : '#eef7f6') : '#fff',
+          dot: on ? (x.bloq ? '#c43d3d' : 'linear-gradient(135deg,#127670,#0E78B5)') : '#fff', dotBd: on ? (x.bloq ? '#c43d3d' : '#127670') : '#c9d5d3' };
+      }),
+      dpChecks: checks.map(c => ({ t: c.t, bg: c.critico ? '#fdecec' : '#f7faf9', c: c.critico ? '#c43d3d' : '#3c4f4e', bd: c.critico ? '#f3d4d4' : '#eef2f1' })),
+      dpAngulos: Object.values(this.ANG()),
+      dpDica: sel === 'vn' ? 'Valdir Nunes está com a trilha de inspeção do implemento vencida. A competência deriva da trilha vigente: não há como marcá-lo apto aqui.' : (pronto ? 'Chega como tarefa no app, offline-first. A inspeção só existe quando sincronizar.' : 'Escolha quem executa para despachar.'),
+      dpBg: pronto ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#eef2f1', dpC: pronto ? '#fff' : '#9db0ae',
+      dpSh: pronto ? '0 8px 18px rgba(18,118,112,.35)' : 'none', dpCur: pronto ? 'pointer' : 'not-allowed',
+      dpConfirmar: () => {
+        if (!pronto) return;
+        const nome = execs.find(x => x.k === sel).n;
+        this.setState({ dp: null, dpExec: null });
+        this.avisar('Inspeção do ' + dp.comp + ' · ' + dp.placa + ' despachada para ' + nome + '. Aparece no app dele agora.');
+      }
+    };
+  }
+  rgVals() {
+    const rg = this.state.rg || { tipo: '', titulo: '', sub: '', nEvid: 0, campos: [], evids: [] };
+    return {
+      rgAberto: !!this.state.rg, rgFechar: () => this.setState({ rg: null }),
+      rg: { ...rg, evids: (rg.evids || []).map(e => ({ ...e, baixar: ev => { ev.stopPropagation(); this.avisar(e.n + ' baixado com hash conferido e carimbo de 6 ago.'); } })) },
+      rgBaixarTudo: () => this.avisar('Registro completo baixado: checklist, fotos, assinatura e hashes num pacote lacrado.'),
+      rgRetificar: () => { this.setState({ rg: null }); this.avisar('Retificação iniciada: o registro original fica intacto; a correção entra como evento novo com justificativa obrigatória.'); }
+    };
+  }
+  agVals() {
+    const ag = this.state.ag;
+    const vazio = { titulo: '', sub: '', estado: '', cta: '', campos: [], d: '', c: '#7c8f8d', bg: '#fff', bd: '1px solid #e4eae8' };
+    return {
+      agAberto: !!ag, agFechar: () => this.setState({ ag: null }),
+      ag: ag ? ag : vazio,
+      agAcao: () => {
+        const a = this.state.ag; this.setState({ ag: null });
+        if (!a) return;
+        if (a.ok) this.avisar(a.arquivo + ' baixado com metadados de integridade e marca d’água.');
+        else this.avisar('Jorge Mattos notificado: falta o ângulo ' + a.nome.toLowerCase() + '. A viagem reavalia sozinha quando a foto sincronizar.');
+      }
+    };
+  }
+  mainVals() {
+    const tone = {
+      aprovada: { st: 'aprovada', stC: '#1a8f57', stBg: '#e9f7ef' },
+      pendencia: { st: 'pendência corrigível', stC: '#b97514', stBg: '#fdf3e2' },
+      reprovada: { st: 'reprovada · item crítico', stC: '#c43d3d', stBg: '#fdecec' },
+      aguardando: { st: 'aguardando sincronização', stC: '#4c5bc0', stBg: '#eceffa' }
+    };
+    const todas = this.inspecoes();
+    const q = this.state.busca.trim().toLowerCase();
+    let view = this.state.loading ? [] : todas.filter(it => {
+      if (this.state.filtro !== 'all' && it.res !== this.state.filtro) return false;
+      if (q && !(it.id + ' ' + it.comp + ' ' + it.placa + ' ' + it.viagem + ' ' + it.quem).toLowerCase().includes(q)) return false;
+      return true;
+    });
+    const CK = this.CHECKS();
+    const lista = view.map(it => {
+      const t = tone[it.res], open = this.state.open === it.id;
+      const itens = CK[it.tipo] || [];
+      const angN = it.angulos.filter(a => a.ok).length;
+      const checks = itens.map(c => {
+        const rep = it.reprovado === c.t;
+        const na = (it.naoAplic || []).includes(c.t);
+        return { t: c.t, critico: !!c.critico,
+          icon: rep ? '✕' : na ? '–' : '✓',
+          st: rep ? 'não conforme' : na ? 'não aplicável' : 'conforme',
+          c: rep ? '#c43d3d' : na ? '#7c8f8d' : '#1a8f57',
+          bg: rep ? '#fdecec' : na ? '#f0f4f3' : '#e9f7ef' };
+      });
+      const ckOk = checks.filter(c => c.st === 'conforme').length;
+      return { ...it, ...t, open, chev: open ? '180deg' : '0deg',
+        angN, angC: angN === 6 ? '#1a8f57' : '#c43d3d',
+        angDica: angN === 6 ? 'seis de seis capturados pela câmera do app' : 'a inspeção não fecha com ângulo faltando',
+        ckOk, ckN: itens.length, ckC: it.res === 'reprovada' ? '#c43d3d' : '#3c4f4e',
+        syncC: it.sync === 'sincronizada' ? '#1a8f57' : '#4c5bc0',
+        temFalta: angN < 6,
+        checks,
+        angulos: it.angulos.map(a => ({
+          ab: a.ab, d: a.d, icon: a.ok ? '✓' : '✕',
+          c: a.ok ? '#1a8f57' : '#c43d3d',
+          bg: a.ok ? 'repeating-linear-gradient(-45deg,#eef7f6 0 5px,#e4efee 5px 10px)' : '#fff',
+          bd: a.ok ? '1px solid #d5e5e3' : '1.5px dashed #e8b4b4',
+          tip: a.n + (a.ok ? ': capturado' : ': faltando'),
+          onClick: () => this.setState({ ag: {
+            ok: a.ok, nome: a.n, d: a.d, arquivo: a.ab.toLowerCase() + '-' + it.comp.toLowerCase() + '.jpg',
+            titulo: a.n, sub: it.comp + ' · ' + it.placa + ' · ' + it.id,
+            estado: a.ok ? 'capturado pela câmera do app' : 'ângulo obrigatório ainda não capturado',
+            cta: a.ok ? 'Baixar foto' : 'Notificar o inspetor',
+            c: a.ok ? '#0C5862' : '#c43d3d',
+            bg: a.ok ? 'repeating-linear-gradient(-45deg,#eef7f6 0 6px,#e4efee 6px 12px)' : '#fff',
+            bd: a.ok ? '1px solid #d5e5e3' : '1.5px dashed #e8b4b4',
+            campos: a.ok ? [
+              { k: 'arquivo', v: a.ab.toLowerCase() + '-' + it.comp.toLowerCase() + '.jpg', f: 'Spline Sans Mono' },
+              { k: 'capturada em', v: it.quando },
+              { k: 'origem', v: 'câmera do app · galeria bloqueada' },
+              { k: 'hash', v: it.hash, f: 'Spline Sans Mono' }
+            ] : [
+              { k: 'exigido por', v: 'checklist ' + it.tipo.toLowerCase() + ' · v4' },
+              { k: 'quem captura', v: it.quem },
+              { k: 'efeito', v: 'a inspeção não fecha' }
+            ]
+          } })
+        })),
+        toggle: () => this.setState(s => ({ open: s.open === it.id ? null : it.id })),
+        abrirRegistro: () => this.setState({ rg: {
+          tipo: 'REGISTRO DE INSPEÇÃO · ' + it.comp + ' · ' + it.placa,
+          titulo: it.id + ' · ' + t.st,
+          sub: it.quando + ' · ' + it.quem + ' · ' + it.tipo.toLowerCase(),
+          nEvid: angN,
+          campos: [
+            { k: 'inspetor', v: it.quem + ' · trilha 6 vigente' },
+            { k: 'data e hora', v: it.quando },
+            { k: 'resultado', v: t.st },
+            { k: 'checklist', v: itens.length + ' itens · ' + itens.filter(c => c.critico).length + ' críticos' },
+            { k: 'ângulos', v: angN + ' de 6 capturados' },
+            { k: 'GPS', v: it.gps },
+            { k: 'sincronização', v: it.sync },
+            { k: 'viagem', v: it.viagem }
+          ],
+          evids: it.angulos.filter(a => a.ok).map(a => ({ n: a.ab.toLowerCase() + '-' + it.comp.toLowerCase() + '.jpg', hash: it.hash }))
+        } }),
+        retificar: () => this.avisar('Retificação de ' + it.id + ' iniciada. O registro original continua no dossiê; a correção entra como evento novo.'),
+        notificar: () => this.avisar('Jorge Mattos notificado pelo app: falta o ângulo da bica de descarga no ' + it.comp + '.')
+      };
+    });
+    const cont = k => todas.filter(i => i.res === k).length;
+    const mk = (key, label) => ({ label, onClick: () => this.setState({ filtro: key, pag: 1 }),
+      bg: this.state.filtro === key ? '#0b2224' : '#fff', c: this.state.filtro === key ? '#fff' : '#3c4f4e',
+      sh: this.state.filtro === key ? 'none' : '0 2px 8px rgba(9,61,68,.06)' });
+    const tipoSel = this.state.tipo, itensTipo = this.CHECKS()[tipoSel];
+    const kTotal = 18, kAprov = 14, kPend = 2, kRep = 2;
+    return {
+      ...this.patioVals(), ...this.rgVals(), ...this.agVals(),
+      loading: this.state.loading, skel: [1, 2, 3],
+      headSub: 'Terça, 5 ago · ' + kTotal + ' inspeções no período · 3 compartimentos esperando · Filial ' + (this.state.filial || 'Rondonópolis MT'),
+      kPct: Math.round(kAprov / kTotal * 100) + '%', kAprov, kTotal, kRep,
+      kW1: Math.round(kAprov / kTotal * 100) + '%', kW2: Math.round(kPend / kTotal * 100) + '%', kW3: Math.round(kRep / kTotal * 100) + '%',
+      kFila: 3, kFilaSub: 'mais antigo: 26 min no pátio',
+      kSync: 1, kSyncSub: 'salva no aparelho de Jorge Mattos',
+      lista: this._pagFatia(lista), ...this._pagVals(lista.length, "inspeções"),
+      listaVazia: !this.state.loading && lista.length === 0,
+      listaVaziaSub: q ? 'Nada corresponde à busca "' + this.state.busca + '" neste filtro.' : 'Nenhuma inspeção com este resultado no período.',
+      filtros: [mk('all', 'Todas · ' + todas.length), mk('aprovada', 'Aprovadas · ' + cont('aprovada')), mk('pendencia', 'Pendência · ' + cont('pendencia')), mk('reprovada', 'Reprovadas · ' + cont('reprovada'))],
+      busca: this.state.busca, onBusca: e => this.setState({ busca: e.target.value, pag: 1 }),
+      tipos: ['Graneleiro', 'Tanque', 'Baú'].map(n => {
+        const on = tipoSel === n;
+        return { n, onClick: () => this.setState({ tipo: n }), bd: on ? '#127670' : '#e0e7e5', bg: on ? '#eef7f6' : '#fff', c: on ? '#0C5862' : '#3c4f4e' };
+      }),
+      tipoN: itensTipo.length, tipoCrit: itensTipo.filter(c => c.critico).length,
+      tipoItens: itensTipo.map(c => ({ t: c.t, critico: !!c.critico,
+        dot: c.critico ? 'linear-gradient(135deg,#e46969,#c43d3d)' : 'linear-gradient(135deg,#9fc9c6,#6ba8a4)',
+        glow: c.critico ? 'rgba(196,61,61,.14)' : 'rgba(107,168,164,.16)' })),
+      cobertura: [
+        { n: 'Visão geral interna', v: '18 de 18', p: 100 },
+        { n: 'Cantos e frestas', v: '18 de 18', p: 100 },
+        { n: 'Teto, lona ou tampa', v: '18 de 18', p: 100 },
+        { n: 'Piso e fundo', v: '17 de 18', p: 94 },
+        { n: 'Bica de descarga', v: '15 de 18', p: 83 },
+        { n: 'Identificação externa', v: '18 de 18', p: 100 }
+      ].map(c => ({ ...c, w: c.p + '%',
+        c: c.p === 100 ? '#1a8f57' : c.p >= 90 ? '#b97514' : '#c43d3d',
+        g1: c.p === 100 ? '#48c78e' : c.p >= 90 ? '#f4c15d' : '#e46969',
+        g2: c.p === 100 ? '#127670' : c.p >= 90 ? '#e8a33d' : '#c43d3d' })),
+      filial: this.state.filial || 'Rondonópolis MT', filialOpen: !!this.state.filialOpen,
+      onFilial: () => this.setState(s => ({ filialOpen: !s.filialOpen })),
+      filiais: ['Rondonópolis MT', 'Sorriso MT', 'Cuiabá MT', 'Rio Verde GO'].map(n => ({ n,
+        bg: (this.state.filial || 'Rondonópolis MT') === n ? '#eef7f6' : '#fff',
+        dot: (this.state.filial || 'Rondonópolis MT') === n ? '#127670' : '#dde5e3',
+        onClick: () => { this.setState({ filial: n, filialOpen: false }); this.avisar('Filial ' + n + ': pátio e inspeções recalculados.'); } })),
+      exportar: () => this.avisar('Inspeções do período exportadas com checklist, ângulos e hashes, carimbadas em 6 ago por Rafael Antunes.'),
+      toast: !!this.state.toast, toastMsg: this.state.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

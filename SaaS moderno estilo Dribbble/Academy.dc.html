@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<script src="./prototype-shell.js" defer></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f2f5f4;font-family:'Hanken Grotesk',sans-serif;color:#0b2224;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0C5862;text-decoration:none}a:hover{color:#127670}
+input{font-family:'Hanken Grotesk',sans-serif}
+input::placeholder{color:#8ba09e}
+@keyframes subir{from{transform:translateY(14px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes deslizar{from{transform:translateX(40px);opacity:0}to{transform:translateX(0);opacity:1}}
+</style>
+</helmet>
+<div style="display:flex;min-height:100vh;min-width:1560px" data-screen-label="Academy">
+  <!-- SIDEBAR -->
+  <div style="width:{{ navW }};flex:none;background:linear-gradient(178deg,#093D44,#0A4650);color:#fff;display:flex;flex-direction:column;padding:24px {{ navPad }};position:sticky;top:0;height:100vh;transition:width .25s ease;overflow-x:hidden;overflow-y:auto">
+    <div style="display:flex;align-items:center;gap:10px;padding:4px 8px 22px">
+      <svg width="34" height="34" viewBox="0 0 32 32"><defs><linearGradient id="lgT" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1a9e93"></stop><stop offset="1" stop-color="#0E78B5"></stop></linearGradient></defs><polygon points="16,2.5 27.5,9 27.5,23 16,29.5 4.5,23 4.5,9" fill="url(#lgT)"></polygon><polyline points="9,20 13,13 18,17 23,10" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></polyline><circle cx="9" cy="20" r="1.6" fill="#fff"></circle><circle cx="13" cy="13" r="1.6" fill="#fff"></circle><circle cx="18" cy="17" r="1.6" fill="#fff"></circle><circle cx="23" cy="10" r="1.6" fill="#fff"></circle></svg>
+      <div style="display:{{ navL }}"><div style="font-weight:800;font-size:17px;letter-spacing:.2px">Traxium</div><div style="font-size:10.5px;letter-spacing:2.2px;color:rgba(255,255,255,.5);text-transform:uppercase">Compliance</div></div>
+    </div>
+    <a href="Torre de Controle v2.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;font-size:14px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="5.6"></circle><circle cx="8" cy="8" r="1.4" fill="currentColor" stroke="none"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Torre de Controle</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">7</span></a>
+    <div style="font-size:10.5px;letter-spacing:1.8px;color:rgba(255,255,255,.38);padding:20px 12px 8px;font-weight:700;display:{{ navSec }}">OPERAÇÃO</div>
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:14px;color:rgba(255,255,255,.66)">
+      <a href="Viagens.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 8h9"></path><path d="M8 4.5 11.5 8 8 11.5"></path></svg><span style="display:{{ navL }};white-space:nowrap">Viagens</span></a>
+      <a href="Excecoes.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="6"></circle><line x1="8" y1="4.8" x2="8" y2="8.6"></line><circle cx="8" cy="11.2" r=".9" fill="currentColor" stroke="none"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Exceções e liberações</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">5</span></a>
+      <a href="Inspecoes.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 6.5 12 13 4.5"></path></svg><span style="display:{{ navL }};white-space:nowrap">Inspeções</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">3</span></a>
+      <a href="Limpezas.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2.8c2.4 2.8 3.7 4.6 3.7 6.5a3.7 3.7 0 1 1-7.4 0c0-1.9 1.3-3.7 3.7-6.5z"></path></svg><span style="display:{{ navL }};white-space:nowrap">Limpezas</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">3</span></a>
+    </div>
+    <div style="font-size:10.5px;letter-spacing:1.8px;color:rgba(255,255,255,.38);padding:20px 12px 8px;font-weight:700;display:{{ navSec }}">PILARES</div>
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:14px;color:rgba(255,255,255,.66)">
+      <a href="Motor IDTF.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="2.5" width="11" height="11" rx="3"></rect><line x1="8" y1="2.5" x2="8" y2="13.5"></line></svg><span style="display:{{ navL }};white-space:nowrap">Motor IDTF</span></a>
+      <a href="Subcontratados.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5.4" cy="6.2" r="2.4"></circle><circle cx="10.8" cy="6.2" r="2.4"></circle><path d="M2.5 13c.6-2 1.7-3 3-3s2.3 1 2.9 3" stroke-linecap="round"></path></svg><span style="display:{{ navL }};white-space:nowrap">Subcontratados</span></a>
+      <a href="Motoristas.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="5.4" r="2.6"></circle><path d="M3 13.4c.8-2.6 2.6-3.9 5-3.9s4.2 1.3 5 3.9"></path></svg><span style="display:{{ navL }};white-space:nowrap">Motoristas</span></a>
+      <a href="Acessos Externos.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.4 8.6a3.2 3.2 0 1 0 0-.01z"></path><path d="M9 7.2 14 2.2M12 4.2l1.6 1.6M10.6 5.6l1.6 1.6"></path></svg><span style="display:{{ navL }};white-space:nowrap">Acessos externos</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">2</span></a>
+      <div style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px;background:linear-gradient(90deg,rgba(26,158,147,.35),rgba(14,120,181,.28));border:1px solid rgba(255,255,255,.14);font-weight:700;color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M2 6.3 8 3.4l6 2.9-6 2.9z"></path><path d="M4.6 8.4v2.6c0 .9 1.5 1.8 3.4 1.8s3.4-.9 3.4-1.8V8.4" stroke-linecap="round"></path></svg><span style="display:{{ navL }};white-space:nowrap">Academy</span><span style="margin-left:auto;display:{{ navL }};background:#fff;color:#0C5862;font-size:11.5px;font-weight:800;padding:1px 8px;border-radius:99px">4</span></div>
+      <a href="Ativos e Frota.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="4.5" width="8" height="5.5" rx="1.4"></rect><path d="M10 6.5h2.4l1.6 2v1.5h-4z" stroke-linejoin="round"></path><circle cx="5" cy="11.8" r="1.4"></circle><circle cx="11.6" cy="11.8" r="1.4"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Ativos e frota</span></a>
+    </div>
+    <div style="font-size:10.5px;letter-spacing:1.8px;color:rgba(255,255,255,.38);padding:20px 12px 8px;font-weight:700;display:{{ navSec }}">PROVA</div>
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:14px;color:rgba(255,255,255,.66)">
+      <a href="Dossie.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3.2" y="2.5" width="9.6" height="11" rx="2"></rect><line x1="6" y1="6" x2="10" y2="6"></line><line x1="6" y1="9" x2="10" y2="9"></line></svg><span style="display:{{ navL }};white-space:nowrap">Dossiê de auditoria</span></a>
+      <a href="Indicadores.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="4" y1="13" x2="4" y2="8.5"></line><line x1="8" y1="13" x2="8" y2="3.5"></line><line x1="12" y1="13" x2="12" y2="10"></line></svg><span style="display:{{ navL }};white-space:nowrap">Indicadores</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">11/15</span></a>
+      <a href="Nao Conformidades.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66)" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="5.8" stroke-dasharray="2.4 2.4"></circle><circle cx="8" cy="8" r="2.2"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Não conformidades</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">4</span></a>
+    </div>
+    <a href="Configuracoes.dc.html" style="margin-top:auto;display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="2.3"></circle><path d="M8 1.8v1.9M8 12.3v1.9M14.2 8h-1.9M3.7 8H1.8M12.4 3.6l-1.3 1.3M4.9 11.1l-1.3 1.3M12.4 12.4l-1.3-1.3M4.9 4.9 3.6 3.6" stroke-linecap="round"></path></svg><span style="display:{{ navL }};white-space:nowrap">Configurações</span></a>
+    <a href="Onboarding Publico.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13V3.8c0-.7.5-1.2 1.2-1.2h5.6c.7 0 1.2.5 1.2 1.2V13"></path><path d="M6 8h7M10.5 5.5 13 8l-2.5 2.5"></path></svg><span style="display:{{ navL }};white-space:nowrap">Onboarding público</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">6 passos</span></a>
+      <a href="App de Campo.dc.html" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="1.8" width="9" height="12.4" rx="2"></rect><line x1="6.5" y1="4" x2="9.5" y2="4"></line><circle cx="8" cy="11.7" r=".65" fill="currentColor" stroke="none"></circle></svg><span style="display:{{ navL }};white-space:nowrap">Protótipo mobile</span><span style="margin-left:auto;display:{{ navL }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;color:#fff">12 telas</span></a>
+      <div onClick="{{ navToggle }}" title="Recolher ou expandir o menu" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;cursor:pointer;font-size:13px;font-weight:600;color:rgba(255,255,255,.6)" style-hover="background:rgba(255,255,255,.08);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="transform:{{ navFlip }};transition:transform .25s;flex:none"><path d="M9.5 3 4.5 8l5 5"></path><line x1="12" y1="3" x2="12" y2="13"></line></svg><span style="display:{{ navL }};white-space:nowrap">Recolher menu</span></div>
+    <div style="display:{{ navCard }};margin-top:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px">
+      <div style="font-size:12px;color:rgba(255,255,255,.55);margin-bottom:8px">Regra central</div>
+      <div style="font-size:12.5px;line-height:1.5;color:rgba(255,255,255,.8)">Motorista sem competência comprovada <strong>não aparece como elegível</strong>. A trilha é requisito, não biblioteca.</div>
+    </div>
+  </div>
+  <!-- CONTENT -->
+  <div style="flex:1;display:flex;flex-direction:column;padding:26px 32px 48px;gap:20px;min-width:0">
+    <div style="display:flex;align-items:center;gap:16px">
+      <div><div style="font-size:24px;font-weight:800">Academy</div><div style="font-size:13.5px;color:#5c706e;margin-top:2px">qualificação contínua ligada à liberação · 46 motoristas na rede ativa</div></div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+        <div style="background:#fff;border:1px solid #e0e7e5;border-radius:11px;padding:0 14px;display:flex;gap:8px;align-items:center">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#7c8f8d" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.6"></circle><line x1="10.5" y1="10.5" x2="13.5" y2="13.5"></line></svg>
+          <input value="{{ busca }}" onInput="{{ onBusca }}" placeholder="Motorista ou trilha…" style="border:none;outline:none;background:transparent;font-size:13.5px;padding:10px 0;width:190px;color:#0b2224">
+        </div>
+        <div onClick="{{ abrirEnvio }}" style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;border-radius:11px;padding:9px 18px;font-size:13.5px;font-weight:700;cursor:pointer;white-space:nowrap;box-shadow:0 6px 14px rgba(18,118,112,.3);transition:transform .15s" style-hover="transform:translateY(-1px)">Enviar em massa</div>
+        <div data-tx-pop style="position:relative">
+          <div onClick="{{ onPerfil }}" style="width:38px;height:38px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13.5px;box-shadow:0 0 0 3px #fff,0 0 0 4.5px #d8e4e2;cursor:pointer" style-hover="box-shadow:0 0 0 3px #fff,0 0 0 4.5px #127670">RA</div>
+          <sc-if value="{{ perfilOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;right:0;top:48px;background:#fff;border:1px solid #e4eae8;border-radius:16px;box-shadow:0 16px 40px rgba(9,61,68,.16);padding:6px;width:250px;z-index:60;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;gap:11px;padding:11px 12px;border-bottom:1px solid #f0f4f3;margin-bottom:4px">
+                <span style="width:38px;height:38px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none">RA</span>
+                <div><div style="font-size:13.5px;font-weight:800">Rafael Antunes</div><div style="font-size:11.5px;color:#5c706e">Gestor de qualidade · GMP+</div></div>
+              </div>
+              <div onClick="{{ abrirPerfil }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer" style-hover="background:#f6f9f8">Meu perfil</div>
+              <div onClick="{{ abrirPrefs }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer" style-hover="background:#f6f9f8">Preferências e notificações</div>
+              <div onClick="{{ abrirPapel }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px" style-hover="background:#f6f9f8">Papel ativo<span style="display:inline-block;font-size:10.5px;font-weight:700;color:#0C5862;background:#e9f3f2;border-radius:99px;padding:2px 9px;white-space:nowrap">{{ papelBadge }}</span></div>
+              <div style="height:1px;background:#f0f4f3;margin:5px 8px"></div>
+              <div onClick="{{ abrirSair }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;color:#c43d3d" style-hover="background:#fdf6f6">Sair</div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+    <!-- KPI FAIXA -->
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:14px">
+      <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:18px 20px">
+        <div style="font-size:13px;font-weight:600;color:#5c706e">Motoristas com competência vigente</div>
+        <div style="display:flex;align-items:baseline;gap:10px;margin-top:6px"><span style="font-size:36px;font-weight:800;font-variant-numeric:tabular-nums">87%</span><span style="font-size:13px;color:#5c706e">40 de 46 elegíveis agora</span></div>
+        <div style="margin-top:12px;height:12px;border-radius:99px;overflow:hidden;display:flex;background:repeating-linear-gradient(-45deg,#eef2f1 0 5px,#e2e9e7 5px 10px)">
+          <div style="width:87%;background:linear-gradient(90deg,#48c78e,#127670)"></div>
+          <div style="width:7%;background:linear-gradient(90deg,#f4c15d,#e8a33d)"></div>
+        </div>
+        <div style="display:flex;gap:16px;margin-top:9px;font-size:12px;color:#5c706e"><span><span style="display:inline-block;width:8px;height:8px;border-radius:3px;background:#2aa876;margin-right:5px"></span>Vigente</span><span><span style="display:inline-block;width:8px;height:8px;border-radius:3px;background:#e8a33d;margin-right:5px"></span>Vence em 30d</span><span><span style="display:inline-block;width:8px;height:8px;border-radius:3px;background:#dde5e3;margin-right:5px"></span>Vencida</span></div>
+      </div>
+      <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:18px 20px;display:flex;flex-direction:column">
+        <div style="font-size:13px;font-weight:600;color:#5c706e">Bloqueados por trilha</div>
+        <div style="font-size:36px;font-weight:800;margin-top:6px;font-variant-numeric:tabular-nums">3</div>
+        <div style="margin-top:auto;display:flex;align-items:center;gap:7px;font-size:12.5px;color:#5c706e;font-weight:600"><span style="width:9px;height:9px;border-radius:99px;background:linear-gradient(135deg,#e46969,#c43d3d);box-shadow:0 0 0 3px rgba(196,61,61,.16)"></span>não aparecem como elegíveis</div>
+      </div>
+      <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:18px 20px;display:flex;flex-direction:column">
+        <div style="font-size:13px;font-weight:600;color:#5c706e">Disparos just-in-time · 7 dias</div>
+        <div style="font-size:36px;font-weight:800;margin-top:6px;font-variant-numeric:tabular-nums">12</div>
+        <div style="margin-top:auto;display:flex;align-items:center;gap:7px;font-size:12.5px;color:#5c706e;font-weight:600"><span style="width:9px;height:9px;border-radius:99px;background:linear-gradient(135deg,#5b8def,#4c5bc0);box-shadow:0 0 0 3px rgba(91,141,239,.16)"></span>acionados pelo risco da operação</div>
+      </div>
+      <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:18px 20px;display:flex;flex-direction:column">
+        <div style="font-size:13px;font-weight:600;color:#5c706e">Nota média · 90 dias</div>
+        <div style="font-size:36px;font-weight:800;margin-top:6px;font-variant-numeric:tabular-nums">8,4</div>
+        <div style="margin-top:auto;display:flex;align-items:center;gap:7px;font-size:12.5px;color:#5c706e;font-weight:600"><span style="width:9px;height:9px;border-radius:99px;background:linear-gradient(135deg,#48c78e,#1a8f57);box-shadow:0 0 0 3px rgba(26,143,87,.16)"></span>mínima exigida: 7,0 · 2 tentativas</div>
+      </div>
+    </div>
+    <!-- MAIN GRID -->
+    <div style="display:grid;grid-template-columns:1fr 392px;gap:20px;align-items:start">
+      <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+        <!-- TRILHAS -->
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:24px">
+          <div style="display:flex;align-items:center"><div style="font-size:15.5px;font-weight:800">Trilhas do programa</div><div style="font-size:12.5px;color:#5c706e;margin-left:10px">10 trilhas · versão gravada em cada conclusão</div><span onClick="{{ novaTrilha }}" style="margin-left:auto;font-size:12.5px;font-weight:700;color:#0C5862;cursor:pointer;white-space:nowrap" style-hover="color:#127670">+ Nova trilha</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">
+            <sc-for list="{{ trilhas }}" as="tr" hint-placeholder-count="10">
+              <div onClick="{{ tr.abrir }}" style="display:flex;align-items:center;gap:12px;border:1px solid #eef2f1;border-radius:15px;padding:12px 14px;cursor:pointer;transition:all .15s" style-hover="border-color:#c9d5d3;box-shadow:0 6px 16px rgba(9,61,68,.06)">
+                <span style="width:38px;height:38px;border-radius:12px;flex:none;background:{{ tr.iBg }};color:{{ tr.iC }};display:flex;align-items:center;justify-content:center;font-family:'Spline Sans Mono';font-size:12px;font-weight:600">{{ tr.num }}</span>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ tr.nome }}</div>
+                  <div style="display:flex;align-items:center;gap:8px;margin-top:5px"><div style="flex:1;height:6px;border-radius:99px;background:#f0f4f3;overflow:hidden"><div style="height:100%;width:{{ tr.pct }};border-radius:99px;background:linear-gradient(90deg,{{ tr.b1 }},{{ tr.b2 }})"></div></div><span style="font-family:'Spline Sans Mono';font-size:10.5px;font-weight:600;color:#5c706e;flex:none">{{ tr.pct }}</span></div>
+                </div>
+                <span style="display:inline-block;font-size:10.5px;font-weight:700;color:{{ tr.tagC }};background:{{ tr.tagBg }};border-radius:99px;padding:3px 9px;white-space:nowrap;flex:none">{{ tr.tag }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <!-- MOTORISTAS -->
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:8px 8px 10px">
+          <div style="display:flex;align-items:center;padding:14px 16px 10px"><div style="font-size:15.5px;font-weight:800">Competência por motorista</div>
+            <div style="display:flex;gap:2px;background:#f0f4f3;border-radius:99px;padding:3px;margin-left:12px">
+              <span onClick="{{ verLista }}" style="font-size:11.5px;font-weight:700;border-radius:99px;padding:4px 12px;cursor:pointer;background:{{ vLisBg }};color:{{ vLisC }};box-shadow:{{ vLisSh }};transition:all .15s">Lista</span>
+              <span onClick="{{ verMatriz }}" style="font-size:11.5px;font-weight:700;border-radius:99px;padding:4px 12px;cursor:pointer;background:{{ vMatBg }};color:{{ vMatC }};box-shadow:{{ vMatSh }};transition:all .15s">Matriz</span>
+            </div>
+            <div style="margin-left:auto;display:flex;gap:6px">
+              <sc-for list="{{ filtros }}" as="f" hint-placeholder-count="3"><span onClick="{{ f.onClick }}" style="font-size:12.5px;font-weight:700;border-radius:99px;padding:6px 14px;cursor:pointer;background:{{ f.bg }};color:{{ f.c }};white-space:nowrap;box-shadow:{{ f.sh }};transition:all .15s">{{ f.label }}</span></sc-for>
+            </div>
+          </div>
+          <sc-if value="{{ vazio }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:40px 20px;display:flex;flex-direction:column;align-items:center;gap:8px"><div style="font-size:14px;font-weight:800">Ninguém neste filtro</div><div style="font-size:12.5px;color:#5c706e">Ajuste a busca ou o filtro de situação.</div></div>
+          </sc-if>
+          <sc-if value="{{ modoMatriz }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:6px 16px 16px;overflow-x:auto">
+              <div style="display:grid;grid-template-columns:170px repeat(10, 1fr);gap:4px;align-items:center">
+                <span style="font-size:10px;font-weight:700;color:#7c8f8d;letter-spacing:.6px">MOTORISTA × TRILHA</span>
+                <sc-for list="{{ matCols }}" as="mc" hint-placeholder-count="10"><span title="{{ mc.nome }}" style="font-family:'Spline Sans Mono';font-size:10px;font-weight:600;color:#7c8f8d;text-align:center;cursor:default">{{ mc.num }}</span></sc-for>
+                <sc-for list="{{ matriz }}" as="mr" hint-placeholder-count="7">
+                  <div style="display:flex;align-items:center;gap:8px;min-width:0"><span style="width:26px;height:26px;border-radius:99px;flex:none;background:linear-gradient(135deg,{{ mr.a1 }},{{ mr.a2 }});color:#fff;font-size:9.5px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ mr.ini }}</span><span style="font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ mr.nome }}</span></div>
+                  <sc-for list="{{ mr.cels }}" as="cl" hint-placeholder-count="10">
+                    <span onClick="{{ cl.onClick }}" title="{{ cl.tip }}" style="height:26px;border-radius:8px;background:{{ cl.bg }};display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s" style-hover="transform:scale(1.12);box-shadow:0 4px 10px rgba(9,61,68,.15)"><span style="font-size:9px;font-weight:800;color:{{ cl.c }}">{{ cl.icon }}</span></span>
+                  </sc-for>
+                </sc-for>
+              </div>
+              <div style="display:flex;gap:14px;margin-top:12px;font-size:11px;color:#5c706e;font-weight:600">
+                <span><span style="display:inline-block;width:9px;height:9px;border-radius:3px;background:linear-gradient(135deg,#48c78e,#127670);margin-right:5px"></span>vigente</span>
+                <span><span style="display:inline-block;width:9px;height:9px;border-radius:3px;background:linear-gradient(135deg,#f4c15d,#e8a33d);margin-right:5px"></span>vence em 30d</span>
+                <span><span style="display:inline-block;width:9px;height:9px;border-radius:3px;background:linear-gradient(135deg,#e46969,#c43d3d);margin-right:5px"></span>vencida ou reprovada</span>
+                <span><span style="display:inline-block;width:9px;height:9px;border-radius:3px;background:#e4ebe9;margin-right:5px"></span>nunca iniciou</span>
+                <span style="margin-left:auto;color:#7c8f8d">clique na célula para ver nota, tentativas e certificado</span>
+              </div>
+            </div>
+          </sc-if>
+          <sc-for list="{{ motoristas }}" as="m" hint-placeholder-count="5">
+            <div style="border-top:1px solid #f0f4f3;border-radius:12px" style-hover="background:#f6f9f8">
+            <div onClick="{{ m.toggle }}" style="display:grid;grid-template-columns:1.3fr 1fr 150px 130px 36px;gap:14px;align-items:center;padding:12px 16px;cursor:pointer">
+              <div style="display:flex;align-items:center;gap:11px;min-width:0">
+                <span style="width:38px;height:38px;border-radius:99px;flex:none;background:linear-gradient(135deg,{{ m.a1 }},{{ m.a2 }});color:#fff;font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2.5px #fff,0 0 0 4px {{ m.ring }}">{{ m.ini }}</span>
+                <div style="min-width:0"><div style="font-size:13.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.nome }}</div><div style="font-size:11px;color:#7c8f8d">{{ m.vinculo }}</div></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:8px;border-radius:99px;background:repeating-linear-gradient(-45deg,#f0f4f3 0 5px,#e4ebe9 5px 10px);overflow:hidden"><div style="height:100%;width:{{ m.pct }};border-radius:99px;background:linear-gradient(90deg,{{ m.b1 }},{{ m.b2 }})"></div></div><span style="font-family:'Spline Sans Mono';font-size:11.5px;font-weight:600;color:#5c706e;flex:none">{{ m.frac }}</span></div>
+              <span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:{{ m.stC }};background:{{ m.stBg }};border-radius:99px;padding:5px 12px;justify-self:start;white-space:nowrap"><span style="width:7px;height:7px;border-radius:99px;background:{{ m.stDot }}"></span>{{ m.st }}</span>
+              <div style="font-size:11.5px;color:{{ m.proxC }};line-height:1.4">{{ m.prox }}</div>
+              <span onClick="{{ m.enviar }}" title="Enviar trilha por WhatsApp" style="width:32px;height:32px;border-radius:99px;background:#f0f4f3;color:#0C5862;display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="background:#e4ebe9"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2 7.5 8.5"></path><path d="M14 2 9.8 14l-2.3-5.5L2 6.2z"></path></svg></span>
+            </div>
+            <sc-if value="{{ m.open }}" hint-placeholder-val="{{ false }}">
+              <div style="margin:0 16px 14px;background:#f7faf9;border:1px solid #e8eeec;border-radius:14px;padding:14px 16px">
+                <div style="font-size:11px;letter-spacing:1.2px;font-weight:700;color:#7c8f8d">O QUE ACONTECEU</div>
+                <div style="display:flex;flex-direction:column;margin-top:10px">
+                  <sc-for list="{{ m.hist }}" as="h" hint-placeholder-count="3">
+                    <div style="display:flex;gap:11px">
+                      <div style="display:flex;flex-direction:column;align-items:center;width:14px;flex:none"><span style="width:8px;height:8px;border-radius:99px;background:{{ h.c }};box-shadow:0 0 0 3px {{ h.glow }};margin-top:4px"></span><span style="flex:1;width:2px;background:{{ h.line }};margin-top:4px"></span></div>
+                      <div style="padding-bottom:12px;flex:1"><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><span style="font-size:12.5px;font-weight:700">{{ h.t }}</span><span style="font-family:'Spline Sans Mono';font-size:10.5px;color:#7c8f8d">{{ h.quando }}</span></div><div style="font-size:11.5px;color:#5c706e;margin-top:1px">{{ h.sub }}</div></div>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:2px">
+                  <span onClick="{{ m.cta }}" style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;font-size:12.5px;font-weight:700;border-radius:99px;padding:8px 16px;cursor:pointer;white-space:nowrap;box-shadow:0 6px 14px rgba(18,118,112,.3)" style-hover="transform:translateY(-1px)">{{ m.ctaT }}</span>
+                  <span style="font-size:11.5px;color:#7c8f8d">{{ m.regra }}</span>
+                </div>
+              </div>
+            </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <!-- RAIL -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:linear-gradient(115deg,#093D44,#0C5862 60%,#0E78B5 140%);color:#fff;border-radius:20px;padding:22px;position:relative;overflow:hidden">
+          <div style="position:absolute;right:-50px;top:-70px;width:220px;height:220px;border-radius:99em;background:radial-gradient(circle,rgba(255,255,255,.13),transparent 65%)"></div>
+          <div style="font-size:15.5px;font-weight:800">Acionado pelo risco</div>
+          <div style="font-size:12.5px;color:rgba(255,255,255,.72);margin-top:2px">o sistema dispara a trilha na hora em que o conhecimento vira requisito</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px">
+            <sc-for list="{{ jit }}" as="j" hint-placeholder-count="4">
+              <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:11px 13px;backdrop-filter:blur(4px)">
+                <div style="display:flex;align-items:center;gap:9px"><span style="width:26px;height:26px;border-radius:9px;flex:none;background:{{ j.iBg }};color:{{ j.iC }};font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ j.icon }}</span><div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:700">{{ j.t }}</div><div style="font-size:10.5px;color:rgba(255,255,255,.65)">{{ j.sub }}</div></div><span style="font-family:'Spline Sans Mono';font-size:10px;color:rgba(255,255,255,.55);white-space:nowrap">{{ j.quando }}</span></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:22px">
+          <div style="font-size:15.5px;font-weight:800">Regras de liberação</div>
+          <div style="font-size:12.5px;color:#5c706e;margin-top:2px">configuráveis por cliente, produto e filial</div>
+          <div style="display:flex;flex-direction:column;gap:7px;margin-top:12px">
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;background:#f7faf9;border-radius:99px;padding:8px 14px"><span style="color:#5c706e">Nota mínima</span><span style="font-family:'Spline Sans Mono';font-weight:600">7,0</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;background:#f7faf9;border-radius:99px;padding:8px 14px"><span style="color:#5c706e">Tentativas</span><span style="font-weight:700">2 · depois reforço obrigatório</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;background:#f7faf9;border-radius:99px;padding:8px 14px"><span style="color:#5c706e">Reciclagem</span><span style="font-weight:700">12 meses por trilha</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;background:#f7faf9;border-radius:99px;padding:8px 14px"><span style="color:#5c706e">NutriMax exige</span><span style="font-weight:700">trilha 9 (proteção da carga)</span></div>
+          </div>
+          <div style="font-size:12px;color:#5c706e;margin-top:12px;line-height:1.5">Reprovou duas vezes: bloqueia e aciona reforço. A liberação volta pela nova avaliação, nunca por edição manual.</div>
+        </div>
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:22px">
+          <div style="display:flex;align-items:center"><div style="font-size:15.5px;font-weight:800">Relatório de auditoria</div></div>
+          <div style="font-size:12.5px;color:#5c706e;margin-top:6px;line-height:1.55">Conclusões com nota, tentativas, aceite de ciência, versão do conteúdo e validade. Exportável por período e por motorista.</div>
+          <span onClick="{{ exportarRel }}" style="display:inline-block;margin-top:12px;background:#093D44;color:#fff;font-size:12.5px;font-weight:700;border-radius:99px;padding:8px 18px;cursor:pointer;white-space:nowrap" style-hover="background:#0C5862">Exportar relatório</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- DRAWER TRILHA -->
+  <sc-if value="{{ drAberto }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ drFechar }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;justify-content:flex-end">
+      <div onClick="{{ pararClique }}" style="width:520px;background:#f7faf9;height:100vh;overflow:auto;box-shadow:-30px 0 80px rgba(9,34,36,.35);animation:deslizar .3s ease-out both">
+        <div style="background:linear-gradient(130deg,#093D44,#0C5862 55%,#0E78B5 130%);color:#fff;padding:24px 26px">
+          <div style="display:flex;align-items:center"><span style="font-size:10.5px;letter-spacing:2.4px;font-weight:700;color:rgba(255,255,255,.6)">TRILHA {{ dr.num }} · v{{ dr.versao }}</span><span onClick="{{ drFechar }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:rgba(255,255,255,.22)">✕</span></div>
+          <div style="font-size:19px;font-weight:800;margin-top:8px">{{ dr.nome }}</div>
+          <div style="font-size:12.5px;color:rgba(255,255,255,.72);margin-top:3px">{{ dr.formato }} · {{ dr.duracao }} · validade {{ dr.validade }}</div>
+          <div style="display:flex;gap:8px;margin-top:14px">
+            <div style="flex:1;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);border-radius:13px;padding:9px 11px"><div style="font-size:15px;font-weight:800">{{ dr.concl }}</div><div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:2px">concluíram</div></div>
+            <div style="flex:1;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);border-radius:13px;padding:9px 11px"><div style="font-size:15px;font-weight:800">{{ dr.nota }}</div><div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:2px">nota média</div></div>
+            <div style="flex:1;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);border-radius:13px;padding:9px 11px"><div style="font-size:15px;font-weight:800">{{ dr.tent }}</div><div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:2px">tentativas médias</div></div>
+          </div>
+        </div>
+        <div style="padding:18px 22px;display:flex;flex-direction:column;gap:12px">
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:16px;padding:16px">
+            <div style="font-size:13px;font-weight:800">Conteúdo</div>
+            <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px">
+              <sc-for list="{{ dr.aulas }}" as="au" hint-placeholder-count="4">
+                <div style="display:flex;align-items:center;gap:10px;background:#f7faf9;border-radius:11px;padding:9px 12px"><span style="width:26px;height:26px;border-radius:9px;flex:none;background:#e9f3f2;color:#0C5862;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800">{{ au.tipo }}</span><span style="font-size:12.5px;font-weight:600;flex:1">{{ au.t }}</span><span style="font-family:'Spline Sans Mono';font-size:10.5px;color:#7c8f8d">{{ au.dur }}</span></div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:16px;padding:16px">
+            <div style="font-size:13px;font-weight:800">Quem falta concluir ({{ dr.faltamN }})</div>
+            <div style="display:flex;flex-direction:column;margin-top:8px">
+              <sc-for list="{{ dr.faltam }}" as="fa" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid #f0f4f3"><span style="width:30px;height:30px;border-radius:99px;flex:none;background:linear-gradient(135deg,{{ fa.a1 }},{{ fa.a2 }});color:#fff;font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ fa.ini }}</span><div style="flex:1"><div style="font-size:12.5px;font-weight:700">{{ fa.n }}</div><div style="font-size:10.5px;color:{{ fa.subC }}">{{ fa.sub }}</div></div><span onClick="{{ fa.enviar }}" style="font-size:11.5px;font-weight:700;color:#0C5862;cursor:pointer;white-space:nowrap" style-hover="color:#127670">Enviar →</span></div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:linear-gradient(90deg,#fdfaf3,#fff);border:1px dashed #e5d9b8;border-radius:14px;padding:11px 14px;font-size:11.5px;color:#5c706e;line-height:1.5">Cada conclusão grava nota, tentativas, aceite de ciência e a versão v{{ dr.versao }} assistida. Atualizar o conteúdo cria v{{ dr.proxVersao }}; conclusões antigas não mudam.</div>
+          <div style="display:flex;gap:8px;padding-bottom:8px">
+            <span onClick="{{ drNovaVersao }}" style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;font-size:12.5px;font-weight:700;border-radius:99px;padding:9px 18px;cursor:pointer;white-space:nowrap;box-shadow:0 6px 14px rgba(18,118,112,.3)" style-hover="transform:translateY(-1px)">Nova versão (v{{ dr.proxVersao }})</span>
+            <span onClick="{{ drEditar }}" style="background:#fff;border:1px solid #dfe7e5;font-size:12.5px;font-weight:700;border-radius:99px;padding:9px 18px;cursor:pointer;white-space:nowrap" style-hover="border-color:#127670">Editar rascunho</span>
+            <span onClick="{{ drArquivar }}" style="background:#fff;border:1px solid #f3d4d4;color:#c43d3d;font-size:12.5px;font-weight:700;border-radius:99px;padding:9px 18px;cursor:pointer;white-space:nowrap;margin-left:auto" style-hover="background:#fdf6f6">Arquivar</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <!-- MODAL ENVIO EM MASSA -->
+  <sc-if value="{{ envAberto }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ envFechar }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:560px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Enviar em massa</div><span onClick="{{ envFechar }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e;margin-top:16px">TRILHA</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">
+          <sc-for list="{{ envTrilhas }}" as="et" hint-placeholder-count="4"><span onClick="{{ et.onClick }}" style="font-size:12px;font-weight:700;border-radius:99px;padding:6px 14px;cursor:pointer;white-space:nowrap;border:1.5px solid {{ et.bd }};background:{{ et.bg }};color:{{ et.c }}">{{ et.t }}</span></sc-for>
+        </div>
+        <div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#3c4f4e;margin-top:16px">PARA QUEM</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+          <sc-for list="{{ envAlvos }}" as="ea" hint-placeholder-count="3">
+            <div onClick="{{ ea.onClick }}" style="display:flex;align-items:center;gap:10px;border:1.5px solid {{ ea.bd }};background:{{ ea.bg }};border-radius:12px;padding:10px 14px;cursor:pointer" style-hover="border-color:#127670"><span style="width:15px;height:15px;border-radius:99px;border:2px solid {{ ea.dotBd }};background:{{ ea.dot }};flex:none"></span><div><div style="font-size:13px;font-weight:700">{{ ea.t }}</div><div style="font-size:11px;color:#5c706e">{{ ea.sub }}</div></div></div>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:18px;justify-content:flex-end">
+          <span onClick="{{ envFechar }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer;white-space:nowrap" style-hover="background:#e4ebe9">Cancelar</span>
+          <span onClick="{{ envConfirmar }}" style="font-size:13.5px;font-weight:800;border-radius:99px;padding:10px 22px;cursor:{{ envCur }};background:{{ envBg }};color:{{ envC }};white-space:nowrap;box-shadow:{{ envSh }}">Enviar por WhatsApp</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:1200;background:#0b2224;color:#fff;border-radius:99px;padding:12px 22px;font-size:13.5px;font-weight:600;box-shadow:0 16px 40px rgba(9,34,36,.35);display:flex;align-items:center;gap:10px"><span style="width:20px;height:20px;border-radius:99px;background:linear-gradient(135deg,#48c78e,#127670);display:flex;align-items:center;justify-content:center;font-size:11px">✓</span>{{ toastMsg }}</div>
+  </sc-if>
+  <sc-if value="{{ modalPerfil }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePerfil }}" style="background:#fff;border-radius:24px;width:460px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Meu perfil</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:16px">
+          <span style="width:76px;height:76px;border-radius:99px;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:26px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #fff,0 0 0 6px #f0debb">RA</span>
+          <div style="font-size:17px;font-weight:800;margin-top:4px">Rafael Antunes</div>
+          <div style="font-size:12.5px;color:#5c706e">rafael.antunes@traxium.com.br</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-top:18px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Papel</span><span style="font-weight:700">Gestor de qualidade</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Autoridade na matriz</span><span style="font-weight:700">nível 3 · Gestor</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Filiais</span><span style="font-weight:700">Rondonópolis, Sorriso</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Liberações assinadas em 2026</span><span style="font-family:'Spline Sans Mono';font-weight:600">14</span></div>
+        </div>
+        <div style="font-size:12px;color:#5c706e;margin-top:12px;line-height:1.5">Toda assinatura sua fica no registro lacrado da viagem. O papel define o que a matriz permite; ninguém assina acima do próprio nível.</div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalPrefs }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePerfil }}" style="background:#fff;border-radius:24px;width:520px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Preferências e notificações</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:16px">
+          <sc-for list="{{ prefs }}" as="pf" hint-placeholder-count="4">
+            <div onClick="{{ pf.onClick }}" style="display:flex;align-items:center;gap:12px;border:1px solid #eef2f1;border-radius:14px;padding:12px 14px;cursor:pointer" style-hover="border-color:#c9d5d3">
+              <div style="flex:1"><div style="font-size:13.5px;font-weight:700">{{ pf.t }}</div><div style="font-size:11.5px;color:#5c706e">{{ pf.sub }}</div></div>
+              <span style="width:40px;height:23px;border-radius:99px;background:{{ pf.swBg }};position:relative;flex:none;transition:background .2s"><span style="position:absolute;top:2.5px;left:{{ pf.swPos }};width:18px;height:18px;border-radius:99px;background:#fff;box-shadow:0 1px 4px rgba(9,34,36,.25);transition:left .2s"></span></span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:12px;color:#5c706e;margin-top:12px">O alerta de bloqueio técnico não pode ser desligado: é requisito da certificação.</div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalPapel }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePop }}" style="background:#fff;border-radius:24px;width:540px;max-height:86vh;overflow:auto;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Papel ativo</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:3px;line-height:1.55">O papel define o que a matriz de autoridade permite assinar. A autoridade escala para cima, nunca para baixo, e ninguém assina acima do próprio nível.</div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-top:16px">
+          <sc-for list="{{ papeisLista }}" as="pp" hint-placeholder-count="5">
+            <div onClick="{{ pp.onClick }}" style="display:flex;align-items:center;gap:13px;border:1.5px solid {{ pp.bd }};background:{{ pp.bg }};border-radius:15px;padding:13px 15px;cursor:pointer;transition:all .15s" style-hover="border-color:#127670">
+              <span style="width:19px;height:19px;border-radius:99px;border:2.5px solid {{ pp.dotBd }};background:{{ pp.dot }};flex:none"></span>
+              <span style="width:34px;height:34px;border-radius:11px;flex:none;background:linear-gradient(135deg,{{ pp.g1 }},{{ pp.g2 }});color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ pp.nivel }}</span>
+              <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:800">{{ pp.n }}</div><div style="font-size:11.5px;color:#5c706e;margin-top:2px;line-height:1.4">{{ pp.resolve }}</div></div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#f7faf9;border-radius:14px;padding:12px 15px;margin-top:14px;font-size:12px;color:#5c706e;line-height:1.55">Nível 0 é técnico: é o nível de autoridade de ninguém. Contaminação não se aprova, se regulariza.</div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalSair }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararCliquePop }}" style="background:#fff;border-radius:24px;width:440px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Sair da conta</div><span onClick="{{ fecharModalTopo }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;align-items:center;gap:12px;background:#f7faf9;border-radius:15px;padding:13px 15px;margin-top:16px">
+          <span style="width:40px;height:40px;border-radius:99px;flex:none;background:linear-gradient(135deg,#e8a33d,#d97544);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">RA</span>
+          <div><div style="font-size:13.5px;font-weight:800">Rafael Antunes</div><div style="font-size:11.5px;color:#5c706e">{{ papelBadge }} · nível {{ papelNivel }} na matriz</div></div>
+        </div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:14px;line-height:1.6">Nada é perdido ao sair. Registro lacrado continua lacrado, e o que estava em preenchimento não foi gravado em lugar nenhum.</div>
+        <div style="display:flex;gap:8px;margin-top:18px;justify-content:flex-end">
+          <span onClick="{{ fecharModalTopo }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer" style-hover="background:#e4ebe9">Cancelar</span>
+          <span onClick="{{ confirmarSair }}" style="background:linear-gradient(135deg,#e46969,#c43d3d);color:#fff;font-size:13.5px;font-weight:800;border-radius:99px;padding:10px 22px;cursor:pointer;box-shadow:0 8px 18px rgba(196,61,61,.3);transition:transform .15s" style-hover="transform:translateY(-1px)">Sair</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { busca: '', filtro: 'all', dr: null, env: false, envTrilha: null, envAlvo: null, toast: null };
+  avisar(msg) { this.setState({ toast: msg }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 4200); }
+  perfilVals() {
+    return {
+      perfilOpen: !!this.state.perfilOpen,
+      onPerfil: () => this.setState(s => ({ perfilOpen: !s.perfilOpen })),
+      modalPerfil: this.state.modalTopo === 'perfil', modalPrefs: this.state.modalTopo === 'prefs',
+      abrirPerfil: () => this.setState({ modalTopo: 'perfil', perfilOpen: false }),
+      abrirPrefs: () => this.setState({ modalTopo: 'prefs', perfilOpen: false }),
+      fecharModalTopo: () => this.setState({ modalTopo: null }),
+      pararCliquePerfil: e => e.stopPropagation(),
+      prefs: [
+        { k: 'bloq', t: 'Bloqueio técnico na filial', sub: 'sempre ativo: requisito da certificação', lock: true },
+        { k: 'fila', t: 'Item há mais de 2h na fila', sub: 'aviso no app e por e-mail' },
+        { k: 'cert', t: 'Certificado de terceiro a vencer', sub: 'aos 30 e aos 15 dias' },
+        { k: 'idtf', t: 'Nova versão da base IDTF', sub: 'quando a Qualidade publicar revisão' }
+      ].map(p => {
+        const on = p.lock || (this.state.prefsOn || { fila: true, cert: true, idtf: false })[p.k];
+        return { ...p, swBg: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#dde5e3', swPos: on ? '19.5px' : '2.5px',
+          onClick: () => { if (p.lock) return; const cur = this.state.prefsOn || { fila: true, cert: true, idtf: false }; this.setState({ prefsOn: { ...cur, [p.k]: !cur[p.k] } }); } };
+      })
+    };
+  }
+  papelVals() {
+    const diz = m => { if (typeof this.avisar === 'function') this.avisar(m); };
+    const PAPEIS = [
+      { n: 'Inspetor de pátio', nivel: 1, resolve: 'condição física do equipamento: checklist reprovado, foto ausente', g1: '#9fc9c6', g2: '#6ba8a4' },
+      { n: 'Tráfego', nivel: 2, resolve: 'pendência simples: certificação a vencer, sincronização pendente', g1: '#5b8def', g2: '#4c5bc0' },
+      { n: 'Gestor de qualidade', nivel: 3, resolve: 'pendência corrigível mediante evidência da correção', g1: '#127670', g2: '#0E78B5' },
+      { n: 'Diretoria e Resp. Técnico', nivel: 4, resolve: 'impacto contratual, risco residual aceito, terceiro emergencial', g1: '#e8a33d', g2: '#d97544' },
+      { n: 'Auditor interno', nivel: 0, resolve: 'somente leitura, mais abrir não conformidade', g1: '#c9d5d3', g2: '#9db0ae' }
+    ];
+    const ativo = this.state.papelAtivo || 'Gestor de qualidade';
+    const atual = PAPEIS.find(p => p.n === ativo) || PAPEIS[2];
+    return {
+      pararClique: e => e.stopPropagation(),
+      pararCliquePop: e => e.stopPropagation(),
+      papelBadge: atual.n === 'Diretoria e Resp. Técnico' ? 'Diretoria' : atual.n.split(' ')[0],
+      papelNivel: atual.nivel,
+      modalPapel: this.state.modalTopo === 'papel',
+      modalSair: this.state.modalTopo === 'sair',
+      abrirPapel: () => this.setState({ modalTopo: 'papel', perfilOpen: false }),
+      abrirSair: () => this.setState({ modalTopo: 'sair', perfilOpen: false }),
+      confirmarSair: () => { this.setState({ modalTopo: null }); diz('Sessão encerrada. Registros assinados continuam no dossiê com seu nome e a data.'); },
+      papeisLista: PAPEIS.map(p => {
+        const on = p.n === ativo;
+        return { ...p, onClick: () => { this.setState({ papelAtivo: p.n, modalTopo: null }); diz('Papel ativo agora é ' + p.n + ', nível ' + p.nivel + '. A fila e as ações de assinatura passam a refletir esta autoridade.'); },
+          bd: on ? '#127670' : '#e0e7e5', bg: on ? '#eef7f6' : '#fff',
+          dot: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#fff', dotBd: on ? '#127670' : '#c9d5d3' };
+      })
+    };
+  }
+  componentDidMount() {
+    this._txFora = ev => { if (!ev.target.closest || !ev.target.closest('[data-tx-pop]')) this.setState({ perfilOpen: false, filialOpen: false, periodoOpen: false, menuOpen: false, versaoOpen: false, notifOpen: false }); };
+    this._txEsc = ev => { if (ev.key === 'Escape') this.setState({ perfilOpen: false, filialOpen: false, periodoOpen: false, menuOpen: false, versaoOpen: false, notifOpen: false, modalTopo: null }); };
+    document.addEventListener('mousedown', this._txFora);
+    document.addEventListener('keydown', this._txEsc);
+  }
+  navVals() {
+    const c = this.state.navC ?? (localStorage.getItem('tx-nav') === '1');
+    return { navW: c ? '84px' : '264px', navPad: c ? '14px' : '16px', navL: c ? 'none' : 'block', navSec: c ? 'none' : 'block', navCard: c ? 'none' : 'block', navFlip: c ? 'rotate(180deg)' : 'none',
+      navToggle: () => { const n = !c; localStorage.setItem('tx-nav', n ? '1' : '0'); this.setState({ navC: n }); } };
+  }
+  trilhasDef() {
+    const t = (num, nome, pct, tag) => ({ num, nome, pct, tag });
+    return [
+      t('01', 'Introdução ao GMP+ FSA para motoristas', 96, 'ok'), t('02', 'Responsabilidades no transporte de feed', 92, 'ok'),
+      t('03', 'Últimas três cargas e histórico T-3', 89, 'ok'), t('04', 'Cargas proibidas e incompatíveis', 85, 'ok'),
+      t('05', 'Regimes de limpeza A, B, C e D', 74, 'atencao'), t('06', 'Inspeção higiênica e estrutural', 91, 'ok'),
+      t('07', 'Uso do checklist Traxium', 97, 'ok'), t('08', 'Comunicação de desvios e contaminação', 81, 'ok'),
+      t('09', 'Proteção da carga no transporte', 66, 'atencao'), t('10', 'Boas práticas Gatekeeper', 58, 'critica')
+    ];
+  }
+  histDe(m) {
+    const ok = { c: '#1a8f57', glow: 'rgba(26,143,87,.15)' }, bad = { c: '#c43d3d', glow: 'rgba(196,61,61,.15)' }, neu = { c: '#9db0ae', glow: 'rgba(157,176,174,.2)' };
+    const fim = { line: 'transparent' }, meio = { line: '#e4eae8' };
+    const H = {
+      'Valdir Nunes': { hist: [
+          { t: 'Trilha 5 concluída · nota 8,5 · 1ª tentativa', quando: '30 jul 2025', sub: 'validade de 12 meses gravada na conclusão', ...ok, ...meio },
+          { t: 'Aviso de reciclagem enviado', quando: '30 jun e 15 jul', sub: 'dois lembretes por WhatsApp, sem conclusão', ...neu, ...meio },
+          { t: 'Validade venceu · bloqueio automático', quando: '31 jul', sub: 'não foi nota: a trilha venceu. Saiu da lista de elegíveis sozinho.', ...bad, ...fim }],
+        ctaT: 'Enviar reciclagem (45 min)', regra: 'concluiu: volta a ser elegível sozinho, sem edição manual' },
+      'João Bortolini': { hist: [
+          { t: 'Trilha 10 · 1ª tentativa · nota 5,5', quando: '12 jul', sub: 'mínima exigida: 7,0', ...bad, ...meio },
+          { t: 'Trilha 10 · 2ª tentativa · nota 6,0', quando: '15 jul', sub: 'segunda reprovação: regra trava novas tentativas', ...bad, ...meio },
+          { t: 'Bloqueado por reprovação dupla · reforço disparado', quando: '15 jul', sub: 'módulo de reforço obrigatório antes de nova avaliação', ...bad, ...fim }],
+        ctaT: 'Acompanhar reforço', regra: 'aprova na nova avaliação: elegibilidade volta sozinha' },
+      'Paulo Lima': { hist: [
+          { t: 'Trilha 9 concluída · nota 7,5 · 2ª tentativa', quando: '2 ago 2025', sub: 'validade de 12 meses', ...ok, ...meio },
+          { t: 'Validade venceu · bloqueio automático', quando: '4 ago', sub: 'não foi nota: venceu a reciclagem anual', ...bad, ...fim }],
+        ctaT: 'Enviar reciclagem (45 min)', regra: 'concluiu: volta a ser elegível sozinho' },
+      'Milton Costa': { hist: [
+          { t: 'Trilha 9 concluída · nota 9,0 · 1ª tentativa', quando: '18 ago 2025', sub: 'vence em 12 dias: ainda elegível', ...ok, ...meio },
+          { t: 'Aviso de reciclagem enviado', quando: 'hoje, 07:00', sub: 'disparo automático aos 30 dias do vencimento', ...neu, ...fim }],
+        ctaT: 'Reenviar aviso', regra: 'se vencer sem concluir, o bloqueio é automático' }
+    };
+    const padrao = { hist: [
+        { t: '10 trilhas vigentes · nota média 8,6', quando: '2025 a 2026', sub: 'nenhuma reprovação registrada', ...ok, ...meio },
+        { t: 'Próxima reciclagem programada', quando: m.prox.replace('reciclagem em ', ''), sub: 'aviso automático aos 30 dias', ...neu, ...fim }],
+      ctaT: 'Ver certificados', regra: 'histórico completo no relatório de auditoria' };
+    const d = H[m.nome] || padrao;
+    return { hist: d.hist, ctaT: d.ctaT, regra: d.regra,
+      cta: e => { e.stopPropagation(); this.avisar(d.ctaT + ': feito para ' + m.nome + '. Tudo fica gravado no registro dele.'); } };
+  }
+  renderVals() { return { ...this.navVals(), ...this.papelVals(), ...this.perfilVals(), ...this.mainVals() }; }
+  mainVals() {
+    const s = this.state, q = s.busca.trim().toLowerCase();
+    const tagT = { ok: { tagC: '#1a8f57', tagBg: '#e9f7ef', tag: 'saudável', b1: '#48c78e', b2: '#127670', iBg: '#e9f3f2', iC: '#0C5862' },
+      atencao: { tagC: '#b97514', tagBg: '#fdf3e2', tag: 'atenção', b1: '#f4c15d', b2: '#e8a33d', iBg: '#fdf3e2', iC: '#b97514' },
+      critica: { tagC: '#c43d3d', tagBg: '#fdecec', tag: 'crítica', b1: '#e46969', b2: '#c43d3d', iBg: '#fdecec', iC: '#c43d3d' } };
+    const trilhas = this.trilhasDef().filter(t => !q || t.nome.toLowerCase().includes(q)).map(t => ({
+      ...t, ...tagT[t.tag], pct: t.pct + '%',
+      abrir: () => this.setState({ dr: t.num }) }));
+    const stT = { ok: { st: 'Elegível', stC: '#1a8f57', stBg: '#e9f7ef', stDot: '#1a8f57', ring: '#cdeeda', b1: '#48c78e', b2: '#127670' },
+      vence: { st: 'Vence em breve', stC: '#b97514', stBg: '#fdf3e2', stDot: '#e8a33d', ring: '#f0debb', b1: '#f4c15d', b2: '#e8a33d' },
+      bloq: { st: 'Bloqueado', stC: '#c43d3d', stBg: '#fdecec', stDot: '#c43d3d', ring: '#f3d4d4', b1: '#e46969', b2: '#c43d3d' } };
+    const mot = [
+      { nome: 'Ivan Prado', vinculo: 'Lima Logística · subcontratado', ini: 'IP', a1: '#0C5862', a2: '#0E78B5', frac: '10/10', pct: '100%', est: 'ok', prox: 'reciclagem em 14 set', proxC: '#5c706e' },
+      { nome: 'Sérgio Ramos', vinculo: 'frota própria', ini: 'SR', a1: '#5b8def', a2: '#4c5bc0', frac: '10/10', pct: '100%', est: 'ok', prox: 'nada nos próximos 90d', proxC: '#5c706e' },
+      { nome: 'Valdir Nunes', vinculo: 'frota própria', ini: 'VN', a1: '#127670', a2: '#0E78B5', frac: '9/10', pct: '90%', est: 'bloq', prox: 'trilha 5 vencida há 6 dias', proxC: '#c43d3d' },
+      { nome: 'Milton Costa', vinculo: 'agregado', ini: 'MC', a1: '#e8a33d', a2: '#d97544', frac: '10/10', pct: '100%', est: 'vence', prox: 'trilha 9 vence em 12 dias', proxC: '#b97514' },
+      { nome: 'Paulo Lima', vinculo: 'frota própria', ini: 'PL', a1: '#48c78e', a2: '#127670', frac: '9/10', pct: '90%', est: 'bloq', prox: 'trilha 9 vencida há 2 dias', proxC: '#c43d3d' },
+      { nome: 'Edson Farias', vinculo: 'frota própria', ini: 'EF', a1: '#c43d3d', a2: '#93313f', frac: '10/10', pct: '100%', est: 'ok', prox: 'reciclagem em 30 out', proxC: '#5c706e' },
+      { nome: 'João Bortolini', vinculo: 'TAC · Gatekeeper', ini: 'JB', a1: '#127670', a2: '#0E78B5', frac: '8/10', pct: '80%', est: 'bloq', prox: 'trilha 10 reprovada 2×: reforço', proxC: '#c43d3d' }
+    ];
+    const motoristas = mot.filter(m => {
+      if (s.filtro !== 'all' && m.est !== s.filtro) return false;
+      if (q && !(m.nome + ' ' + m.vinculo).toLowerCase().includes(q)) return false;
+      return true;
+    }).map(m => ({ ...m, ...stT[m.est], ...this.histDe(m),
+      open: s.motAberto === m.nome,
+      toggle: () => this.setState({ motAberto: s.motAberto === m.nome ? null : m.nome }),
+      enviar: e => { e.stopPropagation(); this.avisar('Trilha pendente enviada a ' + m.nome + ' por WhatsApp. Conclusão recalcula a elegibilidade sozinha.'); } }));
+    const nF = k => mot.filter(m => m.est === k).length;
+    const mk = (key, label) => ({ label, onClick: () => this.setState({ filtro: key }),
+      bg: s.filtro === key ? '#0b2224' : '#fff', c: s.filtro === key ? '#fff' : '#3c4f4e',
+      sh: s.filtro === key ? 'none' : '0 2px 8px rgba(9,61,68,.06)' });
+    const drDef = this.trilhasDef().find(t => t.num === s.dr) || this.trilhasDef()[4];
+    const dr = { ...drDef,
+      versao: '3.2', proxVersao: '3.3', formato: '4 vídeos + PDF + avaliação', duracao: '45 min', validade: '12 meses',
+      concl: Math.round(drDef.pct / 100 * 46) + ' de 46', nota: '8,1', tent: '1,3',
+      aulas: [
+        { tipo: '▶', t: 'Por que o regime existe: contaminação cruzada', dur: '6 min' },
+        { tipo: '▶', t: 'Regime A e B na prática do pátio', dur: '9 min' },
+        { tipo: '▶', t: 'Regime C e D: agente, dosagem, tempo', dur: '11 min' },
+        { tipo: '☰', t: 'Guia visual de evidências por regime (PDF)', dur: 'leitura' },
+        { tipo: '?', t: 'Avaliação: 10 questões · nota mínima 7,0', dur: '10 min' }
+      ],
+      faltamN: 46 - Math.round(drDef.pct / 100 * 46),
+      faltam: [
+        { n: 'Valdir Nunes', sub: 'vencida há 6 dias · bloqueado', subC: '#c43d3d', ini: 'VN', a1: '#127670', a2: '#0E78B5' },
+        { n: 'João Bortolini', sub: 'nunca iniciou', subC: '#7c8f8d', ini: 'JB', a1: '#127670', a2: '#0E78B5' },
+        { n: 'Valdomiro Sanches', sub: 'parou no vídeo 2', subC: '#7c8f8d', ini: 'VS', a1: '#e8a33d', a2: '#b97514' }
+      ].map(f => ({ ...f, enviar: e => { e.stopPropagation(); this.avisar('Trilha ' + drDef.num + ' enviada a ' + f.n + ' por WhatsApp.'); } }))
+    };
+    const envTrilhas = this.trilhasDef().slice(0, 6).map(t => {
+      const on = s.envTrilha === t.num;
+      return { t: t.num + ' · ' + t.nome.split(' ').slice(0, 3).join(' '), onClick: () => this.setState({ envTrilha: t.num }),
+        bd: on ? '#127670' : '#e0e7e5', bg: on ? '#eef7f6' : '#fff', c: on ? '#0C5862' : '#3c4f4e' };
+    });
+    const envAlvos = [
+      { k: 'venc', t: 'Quem está vencido ou vence em 30 dias', sub: '9 motoristas' },
+      { k: 'gate', t: 'Todos em condição Gatekeeper', sub: '14 terceiros' },
+      { k: 'filial', t: 'Filial Rondonópolis inteira', sub: '46 motoristas' }
+    ].map(a => {
+      const on = s.envAlvo === a.k;
+      return { ...a, onClick: () => this.setState({ envAlvo: a.k }),
+        bd: on ? '#127670' : '#e0e7e5', bg: on ? '#eef7f6' : '#fff',
+        dot: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#fff', dotBd: on ? '#127670' : '#c9d5d3' };
+    });
+    const envPronto = s.envTrilha && s.envAlvo;
+    const matriz = mot.map(m => {
+      const exc = {
+        'Valdir Nunes': { 5: 'venc' }, 'Paulo Lima': { 9: 'venc' }, 'Milton Costa': { 9: 'vence' },
+        'João Bortolini': { 10: 'reprov', 9: 'nunca' }, 'Ivan Prado': { 9: 'vence' }
+      }[m.nome] || {};
+      return { nome: m.nome, ini: m.ini, a1: m.a1, a2: m.a2,
+        cels: this.trilhasDef().map(t => {
+          const num = parseInt(t.num, 10);
+          const st = exc[num] || 'ok';
+          const V = {
+            ok: { bg: 'linear-gradient(135deg,#48c78e,#127670)', c: '#fff', icon: '✓', det: 'vigente · nota 8,6 · 1ª tentativa · certificado disponível' },
+            vence: { bg: 'linear-gradient(135deg,#f4c15d,#e8a33d)', c: '#fff', icon: '!', det: 'vence em 12 dias · nota 9,0 · aviso automático já enviado' },
+            venc: { bg: 'linear-gradient(135deg,#e46969,#c43d3d)', c: '#fff', icon: '✕', det: 'vencida · era nota 8,5 · reciclagem pendente, bloqueia elegibilidade' },
+            reprov: { bg: 'linear-gradient(135deg,#e46969,#c43d3d)', c: '#fff', icon: '✕', det: 'reprovada 2× (5,5 e 6,0) · reforço obrigatório antes de nova tentativa' },
+            nunca: { bg: '#e4ebe9', c: '#9db0ae', icon: '·', det: 'nunca iniciou · trilha exigida pela condição Gatekeeper' }
+          }[st];
+          return { ...V, tip: m.nome + ' × trilha ' + t.num + ': ' + V.det.split(' · ')[0],
+            onClick: () => this.avisar(m.nome + ' × trilha ' + t.num + ' (' + t.nome + '): ' + V.det + '.') };
+        }) };
+    });
+    const modoMatriz = s.vista === 'matriz';
+    const tgl = on => ({ bg: on ? '#fff' : 'transparent', c: on ? '#0b2224' : '#7c8f8d', sh: on ? '0 2px 6px rgba(9,61,68,.12)' : 'none' });
+    return {
+      busca: s.busca, onBusca: e => this.setState({ busca: e.target.value }),
+      modoMatriz, matriz, matCols: this.trilhasDef().map(t => ({ num: t.num, nome: t.nome })),
+      verLista: () => this.setState({ vista: 'lista' }), verMatriz: () => this.setState({ vista: 'matriz' }),
+      vLisBg: tgl(!modoMatriz).bg, vLisC: tgl(!modoMatriz).c, vLisSh: tgl(!modoMatriz).sh,
+      vMatBg: tgl(modoMatriz).bg, vMatC: tgl(modoMatriz).c, vMatSh: tgl(modoMatriz).sh,
+      novaTrilha: () => this.avisar('Nova trilha: nasce como rascunho v1.0, invisível aos motoristas até a Qualidade publicar.'),
+      trilhas, motoristas: modoMatriz ? [] : motoristas, vazio: !modoMatriz && motoristas.length === 0,
+      filtros: [mk('all', 'Todos · ' + mot.length), mk('bloq', 'Bloqueados · ' + nF('bloq')), mk('vence', 'Vencem · ' + nF('vence'))],
+      jit: [
+        { icon: 'C', iBg: '#fdf3e2', iC: '#b97514', t: 'Carga exige limpeza C', sub: 'orientação enviada a Milton Costa · VG-2483', quando: 'há 2h' },
+        { icon: '⚑', iBg: '#fdecec', iC: '#c43d3d', t: 'Gatekeeper pela 1ª vez', sub: 'trilha 10 disparada a Valdomiro Sanches', quando: 'ontem' },
+        { icon: '✕', iBg: '#fdecec', iC: '#c43d3d', t: '2ª foto rejeitada no mês', sub: 'microtreinamento corretivo · Paulo Lima', quando: 'ontem' },
+        { icon: '?', iBg: '#eceffa', iC: '#4c5bc0', t: 'Produto sensível na rota', sub: 'instrução pré-confirmação · Ivan Prado', quando: 'seg' }
+      ],
+      drAberto: !!s.dr, drFechar: () => this.setState({ dr: null }), dr,
+      drNovaVersao: () => this.avisar('v' + dr.proxVersao + ' criada como rascunho. Publicar dispara reciclagem só para quem a regra do cliente exigir; conclusões da v' + dr.versao + ' não mudam.'),
+      drEditar: () => this.avisar('Editor da trilha aberto em rascunho: vídeos, PDF e questões. Nada muda para os motoristas até publicar.'),
+      drArquivar: () => this.avisar('Trilha ' + dr.num + ' arquivada: sai das exigências novas; conclusões e certificados existentes ficam válidos no histórico.'),
+      pararClique: e => e.stopPropagation(),
+      envAberto: s.env, abrirEnvio: () => this.setState({ env: true, envTrilha: null, envAlvo: null }),
+      envFechar: () => this.setState({ env: false }), envTrilhas, envAlvos,
+      envBg: envPronto ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#eef2f1',
+      envC: envPronto ? '#fff' : '#9db0ae', envSh: envPronto ? '0 8px 18px rgba(18,118,112,.35)' : 'none',
+      envCur: envPronto ? 'pointer' : 'not-allowed',
+      envConfirmar: () => { if (!envPronto) return; this.setState({ env: false }); this.avisar('Trilha ' + s.envTrilha + ' enviada ao grupo escolhido. Cada conclusão grava nota, tentativas e versão.'); },
+      exportarRel: () => this.avisar('Relatório de treinamento exportado: conclusões, notas, tentativas e versões, carimbado em 6 ago.'),
+      toast: !!s.toast, toastMsg: s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>
