@@ -579,9 +579,17 @@
         return;
       case 'trocarConjunto': {
         const antes = v.conjunto;
-        v.conjunto = d.conjunto; v.t3 = {}; v.checklist = null; v.verificacao = null;
+        const novo = db.conjuntos.find(x => x.id === d.conjunto);
+        if (!novo) throw new Error('conjunto inexistente');
+        v.conjunto = d.conjunto; v.t3 = {}; v.checklist = null; v.verificacao = null; v.termo = null; v.manual = null; v.liberacoes = []; v.regularizacoes = [];
+        if (novo.dono === 'propria') { v.tipo = 'propria'; v.transportador = 'propria'; v.motorista = novo.motorista; }
+        else {
+          const tn = db.transportadores.find(x => x.id === novo.dono);
+          v.tipo = 'afretamento'; v.transportador = tn.id; v.motorista = tn.tipo === 'TAC' ? tn.pessoa : (d.motorista || tn.motoristas[0]);
+        }
         v.link = v.link.enviadoEm ? { enviadoEm: v.link.enviadoEm } : {};
-        evento(db, op, v.id, 'Conjunto trocado: ' + antes + ' por ' + d.conjunto + '. T-3 e checklist voltam a ser pedidos.');
+        evento(db, op, v.id, 'Conjunto trocado (' + d.motivo + '). T-3, checklist e termo voltam a ser pedidos.');
+        v.retificacoes.push({ campo: 'conjunto', de: antes, para: d.conjunto, motivo: d.motivo || 'troca de conjunto', em: op.em, por: op.por });
         return;
       }
       case 'registrarOcorrencia': {
