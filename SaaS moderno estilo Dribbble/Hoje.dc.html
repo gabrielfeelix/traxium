@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Traxium: hoje</title>
+<script src="./tx-dados.js"></script>
+<script src="./tx-ui.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f2f5f4;font-family:'Hanken Grotesk',sans-serif;color:#0b2224;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0C5862;text-decoration:none}a:hover{color:#127670}
+input,textarea{font-family:'Hanken Grotesk',sans-serif;color:#0b2224}
+input::placeholder{color:#8ba09e}
+@keyframes txsh{from{background-position:-600px 0}to{background-position:600px 0}}
+@keyframes pulso{0%{box-shadow:0 0 0 0 rgba(14,120,181,.45)}70%{box-shadow:0 0 0 7px rgba(14,120,181,0)}100%{box-shadow:0 0 0 0 rgba(14,120,181,0)}}
+</style>
+</helmet>
+<div style="display:flex;min-height:100vh;min-width:1560px" data-screen-label="Hoje">
+  <!-- TX:SIDEBAR -->
+  <div data-tx-sidebar style="width:{{ navW }};flex:none;background:linear-gradient(178deg,#093D44,#0A4650);color:#fff;display:flex;flex-direction:column;padding:22px {{ navPad }};position:sticky;top:0;height:100vh;transition:width .25s ease;overflow-x:hidden;overflow-y:auto;z-index:20">
+    <a href="Hoje.dc.html" title="Traxium: ir para Hoje" style="display:flex;align-items:center;gap:10px;padding:4px 8px 20px;color:#fff">
+      <svg width="34" height="34" viewBox="0 0 32 32" style="flex:none"><defs><linearGradient id="txLogo" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1a9e93"></stop><stop offset="1" stop-color="#0E78B5"></stop></linearGradient></defs><polygon points="16,2.5 27.5,9 27.5,23 16,29.5 4.5,23 4.5,9" fill="url(#txLogo)"></polygon><polyline points="9,20 13,13 18,17 23,10" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></polyline><circle cx="9" cy="20" r="1.6" fill="#fff"></circle><circle cx="13" cy="13" r="1.6" fill="#fff"></circle><circle cx="18" cy="17" r="1.6" fill="#fff"></circle><circle cx="23" cy="10" r="1.6" fill="#fff"></circle></svg>
+      <div style="display:{{ navL }}"><div style="font-weight:800;font-size:17px;letter-spacing:.2px">Traxium</div><div style="font-size:10.5px;letter-spacing:1.6px;color:rgba(255,255,255,.5);text-transform:uppercase;white-space:nowrap">{{ tenantNome }}</div></div>
+    </a>
+    <div style="display:flex;flex-direction:column;gap:3px">
+      <div title="Hoje" style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px;background:linear-gradient(90deg,rgba(26,158,147,.35),rgba(14,120,181,.28));border:1px solid rgba(255,255,255,.14);font-size:14px;font-weight:700;color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><rect x="2.5" y="3.2" width="11" height="10.3" rx="2.4"></rect><line x1="2.5" y1="6.6" x2="13.5" y2="6.6"></line><line x1="5.6" y1="1.8" x2="5.6" y2="4.2"></line><line x1="10.4" y1="1.8" x2="10.4" y2="4.2"></line><circle cx="8" cy="10" r="1.3" fill="currentColor" stroke="none"></circle></svg><span data-tx-item="hoje" style="display:{{ navL }};white-space:nowrap">Hoje</span><span title="viagens de hoje com pendência" data-tx-badge="hoje" style="margin-left:auto;display:{{ sbHojeD }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;font-family:'Spline Sans Mono',monospace">{{ sbHoje }}</span></div>
+      <a href="Viagens v2.dc.html" title="Viagens" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M2.5 8h9"></path><path d="M8 4.5 11.5 8 8 11.5"></path></svg><span data-tx-item="viagens" style="display:{{ navL }};white-space:nowrap">Viagens</span></a>
+      <a href="Transportadores.dc.html" title="Transportadores" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" style="flex:none"><circle cx="5.4" cy="6.2" r="2.4"></circle><circle cx="10.8" cy="6.2" r="2.4"></circle><path d="M2.5 13c.6-2 1.7-3 3-3s2.3 1 2.9 3" stroke-linecap="round"></path></svg><span data-tx-item="transportadores" style="display:{{ navL }};white-space:nowrap">Transportadores</span><span title="documentos vencidos ou vencendo em 15 dias" data-tx-badge="transportadores" style="margin-left:auto;display:{{ sbTranspD }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;font-family:'Spline Sans Mono',monospace">{{ sbTransp }}</span></a>
+      <a href="Frota.dc.html" title="Frota própria" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" style="flex:none"><rect x="2" y="4.5" width="8" height="5.5" rx="1.4"></rect><path d="M10 6.5h2.4l1.6 2v1.5h-4z" stroke-linejoin="round"></path><circle cx="5" cy="11.8" r="1.4"></circle><circle cx="11.6" cy="11.8" r="1.4"></circle></svg><span data-tx-item="frota" style="display:{{ navL }};white-space:nowrap">Frota própria</span></a>
+      <a href="Auditoria.dc.html" title="Auditoria" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" style="flex:none"><rect x="2.6" y="2.2" width="8" height="10.5" rx="1.8"></rect><line x1="4.8" y1="5.4" x2="8.4" y2="5.4"></line><line x1="4.8" y1="8" x2="7.2" y2="8"></line><circle cx="10.6" cy="10.4" r="2.3"></circle><line x1="12.3" y1="12.1" x2="14" y2="13.8"></line></svg><span data-tx-item="auditoria" style="display:{{ navL }};white-space:nowrap">Auditoria</span></a>
+    </div>
+    <div style="margin-top:14px;display:flex;flex-direction:column;gap:2px">
+      <div onClick="{{ cadToggle }}" title="Cadastros" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px;cursor:pointer" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" style="flex:none"><path d="M8 2.2 13.5 5 8 7.8 2.5 5z"></path><path d="M2.5 8 8 10.8 13.5 8" stroke-linecap="round"></path><path d="M2.5 11 8 13.8 13.5 11" stroke-linecap="round"></path></svg><span data-tx-item="cadastros" style="display:{{ navL }};white-space:nowrap">Cadastros</span><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto;display:{{ navL }};transform:{{ cadChev }};transition:transform .2s;opacity:.7"><path d="M4.5 2.5 8 6l-3.5 3.5"></path></svg></div>
+      <sc-if value="{{ cadOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:1px;margin-top:2px">
+          <a href="Cadastros.dc.html?aba=produtos" data-tx-sub="produtos" style="display:flex;align-items:center;gap:10px;padding:7px 12px 7px 39px;border-radius:9px;font-size:13px;font-weight:{{ sbc.produtos.fw }};color:{{ sbc.produtos.c }};background:{{ sbc.produtos.bg }}" style-hover="color:#fff;background:rgba(255,255,255,.06)"><span style="width:5px;height:5px;border-radius:99px;background:{{ sbc.produtos.dot }};flex:none"></span>Produtos e regimes</a>
+          <a href="Cadastros.dc.html?aba=manual" data-tx-sub="manual" style="display:flex;align-items:center;gap:10px;padding:7px 12px 7px 39px;border-radius:9px;font-size:13px;font-weight:{{ sbc.manual.fw }};color:{{ sbc.manual.c }};background:{{ sbc.manual.bg }}" style-hover="color:#fff;background:rgba(255,255,255,.06)"><span style="width:5px;height:5px;border-radius:99px;background:{{ sbc.manual.dot }};flex:none"></span>Manual e treinamentos</a>
+          <a href="Cadastros.dc.html?aba=fornecedores" data-tx-sub="fornecedores" style="display:flex;align-items:center;gap:10px;padding:7px 12px 7px 39px;border-radius:9px;font-size:13px;font-weight:{{ sbc.fornecedores.fw }};color:{{ sbc.fornecedores.c }};background:{{ sbc.fornecedores.bg }}" style-hover="color:#fff;background:rgba(255,255,255,.06)"><span style="width:5px;height:5px;border-radius:99px;background:{{ sbc.fornecedores.dot }};flex:none"></span>Fornecedores</a>
+          <a href="Cadastros.dc.html?aba=filiais" data-tx-sub="filiais" style="display:flex;align-items:center;gap:10px;padding:7px 12px 7px 39px;border-radius:9px;font-size:13px;font-weight:{{ sbc.filiais.fw }};color:{{ sbc.filiais.c }};background:{{ sbc.filiais.bg }}" style-hover="color:#fff;background:rgba(255,255,255,.06)"><span style="width:5px;height:5px;border-radius:99px;background:{{ sbc.filiais.dot }};flex:none"></span>Filiais</a>
+        </div>
+      </sc-if>
+    </div>
+    <div style="margin-top:auto;padding-top:18px;display:flex;flex-direction:column;gap:2px">
+      <a href="Configuracoes v2.dc.html" title="Configurações" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" style="flex:none"><circle cx="8" cy="8" r="2.3"></circle><path d="M8 1.8v1.9M8 12.3v1.9M14.2 8h-1.9M3.7 8H1.8M12.4 3.6l-1.3 1.3M4.9 11.1l-1.3 1.3M12.4 12.4l-1.3-1.3M4.9 4.9 3.6 3.6" stroke-linecap="round"></path></svg><span data-tx-item="config" style="display:{{ navL }};white-space:nowrap">Configurações</span></a>
+      <a href="Link da Viagem.dc.html?id=VG-3122" target="_blank" rel="noopener" title="Abre em outra aba a página que o motorista recebe pelo WhatsApp" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><rect x="3.5" y="1.8" width="9" height="12.4" rx="2"></rect><line x1="6.5" y1="4" x2="9.5" y2="4"></line><circle cx="8" cy="11.7" r=".65" fill="currentColor" stroke="none"></circle></svg><span data-tx-item="link" style="display:{{ navL }};white-space:nowrap">Link do motorista</span><span style="margin-left:auto;display:{{ navL }};font-size:10px;font-weight:700;letter-spacing:.4px;padding:1px 7px;border-radius:99px;border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.7)">demo</span></a>
+      <a href="versao-anterior.html" title="Versão anterior" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M2.6 8a5.4 5.4 0 1 0 1.6-3.8"></path><path d="M2.4 2.6v2.6H5"></path><path d="M8 5.2V8l1.9 1.3"></path></svg><span data-tx-item="anterior" style="display:{{ navL }};white-space:nowrap">Versão anterior</span></a>
+      <div onClick="{{ navToggle }}" title="Recolher ou expandir o menu" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;cursor:pointer;font-size:13px;font-weight:600;color:rgba(255,255,255,.55)" style-hover="background:rgba(255,255,255,.08);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="transform:{{ navFlip }};transition:transform .25s;flex:none"><path d="M9.5 3 4.5 8l5 5"></path><line x1="12" y1="3" x2="12" y2="13"></line></svg><span style="display:{{ navL }};white-space:nowrap">Recolher menu</span></div>
+      <div style="display:{{ navL }};margin-top:10px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);padding:12px 14px">
+        <div style="font-size:11.5px;color:rgba(255,255,255,.5)">Base IDTF mantida pela Traxium</div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;margin-top:5px"><span style="width:8px;height:8px;border-radius:99px;background:#3ddc97;box-shadow:0 0 0 4px rgba(61,220,151,.18)"></span>{{ baseVersao }} vigente</div>
+      </div>
+    </div>
+  </div>
+  <!-- /TX:SIDEBAR -->
+  <div style="flex:1;display:flex;flex-direction:column;padding:24px 32px 48px;gap:20px;min-width:0">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div><div style="font-size:24px;font-weight:800">{{ titulo }}</div><div style="font-size:13.5px;color:#5c706e;margin-top:2px">{{ subtitulo }}</div></div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+        <div style="background:#fff;border:1px solid #e0e7e5;border-radius:11px;padding:0 14px;display:flex;gap:8px;align-items:center">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#7c8f8d" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.6"></circle><line x1="10.5" y1="10.5" x2="13.5" y2="13.5"></line></svg>
+          <input value="{{ busca }}" onInput="{{ onBusca }}" data-tx-busca placeholder="Placa, ordem, motorista…" style="border:none;outline:none;background:transparent;font-size:13.5px;padding:10px 0;width:210px">
+        </div>
+        <sc-if value="{{ temFiliais }}" hint-placeholder-val="{{ false }}">
+          <div data-tx-pop style="position:relative">
+            <div onClick="{{ onFilial }}" data-tx-filial style="background:#fff;border:1px solid #e0e7e5;border-radius:11px;padding:9px 14px;font-size:13.5px;font-weight:700;cursor:pointer" style-hover="border-color:#127670">{{ filialRot }} ▾</div>
+            <sc-if value="{{ filialOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;right:0;top:46px;background:#fff;border:1px solid #e4eae8;border-radius:14px;box-shadow:0 16px 40px rgba(9,61,68,.16);padding:6px;width:250px;z-index:60;display:flex;flex-direction:column">
+                <sc-for list="{{ filiais }}" as="fl" hint-placeholder-count="5">
+                  <div onClick="{{ fl.onClick }}" data-tx-filial-op="{{ fl.id }}" style="display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;background:{{ fl.bg }}" style-hover="background:#f6f9f8"><span style="width:7px;height:7px;border-radius:99px;background:{{ fl.dot }}"></span><span style="flex:1">{{ fl.n }}</span><span style="font-family:'Spline Sans Mono',monospace;font-size:11.5px;color:#7c8f8d">{{ fl.q }}</span></div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+        <span onClick="{{ abrirNova }}" data-tx-nova-viagem style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;border-radius:99px;padding:10px 20px;font-size:13.5px;font-weight:800;cursor:pointer;box-shadow:0 6px 14px rgba(18,118,112,.3)" style-hover="transform:translateY(-1px)">Nova viagem</span>
+        <!-- TX:PERFIL -->
+        <div data-tx-pop style="position:relative">
+          <div onClick="{{ onPerfil }}" title="{{ uNome }}" data-tx-avatar style="width:38px;height:38px;border-radius:99px;background:linear-gradient(135deg,{{ uG1 }},{{ uG2 }});color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13.5px;box-shadow:0 0 0 3px #fff,0 0 0 4.5px #d8e4e2;cursor:pointer" style-hover="box-shadow:0 0 0 3px #fff,0 0 0 4.5px #127670">{{ uIni }}</div>
+          <sc-if value="{{ perfilOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;right:0;top:48px;background:#fff;border:1px solid #e4eae8;border-radius:16px;box-shadow:0 16px 40px rgba(9,61,68,.16);padding:6px;width:268px;z-index:80;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;gap:11px;padding:11px 12px;border-bottom:1px solid #f0f4f3;margin-bottom:4px">
+                <span style="width:38px;height:38px;border-radius:99px;background:linear-gradient(135deg,{{ uG1 }},{{ uG2 }});color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none">{{ uIni }}</span>
+                <div style="min-width:0"><div style="font-size:13.5px;font-weight:800">{{ uNome }}</div><div style="font-size:11.5px;color:#5c706e">{{ uCargo }}</div></div>
+              </div>
+              <div onClick="{{ abrirPerfil }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer" style-hover="background:#f6f9f8">Meu perfil</div>
+              <div onClick="{{ abrirPrefs }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer" style-hover="background:#f6f9f8">Avisos</div>
+              <div onClick="{{ abrirEntrar }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px" style-hover="background:#f6f9f8">Entrar como<span style="font-size:10.5px;font-weight:700;color:#0C5862;border:1px solid #cfe3e1;border-radius:99px;padding:1px 9px;white-space:nowrap">{{ uPapel }}</span></div>
+              <div style="height:1px;background:#f0f4f3;margin:5px 8px"></div>
+              <div onClick="{{ abrirSair }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;color:#c43d3d" style-hover="background:#fdf6f6">Sair</div>
+            </div>
+          </sc-if>
+        </div>
+<!-- /TX:PERFIL -->
+      </div>
+    </div>
+
+    <sc-if value="{{ loading }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <sc-for list="{{ skel }}" as="sk" hint-placeholder-count="5"><div style="height:74px;border-radius:20px;background:linear-gradient(90deg,#eef2f1 25%,#f7faf9 40%,#eef2f1 55%);background-size:600px 100%;animation:txsh 1.3s linear infinite"></div></sc-for>
+      </div>
+    </sc-if>
+
+    <!-- MESA DO AFRETADOR -->
+    <sc-if value="{{ modoMesa }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+        <sc-for list="{{ contadores }}" as="ct" hint-placeholder-count="4">
+          <div onClick="{{ ct.onClick }}" style="background:#fff;border:1.5px solid {{ ct.bd }};border-radius:18px;padding:16px 20px;cursor:pointer;transition:all .15s" style-hover="box-shadow:0 10px 24px rgba(9,61,68,.08)">
+            <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#5c706e"><span style="width:9px;height:9px;border-radius:99px;background:{{ ct.dot }};box-shadow:0 0 0 3px {{ ct.ring }}"></span>{{ ct.n }}</div>
+            <div style="font-size:32px;font-weight:800;margin-top:4px;font-variant-numeric:tabular-nums">{{ ct.v }}</div>
+            <div style="font-size:12px;color:#7c8f8d">{{ ct.sub }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ mesaVazia }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:50px 20px;display:flex;flex-direction:column;align-items:center;gap:10px">
+          <span style="width:50px;height:50px;border-radius:99px;background:linear-gradient(135deg,#48c78e,#127670);display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 6.5 12 13 4.5"></path></svg></span>
+          <div style="font-size:16px;font-weight:800">{{ vazioTitulo }}</div>
+          <div style="font-size:13.5px;color:#5c706e">{{ vazioSub }}</div>
+        </div>
+      </sc-if>
+
+      <sc-for list="{{ grupos }}" as="gr" hint-placeholder-count="3">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div onClick="{{ gr.toggle }}" style="display:flex;align-items:center;gap:10px;padding:4px 4px 0;cursor:pointer">
+            <span style="width:10px;height:10px;border-radius:99px;background:{{ gr.dot }};box-shadow:0 0 0 3px {{ gr.ring }}"></span>
+            <div style="font-size:16px;font-weight:800">{{ gr.n }}</div>
+            <span style="font-family:'Spline Sans Mono',monospace;font-size:13px;font-weight:600;color:#5c706e">{{ gr.q }}</span>
+            <div style="font-size:12.5px;color:#7c8f8d">{{ gr.sub }}</div>
+            <span style="margin-left:auto;font-size:12.5px;font-weight:700;color:#0C5862">{{ gr.toggleRot }}</span>
+          </div>
+          <sc-if value="{{ gr.aberto }}" hint-placeholder-val="{{ true }}">
+            <sc-for list="{{ gr.linhas }}" as="ln" hint-placeholder-count="3">
+              <div data-tx-linha="{{ ln.id }}" style="background:#fff;border:1px solid #eef2f1;border-radius:18px;box-shadow:0 2px 10px rgba(9,61,68,.04);display:flex;align-items:center;gap:16px;padding:13px 18px;transition:box-shadow .2s" style-hover="box-shadow:0 12px 30px rgba(9,61,68,.09)">
+                <a href="{{ ln.href }}" style="display:flex;align-items:center;gap:16px;flex:1;min-width:0;color:inherit">
+                  <div style="width:62px;flex:none;text-align:center"><div style="font-family:'Spline Sans Mono',monospace;font-size:17px;font-weight:600">{{ ln.janela }}</div><div style="font-size:10.5px;color:{{ ln.prazoC }};font-weight:700">{{ ln.prazo }}</div></div>
+                  <span style="width:42px;height:42px;border-radius:99px;flex:none;background:linear-gradient(135deg,{{ ln.g1 }},{{ ln.g2 }});color:#fff;font-size:13.5px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #fff,0 0 0 4.5px {{ ln.anel }}">{{ ln.ini }}</span>
+                  <div style="min-width:0;width:270px;flex:none">
+                    <div style="display:flex;gap:8px;align-items:baseline"><span style="font-size:14.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ln.motorista }}</span><span style="font-size:11.5px;color:#7c8f8d;white-space:nowrap">{{ ln.tipo }}</span></div>
+                    <div style="font-size:12.5px;color:#5c706e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ln.produto }} para {{ ln.destino }}</div>
+                    <div style="font-family:'Spline Sans Mono',monospace;font-size:11.5px;color:#3c4f4e;margin-top:2px">{{ ln.ordem }}  {{ ln.placas }}</div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:6px;width:250px;flex:none">
+                    <div style="display:flex;gap:4px"><sc-for list="{{ ln.etapas }}" as="et" hint-placeholder-count="5"><span title="{{ et.tip }}" style="flex:1;height:6px;border-radius:99px;background:{{ et.bg }}"></span></sc-for></div>
+                    <div style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:{{ ln.linkC }}"><span style="width:8px;height:8px;border-radius:99px;background:{{ ln.linkDot }};animation:{{ ln.pulso }}"></span>{{ ln.linkRot }}<span style="font-family:'Spline Sans Mono',monospace;font-weight:500;color:#7c8f8d">{{ ln.linkHora }}</span></div>
+                  </div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:13px;font-weight:700;color:{{ ln.faltaC }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ln.falta }}</div>
+                    <div style="font-size:11.5px;color:#7c8f8d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ ln.quem }}</div>
+                  </div>
+                </a>
+                <sc-if value="{{ ln.temAcao }}" hint-placeholder-val="{{ false }}">
+                  <span onClick="{{ ln.onAcao }}" data-tx-acao-linha="{{ ln.acaoK }}" style="background:{{ ln.acaoBg }};color:{{ ln.acaoC }};box-shadow:{{ ln.acaoSh }};font-size:12.5px;font-weight:800;border-radius:99px;padding:8px 16px;cursor:pointer;white-space:nowrap;flex:none" style-hover="transform:translateY(-1px)">{{ ln.acao }}</span>
+                </sc-if>
+              </div>
+            </sc-for>
+          </sc-if>
+        </div>
+      </sc-for>
+    </sc-if>
+
+    <!-- PAINEL DA QUALIDADE -->
+    <sc-if value="{{ modoPainel }}" hint-placeholder-val="{{ false }}">
+      <div style="position:relative;overflow:hidden;border-radius:22px;background:linear-gradient(115deg,#093D44,#0C5862 60%,#0E78B5 140%);color:#fff;padding:24px 28px;display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr;gap:26px;align-items:center">
+        <div style="position:absolute;right:-60px;top:-120px;width:340px;height:340px;border-radius:99px;background:radial-gradient(circle,rgba(255,255,255,.14),transparent 65%)"></div>
+        <div style="position:relative">
+          <div style="font-size:11px;font-weight:700;letter-spacing:1.4px;color:rgba(255,255,255,.6)">PRONTIDÃO PARA AUDITORIA, ÚLTIMOS 45 DIAS</div>
+          <div style="display:flex;align-items:baseline;gap:10px;margin-top:6px"><span style="font-size:40px;font-weight:800">{{ prPct }}</span><span style="font-size:13px;color:rgba(255,255,255,.75)">{{ prSub }}</span></div>
+          <div style="margin-top:10px;height:10px;border-radius:99px;overflow:hidden;background:repeating-linear-gradient(-45deg,rgba(255,255,255,.08) 0 5px,rgba(255,255,255,.15) 5px 10px)"><div style="height:100%;width:{{ prPct }};background:linear-gradient(90deg,#48c78e,#9fe0c3)"></div></div>
+          <div style="font-size:11.5px;color:rgba(255,255,255,.6);margin-top:7px">viagem completa = T-3, verificação aprovada, termo quando gatekeeper e CT-e conciliado</div>
+        </div>
+        <sc-for list="{{ heroNums }}" as="hn" hint-placeholder-count="3">
+          <div style="position:relative;border-left:1px solid rgba(255,255,255,.14);padding-left:22px"><div style="font-size:12.5px;color:rgba(255,255,255,.7)">{{ hn.n }}</div><div style="font-size:30px;font-weight:800;margin-top:4px">{{ hn.v }}</div><div style="font-size:11.5px;color:rgba(255,255,255,.55)">{{ hn.sub }}</div></div>
+        </sc-for>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+        <sc-for list="{{ cardsFilial }}" as="cf" hint-placeholder-count="4">
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:16px 18px;display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;gap:8px"><div style="font-size:15px;font-weight:800">{{ cf.n }}</div><span style="font-size:11px;color:#7c8f8d;font-family:'Spline Sans Mono',monospace">{{ cf.reg }}</span></div>
+            <div style="display:flex;gap:14px;font-size:12.5px"><span><b style="font-size:18px">{{ cf.hoje }}</b> hoje</span><span style="color:{{ cf.pendC }}"><b style="font-size:18px">{{ cf.pend }}</b> com pendência</span></div>
+            <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:{{ cf.ocC }};font-weight:700"><span style="width:7px;height:7px;border-radius:99px;background:{{ cf.ocDot }}"></span>{{ cf.oc }}</div>
+            <div style="font-size:12px;color:#5c706e">afretador: {{ cf.afretador }}</div>
+            <span onClick="{{ cf.onClick }}" data-tx-abrir-mesa="{{ cf.id }}" style="margin-top:2px;align-self:flex-start;font-size:12.5px;font-weight:800;color:#0C5862;cursor:pointer" style-hover="color:#127670">Abrir a mesa da filial →</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 420px;gap:20px;align-items:start">
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:20px 22px">
+          <div style="display:flex;align-items:center;gap:10px"><div style="font-size:16px;font-weight:800">Pendências de registro</div><div style="font-size:12.5px;color:#5c706e">viagens asseguradas já carregadas com item faltando; quem trata é a qualidade</div><a href="Viagens v2.dc.html?conciliar=1" style="margin-left:auto;font-size:12.5px;font-weight:800">Conciliar CT-e em lote →</a></div>
+          <div style="display:flex;flex-direction:column;margin-top:10px">
+            <sc-for list="{{ pendRegs }}" as="pr" hint-placeholder-count="4">
+              <a href="{{ pr.href }}" style="display:flex;align-items:center;gap:12px;padding:11px 4px;border-bottom:1px solid #f0f4f3;color:inherit" style-hover="background:#f7faf9">
+                <span style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;font-weight:600;width:84px;flex:none">{{ pr.ordem }}</span>
+                <span style="font-size:12px;color:#5c706e;width:90px;flex:none">{{ pr.filial }}, {{ pr.data }}</span>
+                <span style="font-size:13px;font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ pr.quem }}</span>
+                <div style="display:flex;gap:5px"><sc-for list="{{ pr.itens }}" as="pi" hint-placeholder-count="1"><span style="font-size:11px;font-weight:700;color:{{ pi.c }};border:1px solid {{ pi.bd }};border-radius:99px;padding:2px 9px;white-space:nowrap">{{ pi.n }}</span></sc-for></div>
+              </a>
+            </sc-for>
+            <sc-if value="{{ semPend }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;color:#5c706e;padding:16px 4px">Nenhuma pendência de registro no período. Tudo pronto para a amostra.</div></sc-if>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:20px">
+            <div style="display:flex;align-items:center"><div style="font-size:15.5px;font-weight:800">Vencimentos</div><a href="Transportadores.dc.html?filtro=vencendo" style="margin-left:auto;font-size:12.5px;font-weight:800">Ver todos →</a></div>
+            <div style="margin-top:14px;height:12px;border-radius:99px;overflow:hidden;display:flex;background:repeating-linear-gradient(-45deg,#f0f4f3 0 5px,#e4ebe9 5px 10px)">
+              <div style="width:{{ vW1 }};background:linear-gradient(90deg,#e46969,#c43d3d)"></div><div style="width:{{ vW2 }};background:linear-gradient(90deg,#f4c15d,#e8a33d)"></div><div style="width:{{ vW3 }};background:linear-gradient(90deg,#9fc9c6,#6ba8a4)"></div>
+            </div>
+            <div style="display:flex;gap:14px;margin-top:9px;font-size:12px;color:#5c706e;font-weight:600"><span><span style="display:inline-block;width:8px;height:8px;border-radius:3px;background:#c43d3d;margin-right:5px"></span>{{ v15 }} até 15 dias</span><span><span style="display:inline-block;width:8px;height:8px;border-radius:3px;background:#e8a33d;margin-right:5px"></span>{{ v30 }} até 30</span><span><span style="display:inline-block;width:8px;height:8px;border-radius:3px;background:#6ba8a4;margin-right:5px"></span>{{ v60 }} até 60</span></div>
+            <div style="display:flex;flex-direction:column;margin-top:8px">
+              <sc-for list="{{ vencs }}" as="vc" hint-placeholder-count="5">
+                <a href="{{ vc.href }}" style="display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid #f0f4f3;color:inherit" style-hover="background:#f7faf9">
+                  <div style="min-width:0;flex:1"><div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ vc.t }}</div><div style="font-size:11.5px;color:#5c706e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ vc.dono }}</div></div>
+                  <span style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:{{ vc.c }};white-space:nowrap"><span style="width:7px;height:7px;border-radius:99px;background:{{ vc.c }}"></span>{{ vc.d }}</span>
+                </a>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:20px">
+            <div style="font-size:15.5px;font-weight:800">Auditoria</div>
+            <div style="font-size:12.5px;color:#5c706e;margin-top:4px;line-height:1.5">{{ simTxt }}</div>
+            <a href="Auditoria.dc.html" style="display:inline-block;margin-top:10px;font-size:12.5px;font-weight:800">Rastrear placa ou montar amostra →</a>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+
+  <!-- NOVA VIAGEM -->
+  <sc-if value="{{ novaAberta }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModal }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:28px">
+      <div onClick="{{ pararClique }}" data-tx-modal="nova" style="background:#fff;border-radius:24px;width:700px;max-height:92vh;overflow:auto;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center;gap:10px"><div style="font-size:17px;font-weight:800">{{ nTitulo }}</div><span style="font-size:12px;font-weight:700;color:#5c706e">filial {{ nFilialNome }}</span><span onClick="{{ fecharModal }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px">✕</span></div>
+        <div style="display:flex;gap:6px;margin-top:12px"><sc-for list="{{ nPassos }}" as="np" hint-placeholder-count="3"><div style="flex:1"><div style="height:4px;border-radius:99px;background:{{ np.bg }}"></div><div style="font-size:11.5px;font-weight:700;color:{{ np.c }};margin-top:5px">{{ np.n }}</div></div></sc-for></div>
+
+        <sc-if value="{{ nP1 }}" hint-placeholder-val="{{ false }}">
+          <label data-tx-importar-pdf style="margin-top:16px;display:flex;align-items:center;gap:14px;border:1.5px dashed {{ pdfBd }};background:{{ pdfBg }};border-radius:16px;padding:14px 16px;cursor:pointer">
+            <input type="file" accept=".pdf" onChange="{{ onPdf }}" style="display:none">
+            <span style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#127670,#0E78B5);display:flex;align-items:center;justify-content:center;flex:none"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2H4.5A1.5 1.5 0 0 0 3 3.5v9A1.5 1.5 0 0 0 4.5 14h7a1.5 1.5 0 0 0 1.5-1.5V6z"></path><path d="M9 2v4h4"></path></svg></span>
+            <div style="flex:1"><div style="font-size:14px;font-weight:800">{{ pdfTitulo }}</div><div style="font-size:12px;color:#5c706e">{{ pdfSub }}</div></div>
+            <span onClick="{{ usarOrdemExemplo }}" data-tx-ordem-exemplo style="font-size:12px;font-weight:800;color:#0C5862;white-space:nowrap">usar ordem de exemplo</span>
+          </label>
+          <div style="font-size:11.5px;color:#7c8f8d;margin-top:8px">ou preencha o mínimo:</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px">
+            <div style="position:relative"><div style="font-size:12px;font-weight:800;color:#3c4f4e">Produto</div><input value="{{ nProdBusca }}" onInput="{{ onProdBusca }}" data-tx-campo="produto" placeholder="farelo, milho, casquinha…" style="width:100%;margin-top:6px;border:1px solid #dfe7e5;border-radius:11px;padding:9px 12px;font-size:13.5px;outline:none">
+              <sc-if value="{{ nProdLista }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:0;right:0;top:66px;background:#fff;border:1px solid #e4eae8;border-radius:12px;box-shadow:0 14px 30px rgba(9,61,68,.14);padding:5px;z-index:5"><sc-for list="{{ nProdOps }}" as="po" hint-placeholder-count="3"><div onClick="{{ po.onClick }}" data-tx-produto-op="{{ po.id }}" style="padding:7px 10px;border-radius:8px;cursor:pointer;font-size:13px" style-hover="background:#f6f9f8"><b>{{ po.n }}</b> <span style="color:#7c8f8d;font-size:11.5px">{{ po.via }}</span></div></sc-for></div></sc-if>
+            </div>
+            <div><div style="font-size:12px;font-weight:800;color:#3c4f4e">Ordem de carregamento</div><input value="{{ nOrdem }}" onInput="{{ onOrdem }}" data-tx-campo="ordem" placeholder="OC 48140" style="width:100%;margin-top:6px;border:1px solid #dfe7e5;border-radius:11px;padding:9px 12px;font-size:13.5px;outline:none;font-family:'Spline Sans Mono',monospace"></div>
+            <div><div style="font-size:12px;font-weight:800;color:#3c4f4e">Embarcador</div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"><sc-for list="{{ nEmbs }}" as="ne" hint-placeholder-count="3"><span onClick="{{ ne.onClick }}" style="font-size:12px;font-weight:700;border-radius:99px;padding:5px 11px;cursor:pointer;border:1.5px solid {{ ne.bd }};background:{{ ne.bg }};color:{{ ne.c }}">{{ ne.n }}</span></sc-for></div></div>
+            <div><div style="font-size:12px;font-weight:800;color:#3c4f4e">Destinatário</div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"><sc-for list="{{ nDests }}" as="nd" hint-placeholder-count="3"><span onClick="{{ nd.onClick }}" style="font-size:12px;font-weight:700;border-radius:99px;padding:5px 11px;cursor:pointer;border:1.5px solid {{ nd.bd }};background:{{ nd.bg }};color:{{ nd.c }}">{{ nd.n }}</span></sc-for></div></div>
+            <div><div style="font-size:12px;font-weight:800;color:#3c4f4e">Carregamento</div><div style="display:flex;gap:6px;margin-top:6px;align-items:center"><sc-for list="{{ nDias }}" as="nx" hint-placeholder-count="2"><span onClick="{{ nx.onClick }}" style="font-size:12px;font-weight:700;border-radius:99px;padding:5px 11px;cursor:pointer;border:1.5px solid {{ nx.bd }};background:{{ nx.bg }};color:{{ nx.c }}">{{ nx.n }}</span></sc-for><input value="{{ nJanela }}" onInput="{{ onJanela }}" data-tx-campo="janela" style="width:76px;border:1px solid #dfe7e5;border-radius:11px;padding:6px 10px;font-size:13px;outline:none;font-family:'Spline Sans Mono',monospace"></div></div>
+            <div><div style="font-size:12px;font-weight:800;color:#3c4f4e">Peso (t)</div><input value="{{ nPeso }}" onInput="{{ onPeso }}" data-tx-campo="peso" style="width:100%;margin-top:6px;border:1px solid #dfe7e5;border-radius:11px;padding:9px 12px;font-size:13.5px;outline:none;font-family:'Spline Sans Mono',monospace"></div>
+          </div>
+          <div style="margin-top:12px;display:flex;align-items:center;gap:9px;border-radius:12px;padding:10px 13px;background:{{ asBg }};font-size:12.5px;color:{{ asC }};font-weight:700"><span style="width:8px;height:8px;border-radius:99px;background:{{ asDot }}"></span>{{ asTxt }}</div>
+        </sc-if>
+
+        <sc-if value="{{ nP2 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;gap:6px;margin-top:16px"><sc-for list="{{ nTipos }}" as="nt" hint-placeholder-count="2"><span onClick="{{ nt.onClick }}" data-tx-tipo="{{ nt.k }}" style="font-size:12.5px;font-weight:700;border-radius:99px;padding:6px 14px;cursor:pointer;border:1.5px solid {{ nt.bd }};background:{{ nt.bg }};color:{{ nt.c }}">{{ nt.n }}</span></sc-for></div>
+          <sc-if value="{{ nTerceiro }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:12px;font-weight:800;color:#3c4f4e;margin-top:14px">PLACA DO CAVALO OU CPF DO MOTORISTA</div>
+            <input value="{{ nQuem }}" onInput="{{ onQuem }}" data-tx-campo="quem" placeholder="Ex.: RCB 9M15 ou 633.081.277-19" style="width:100%;margin-top:6px;border:1px solid #dfe7e5;border-radius:12px;padding:10px 12px;font-size:14px;outline:none;font-family:'Spline Sans Mono',monospace">
+            <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px">
+              <sc-for list="{{ nAchados }}" as="na" hint-placeholder-count="2">
+                <div onClick="{{ na.onClick }}" data-tx-achado="{{ na.id }}" style="display:flex;align-items:center;gap:12px;border:1.5px solid {{ na.bd }};background:{{ na.bg }};border-radius:14px;padding:10px 13px;cursor:pointer">
+                  <span style="width:16px;height:16px;border-radius:99px;border:2px solid {{ na.dotBd }};background:{{ na.dot }};flex:none"></span>
+                  <span style="width:34px;height:34px;border-radius:99px;background:linear-gradient(135deg,{{ na.g1 }},{{ na.g2 }});color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none">{{ na.ini }}</span>
+                  <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:800">{{ na.nome }}</div><div style="font-family:'Spline Sans Mono',monospace;font-size:11.5px;color:#3c4f4e">{{ na.placas }}</div><div style="font-size:11.5px;color:{{ na.docC }};margin-top:1px">{{ na.docs }}</div></div>
+                </div>
+              </sc-for>
+              <sc-if value="{{ nNaoAchou }}" hint-placeholder-val="{{ false }}">
+                <div style="border:1.5px dashed #c9d5d3;border-radius:14px;padding:12px 14px">
+                  <div style="font-size:13px;font-weight:800">Não encontrado na base. Cadastro mínimo:</div>
+                  <div style="font-size:12px;color:#5c706e;margin-top:2px">O resto (CNH, RNTRC, CRLV) o motorista manda pelo link.</div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+                    <input value="{{ cmNome }}" onInput="{{ onCmNome }}" data-tx-campo="cm-nome" placeholder="Nome do motorista" style="border:1px solid #dfe7e5;border-radius:11px;padding:9px 12px;font-size:13.5px;outline:none">
+                    <input value="{{ cmTel }}" onInput="{{ onCmTel }}" data-tx-campo="cm-tel" placeholder="(66) 99999-0000" style="border:1px solid #dfe7e5;border-radius:11px;padding:9px 12px;font-size:13.5px;outline:none">
+                    <input value="{{ cmCpf }}" onInput="{{ onCmCpf }}" data-tx-campo="cm-cpf" placeholder="CPF" style="border:1px solid #dfe7e5;border-radius:11px;padding:9px 12px;font-size:13.5px;outline:none;font-family:'Spline Sans Mono',monospace">
+                    <input value="{{ cmPlacas }}" onInput="{{ onCmPlacas }}" data-tx-campo="cm-placas" placeholder="Placas: cavalo, carreta 1, carreta 2" style="border:1px solid #dfe7e5;border-radius:11px;padding:9px 12px;font-size:13.5px;outline:none;font-family:'Spline Sans Mono',monospace">
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+          <sc-if value="{{ nPropria }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:6px;margin-top:14px">
+              <sc-for list="{{ nConjs }}" as="nc" hint-placeholder-count="4">
+                <div onClick="{{ nc.onClick }}" style="display:flex;align-items:center;gap:12px;border:1.5px solid {{ nc.bd }};background:{{ nc.bg }};border-radius:14px;padding:10px 13px;cursor:{{ nc.cur }};opacity:{{ nc.op }}">
+                  <span style="width:16px;height:16px;border-radius:99px;border:2px solid {{ nc.dotBd }};background:{{ nc.dot }};flex:none"></span>
+                  <div style="flex:1"><div style="font-family:'Spline Sans Mono',monospace;font-size:13px;font-weight:600">{{ nc.placas }}</div><div style="font-size:11.5px;color:{{ nc.subC }}">{{ nc.sub }}</div></div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </sc-if>
+
+        <sc-if value="{{ nP3 }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:16px;display:flex;align-items:center;gap:12px;background:#eef7f6;border-radius:16px;padding:14px 16px">
+            <span style="width:36px;height:36px;border-radius:99px;background:linear-gradient(135deg,#48c78e,#1a8f57);display:flex;align-items:center;justify-content:center;flex:none"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5 6.5 12 13 4.5"></path></svg></span>
+            <div><div style="font-size:14px;font-weight:800">{{ nCriadaTxt }}</div><div style="font-size:12px;color:#3c4f4e">Agora mande o link: o motorista informa as cargas, as fotos e assina pelo celular.</div></div>
+          </div>
+          <div style="margin-top:12px;background:#e7f1ec;border-radius:16px;padding:14px"><div style="background:#fff;border-radius:4px 14px 14px 14px;padding:11px 13px;font-size:13px;line-height:1.5">{{ nMensagem }}</div></div>
+        </sc-if>
+
+        <div style="display:flex;gap:8px;margin-top:18px;justify-content:flex-end;align-items:center">
+          <span style="font-size:12px;color:#7c8f8d;margin-right:auto">{{ nDica }}</span>
+          <sc-if value="{{ nVoltar }}" hint-placeholder-val="{{ false }}"><span onClick="{{ nVoltarFn }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer">Voltar</span></sc-if>
+          <sc-if value="{{ nP3 }}" hint-placeholder-val="{{ false }}"><a href="{{ nHref }}" style="background:#f0f4f3;color:#0b2224;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px">Abrir viagem</a></sc-if>
+          <span onClick="{{ nAvancar }}" data-tx-confirmar style="background:{{ ctaBg }};color:{{ ctaC }};box-shadow:{{ ctaSh }};cursor:{{ ctaCur }};font-size:13.5px;font-weight:800;border-radius:99px;padding:10px 22px">{{ nAvancarRot }}</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <!-- TX:MODAIS -->
+  <sc-if value="{{ modalPerfil }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:470px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Meu perfil</div><span onClick="{{ fecharModalTopo }}" title="Fechar" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;flex:none" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:14px">
+          <span style="width:72px;height:72px;border-radius:99px;background:linear-gradient(135deg,{{ uG1 }},{{ uG2 }});color:#fff;font-size:24px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #fff,0 0 0 6px #e4eae8">{{ uIni }}</span>
+          <div style="font-size:17px;font-weight:800;margin-top:4px">{{ uNome }}</div>
+          <div style="font-size:12.5px;color:#5c706e">{{ uEmail }}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-top:18px">
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Papel</span><span style="font-weight:700;text-align:right">{{ uCargo }}</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Escopo</span><span style="font-weight:700;text-align:right">{{ uFiliais }}</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Alçada de liberação</span><span style="font-weight:700;text-align:right">{{ uAlcada }}</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Liberações assinadas</span><span style="font-family:'Spline Sans Mono',monospace;font-weight:600">{{ uAssinadas }}</span></div>
+        </div>
+        <div style="font-size:12px;color:#5c706e;margin-top:12px;line-height:1.55">{{ uAlcadaSub }}</div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalPrefs }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:520px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Avisos</div><span onClick="{{ fecharModalTopo }}" title="Fechar" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;flex:none" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:3px">O que chega para você, na tela e no celular.</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:14px">
+          <sc-for list="{{ prefs }}" as="pf" hint-placeholder-count="4">
+            <div onClick="{{ pf.onClick }}" style="display:flex;align-items:center;gap:12px;border:1px solid #eef2f1;border-radius:14px;padding:12px 14px;cursor:pointer" style-hover="border-color:#c9d5d3">
+              <div style="flex:1"><div style="font-size:13.5px;font-weight:700">{{ pf.t }}</div><div style="font-size:11.5px;color:#5c706e">{{ pf.sub }}</div></div>
+              <span style="width:40px;height:23px;border-radius:99px;background:{{ pf.swBg }};position:relative;flex:none;transition:background .2s"><span style="position:absolute;top:2.5px;left:{{ pf.swPos }};width:18px;height:18px;border-radius:99px;background:#fff;box-shadow:0 1px 4px rgba(9,34,36,.25);transition:left .2s"></span></span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalEntrar }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:540px;max-height:88vh;overflow:auto;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">{{ entrarTitulo }}</div><span onClick="{{ fecharModalTopo }}" title="Fechar" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;flex:none" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:3px;line-height:1.55">{{ entrarSub }}</div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-top:14px">
+          <sc-for list="{{ usuariosLista }}" as="ul" hint-placeholder-count="6">
+            <div onClick="{{ ul.onClick }}" data-tx-usuario="{{ ul.id }}" style="display:flex;align-items:center;gap:12px;border:1.5px solid {{ ul.bd }};background:{{ ul.bg }};border-radius:15px;padding:11px 14px;cursor:pointer;transition:all .15s" style-hover="border-color:#127670">
+              <span style="width:18px;height:18px;border-radius:99px;border:2.5px solid {{ ul.dotBd }};background:{{ ul.dot }};flex:none"></span>
+              <span style="width:34px;height:34px;border-radius:99px;flex:none;background:linear-gradient(135deg,{{ ul.g1 }},{{ ul.g2 }});color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ ul.ini }}</span>
+              <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:800">{{ ul.nome }}</div><div style="font-size:11.5px;color:#5c706e;margin-top:1px">{{ ul.cargo }}, {{ ul.escopo }}</div></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalSair }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:440px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Sair da conta</div><span onClick="{{ fecharModalTopo }}" title="Fechar" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;flex:none" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;align-items:center;gap:12px;background:#f7faf9;border-radius:15px;padding:13px 15px;margin-top:16px">
+          <span style="width:40px;height:40px;border-radius:99px;flex:none;background:linear-gradient(135deg,{{ uG1 }},{{ uG2 }});color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ uIni }}</span>
+          <div><div style="font-size:13.5px;font-weight:800">{{ uNome }}</div><div style="font-size:11.5px;color:#5c706e">{{ uCargo }}</div></div>
+        </div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:14px;line-height:1.6">O que você registrou continua na viagem, com seu nome e a hora. O que estava aberto num formulário sem confirmar não foi gravado.</div>
+        <div style="display:flex;gap:8px;margin-top:18px;justify-content:flex-end">
+          <span onClick="{{ fecharModalTopo }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer" style-hover="background:#e4ebe9">Cancelar</span>
+          <span onClick="{{ confirmarSair }}" style="background:linear-gradient(135deg,#e46969,#c43d3d);color:#fff;font-size:13.5px;font-weight:800;border-radius:99px;padding:10px 22px;cursor:pointer;box-shadow:0 8px 18px rgba(196,61,61,.3)" style-hover="transform:translateY(-1px)">Sair</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div data-tx-toast style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:1200;background:#0b2224;color:#fff;border-radius:99px;padding:12px 22px;font-size:13.5px;font-weight:600;box-shadow:0 16px 40px rgba(9,34,36,.35);display:flex;align-items:center;gap:10px;max-width:760px"><span style="width:20px;height:20px;border-radius:99px;background:linear-gradient(135deg,#48c78e,#127670);display:flex;align-items:center;justify-content:center;font-size:11px;flex:none">✓</span>{{ toastMsg }}</div>
+  </sc-if>
+<!-- /TX:MODAIS -->
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { loading: true, busca: '', abertos: { falta: true, bloq: true, pronta: false }, nova: false };
+  componentDidMount() { TX.ui.montar(this); }
+  avisar(m) { TX.ui.avisar(this, m); }
+  filialAtual() {
+    const u = TX.sessao();
+    const p = this.state.filial || TX.ui.param('filial') || TX.ui.lerLS('tx-v2-filial', null);
+    if (u.filiais.length === 1) return u.filiais[0];
+    if (p === 'todas' || (p && u.filiais.includes(p))) return p;
+    return 'todas';
+  }
+  setFilial(f) { TX.ui.gravarLS('tx-v2-filial', f); this.setState({ filial: f, filialOpen: false }); try { history.replaceState(null, '', 'Hoje.dc.html?filial=' + f); } catch (e) {} }
+  aoTrocarUsuario() { this.setState({ filial: null }); }
+  renderVals() { return Object.assign({}, TX.ui.base(this), this.telaVals(), this.novaVals()); }
+
+  linha(v) {
+    const U = TX.ui, F = TX.fmt;
+    const dec = TX.decidir(v), le = TX.linkEstado(v);
+    const mot = TX.pessoa(v.motorista), conj = TX.conjunto(v.conjunto), t = TX.transportador(v.transportador), prod = TX.produto(v.produto), dest = TX.destinatario(v.destinatario);
+    const tomR = U.tomResultado(dec);
+    const ck = v.checklist, vf = v.verificacao, l = v.link || {};
+    const conferir = dec.falta.some(f => f.k === 'verificacao' && /esperando conferência/.test(f.detalhe));
+    const gk = dec.cobertura === 'gatekeeper';
+    const fz = (on, atual) => on ? 'linear-gradient(90deg,#48c78e,#1a8f57)' : atual ? 'linear-gradient(90deg,#f4c15d,#e8a33d)' : '#e4eae8';
+    const etapas = [
+      { tip: 'link enviado', bg: fz(!!l.enviadoEm, !l.enviadoEm) },
+      { tip: 'três últimas cargas', bg: fz(dec.t3.every(c => c.completo) && dec.t3.length, !!l.abertoEm) },
+      { tip: 'checklist com fotos', bg: fz(ck && ck.enviadoEm, !!l.abertoEm) },
+      { tip: 'conferência do afretador', bg: fz(vf && vf.estado === 'aprovada' && !conferir, conferir || (vf && vf.estado === 'devolvida')) },
+      { tip: gk ? 'termo assinado' : 'ciência do manual', bg: fz(gk ? !!v.termo : !!v.manual, !!l.abertoEm) }
+    ];
+    const ltom = { nao_enviado: U.tom('falta'), enviado: U.tom('info'), aberto: U.tom('info'), preenchendo: U.tom('info'), concluido: U.tom('ok'), cancelado: U.tom('na') }[le.k];
+    const f0 = dec.falta[0];
+    let falta, faltaC, quem;
+    if (dec.resultado === 'pronta') { falta = dec.porAutoridade ? 'Pronta por autoridade' : 'Pronta para assegurar'; faltaC = '#1a8f57'; quem = 'declaração do CT-e liberada'; }
+    else { falta = dec.resultado === 'tecnico' ? 'Bloqueio técnico: ' + f0.detalhe.split(':')[0] : dec.resultado === 'bloqueada' ? 'Bloqueada: ' + ({ ocorrencia: 'transportador em revisão após ocorrência grave', 'docs-conj': 'CRLV vencido no conjunto', 'docs-mot': 'CNH vencida', 'docs-transp': 'RNTRC vencido', produto: 'produto não é ração' }[f0.k] || (dec.cobertura === 'gatekeeper' && f0.k === 'cobertura' ? 'filial sem comunicação ao organismo certificador' : f0.o.toLowerCase())) : f0.o; faltaC = tomR.c; quem = dec.falta.length > 1 ? f0.quem + ' e mais ' + (dec.falta.length - 1) : f0.quem; }
+    let acao = null;
+    if (le.k === 'nao_enviado' && !v.cancelada) acao = { k: 'link', n: 'Enviar link', fn: () => this.mandarLink(v), prim: true };
+    else if (conferir) acao = { k: 'conferir', n: 'Conferir fotos', fn: () => { location.href = 'Viagem.dc.html?id=' + v.id + '#tx-verif'; }, prim: true };
+    else if (dec.resultado === 'pronta') acao = { k: 'declaracao', n: 'Copiar declaração', fn: () => { U.copiar(TX.DECLARACAO_CTE); this.avisar('Declaração copiada: "' + TX.DECLARACAO_CTE + '". Cole no CT-e da ' + v.ordem + '.'); }, prim: false };
+    const min = (+v.janela.slice(0, 2)) * 60 + (+v.janela.slice(3, 5));
+    const hm = TX.agoraHM(); const ag = (+hm.slice(0, 2)) * 60 + (+hm.slice(3, 5));
+    const dif = min - ag;
+    return { id: v.id, href: 'Viagem.dc.html?id=' + v.id, janela: v.janela, prazo: v.data !== TX.HOJE ? F.curta(v.data) : dif < 0 ? 'passou' : dif < 120 ? 'em ' + dif + ' min' : 'em ' + Math.round(dif / 60) + ' h', prazoC: dif < 120 && dec.resultado !== 'pronta' ? '#c43d3d' : '#7c8f8d',
+      ini: F.iniciais(mot.nome), g1: mot.g1, g2: mot.g2, anel: tomR.c, motorista: mot.nome, tipo: v.tipo === 'propria' ? 'frota própria' : t.tipo === 'ETC' ? t.nome.replace(' Ltda', '') : 'TAC',
+      produto: prod.nome, destino: dest.nome, ordem: v.ordem, placas: TX.placasDoConjunto(conj).join(' '),
+      etapas, linkRot: le.n, linkC: ltom.c, linkDot: ltom.dot, linkHora: le.em ? F.hora(le.em) : (l.enviadoEm ? F.hora(l.enviadoEm) : ''), pulso: le.k === 'preenchendo' || le.k === 'aberto' ? 'pulso 1.6s infinite' : 'none',
+      falta, faltaC, quem, temAcao: !!acao, acao: acao ? acao.n : '', acaoK: acao ? acao.k : '', onAcao: acao ? acao.fn : null,
+      acaoBg: acao && acao.prim ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#f0f4f3', acaoC: acao && acao.prim ? '#fff' : '#0b2224', acaoSh: acao && acao.prim ? '0 6px 14px rgba(18,118,112,.28)' : 'none',
+      _r: dec.resultado, _busca: TX.norm([v.ordem, v.id, mot.nome, prod.nome, dest.nome, TX.placasDoConjunto(conj).join(' '), TX.nomeTransportador(t)].join(' ')) };
+  }
+  mandarLink(v) {
+    TX.ui.copiar(TX.mensagemLink(v));
+    TX.fazer('enviarLink', { id: v.id, canal: 'copiado' });
+    this.avisar('Mensagem copiada para ' + TX.pessoa(v.motorista).nome.split(' ')[0] + '. Cole no WhatsApp; a linha mostra quando ele abrir.');
+  }
+
+  telaVals() {
+    const s = this.state, U = TX.ui, F = TX.fmt;
+    const u = TX.sessao();
+    const fil = this.filialAtual();
+    const todas = fil === 'todas';
+    const filNome = todas ? 'todas as filiais' : 'filial ' + TX.filial(fil).nome;
+    const base = {
+      titulo: todas ? 'Hoje na empresa' : 'Hoje em ' + TX.filial(fil).nome,
+      subtitulo: F.extenso(TX.HOJE).replace(/^./, c => c.toUpperCase()) + ', ' + (todas ? 'painel da qualidade com as ' + u.filiais.length + ' filiais' : 'mesa do afretador'),
+      busca: s.busca, onBusca: e => this.setState({ busca: e.target.value }),
+      temFiliais: u.filiais.length > 1, filialOpen: !!s.filialOpen, onFilial: () => this.setState({ filialOpen: !s.filialOpen }),
+      filialRot: todas ? 'Todas as filiais' : 'Filial ' + TX.filial(fil).nome,
+      filiais: (u.filiais.length > 1 ? ['todas'] : []).concat(u.filiais).map(id => { const on = id === fil; const q = TX.viagensDoDia(id).filter(v => !v.cancelada).length; return { id, n: id === 'todas' ? 'Todas as filiais' : TX.filial(id).nome + ' ' + TX.filial(id).uf, q: q + ' hoje', bg: on ? '#eef7f6' : '#fff', dot: on ? '#127670' : '#c9d5d3', onClick: () => this.setFilial(id) }; }),
+      skel: [1, 2, 3, 4, 5], modoMesa: !s.loading && !todas, modoPainel: !s.loading && todas,
+      abrirNova: () => this.setState({ nova: true, nPasso: 1, nProd: null, nProdBusca: '', nOrdem: '', nEmb: null, nDest: null, nDia: TX.HOJE, nJanela: '16:00', nPeso: '37', nPdf: null, nTipo: 'terceiro', nQuem: '', nSel: null, cmNome: '', cmTel: '', cmCpf: '', cmPlacas: '', nCriada: null })
+    };
+    if (todas) return Object.assign(base, this.painelVals(u));
+    const q = TX.norm(s.busca);
+    const linhas = TX.viagensDoDia(fil).filter(v => !v.cancelada).map(v => this.linha(v)).filter(l => !q || l._busca.includes(q)).sort((a, b) => a.janela.localeCompare(b.janela));
+    const g = k => linhas.filter(l => k === 'bloq' ? (l._r === 'bloqueada' || l._r === 'tecnico') : k === 'pronta' ? (l._r === 'pronta' || l._r === 'nao_assegurada') : l._r === 'falta');
+    const abertos = s.abertos;
+    const conferir = linhas.filter(l => l.acaoK === 'conferir').length;
+    const semLink = linhas.filter(l => l.acaoK === 'link').length;
+    const GR = [['falta', 'Falta algo', U.tom('falta'), 'o que falta e quem resolve, por ordem de carregamento'], ['bloq', 'Bloqueadas', U.tom('bloqueio'), 'cada uma diz o motivo e o caminho'], ['pronta', 'Prontas para assegurar', U.tom('ok'), 'declaração do CT-e liberada']];
+    const grupos = GR.map(([k, n, tm, sub]) => { const ls = g(k); return { k, n, q: ls.length, sub, dot: tm.dot, ring: tm.ring, aberto: !!abertos[k] && ls.length > 0, linhas: ls, toggleRot: ls.length ? (abertos[k] ? 'recolher' : 'mostrar') : '', toggle: () => this.setState({ abertos: Object.assign({}, abertos, { [k]: !abertos[k] }) }) }; }).filter(x => x.q > 0);
+    const cont = (n, v, sub, tm, k) => ({ n, v, sub, dot: tm.dot, ring: tm.ring, bd: '#e4eae8', onClick: () => this.setState({ abertos: { falta: k === 'falta' || k === 'todas', bloq: k === 'bloq' || k === 'todas', pronta: k === 'pronta' } }) });
+    return Object.assign(base, {
+      contadores: [
+        cont('Falta algo', g('falta').length, conferir + ' com fotos a conferir, ' + semLink + ' sem link', U.tom('falta'), 'falta'),
+        cont('Bloqueadas', g('bloq').length, g('bloq').filter(l => l._r === 'tecnico').length + ' bloqueio técnico', U.tom('bloqueio'), 'bloq'),
+        cont('Prontas', g('pronta').length, 'declaração liberada', U.tom('ok'), 'pronta'),
+        cont('Motoristas no link agora', linhas.filter(l => /preenchimento|aberto/.test(l.linkRot)).length, 'abriram e ainda não terminaram', U.tom('info'), 'todas')
+      ],
+      grupos, mesaVazia: linhas.length === 0,
+      vazioTitulo: q ? 'Nada encontrado' : 'Nenhuma viagem hoje em ' + TX.filial(fil).nome,
+      vazioSub: q ? 'Nenhuma viagem de hoje bate com "' + s.busca + '". Busque por placa, ordem ou nome do motorista.' : 'Crie a viagem a partir da ordem de carregamento em Nova viagem.'
+    });
+  }
+
+  painelVals(u) {
+    const U = TX.ui, F = TX.fmt;
+    const pr = TX.prontidao('todas');
+    const pend = TX.pendenciasRegistro('todas');
+    const venc = TX.vencimentos(60);
+    const hojeTodas = TX.viagensDoDia('todas').filter(v => !v.cancelada);
+    const assegPeriodo = TX.db.viagens.filter(v => !v.cancelada && v.assegurada && v.data >= TX.addDias(TX.HOJE, -45) && v.data <= TX.HOJE);
+    const gk = assegPeriodo.filter(v => TX.coberturaDe(v) === 'gatekeeper').length;
+    const sim = TX.db.simulacoes[TX.db.simulacoes.length - 1];
+    const v15 = venc.filter(x => x.dias <= 15).length, v30 = venc.filter(x => x.dias > 15 && x.dias <= 30).length, v60 = venc.filter(x => x.dias > 30).length, vt = Math.max(1, venc.length);
+    return {
+      prPct: pr.pct + '%', prSub: pr.completas + ' de ' + pr.total + ' viagens asseguradas completas',
+      heroNums: [
+        { n: 'Viagens hoje', v: hojeTodas.length, sub: hojeTodas.filter(v => TX.decidir(v).resultado !== 'pronta').length + ' com pendência' },
+        { n: 'Protocolos gatekeeper', v: gk, sub: 'viagens com TAC ou ETC não certificada, 45 dias' },
+        { n: 'Documentos a vencer', v: venc.length, sub: v15 + ' em até 15 dias' }
+      ],
+      cardsFilial: TX.db.filiais.filter(f => u.filiais.includes(f.id)).map(f => { const hj = TX.viagensDoDia(f.id).filter(v => !v.cancelada); const pd = hj.filter(v => TX.decidir(v).resultado !== 'pronta').length; const oc = f.comunicacaoOC; return { id: f.id, n: f.nome + ' ' + f.uf + (f.matriz ? ', matriz' : ''), reg: f.registro, hoje: hj.length, pend: pd, pendC: pd ? '#b97514' : '#5c706e', oc: oc ? 'Gatekeeper comunicado ao OC em ' + F.curta(oc.data) : 'Gatekeeper não comunicado ao OC', ocC: oc ? '#1a8f57' : '#c43d3d', ocDot: oc ? '#1a8f57' : '#c43d3d', afretador: TX.usuario(f.afretador).nome, onClick: () => this.setFilial(f.id) }; }),
+      pendRegs: pend.map(p => { const v = p.viagem; return { href: 'Viagem.dc.html?id=' + v.id, ordem: v.ordem, filial: TX.filial(v.filial).nome, data: F.curta(v.data), quem: TX.pessoa(v.motorista).nome + ', ' + TX.produto(v.produto).nome.toLowerCase(), itens: p.itens.map(i => ({ n: i.n, c: i.leve ? '#b85a2e' : '#b97514', bd: i.leve ? '#f0d3bf' : '#f3dfb8' })) }; }),
+      semPend: pend.length === 0,
+      vW1: Math.round(v15 / vt * 100) + '%', vW2: Math.round(v30 / vt * 100) + '%', vW3: Math.round(v60 / vt * 100) + '%', v15, v30, v60,
+      vencs: venc.slice(0, 6).map(x => ({ t: x.tipo + ' ' + x.ref, dono: x.dono, href: x.href, d: x.estado === 'vencido' ? 'vencido' : x.dias + ' dias', c: x.dias <= 15 ? '#c43d3d' : x.dias <= 30 ? '#b97514' : '#5c706e' })),
+      simTxt: sim ? 'Última simulação de rastreabilidade: ' + F.data(sim.em.slice(0, 10)) + ', ' + sim.pedido.toLowerCase() + ', em ' + Math.floor(sim.duracaoMin / 60) + 'h' + String(sim.duracaoMin % 60).padStart(2, '0') + '. O limite da auditoria é 4 horas.' : 'Nenhuma simulação registrada.'
+    };
+  }
+
+  novaVals() {
+    const s = this.state, U = TX.ui, F = TX.fmt;
+    if (!s.nova) return { novaAberta: false, fecharModal: () => {}, ctaBg: '', ctaC: '', ctaSh: '', ctaCur: '' };
+    const fil = this.filialAtual() === 'todas' ? (TX.sessao().filiais[0]) : this.filialAtual();
+    const filObj = TX.filial(fil);
+    const p = s.nPasso || 1;
+    const fechar = () => this.setState({ nova: false });
+    const prod = s.nProd ? TX.produto(s.nProd) : null;
+    const dest = s.nDest ? TX.destinatario(s.nDest) : null;
+    const v1 = !!prod && !!s.nEmb && !!s.nDest && /^\d{2}:\d{2}$/.test(s.nJanela || '') && +(s.nPeso || 0) > 0 && (s.nOrdem || '').trim().length >= 3;
+    const assegura = prod && dest ? prod.racao && dest.certificado : null;
+    // passo 2
+    const q = TX.norm(s.nQuem || '');
+    const qd = TX.soDigitos(s.nQuem || '');
+    const achados = q.length >= 3 ? TX.db.transportadores.filter(t => {
+      const nomes = t.tipo === 'TAC' ? [TX.pessoa(t.pessoa).nome, TX.pessoa(t.pessoa).cpf] : [t.nome, t.cnpj].concat((t.motoristas || []).map(m => TX.pessoa(m).cpf));
+      const placas = (t.conjuntos || []).map(c => TX.placasDoConjunto(c).join(' ')).join(' ');
+      return TX.norm(nomes.join(' ') + ' ' + placas).includes(q) || (qd.length >= 5 && nomes.some(n => TX.soDigitos(n).startsWith(qd)));
+    }).slice(0, 4) : [];
+    const placasCm = (s.cmPlacas || '').toUpperCase().split(/[,;]+/).map(x => x.trim().replace(/^([A-Z]{3})-?(\w{4})$/, '$1 $2')).filter(x => /^[A-Z]{3} \w{4}$/.test(x));
+    const cmOk = (s.cmNome || '').trim().length >= 5 && TX.soDigitos(s.cmTel).length >= 10 && placasCm.length >= 2;
+    const terceiro = s.nTipo === 'terceiro';
+    const selConj = terceiro ? (s.nSel ? TX.conjunto((TX.transportador(s.nSel).conjuntos || [])[0]) : null) : (s.nSel ? TX.conjunto(s.nSel) : null);
+    const v2 = terceiro ? (!!s.nSel || (achados.length === 0 && q.length >= 3 && cmOk)) : !!s.nSel;
+    const criar = () => {
+      const d = { filial: fil, produto: s.nProd, peso: +String(s.nPeso).replace(',', '.'), embarcador: s.nEmb, destinatario: s.nDest, data: s.nDia, janela: s.nJanela, ordem: s.nOrdem.trim(), origemOrdem: s.nPdf ? 'pdf' : 'digitada' };
+      if (!terceiro) Object.assign(d, { tipo: 'propria', transportador: 'propria', conjunto: s.nSel, motorista: TX.conjunto(s.nSel).motorista });
+      else if (s.nSel) { const t = TX.transportador(s.nSel); Object.assign(d, { transportador: t.id, conjunto: t.conjuntos[0], motorista: t.tipo === 'TAC' ? t.pessoa : t.motoristas[0] }); }
+      else Object.assign(d, { novoTAC: { nome: s.cmNome.trim(), telefone: s.cmTel.trim(), cpf: s.cmCpf, placas: placasCm } });
+      const id = TX.fazer('criarViagem', d);
+      this.setState({ nPasso: 3, nCriada: id });
+    };
+    const c = U.cta(p === 1 ? v1 : p === 2 ? v2 : true);
+    const criada = s.nCriada ? TX.viagem(s.nCriada) : null;
+    const vals = {
+      novaAberta: true, fecharModal: fechar, pararClique: e => e.stopPropagation(),
+      nTitulo: p === 3 ? 'Viagem criada' : 'Nova viagem', nFilialNome: filObj.nome,
+      nPassos: [['Ordem', 1], ['Quem carrega', 2], ['Link', 3]].map(([n, i]) => ({ n, bg: i <= p ? 'linear-gradient(90deg,#127670,#0E78B5)' : '#e4eae8', c: i <= p ? '#0C5862' : '#9db0ae' })),
+      nP1: p === 1, nP2: p === 2, nP3: p === 3,
+      pdfBd: s.nPdf ? '#127670' : '#c9d5d3', pdfBg: s.nPdf ? '#eef7f6' : '#fff', pdfTitulo: s.nPdf ? 'Ordem importada: ' + s.nPdf : 'Importar o PDF da ordem de carregamento', pdfSub: s.nPdf ? 'Produto, embarcador, destinatário, data e peso preenchidos. Confira abaixo.' : 'O caminho mais rápido: o TMS já gerou a ordem, não precisa digitar de novo.',
+      onPdf: e => { const f = e.target.files && e.target.files[0]; if (f) this.preencherOrdem(f.name); },
+      usarOrdemExemplo: e => { e.preventDefault(); e.stopPropagation(); this.preencherOrdem('OC-48140.pdf'); },
+      nProdBusca: s.nProdBusca, onProdBusca: e => this.setState({ nProdBusca: e.target.value, nProd: null }),
+      nProdLista: !s.nProd && (s.nProdBusca || '').length >= 2, nProdOps: TX.buscarProdutos(s.nProdBusca, 5).map(r => ({ id: r.produto.id, n: r.produto.nome, via: r.via ? 'achado por "' + r.via + '"' : r.produto.racao ? 'ração' : 'não é ração', onClick: () => this.setState({ nProd: r.produto.id, nProdBusca: r.produto.nome }) })),
+      nOrdem: s.nOrdem, onOrdem: e => this.setState({ nOrdem: e.target.value }),
+      nEmbs: TX.db.embarcadores.map(x => Object.assign({ n: x.nome, onClick: () => this.setState({ nEmb: x.id }) }, U.sel(s.nEmb === x.id))),
+      nDests: TX.db.destinatarios.map(x => Object.assign({ n: x.nome, onClick: () => this.setState({ nDest: x.id }) }, U.sel(s.nDest === x.id))),
+      nDias: [[TX.HOJE, 'hoje'], [TX.addDias(TX.HOJE, 1), 'amanhã']].map(([d, n]) => Object.assign({ n, onClick: () => this.setState({ nDia: d }) }, U.chip(s.nDia === d))),
+      nJanela: s.nJanela, onJanela: e => this.setState({ nJanela: e.target.value }), nPeso: s.nPeso, onPeso: e => this.setState({ nPeso: e.target.value.replace(/[^0-9,.]/g, '') }),
+      asTxt: assegura === null ? 'Escolha produto e destinatário: o sistema diz se a viagem leva a declaração GMP+.' : assegura ? 'Viagem assegurada GMP+: produto é ração e o destinatário é certificado.' : 'Sem declaração GMP+: ' + (prod.racao ? 'destinatário não certificado.' : prod.nome + ' não é ração.'),
+      asBg: assegura === null ? '#f7faf9' : assegura ? '#eef7f6' : '#fdf6ec', asC: assegura === null ? '#5c706e' : assegura ? '#0C5862' : '#b97514', asDot: assegura === null ? '#c9d5d3' : assegura ? '#1a8f57' : '#e8a33d',
+      nTipos: [['terceiro', 'TAC ou ETC'], ['propria', 'Frota própria']].map(([k, n]) => Object.assign({ k, n, onClick: () => this.setState({ nTipo: k, nSel: null }) }, U.chip(s.nTipo === k))),
+      nTerceiro: terceiro, nPropria: !terceiro,
+      nQuem: s.nQuem, onQuem: e => this.setState({ nQuem: e.target.value, nSel: null }),
+      nAchados: achados.map(t => { const nome = TX.nomeTransportador(t); const qual = TX.qualificacao(t); const p0 = t.tipo === 'TAC' ? TX.pessoa(t.pessoa) : null; const ruins = qual.docs.filter(d => d.estado !== 'ok').length; const sx = U.sel(s.nSel === t.id); return Object.assign({ id: t.id, nome: nome + (t.tipo === 'ETC' ? ' (ETC)' : ''), ini: F.iniciais(nome), g1: p0 ? p0.g1 : '#0C5862', g2: p0 ? p0.g2 : '#0E78B5', placas: (t.conjuntos || []).map(c => TX.placasDoConjunto(c).join(' ')).join('  /  '), docs: qual.ocorrencia ? 'em revisão após ocorrência grave: a Direção decide' : ruins ? qual.n + ': o motorista atualiza pelo link' : 'documentos em dia, dados voltam preenchidos', docC: qual.ocorrencia ? '#c43d3d' : ruins ? '#b97514' : '#1a8f57', onClick: () => this.setState({ nSel: t.id }) }, sx); }),
+      nNaoAchou: q.length >= 3 && achados.length === 0,
+      cmNome: s.cmNome, onCmNome: e => this.setState({ cmNome: e.target.value }), cmTel: s.cmTel, onCmTel: e => this.setState({ cmTel: e.target.value }), cmCpf: s.cmCpf, onCmCpf: e => this.setState({ cmCpf: e.target.value }), cmPlacas: s.cmPlacas, onCmPlacas: e => this.setState({ cmPlacas: e.target.value }),
+      nConjs: TX.db.conjuntos.filter(c => c.dono === 'propria').map(c => { const no = c.escopo && c.escopo.no; const sx = U.sel(s.nSel === c.id, no || !assegura); return Object.assign({ placas: TX.placasDoConjunto(c).join('  '), sub: (no ? 'no escopo GMP+, ' : 'fora do escopo: ' + (c.escopo.motivo || '') + ', ') + TX.pessoa(c.motorista).nome, subC: no ? '#5c706e' : '#c43d3d', onClick: () => { if (no || !assegura) this.setState({ nSel: c.id }); else this.avisar('Conjunto fora do escopo GMP+ não é selecionável para viagem assegurada.'); } }, sx); }),
+      nCriadaTxt: criada ? criada.ordem + ' criada para ' + TX.pessoa(criada.motorista).nome : '', nMensagem: criada ? TX.mensagemLink(criada) : '', nHref: criada ? 'Viagem.dc.html?id=' + criada.id : '',
+      nDica: p === 1 ? 'Produto, ordem, embarcador, destinatário, horário e peso.' : p === 2 ? 'Placa ou CPF trazem o cadastro e os documentos de volta.' : '',
+      nVoltar: p === 2, nVoltarFn: () => this.setState({ nPasso: 1 }),
+      nAvancarRot: p === 1 ? 'Continuar' : p === 2 ? 'Criar viagem' : 'Copiar mensagem do link',
+      nAvancar: () => {
+        if (p === 1) { if (v1) this.setState({ nPasso: 2 }); return; }
+        if (p === 2) { if (v2) criar(); return; }
+        TX.ui.copiar(TX.mensagemLink(criada)); TX.fazer('enviarLink', { id: criada.id, canal: 'copiado' });
+        this.setState({ nova: false }); this.avisar('Mensagem copiada. A ' + criada.ordem + ' está na mesa com o link enviado.');
+      },
+      ctaBg: c.bg, ctaC: c.c, ctaSh: c.sh, ctaCur: c.cur
+    };
+    return vals;
+  }
+  preencherOrdem(nome) {
+    const fil = this.filialAtual() === 'todas' ? TX.sessao().filiais[0] : this.filialAtual();
+    const emb = { SOR: 'em-agrosorriso', RON: 'em-planalto', RVD: 'em-granosrv', PNG: 'em-litoral' }[fil];
+    this.setState({ nPdf: nome, nProd: 'farelo-soja', nProdBusca: 'Farelo de soja', nOrdem: 'OC ' + (48140 + TX.db.viagens.length - 30), nEmb: emb, nDest: 'de-nutrimax', nDia: TX.HOJE, nJanela: '18:30', nPeso: '37' });
+  }
+}
+</script>
+</body>
+</html>

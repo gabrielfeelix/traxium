@@ -52,11 +52,14 @@
     peso: t => String(t).replace('.', ',') + ' t',
     iniciais: n => { const ps = String(n || '').split(' ').filter(p => p.length > 2); return ((ps[0] || '?')[0] + (ps.length > 1 ? ps[ps.length - 1][0] : '')).toUpperCase(); }
   };
-  function agoraTs() {
+  // Relógio da demonstração: o dia é sempre HOJE; fora do expediente, a hora cai entre 10:00 e 10:59.
+  function agoraHM() {
     const d = new Date();
     const p = n => String(n).padStart(2, '0');
-    return HOJE + 'T' + p(d.getHours()) + ':' + p(d.getMinutes());
+    const h = d.getHours() >= 6 && d.getHours() < 18 ? d.getHours() : 10;
+    return p(h) + ':' + p(d.getMinutes());
   }
+  function agoraTs() { return HOJE + 'T' + agoraHM(); }
 
   // ------------------------------------------------------------------ semente
   function semente() {
@@ -1170,7 +1173,7 @@
   reconstruir();
 
   const TX = {
-    HOJE, DECLARACAO_CTE, ITENS_CHECKLIST, REGIMES,
+    HOJE, DECLARACAO_CTE, ITENS_CHECKLIST, REGIMES, agoraHM,
     get db() { return mem.db; }, get versao() { return mem.versao; }, get ops() { return mem.ops.slice(); },
     fmt, norm, soDigitos, addDias, difDias,
     produto, pessoa, transportador, conjunto, placa, filial, usuario, viagem, embarcador, destinatario, fornecedor,

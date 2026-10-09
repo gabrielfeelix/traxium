@@ -634,7 +634,7 @@ input::placeholder,textarea::placeholder{color:#8ba09e}
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
   state = { loading: true, modal: null, acoesOpen: false };
-  componentDidMount() { TX.ui.montar(this); }
+  componentDidMount() { TX.ui.montar(this); if (location.hash) setTimeout(() => { const el = document.getElementById(location.hash.slice(1)); if (el) el.scrollIntoView({ block: 'center' }); }, 900); }
   avisar(m) { TX.ui.avisar(this, m); }
   vid() { const p = TX.ui.param('id'); return p && TX.viagem(p) ? p : 'VG-3116'; }
   abrir(modal, extra) { this.setState(Object.assign({ modal, acoesOpen: false, fMotivo: '', fItens: [], fJust: '', fMot: null, fRisco: null, fValidade: null, fEvid: null, fEscopo: false, fCiencia: false, fInspetor: '', fLaudo: '', fOpcao: 'A', fBuscaPlaca: '', fConj: null, fComp: null, fLavador: null, fComprovante: '', fTipo: null, fGrav: null, fCampo: 'peso', fNovo: '' }, extra || {})); }
