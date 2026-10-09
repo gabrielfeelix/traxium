@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Traxium: viagens</title>
+<script src="./tx-dados.js"></script>
+<script src="./tx-ui.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f2f5f4;font-family:'Hanken Grotesk',sans-serif;color:#0b2224;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0C5862;text-decoration:none}a:hover{color:#127670}
+input{font-family:'Hanken Grotesk',sans-serif;color:#0b2224}
+input::placeholder{color:#8ba09e}
+@keyframes txsh{from{background-position:-600px 0}to{background-position:600px 0}}
+</style>
+</helmet>
+<div style="display:flex;min-height:100vh;min-width:1560px" data-screen-label="Viagens">
+  <!-- TX:SIDEBAR -->
+  <div data-tx-sidebar style="width:{{ navW }};flex:none;background:linear-gradient(178deg,#093D44,#0A4650);color:#fff;display:flex;flex-direction:column;padding:22px {{ navPad }};position:sticky;top:0;height:100vh;transition:width .25s ease;overflow-x:hidden;overflow-y:auto;z-index:20">
+    <a href="Hoje.dc.html" title="Traxium: ir para Hoje" style="display:flex;align-items:center;gap:10px;padding:4px 8px 20px;color:#fff">
+      <svg width="34" height="34" viewBox="0 0 32 32" style="flex:none"><defs><linearGradient id="txLogo" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1a9e93"></stop><stop offset="1" stop-color="#0E78B5"></stop></linearGradient></defs><polygon points="16,2.5 27.5,9 27.5,23 16,29.5 4.5,23 4.5,9" fill="url(#txLogo)"></polygon><polyline points="9,20 13,13 18,17 23,10" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></polyline><circle cx="9" cy="20" r="1.6" fill="#fff"></circle><circle cx="13" cy="13" r="1.6" fill="#fff"></circle><circle cx="18" cy="17" r="1.6" fill="#fff"></circle><circle cx="23" cy="10" r="1.6" fill="#fff"></circle></svg>
+      <div style="display:{{ navL }}"><div style="font-weight:800;font-size:17px;letter-spacing:.2px">Traxium</div><div style="font-size:10.5px;letter-spacing:1.6px;color:rgba(255,255,255,.5);text-transform:uppercase;white-space:nowrap">{{ tenantNome }}</div></div>
+    </a>
+    <div style="display:flex;flex-direction:column;gap:3px">
+      <a href="Hoje.dc.html" title="Hoje" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><rect x="2.5" y="3.2" width="11" height="10.3" rx="2.4"></rect><line x1="2.5" y1="6.6" x2="13.5" y2="6.6"></line><line x1="5.6" y1="1.8" x2="5.6" y2="4.2"></line><line x1="10.4" y1="1.8" x2="10.4" y2="4.2"></line><circle cx="8" cy="10" r="1.3" fill="currentColor" stroke="none"></circle></svg><span data-tx-item="hoje" style="display:{{ navL }};white-space:nowrap">Hoje</span><span title="viagens de hoje com pendência" data-tx-badge="hoje" style="margin-left:auto;display:{{ sbHojeD }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;font-family:'Spline Sans Mono',monospace">{{ sbHoje }}</span></a>
+      <div title="Viagens" style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px;background:linear-gradient(90deg,rgba(26,158,147,.35),rgba(14,120,181,.28));border:1px solid rgba(255,255,255,.14);font-size:14px;font-weight:700;color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M2.5 8h9"></path><path d="M8 4.5 11.5 8 8 11.5"></path></svg><span data-tx-item="viagens" style="display:{{ navL }};white-space:nowrap">Viagens</span></div>
+      <a href="Transportadores.dc.html" title="Transportadores" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" style="flex:none"><circle cx="5.4" cy="6.2" r="2.4"></circle><circle cx="10.8" cy="6.2" r="2.4"></circle><path d="M2.5 13c.6-2 1.7-3 3-3s2.3 1 2.9 3" stroke-linecap="round"></path></svg><span data-tx-item="transportadores" style="display:{{ navL }};white-space:nowrap">Transportadores</span><span title="documentos vencidos ou vencendo em 15 dias" data-tx-badge="transportadores" style="margin-left:auto;display:{{ sbTranspD }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;font-family:'Spline Sans Mono',monospace">{{ sbTransp }}</span></a>
+      <a href="Frota.dc.html" title="Frota própria" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" style="flex:none"><rect x="2" y="4.5" width="8" height="5.5" rx="1.4"></rect><path d="M10 6.5h2.4l1.6 2v1.5h-4z" stroke-linejoin="round"></path><circle cx="5" cy="11.8" r="1.4"></circle><circle cx="11.6" cy="11.8" r="1.4"></circle></svg><span data-tx-item="frota" style="display:{{ navL }};white-space:nowrap">Frota própria</span></a>
+      <a href="Auditoria.dc.html" title="Auditoria" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" style="flex:none"><rect x="2.6" y="2.2" width="8" height="10.5" rx="1.8"></rect><line x1="4.8" y1="5.4" x2="8.4" y2="5.4"></line><line x1="4.8" y1="8" x2="7.2" y2="8"></line><circle cx="10.6" cy="10.4" r="2.3"></circle><line x1="12.3" y1="12.1" x2="14" y2="13.8"></line></svg><span data-tx-item="auditoria" style="display:{{ navL }};white-space:nowrap">Auditoria</span></a>
+    </div>
+    <div style="margin-top:14px;display:flex;flex-direction:column;gap:2px">
+      <div onClick="{{ cadToggle }}" title="Cadastros" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px;cursor:pointer" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" style="flex:none"><path d="M8 2.2 13.5 5 8 7.8 2.5 5z"></path><path d="M2.5 8 8 10.8 13.5 8" stroke-linecap="round"></path><path d="M2.5 11 8 13.8 13.5 11" stroke-linecap="round"></path></svg><span data-tx-item="cadastros" style="display:{{ navL }};white-space:nowrap">Cadastros</span><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto;display:{{ navL }};transform:{{ cadChev }};transition:transform .2s;opacity:.7"><path d="M4.5 2.5 8 6l-3.5 3.5"></path></svg></div>
+      <sc-if value="{{ cadOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:1px;margin-top:2px">
+          <a href="Cadastros.dc.html?aba=produtos" data-tx-sub="produtos" style="display:flex;align-items:center;gap:10px;padding:7px 12px 7px 39px;border-radius:9px;font-size:13px;font-weight:{{ sbc.produtos.fw }};color:{{ sbc.produtos.c }};background:{{ sbc.produtos.bg }}" style-hover="color:#fff;background:rgba(255,255,255,.06)"><span style="width:5px;height:5px;border-radius:99px;background:{{ sbc.produtos.dot }};flex:none"></span>Produtos e regimes</a>
+          <a href="Cadastros.dc.html?aba=manual" data-tx-sub="manual" style="display:flex;align-items:center;gap:10px;padding:7px 12px 7px 39px;border-radius:9px;font-size:13px;font-weight:{{ sbc.manual.fw }};color:{{ sbc.manual.c }};background:{{ sbc.manual.bg }}" style-hover="color:#fff;background:rgba(255,255,255,.06)"><span style="width:5px;height:5px;border-radius:99px;background:{{ sbc.manual.dot }};flex:none"></span>Manual e treinamentos</a>
+          <a href="Cadastros.dc.html?aba=fornecedores" data-tx-sub="fornecedores" style="display:flex;align-items:center;gap:10px;padding:7px 12px 7px 39px;border-radius:9px;font-size:13px;font-weight:{{ sbc.fornecedores.fw }};color:{{ sbc.fornecedores.c }};background:{{ sbc.fornecedores.bg }}" style-hover="color:#fff;background:rgba(255,255,255,.06)"><span style="width:5px;height:5px;border-radius:99px;background:{{ sbc.fornecedores.dot }};flex:none"></span>Fornecedores</a>
+          <a href="Cadastros.dc.html?aba=filiais" data-tx-sub="filiais" style="display:flex;align-items:center;gap:10px;padding:7px 12px 7px 39px;border-radius:9px;font-size:13px;font-weight:{{ sbc.filiais.fw }};color:{{ sbc.filiais.c }};background:{{ sbc.filiais.bg }}" style-hover="color:#fff;background:rgba(255,255,255,.06)"><span style="width:5px;height:5px;border-radius:99px;background:{{ sbc.filiais.dot }};flex:none"></span>Filiais</a>
+        </div>
+      </sc-if>
+    </div>
+    <div style="margin-top:auto;padding-top:18px;display:flex;flex-direction:column;gap:2px">
+      <a href="Configuracoes v2.dc.html" title="Configurações" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" style="flex:none"><circle cx="8" cy="8" r="2.3"></circle><path d="M8 1.8v1.9M8 12.3v1.9M14.2 8h-1.9M3.7 8H1.8M12.4 3.6l-1.3 1.3M4.9 11.1l-1.3 1.3M12.4 12.4l-1.3-1.3M4.9 4.9 3.6 3.6" stroke-linecap="round"></path></svg><span data-tx-item="config" style="display:{{ navL }};white-space:nowrap">Configurações</span></a>
+      <a href="Link da Viagem.dc.html?id=VG-3122" target="_blank" rel="noopener" title="Abre em outra aba a página que o motorista recebe pelo WhatsApp" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><rect x="3.5" y="1.8" width="9" height="12.4" rx="2"></rect><line x1="6.5" y1="4" x2="9.5" y2="4"></line><circle cx="8" cy="11.7" r=".65" fill="currentColor" stroke="none"></circle></svg><span data-tx-item="link" style="display:{{ navL }};white-space:nowrap">Link do motorista</span><span style="margin-left:auto;display:{{ navL }};font-size:10px;font-weight:700;letter-spacing:.4px;padding:1px 7px;border-radius:99px;border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.7)">demo</span></a>
+      <a href="versao-anterior.html" title="Versão anterior" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M2.6 8a5.4 5.4 0 1 0 1.6-3.8"></path><path d="M2.4 2.6v2.6H5"></path><path d="M8 5.2V8l1.9 1.3"></path></svg><span data-tx-item="anterior" style="display:{{ navL }};white-space:nowrap">Versão anterior</span></a>
+      <div onClick="{{ navToggle }}" title="Recolher ou expandir o menu" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;cursor:pointer;font-size:13px;font-weight:600;color:rgba(255,255,255,.55)" style-hover="background:rgba(255,255,255,.08);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="transform:{{ navFlip }};transition:transform .25s;flex:none"><path d="M9.5 3 4.5 8l5 5"></path><line x1="12" y1="3" x2="12" y2="13"></line></svg><span style="display:{{ navL }};white-space:nowrap">Recolher menu</span></div>
+      <div style="display:{{ navL }};margin-top:10px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);padding:12px 14px">
+        <div style="font-size:11.5px;color:rgba(255,255,255,.5)">Base IDTF mantida pela Traxium</div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;margin-top:5px"><span style="width:8px;height:8px;border-radius:99px;background:#3ddc97;box-shadow:0 0 0 4px rgba(61,220,151,.18)"></span>{{ baseVersao }} vigente</div>
+      </div>
+    </div>
+  </div>
+  <!-- /TX:SIDEBAR -->
+  <div style="flex:1;display:flex;flex-direction:column;padding:24px 32px 48px;gap:16px;min-width:0">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div><div style="font-size:24px;font-weight:800">Viagens</div><div style="font-size:13.5px;color:#5c706e;margin-top:2px">{{ subtitulo }}</div></div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+        <div onClick="{{ abrirConciliar }}" data-tx-conciliar style="background:#fff;border:1px solid #e0e7e5;border-radius:11px;padding:9px 15px;font-size:13.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px" style-hover="border-color:#127670">Conciliar CT-e em lote<span style="font-family:'Spline Sans Mono',monospace;font-size:11.5px;font-weight:600;color:#b97514;border:1px solid #f3dfb8;border-radius:99px;padding:0 7px;display:{{ semCteD }}">{{ semCte }}</span></div>
+        <div onClick="{{ exportar }}" data-tx-exportar style="background:#093D44;color:#fff;border-radius:11px;padding:9px 16px;font-size:13.5px;font-weight:700;cursor:pointer" style-hover="background:#0C5862">Exportar planilha</div>
+        <!-- TX:PERFIL -->
+        <div data-tx-pop style="position:relative">
+          <div onClick="{{ onPerfil }}" title="{{ uNome }}" data-tx-avatar style="width:38px;height:38px;border-radius:99px;background:linear-gradient(135deg,{{ uG1 }},{{ uG2 }});color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13.5px;box-shadow:0 0 0 3px #fff,0 0 0 4.5px #d8e4e2;cursor:pointer" style-hover="box-shadow:0 0 0 3px #fff,0 0 0 4.5px #127670">{{ uIni }}</div>
+          <sc-if value="{{ perfilOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;right:0;top:48px;background:#fff;border:1px solid #e4eae8;border-radius:16px;box-shadow:0 16px 40px rgba(9,61,68,.16);padding:6px;width:268px;z-index:80;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;gap:11px;padding:11px 12px;border-bottom:1px solid #f0f4f3;margin-bottom:4px">
+                <span style="width:38px;height:38px;border-radius:99px;background:linear-gradient(135deg,{{ uG1 }},{{ uG2 }});color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none">{{ uIni }}</span>
+                <div style="min-width:0"><div style="font-size:13.5px;font-weight:800">{{ uNome }}</div><div style="font-size:11.5px;color:#5c706e">{{ uCargo }}</div></div>
+              </div>
+              <div onClick="{{ abrirPerfil }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer" style-hover="background:#f6f9f8">Meu perfil</div>
+              <div onClick="{{ abrirPrefs }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer" style-hover="background:#f6f9f8">Avisos</div>
+              <div onClick="{{ abrirEntrar }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px" style-hover="background:#f6f9f8">Entrar como<span style="font-size:10.5px;font-weight:700;color:#0C5862;border:1px solid #cfe3e1;border-radius:99px;padding:1px 9px;white-space:nowrap">{{ uPapel }}</span></div>
+              <div style="height:1px;background:#f0f4f3;margin:5px 8px"></div>
+              <div onClick="{{ abrirSair }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;color:#c43d3d" style-hover="background:#fdf6f6">Sair</div>
+            </div>
+          </sc-if>
+        </div>
+<!-- /TX:PERFIL -->
+      </div>
+    </div>
+
+    <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <div style="background:#f7faf9;border:1px solid #e0e7e5;border-radius:11px;padding:0 13px;display:flex;gap:8px;align-items:center;width:360px">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#7c8f8d" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.6"></circle><line x1="10.5" y1="10.5" x2="13.5" y2="13.5"></line></svg>
+          <input value="{{ busca }}" onInput="{{ onBusca }}" data-tx-busca placeholder="Placa, CT-e, NF, ordem, motorista, RNTRC…" style="border:none;outline:none;background:transparent;font-size:13.5px;padding:9px 0;flex:1">
+        </div>
+        <span style="font-size:11px;font-weight:800;letter-spacing:.8px;color:#7c8f8d;margin-left:6px">PERÍODO</span>
+        <sc-for list="{{ periodos }}" as="pd" hint-placeholder-count="5"><span onClick="{{ pd.onClick }}" data-tx-periodo="{{ pd.k }}" style="font-size:12.5px;font-weight:700;border-radius:99px;padding:6px 13px;cursor:pointer;border:1.5px solid {{ pd.bd }};background:{{ pd.bg }};color:{{ pd.c }}">{{ pd.n }}</span></sc-for>
+        <span style="font-size:11px;font-weight:800;letter-spacing:.8px;color:#7c8f8d;margin-left:6px">TIPO</span>
+        <sc-for list="{{ tipos }}" as="tp" hint-placeholder-count="3"><span onClick="{{ tp.onClick }}" style="font-size:12.5px;font-weight:700;border-radius:99px;padding:6px 13px;cursor:pointer;border:1.5px solid {{ tp.bd }};background:{{ tp.bg }};color:{{ tp.c }}">{{ tp.n }}</span></sc-for>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="font-size:11px;font-weight:800;letter-spacing:.8px;color:#7c8f8d">FILIAL</span>
+        <sc-for list="{{ filiais }}" as="fl" hint-placeholder-count="5"><span onClick="{{ fl.onClick }}" data-tx-filial-chip="{{ fl.k }}" style="font-size:12.5px;font-weight:700;border-radius:99px;padding:6px 13px;cursor:pointer;border:1.5px solid {{ fl.bd }};background:{{ fl.bg }};color:{{ fl.c }}">{{ fl.n }}</span></sc-for>
+        <span style="font-size:11px;font-weight:800;letter-spacing:.8px;color:#7c8f8d;margin-left:10px">SITUAÇÃO</span>
+        <sc-for list="{{ situacoes }}" as="st" hint-placeholder-count="7"><span onClick="{{ st.onClick }}" data-tx-situacao="{{ st.k }}" style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;border-radius:99px;padding:6px 12px;cursor:pointer;border:1.5px solid {{ st.bd }};background:{{ st.bg }};color:{{ st.c }}"><span style="width:7px;height:7px;border-radius:99px;background:{{ st.dot }}"></span>{{ st.n }}<span style="font-family:'Spline Sans Mono',monospace;font-size:11px;opacity:.7">{{ st.q }}</span></span></sc-for>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-top:1px dashed #e4eae8;padding-top:11px">
+        <span style="font-size:11px;font-weight:800;letter-spacing:.8px;color:#7c8f8d">VISÕES SALVAS</span>
+        <sc-for list="{{ visoes }}" as="vi" hint-placeholder-count="4"><span onClick="{{ vi.onClick }}" data-tx-visao="{{ vi.k }}" style="font-size:12.5px;font-weight:700;border-radius:10px;padding:5px 11px;cursor:pointer;border:1px solid {{ vi.bd }};background:{{ vi.bg }};color:{{ vi.c }}">{{ vi.n }}</span></sc-for>
+        <span onClick="{{ salvarVisao }}" data-tx-salvar-visao style="font-size:12.5px;font-weight:800;color:#0C5862;cursor:pointer;margin-left:4px">+ Salvar esta visão</span>
+        <span onClick="{{ limpar }}" style="margin-left:auto;font-size:12.5px;font-weight:700;color:{{ limparC }};cursor:pointer">Limpar filtros</span>
+      </div>
+    </div>
+
+    <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;overflow:hidden">
+      <div style="display:grid;grid-template-columns:{{ cols }};gap:12px;padding:12px 20px;background:#f7faf9;border-bottom:1px solid #eef2f1;font-size:11px;font-weight:800;letter-spacing:.7px;color:#7c8f8d">
+        <span>CARREGAMENTO</span><span>ORDEM</span><span>CT-E / NF</span><span>PRODUTO E ROTA</span><span>TRANSPORTADOR</span><span>PLACAS</span><span>SITUAÇÃO</span>
+      </div>
+      <sc-if value="{{ loading }}" hint-placeholder-val="{{ true }}">
+        <sc-for list="{{ skel }}" as="sk" hint-placeholder-count="6"><div style="padding:14px 20px;border-bottom:1px solid #f0f4f3"><div style="height:16px;border-radius:99px;background:linear-gradient(90deg,#eef2f1 25%,#f7faf9 40%,#eef2f1 55%);background-size:600px 100%;animation:txsh 1.3s linear infinite"></div></div></sc-for>
+      </sc-if>
+      <sc-for list="{{ linhas }}" as="r" hint-placeholder-count="8">
+        <a href="{{ r.href }}" data-tx-linha="{{ r.id }}" style="display:grid;grid-template-columns:{{ cols }};gap:12px;padding:12px 20px;border-bottom:1px solid #f0f4f3;align-items:center;color:inherit" style-hover="background:#f7faf9">
+          <div><div style="font-family:'Spline Sans Mono',monospace;font-size:13px;font-weight:600">{{ r.data }}</div><div style="font-size:11.5px;color:#7c8f8d">{{ r.filial }}</div></div>
+          <div><div style="font-family:'Spline Sans Mono',monospace;font-size:13px;font-weight:600">{{ r.ordem }}</div><div style="font-size:11px;color:#9db0ae;font-family:'Spline Sans Mono',monospace">{{ r.id }}</div></div>
+          <div style="font-family:'Spline Sans Mono',monospace;font-size:12.5px"><div style="color:{{ r.cteC }}">{{ r.cte }}</div><div style="color:{{ r.cteC }}">{{ r.nf }}</div></div>
+          <div style="min-width:0"><div style="font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.produto }}<span style="font-weight:600;color:#7c8f8d;font-size:12px"> {{ r.assegTxt }}</span></div><div style="font-size:12px;color:#5c706e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.rota }}</div></div>
+          <div style="min-width:0"><div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.transp }}</div><div style="font-size:11.5px;color:#7c8f8d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.transpSub }}</div></div>
+          <div style="font-family:'Spline Sans Mono',monospace;font-size:12px;color:#3c4f4e;line-height:1.5">{{ r.placas }}</div>
+          <div><div style="display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:{{ r.c }}"><span style="width:8px;height:8px;border-radius:99px;background:{{ r.dot }};box-shadow:0 0 0 3px {{ r.ring }}"></span>{{ r.res }}</div><div style="font-size:11.5px;color:#7c8f8d;margin-top:2px">{{ r.ciclo }}</div></div>
+        </a>
+      </sc-for>
+      <sc-if value="{{ vazio }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:48px 20px;text-align:center"><div style="font-size:15px;font-weight:800">Nenhuma viagem com estes filtros</div><div style="font-size:13px;color:#5c706e;margin-top:4px">Amplie o período ou limpe os filtros. A busca aceita placa, CT-e, NF, ordem, nome e RNTRC.</div></div>
+      </sc-if>
+      <div style="display:flex;align-items:center;gap:8px;padding:12px 20px">
+        <span style="font-size:12.5px;color:#5c706e">{{ pagInfo }}</span>
+        <sc-if value="{{ temPaginacao }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-left:auto;display:flex;gap:5px;align-items:center">
+            <span onClick="{{ pagAnt }}" style="font-size:13px;font-weight:700;color:{{ pagAntC }};cursor:{{ pagAntCur }};padding:4px 8px">‹</span>
+            <sc-for list="{{ paginas }}" as="pg" hint-placeholder-count="2"><span onClick="{{ pg.onClick }}" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;font-weight:600;width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid {{ pg.bd }};background:{{ pg.bg }};color:{{ pg.c }}">{{ pg.n }}</span></sc-for>
+            <span onClick="{{ pagProx }}" style="font-size:13px;font-weight:700;color:{{ pagProxC }};cursor:{{ pagProxCur }};padding:4px 8px">›</span>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONCILIAÇÃO -->
+  <sc-if value="{{ concAberta }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModal }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" data-tx-modal="conciliar" style="background:#fff;border-radius:24px;width:760px;max-height:90vh;overflow:auto;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Conciliar CT-e e NF em lote</div><span onClick="{{ fecharModal }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px">✕</span></div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:4px;line-height:1.55">Importe a planilha ou os XML de CT-e do período exportados do TMS. O Traxium casa cada CT-e com a viagem pela placa do cavalo e pela data. Viagem conciliada com descarga passada se conclui sozinha.</div>
+        <label style="margin-top:14px;display:flex;align-items:center;gap:12px;border:1.5px dashed {{ arqBd }};background:{{ arqBg }};border-radius:15px;padding:13px 15px;cursor:pointer">
+          <input type="file" accept=".xml,.csv,.xlsx,.zip" onChange="{{ onArquivo }}" style="display:none">
+          <div style="flex:1"><div style="font-size:13.5px;font-weight:800">{{ arqTitulo }}</div><div style="font-size:12px;color:#5c706e">planilha (.xlsx, .csv) ou XML de CT-e (.xml, .zip)</div></div>
+          <span onClick="{{ usarExemplo }}" data-tx-lote-exemplo style="font-size:12px;font-weight:800;color:#0C5862">usar o lote de exemplo</span>
+        </label>
+        <sc-if value="{{ temLote }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:14px;border:1px solid #eef2f1;border-radius:14px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:80px 80px 100px 70px 1fr;gap:10px;padding:9px 14px;background:#f7faf9;font-size:10.5px;font-weight:800;letter-spacing:.7px;color:#7c8f8d"><span>CT-E</span><span>NF</span><span>PLACA</span><span>DATA</span><span>VIAGEM</span></div>
+            <sc-for list="{{ lote }}" as="lt" hint-placeholder-count="4">
+              <div style="display:grid;grid-template-columns:80px 80px 100px 70px 1fr;gap:10px;padding:9px 14px;border-top:1px solid #f0f4f3;font-size:12.5px;align-items:center"><span style="font-family:'Spline Sans Mono',monospace">{{ lt.cte }}</span><span style="font-family:'Spline Sans Mono',monospace">{{ lt.nf }}</span><span style="font-family:'Spline Sans Mono',monospace">{{ lt.placa }}</span><span style="font-family:'Spline Sans Mono',monospace">{{ lt.data }}</span><span style="display:flex;align-items:center;gap:7px;color:{{ lt.c }};font-weight:700"><span style="width:7px;height:7px;border-radius:99px;background:{{ lt.c }}"></span>{{ lt.viagem }}</span></div>
+            </sc-for>
+          </div>
+          <div style="font-size:12.5px;color:#3c4f4e;margin-top:10px">{{ loteResumo }}</div>
+        </sc-if>
+        <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+          <span onClick="{{ fecharModal }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer">Cancelar</span>
+          <span onClick="{{ confirmarConciliar }}" data-tx-confirmar style="background:{{ ctaBg }};color:{{ ctaC }};box-shadow:{{ ctaSh }};cursor:{{ ctaCur }};font-size:13.5px;font-weight:800;border-radius:99px;padding:10px 22px">{{ concRot }}</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <!-- TX:MODAIS -->
+  <sc-if value="{{ modalPerfil }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:470px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Meu perfil</div><span onClick="{{ fecharModalTopo }}" title="Fechar" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;flex:none" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:14px">
+          <span style="width:72px;height:72px;border-radius:99px;background:linear-gradient(135deg,{{ uG1 }},{{ uG2 }});color:#fff;font-size:24px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #fff,0 0 0 6px #e4eae8">{{ uIni }}</span>
+          <div style="font-size:17px;font-weight:800;margin-top:4px">{{ uNome }}</div>
+          <div style="font-size:12.5px;color:#5c706e">{{ uEmail }}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-top:18px">
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Papel</span><span style="font-weight:700;text-align:right">{{ uCargo }}</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Escopo</span><span style="font-weight:700;text-align:right">{{ uFiliais }}</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Alçada de liberação</span><span style="font-weight:700;text-align:right">{{ uAlcada }}</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Liberações assinadas</span><span style="font-family:'Spline Sans Mono',monospace;font-weight:600">{{ uAssinadas }}</span></div>
+        </div>
+        <div style="font-size:12px;color:#5c706e;margin-top:12px;line-height:1.55">{{ uAlcadaSub }}</div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalPrefs }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:520px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Avisos</div><span onClick="{{ fecharModalTopo }}" title="Fechar" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;flex:none" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:3px">O que chega para você, na tela e no celular.</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:14px">
+          <sc-for list="{{ prefs }}" as="pf" hint-placeholder-count="4">
+            <div onClick="{{ pf.onClick }}" style="display:flex;align-items:center;gap:12px;border:1px solid #eef2f1;border-radius:14px;padding:12px 14px;cursor:pointer" style-hover="border-color:#c9d5d3">
+              <div style="flex:1"><div style="font-size:13.5px;font-weight:700">{{ pf.t }}</div><div style="font-size:11.5px;color:#5c706e">{{ pf.sub }}</div></div>
+              <span style="width:40px;height:23px;border-radius:99px;background:{{ pf.swBg }};position:relative;flex:none;transition:background .2s"><span style="position:absolute;top:2.5px;left:{{ pf.swPos }};width:18px;height:18px;border-radius:99px;background:#fff;box-shadow:0 1px 4px rgba(9,34,36,.25);transition:left .2s"></span></span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalEntrar }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:540px;max-height:88vh;overflow:auto;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">{{ entrarTitulo }}</div><span onClick="{{ fecharModalTopo }}" title="Fechar" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;flex:none" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:3px;line-height:1.55">{{ entrarSub }}</div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-top:14px">
+          <sc-for list="{{ usuariosLista }}" as="ul" hint-placeholder-count="6">
+            <div onClick="{{ ul.onClick }}" data-tx-usuario="{{ ul.id }}" style="display:flex;align-items:center;gap:12px;border:1.5px solid {{ ul.bd }};background:{{ ul.bg }};border-radius:15px;padding:11px 14px;cursor:pointer;transition:all .15s" style-hover="border-color:#127670">
+              <span style="width:18px;height:18px;border-radius:99px;border:2.5px solid {{ ul.dotBd }};background:{{ ul.dot }};flex:none"></span>
+              <span style="width:34px;height:34px;border-radius:99px;flex:none;background:linear-gradient(135deg,{{ ul.g1 }},{{ ul.g2 }});color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ ul.ini }}</span>
+              <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:800">{{ ul.nome }}</div><div style="font-size:11.5px;color:#5c706e;margin-top:1px">{{ ul.cargo }}, {{ ul.escopo }}</div></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalSair }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:440px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Sair da conta</div><span onClick="{{ fecharModalTopo }}" title="Fechar" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;flex:none" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;align-items:center;gap:12px;background:#f7faf9;border-radius:15px;padding:13px 15px;margin-top:16px">
+          <span style="width:40px;height:40px;border-radius:99px;flex:none;background:linear-gradient(135deg,{{ uG1 }},{{ uG2 }});color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ uIni }}</span>
+          <div><div style="font-size:13.5px;font-weight:800">{{ uNome }}</div><div style="font-size:11.5px;color:#5c706e">{{ uCargo }}</div></div>
+        </div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:14px;line-height:1.6">O que você registrou continua na viagem, com seu nome e a hora. O que estava aberto num formulário sem confirmar não foi gravado.</div>
+        <div style="display:flex;gap:8px;margin-top:18px;justify-content:flex-end">
+          <span onClick="{{ fecharModalTopo }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer" style-hover="background:#e4ebe9">Cancelar</span>
+          <span onClick="{{ confirmarSair }}" style="background:linear-gradient(135deg,#e46969,#c43d3d);color:#fff;font-size:13.5px;font-weight:800;border-radius:99px;padding:10px 22px;cursor:pointer;box-shadow:0 8px 18px rgba(196,61,61,.3)" style-hover="transform:translateY(-1px)">Sair</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div data-tx-toast style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:1200;background:#0b2224;color:#fff;border-radius:99px;padding:12px 22px;font-size:13.5px;font-weight:600;box-shadow:0 16px 40px rgba(9,34,36,.35);display:flex;align-items:center;gap:10px;max-width:760px"><span style="width:20px;height:20px;border-radius:99px;background:linear-gradient(135deg,#48c78e,#127670);display:flex;align-items:center;justify-content:center;font-size:11px;flex:none">✓</span>{{ toastMsg }}</div>
+  </sc-if>
+<!-- /TX:MODAIS -->
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { loading: true, busca: '', periodo: '30', tipo: 'todos', filial: null, sit: 'todas', visao: null, modal: null };
+  componentDidMount() {
+    TX.ui.montar(this);
+    const P = TX.ui.param;
+    const ini = {};
+    if (P('conciliar')) ini.modal = 'conciliar';
+    if (P('q')) ini.busca = P('q');
+    if (P('situacao')) ini.sit = P('situacao');
+    if (P('periodo')) ini.periodo = P('periodo');
+    this.setState(ini);
+  }
+  avisar(m) { TX.ui.avisar(this, m); }
+  visoesSalvas() { try { return JSON.parse(TX.ui.lerLS('tx-v2-visoes', '[]')); } catch (e) { return []; } }
+  filtrar() {
+    const s = this.state, u = TX.sessao();
+    const fil = s.filial || 'todas';
+    const lim = { hoje: TX.HOJE, '7': TX.addDias(TX.HOJE, -7), '30': TX.addDias(TX.HOJE, -30), '90': TX.addDias(TX.HOJE, -90), tudo: '0000' }[s.periodo];
+    const q = TX.norm(s.busca);
+    const todas = TX.db.viagens.filter(v => u.filiais.includes(v.filial)).filter(v => (fil === 'todas' || v.filial === fil) && v.data >= lim && (s.periodo !== 'hoje' || v.data === TX.HOJE) && (s.tipo === 'todos' || (s.tipo === 'propria') === (v.tipo === 'propria')));
+    const enriquecidas = todas.map(v => {
+      const dec = TX.decidir(v), cic = TX.ciclo(v), t = TX.transportador(v.transportador), conj = TX.conjunto(v.conjunto), mot = TX.pessoa(v.motorista);
+      const txt = TX.norm([v.ordem, v.id, v.cte && v.cte.numero, v.cte && v.cte.nf, TX.placasDoConjunto(conj).join(' '), mot.nome, TX.nomeTransportador(t), t && t.rntrc && t.rntrc.numero, TX.produto(v.produto).nome, TX.embarcador(v.embarcador).nome, TX.destinatario(v.destinatario).nome].join(' '));
+      return { v, dec, cic, t, conj, mot, txt };
+    }).filter(x => !q || x.txt.includes(q) || TX.soDigitos(x.txt).includes(TX.soDigitos(s.busca) || '#'));
+    return enriquecidas;
+  }
+  sitDe(x) {
+    if (x.v.cancelada) return 'cancelada';
+    if (x.cic.k === 'concluida') return 'concluida';
+    if (x.cic.k === 'sem_cte') return 'sem_cte';
+    if (x.cic.k === 'transito') return 'transito';
+    return { pronta: 'pronta', falta: 'falta', bloqueada: 'bloqueada', tecnico: 'bloqueada', nao_assegurada: 'pronta' }[x.dec.resultado];
+  }
+  renderVals() { return Object.assign({}, TX.ui.base(this), this.telaVals(), this.concVals()); }
+  telaVals() {
+    const s = this.state, U = TX.ui, F = TX.fmt, u = TX.sessao();
+    const base = this.filtrar();
+    const SIT = [['todas', 'Todas', U.tom('na')], ['falta', 'Falta algo', U.tom('falta')], ['bloqueada', 'Bloqueadas', U.tom('bloqueio')], ['pronta', 'Prontas', U.tom('ok')], ['sem_cte', 'Aguardando CT-e', U.tom('autoridade')], ['transito', 'Em trânsito', U.tom('info')], ['concluida', 'Concluídas', U.tom('ok')], ['cancelada', 'Canceladas', U.tom('na')]];
+    const lista = base.filter(x => s.sit === 'todas' || this.sitDe(x) === s.sit).filter(x => s.visao !== 'autoridade' || x.dec.porAutoridade).filter(x => s.visao !== 'tecnico' || x.dec.resultado === 'tecnico').sort((a, b) => (b.v.data + b.v.janela).localeCompare(a.v.data + a.v.janela));
+    const pg = U.paginar(this, lista, 'viagens');
+    const set = o => this.setState(Object.assign({ pag: 1, visao: null }, o));
+    const VIS = [
+      { k: 'hoje-pend', n: 'Hoje com pendência', f: { periodo: 'hoje', sit: 'falta', tipo: 'todos', filial: null, busca: '' } },
+      { k: 'sem-cte', n: 'Aguardando CT-e', f: { periodo: '90', sit: 'sem_cte', tipo: 'todos', filial: null, busca: '' } },
+      { k: 'autoridade', n: 'Liberadas por autoridade', f: { periodo: '90', sit: 'todas', tipo: 'todos', filial: null, busca: '' } },
+      { k: 'tecnico', n: 'Bloqueio técnico', f: { periodo: '90', sit: 'todas', tipo: 'todos', filial: null, busca: '' } }
+    ].concat(this.visoesSalvas());
+    const semCte = TX.db.viagens.filter(v => !v.cancelada && v.data < TX.HOJE && !v.cte).length;
+    const filtroAtivo = s.busca || s.sit !== 'todas' || s.tipo !== 'todos' || s.filial || s.periodo !== '30' || s.visao;
+    return Object.assign({
+      subtitulo: lista.length + ' de ' + TX.db.viagens.filter(v => u.filiais.includes(v.filial)).length + ' viagens, ' + (s.filial ? 'filial ' + TX.filial(s.filial).nome : u.filiais.length > 1 ? 'todas as filiais' : 'filial ' + TX.filial(u.filiais[0]).nome),
+      semCte, semCteD: semCte ? 'inline-block' : 'none',
+      busca: s.busca, onBusca: e => this.setState({ busca: e.target.value, pag: 1 }),
+      periodos: [['hoje', 'Hoje'], ['7', '7 dias'], ['30', '30 dias'], ['90', '90 dias'], ['tudo', 'Tudo']].map(([k, n]) => Object.assign({ k, n, onClick: () => set({ periodo: k }) }, U.chip(s.periodo === k))),
+      tipos: [['todos', 'Todos'], ['afretamento', 'Afretamento'], ['propria', 'Frota própria']].map(([k, n]) => Object.assign({ n, onClick: () => set({ tipo: k }) }, U.chip(s.tipo === k))),
+      filiais: (u.filiais.length > 1 ? [[null, 'Todas']] : []).concat(u.filiais.map(f => [f, TX.filial(f).nome])).map(([k, n]) => Object.assign({ k: k || 'todas', n, onClick: () => set({ filial: k }) }, U.chip((s.filial || null) === k))),
+      situacoes: SIT.map(([k, n, tm]) => { const on = s.sit === k; return { k, n, q: k === 'todas' ? base.length : base.filter(x => this.sitDe(x) === k).length, dot: tm.dot, bd: on ? '#0b2224' : '#e0e7e5', bg: on ? '#0b2224' : '#fff', c: on ? '#fff' : '#3c4f4e', onClick: () => set({ sit: k }) }; }),
+      visoes: VIS.map(vi => { const on = s.visao === vi.k; return { k: vi.k, n: vi.n, bd: on ? '#127670' : '#e0e7e5', bg: on ? '#eef7f6' : '#fff', c: on ? '#0C5862' : '#3c4f4e', onClick: () => this.setState(Object.assign({ pag: 1 }, vi.f, { visao: vi.k })) }; }),
+      salvarVisao: () => { const n = 'Minha visão ' + (this.visoesSalvas().length + 1); const lista2 = this.visoesSalvas().concat([{ k: 'u' + Date.now(), n, f: { periodo: s.periodo, sit: s.sit, tipo: s.tipo, filial: s.filial, busca: s.busca } }]); U.gravarLS('tx-v2-visoes', JSON.stringify(lista2)); this.setState({ txv: Date.now() }); this.avisar('"' + n + '" salva neste navegador com os filtros atuais.'); },
+      limpar: () => this.setState({ busca: '', periodo: '30', tipo: 'todos', filial: null, sit: 'todas', visao: null, pag: 1 }), limparC: filtroAtivo ? '#c43d3d' : '#c9d5d3',
+      cols: '104px 104px 92px 1.4fr 1.1fr 150px 160px',
+      skel: [1, 2, 3, 4, 5, 6],
+      linhas: s.loading ? [] : pg.itens.map(x => {
+        const v = x.v, tm = U.tomResultado(x.dec);
+        const sit = this.sitDe(x);
+        const tom2 = sit === 'concluida' ? U.tom('ok') : sit === 'sem_cte' ? U.tom('autoridade') : sit === 'transito' ? U.tom('info') : tm;
+        return { id: v.id, href: 'Viagem.dc.html?id=' + v.id, data: F.curta(v.data) + ' ' + v.janela, filial: TX.filial(v.filial).nome, ordem: v.ordem,
+          cte: v.cte ? v.cte.numero : 'a conciliar', nf: v.cte ? v.cte.nf : '', cteC: v.cte ? '#0b2224' : '#b97514',
+          produto: TX.produto(v.produto).nome, assegTxt: v.assegurada ? '' : '(sem GMP+)', rota: TX.embarcador(v.embarcador).nome + ' → ' + TX.destinatario(v.destinatario).nome + ', ' + TX.destinatario(v.destinatario).cidade,
+          transp: x.t ? TX.nomeTransportador(x.t) : 'Frota própria', transpSub: x.t ? (x.t.tipo === 'TAC' ? 'TAC, RNTRC ' + (x.t.rntrc ? x.t.rntrc.numero : 'pendente') : 'motorista ' + x.mot.nome) : 'motorista ' + x.mot.nome,
+          placas: TX.placasDoConjunto(x.conj).join(' '),
+          res: sit === 'concluida' ? 'Concluída' : sit === 'sem_cte' ? 'Aguardando CT-e' : sit === 'transito' ? 'Em trânsito' : x.dec.rotulo, c: tom2.c, dot: tom2.dot, ring: tom2.ring,
+          ciclo: x.dec.porAutoridade ? 'liberada por autoridade' : x.cic.sub || x.cic.n };
+      }),
+      vazio: !s.loading && lista.length === 0,
+      exportar: () => this.exportarCsv(lista)
+    }, pg.vals);
+  }
+  exportarCsv(lista) {
+    const F = TX.fmt;
+    const cab = ['Data', 'Janela', 'Filial', 'Ordem', 'Código interno', 'CT-e', 'NF', 'Produto', 'Peso (t)', 'Embarcador', 'Destinatário', 'Transportador', 'RNTRC', 'Motorista', 'Placas', 'Assegurada GMP+', 'Resultado', 'Termo assinado', 'Verificação aprovada'];
+    const lin = lista.map(x => { const v = x.v; return [F.data(v.data), v.janela, TX.filial(v.filial).nome, v.ordem, v.id, v.cte ? v.cte.numero : '', v.cte ? v.cte.nf : '', TX.produto(v.produto).nome, v.peso, TX.embarcador(v.embarcador).nome, TX.destinatario(v.destinatario).nome, TX.nomeTransportador(x.t), x.t && x.t.rntrc ? x.t.rntrc.numero : '', x.mot.nome, TX.placasDoConjunto(x.conj).join(' '), v.assegurada ? 'sim' : 'não', x.dec.rotulo, v.termo ? F.data(v.termo.em.slice(0, 10)) : '', v.verificacao && v.verificacao.estado === 'aprovada' ? F.data(v.verificacao.em.slice(0, 10)) : '']; });
+    const csv = '﻿' + [cab].concat(lin).map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(';')).join('\r\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    a.download = 'viagens-' + TX.HOJE + '.csv'; document.body.appendChild(a); a.click(); a.remove();
+    this.avisar(lista.length + ' viagens exportadas em planilha (CSV), com os filtros da tela.');
+  }
+  concVals() {
+    const s = this.state, U = TX.ui, F = TX.fmt;
+    const aberta = s.modal === 'conciliar';
+    const lote = s.lote;
+    const casadas = lote ? lote.linhas.filter(l => l.casou) : [];
+    const c = U.cta(casadas.length > 0);
+    return {
+      concAberta: aberta, fecharModal: () => this.setState({ modal: null, lote: null }), pararClique: e => e.stopPropagation(),
+      abrirConciliar: () => this.setState({ modal: 'conciliar', lote: null }),
+      arqBd: lote ? '#127670' : '#c9d5d3', arqBg: lote ? '#eef7f6' : '#fff', arqTitulo: lote ? 'Arquivo: ' + lote.arquivo : 'Escolher arquivo do TMS',
+      onArquivo: e => { const f = e.target.files && e.target.files[0]; if (f) { const l = TX.loteCTe(); l.arquivo = f.name; this.setState({ lote: l }); } },
+      usarExemplo: e => { e.preventDefault(); e.stopPropagation(); this.setState({ lote: TX.loteCTe() }); },
+      temLote: !!lote,
+      lote: lote ? lote.linhas.map(l => ({ cte: l.cte, nf: l.nf, placa: l.placa, data: F.curta(l.data), viagem: l.casou ? TX.viagem(l.viagem).ordem + ', ' + TX.pessoa(TX.viagem(l.viagem).motorista).nome : 'sem correspondência: ' + l.motivo.toLowerCase(), c: l.casou ? '#1a8f57' : '#b97514' })) : [],
+      loteResumo: lote ? casadas.length + ' CT-e casados com viagens; ' + (lote.linhas.length - casadas.length) + ' sem correspondência ficam fora. Nada é digitado viagem a viagem.' : '',
+      concRot: casadas.length ? 'Conciliar ' + casadas.length + ' viagens' : 'Conciliar',
+      confirmarConciliar: () => { if (!casadas.length) return; TX.fazer('conciliarCTe', { arquivo: lote.arquivo, linhas: casadas }); this.setState({ modal: null, lote: null }); this.avisar(casadas.length + ' viagens conciliadas. As de descarga passada já aparecem como concluídas.'); },
+      ctaBg: c.bg, ctaC: c.c, ctaSh: c.sh, ctaCur: c.cur
+    };
+  }
+}
+</script>
+</body>
+</html>
