@@ -75,3 +75,27 @@ Hoje (badge: viagens do dia com pendência), Viagens, Transportadores (badge: do
 Cada fase termina em commit. Publicação na Vercel só com autorização.
 
 Ferramentas de verificação disponíveis: Chromium em `~/.cache/ms-playwright/chromium-1243`, `playwright-core` em `/mnt/d/solar-buy-side-v2/node_modules/playwright-core`, servidor estático com `python3 -m http.server` na pasta do protótipo.
+
+## 6. Registro de execução
+
+Fases A a F executadas em 08/10/2026, uma por commit, com as premissas da seção 1.
+
+| Fase | Commit | Verificação feita |
+| --- | --- | --- |
+| A | 34e2e4c | `scripts/testar-tx-dados.mjs`: 660 conferências (referências, contagens, três canônicas, fluxos F1 e F3, persistência) |
+| B | 0bda422 | Capturas de VG-3116 (pronta), VG-3117 (frota própria pronta) e VG-3118 (bloqueio técnico) |
+| C | 656b2b1 | `scripts/e2e-f1.cjs`: F1 em duas abas, da criação da viagem à declaração do CT-e liberada |
+| D | 29a9cfc | Capturas das quatro telas; `scripts/conferir-v2.mjs` sem link quebrado nem botão sem ação |
+| E | aa82c1c | `scripts/e2e-f5.cjs`: rastreio por placa, amostra, listas de apoio, simulação; varredura sem erro de JavaScript; assinatura única de sidebar em 9 telas |
+| F | este | `scripts/varrer-texto.cjs`: texto renderizado de 44 estados sem travessão, ponto médio ou valor vazado; Esc passou a fechar "Nova viagem" |
+
+Diferenças em relação ao plano:
+
+- Além de `tx-dados.js`, as telas carregam `tx-ui.js`, com os valores comuns de sidebar, sessão, perfil e toast. A marcação continua no fonte de cada tela, escrita por `scripts/gerar-sidebar.mjs`.
+- Os scripts ficam em `SaaS moderno estilo Dribbble/scripts/`, fora da publicação (`.vercelignore`).
+- A semente tem 30 viagens, não 24, para cobrir todas as situações nas quatro filiais.
+- O dia da demonstração é fixo em 08/10/2026. Fora do horário comercial, a hora das ações cai entre 10:00 e 10:59, para os prazos de carregamento não aparecerem todos vencidos.
+- O perfil troca "Papel ativo" por "Entrar como", que muda o usuário da sessão (afretador, qualidade, direção) e com ele filial, badges e alçada.
+- Configurações muda de fato o motor: regra de documentos ou de manual como "só alerta" deixa de travar a viagem e registra o aviso.
+
+Publicação na Vercel: pendente de autorização.

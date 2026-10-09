@@ -48,7 +48,7 @@
     c._txFora = ev => { if (!ev.target.closest || !ev.target.closest('[data-tx-pop]')) c.setState(FECHAR_POPS); };
     c._txEsc = ev => {
       if (ev.key !== 'Escape') return;
-      if (c.state.modal || c.state.modalTopo || c.state.drawer) c.setState({ modal: null, modalTopo: null, drawer: null });
+      if (c.state.modal || c.state.modalTopo || c.state.drawer || c.state.nova) c.setState({ modal: null, modalTopo: null, drawer: null, nova: false });
       else c.setState(FECHAR_POPS);
     };
     document.addEventListener('mousedown', c._txFora);
