@@ -34,7 +34,6 @@ São 5 itens principais, um grupo de cadastros e configurações, contra 17 iten
 | Superfície | Quem | O que é |
 | --- | --- | --- |
 | **Link da viagem** | Motorista TAC e motorista próprio | Página aberta pelo WhatsApp, sem instalar e sem senha: confirma identidade e placas, informa as três últimas cargas de cada compartimento, lê o manual vigente, assina o termo. Funciona offline depois de aberto. Substitui o Onboarding público |
-| **Hoje no celular** | Afretador no pátio do cliente | A mesma mesa em formato de celular, com a verificação do compartimento (checklist do tipo de implemento e fotos) |
 | **Console Traxium** | Equipe Traxium | Clientes e contratos, base IDTF de referência e suas versões, indicadores do produto (incluindo os não medidos) |
 
 O App de campo de 12 telas fica como referência de interação. Se o Rafael confirmar que o motorista próprio também faz checklist de viagem, o link da viagem ganha esse passo; app instalado não é necessário na primeira versão (pergunta 4 do diagnóstico).
@@ -62,11 +61,11 @@ Cada fluxo diz quem faz, onde começa, onde termina, que registro produz, como s
 
 1. **Início.** A ordem de carregamento chega. O afretador cria a viagem em Hoje: importa o PDF da ordem ou digita produto, embarcador, destinatário, data e filial. O sistema já diz se a viagem precisa ser assegurada GMP+ (produto ração e cliente certificado).
 2. **Quem carrega.** O afretador digita a placa do cavalo ou o CPF do motorista. Se o conjunto ou o TAC já existem, os dados voltam preenchidos e os documentos vencidos aparecem marcados. Se não existem, nasce um cadastro mínimo (nome, telefone, placas).
-3. **Link ao motorista.** O sistema envia o link da viagem por WhatsApp. O motorista confirma dados e placas, informa as três últimas cargas de cada compartimento, lê o manual e assina o termo. Cada resposta aparece na linha da viagem em Hoje.
+3. **Link ao motorista.** O afretador manda o link da viagem pelo próprio WhatsApp, com mensagem pronta. O motorista confirma CPF e placas, envia só os documentos que faltam, informa as três últimas cargas de cada carreta, responde o checklist com fotos guiadas, lê o manual em cartões e assina o termo. Cada resposta aparece na linha da viagem em Hoje.
 4. **Decisão.** Com as três últimas cargas, o motor resolve o regime pela IDTF. Carga anterior proibida ou não classificada bloqueia, com caminho de regularização, nunca de aprovação. T-3 incompleto bloqueia. Documento vencido gera pendência.
-5. **Verificação.** O afretador avalia o compartimento no celular (lona, correntes, cintas, carroceria, interior), com fotos quando o modelo pedir. Item crítico reprovado bloqueia.
-6. **Pronta.** Sem pendências, a viagem fica "pronta para assegurar" e o sistema entrega o texto da declaração positiva para o CT-e. O número do CT-e e da nota fiscal são informados ou chegam por integração.
-7. **Fim.** Após a descarga, a viagem é concluída e o produto entra no histórico dos compartimentos das placas usadas.
+5. **Conferência.** O afretador confere na mesa o checklist e as fotos enviadas pelo motorista (lona, correntes, cintas, carroceria, interior) e aprova ou devolve com motivo. Item crítico reprovado bloqueia. É a "verificação de conformidade online" que o auditor encontrou na transportadora auditada.
+6. **Pronta.** Sem pendências, a viagem fica "pronta para assegurar" e o sistema entrega o texto da declaração positiva para copiar no CT-e, emitido no TMS.
+7. **Fim.** CT-e e nota fiscal chegam pela conciliação em lote (planilha ou XML do período, casados por placa e data). Conciliada e com a data de descarga vencida, a viagem se conclui sozinha e o produto entra no histórico dos compartimentos das placas usadas.
 
 Registro produzido: a viagem com todos os itens que o auditor anota. Correção: evento de retificação com motivo; cancelamento como evento. Com 80 viagens no dia: Hoje agrupa por situação e mostra primeiro o que falta, com contagem; viagens prontas recolhem.
 

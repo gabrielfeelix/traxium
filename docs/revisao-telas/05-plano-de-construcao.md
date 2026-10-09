@@ -7,8 +7,9 @@ Registro de 08/10/2026. Leva ao protótipo a arquitetura de `04-arquitetura-prop
 | Tema | Premissa | Se a resposta vier diferente |
 | --- | --- | --- |
 | Cliente da v1 | Transportadora certificada com afretamento (granel sólido, multi-filial, TAC sob gatekeeper) | Embarcador com gatekeeper entra como variação da mesma mesa |
-| Verificação do compartimento | Feita pelo afretador da filial, no celular, com checklist por tipo de implemento e fotos opcionais por modelo | Se for do motorista, o passo vai para o link da viagem |
-| CT-e | Emitido no TMS do cliente (ex.: Atua); o Traxium entrega o texto da declaração positiva e recebe número do CT-e e da NF por digitação ou importação | Se nascer no Traxium, a viagem ganha emissão |
+| Verificação do compartimento | O motorista responde o checklist (lona, correntes, cintas, carroceria, interior) e manda as fotos pelo link; o afretador confere na mesa e aprova ou devolve com motivo (ver `06-analise-como-usuario.md`) | Se houver inspeção presencial, ela entra como alternativa na mesma etapa |
+| CT-e | Emitido no TMS do cliente (ex.: Atua); o Traxium entrega o texto da declaração positiva; CT-e e NF chegam por conciliação em lote (planilha ou XML casados por placa e data), não por digitação viagem a viagem | Se nascer no Traxium, a viagem ganha emissão |
+| Conclusão da viagem | Automática quando o CT-e é conciliado e a data de descarga passa | |
 | TAC e ETC | Maioria TAC; ETC recorrente existe e tem cadastro com estados de qualificação | Se ETC for raro, estados de empresa somem |
 | Exceções | Raras; registro de 9 campos dentro da viagem; três alçadas padrão (Gestor da qualidade, Direção e RT, Técnico = ninguém), configuráveis | Se forem frequentes, volta uma fila própria |
 | Limpeza | Regime seco é o caso comum; campos por regime continuam para B, C e D | |
@@ -24,16 +25,16 @@ Arquivos novos em `SaaS moderno estilo Dribbble/`. Os antigos ficam no disco e n
 
 | Arquivo | Tela | Parâmetro de URL |
 | --- | --- | --- |
-| `Hoje.dc.html` | Mesa do afretador e painel da qualidade (filial "todas") | `?filial=` |
-| `Viagens v2.dc.html` | Lista de viagens, filtros fixos, visões salvas, exportação | |
+| `Hoje.dc.html` | Mesa do afretador (viagens do dia da filial, com estado do link e fotos a conferir); em filial "todas", painel da qualidade (pendências de registro do período, vencimentos, prontidão para auditoria) | `?filial=` |
+| `Viagens v2.dc.html` | Lista de viagens, filtros fixos, visões salvas, exportação, conciliação de CT-e em lote | |
 | `Viagem.dc.html` | Detalhe da viagem: passos, decisão, verificação, documentos, liberação, ocorrências, linha do tempo | `?id=VG-xxxx` |
 | `Transportadores.dc.html` | Base de TACs e ETCs com drawer de detalhe, convite na linha | `?id=` |
 | `Frota.dc.html` | Frota própria com escopo GMP+ | |
 | `Compartimento v2.dc.html` | Histórico do compartimento (journey sheet) | `?placa=&pos=` |
-| `Auditoria.dc.html` | Rastrear por placa, CT-e, NF ou período; amostra; exportações | |
+| `Auditoria.dc.html` | Rastrear por placa, CT-e, NF ou período; amostra; exportações; registrar simulação de rastreabilidade | |
 | `Cadastros.dc.html` | Produtos e regimes, Manual e treinamentos, Fornecedores, Filiais | `?aba=` |
 | `Configuracoes v2.dc.html` | Usuários e papéis, alçadas, regras com piso, modelos, LGPD, integrações | |
-| `Link da Viagem.dc.html` | Página do motorista, mobile, sem login | `?id=` |
+| `Link da Viagem.dc.html` | Página do motorista, mobile, sem login: confirma CPF, documentos que faltam, três últimas cargas por placa, checklist com fotos guiadas, manual em cartões, assinatura; salva sem sinal | `?id=` |
 
 `index.html` passa a redirecionar para `Hoje.dc.html`.
 
