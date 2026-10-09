@@ -1,5 +1,7 @@
 # HANDOFF — Traxium
 
+> **Atualização de 08/10/2026:** o trabalho atual é a revisão de produto e a construção do protótipo v2. Comece por `docs/revisao-telas/HANDOFF.md`. As seções de próximos passos abaixo estão superadas; as regras visuais e de domínio continuam valendo.
+
 Para quem chega sem contexto. Leia as seções 1 a 4 antes de tocar em qualquer arquivo; elas custam cinco minutos e evitam os erros que já custaram caro.
 
 ---

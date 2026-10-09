@@ -1,5 +1,7 @@
 # TRAXIUM — Documento de handoff para o próximo agente
 
+> **Atualização de 08/10/2026:** o trabalho atual é a revisão de produto e a construção do protótipo v2. Comece por `../docs/revisao-telas/HANDOFF.md`. As seções de próximos passos abaixo estão superadas; as regras visuais e de domínio continuam valendo.
+
 Leia este arquivo INTEIRO antes de tocar em qualquer tela. Ele é a fonte da verdade do projeto: padrões visuais, decisões de UX aprovadas pelo usuário, estado de cada arquivo e o que falta. As regras persistentes também estão em `CLAUDE.md` (leia). O briefing original está em `uploads/BRIEFING-DESIGN.md` e o PDF do P.O. em `uploads/pilares.pdf` (cópia de `uploads/Traxium - 5 Pilares prioritários.pdf`).
 
 ## 1. O produto
