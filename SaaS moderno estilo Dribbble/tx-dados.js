@@ -960,6 +960,13 @@
       else add('manual', 'Ciência do manual vigente', 'falta', 'Manual v' + vig.v + ' ainda não lido', 'Motorista pelo link');
     }
 
+    // Regras configuradas como alerta não travam: viram aviso, com o motivo escrito.
+    const regraDe = { 'docs-transp': 'docs', 'docs-mot': 'docs', 'docs-conj': 'docs', manual: 'manual' };
+    ch.forEach(c => {
+      const r = db().config.regras.find(x => x.k === regraDe[c.k]);
+      if (r && r.classe === 'alerta' && (c.estado === 'bloqueio' || c.estado === 'falta') && !c.tecnico) { c.estado = 'ok'; c.aviso = true; c.detalhe = 'Alerta (regra configurada como alerta): ' + c.detalhe; }
+    });
+
     // Liberações por autoridade cobrem bloqueios não técnicos; o motor continua reprovando.
     const libs = v.liberacoes || [];
     ch.forEach(c => {

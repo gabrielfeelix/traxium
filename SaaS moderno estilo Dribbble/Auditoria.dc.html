@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Traxium: auditoria</title>
+<script src="./tx-dados.js"></script>
+<script src="./tx-ui.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f2f5f4;font-family:'Hanken Grotesk',sans-serif;color:#0b2224;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0C5862;text-decoration:none}a:hover{color:#127670}
+input{font-family:'Hanken Grotesk',sans-serif;color:#0b2224}
+input::placeholder{color:#8ba09e}
+@keyframes txsh{from{background-position:-600px 0}to{background-position:600px 0}}
+</style>
+</helmet>
+<div style="display:flex;min-height:100vh;min-width:1560px" data-screen-label="Auditoria">
+  <!-- TX:SIDEBAR -->
+  <div data-tx-sidebar style="width:{{ navW }};flex:none;background:linear-gradient(178deg,#093D44,#0A4650);color:#fff;display:flex;flex-direction:column;padding:22px {{ navPad }};position:sticky;top:0;height:100vh;transition:width .25s ease;overflow-x:hidden;overflow-y:auto;z-index:20">
+    <a href="Hoje.dc.html" title="Traxium: ir para Hoje" style="display:flex;align-items:center;gap:10px;padding:4px 8px 20px;color:#fff">
+      <svg width="34" height="34" viewBox="0 0 32 32" style="flex:none"><defs><linearGradient id="txLogo" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1a9e93"></stop><stop offset="1" stop-color="#0E78B5"></stop></linearGradient></defs><polygon points="16,2.5 27.5,9 27.5,23 16,29.5 4.5,23 4.5,9" fill="url(#txLogo)"></polygon><polyline points="9,20 13,13 18,17 23,10" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></polyline><circle cx="9" cy="20" r="1.6" fill="#fff"></circle><circle cx="13" cy="13" r="1.6" fill="#fff"></circle><circle cx="18" cy="17" r="1.6" fill="#fff"></circle><circle cx="23" cy="10" r="1.6" fill="#fff"></circle></svg>
+      <div style="display:{{ navL }}"><div style="font-weight:800;font-size:17px;letter-spacing:.2px">Traxium</div><div style="font-size:10.5px;letter-spacing:1.6px;color:rgba(255,255,255,.5);text-transform:uppercase;white-space:nowrap">{{ tenantNome }}</div></div>
+    </a>
+    <div style="display:flex;flex-direction:column;gap:3px">
+      <a href="Hoje.dc.html" title="Hoje" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><rect x="2.5" y="3.2" width="11" height="10.3" rx="2.4"></rect><line x1="2.5" y1="6.6" x2="13.5" y2="6.6"></line><line x1="5.6" y1="1.8" x2="5.6" y2="4.2"></line><line x1="10.4" y1="1.8" x2="10.4" y2="4.2"></line><circle cx="8" cy="10" r="1.3" fill="currentColor" stroke="none"></circle></svg><span data-tx-item="hoje" style="display:{{ navL }};white-space:nowrap">Hoje</span><span title="viagens de hoje com pendência" data-tx-badge="hoje" style="margin-left:auto;display:{{ sbHojeD }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;font-family:'Spline Sans Mono',monospace">{{ sbHoje }}</span></a>
+      <a href="Viagens v2.dc.html" title="Viagens" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M2.5 8h9"></path><path d="M8 4.5 11.5 8 8 11.5"></path></svg><span data-tx-item="viagens" style="display:{{ navL }};white-space:nowrap">Viagens</span></a>
+      <a href="Transportadores.dc.html" title="Transportadores" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" style="flex:none"><circle cx="5.4" cy="6.2" r="2.4"></circle><circle cx="10.8" cy="6.2" r="2.4"></circle><path d="M2.5 13c.6-2 1.7-3 3-3s2.3 1 2.9 3" stroke-linecap="round"></path></svg><span data-tx-item="transportadores" style="display:{{ navL }};white-space:nowrap">Transportadores</span><span title="documentos vencidos ou vencendo em 15 dias" data-tx-badge="transportadores" style="margin-left:auto;display:{{ sbTranspD }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;font-family:'Spline Sans Mono',monospace">{{ sbTransp }}</span></a>
+      <a href="Frota.dc.html" title="Frota própria" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" style="flex:none"><rect x="2" y="4.5" width="8" height="5.5" rx="1.4"></rect><path d="M10 6.5h2.4l1.6 2v1.5h-4z" stroke-linejoin="round"></path><circle cx="5" cy="11.8" r="1.4"></circle><circle cx="11.6" cy="11.8" r="1.4"></circle></svg><span data-tx-item="frota" style="display:{{ navL }};white-space:nowrap">Frota própria</span></a>
+      <div title="Auditoria" style="display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px;background:linear-gradient(90deg,rgba(26,158,147,.35),rgba(14,120,181,.28));border:1px solid rgba(255,255,255,.14);font-size:14px;font-weight:700;color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" style="flex:none"><rect x="2.6" y="2.2" width="8" height="10.5" rx="1.8"></rect><line x1="4.8" y1="5.4" x2="8.4" y2="5.4"></line><line x1="4.8" y1="8" x2="7.2" y2="8"></line><circle cx="10.6" cy="10.4" r="2.3"></circle><line x1="12.3" y1="12.1" x2="14" y2="13.8"></line></svg><span data-tx-item="auditoria" style="display:{{ navL }};white-space:nowrap">Auditoria</span></div>
+    </div>
+    <div style="margin-top:14px;display:flex;flex-direction:column;gap:2px">
+      <div onClick="{{ cadToggle }}" title="Cadastros" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px;cursor:pointer" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" style="flex:none"><path d="M8 2.2 13.5 5 8 7.8 2.5 5z"></path><path d="M2.5 8 8 10.8 13.5 8" stroke-linecap="round"></path><path d="M2.5 11 8 13.8 13.5 11" stroke-linecap="round"></path></svg><span data-tx-item="cadastros" style="display:{{ navL }};white-space:nowrap">Cadastros</span><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto;display:{{ navL }};transform:{{ cadChev }};transition:transform .2s;opacity:.7"><path d="M4.5 2.5 8 6l-3.5 3.5"></path></svg></div>
+      <sc-if value="{{ cadOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:1px;margin-top:2px">
+          <a href="Cadastros.dc.html?aba=produtos" data-tx-sub="produtos" style="display:flex;align-items:center;gap:10px;padding:7px 12px 7px 39px;border-radius:9px;font-size:13px;font-weight:{{ sbc.produtos.fw }};color:{{ sbc.produtos.c }};background:{{ sbc.produtos.bg }}" style-hover="color:#fff;background:rgba(255,255,255,.06)"><span style="width:5px;height:5px;border-radius:99px;background:{{ sbc.produtos.dot }};flex:none"></span>Produtos e regimes</a>
+          <a href="Cadastros.dc.html?aba=manual" data-tx-sub="manual" style="display:flex;align-items:center;gap:10px;padding:7px 12px 7px 39px;border-radius:9px;font-size:13px;font-weight:{{ sbc.manual.fw }};color:{{ sbc.manual.c }};background:{{ sbc.manual.bg }}" style-hover="color:#fff;background:rgba(255,255,255,.06)"><span style="width:5px;height:5px;border-radius:99px;background:{{ sbc.manual.dot }};flex:none"></span>Manual e treinamentos</a>
+          <a href="Cadastros.dc.html?aba=fornecedores" data-tx-sub="fornecedores" style="display:flex;align-items:center;gap:10px;padding:7px 12px 7px 39px;border-radius:9px;font-size:13px;font-weight:{{ sbc.fornecedores.fw }};color:{{ sbc.fornecedores.c }};background:{{ sbc.fornecedores.bg }}" style-hover="color:#fff;background:rgba(255,255,255,.06)"><span style="width:5px;height:5px;border-radius:99px;background:{{ sbc.fornecedores.dot }};flex:none"></span>Fornecedores</a>
+          <a href="Cadastros.dc.html?aba=filiais" data-tx-sub="filiais" style="display:flex;align-items:center;gap:10px;padding:7px 12px 7px 39px;border-radius:9px;font-size:13px;font-weight:{{ sbc.filiais.fw }};color:{{ sbc.filiais.c }};background:{{ sbc.filiais.bg }}" style-hover="color:#fff;background:rgba(255,255,255,.06)"><span style="width:5px;height:5px;border-radius:99px;background:{{ sbc.filiais.dot }};flex:none"></span>Filiais</a>
+        </div>
+      </sc-if>
+    </div>
+    <div style="margin-top:auto;padding-top:18px;display:flex;flex-direction:column;gap:2px">
+      <a href="Configuracoes v2.dc.html" title="Configurações" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" style="flex:none"><circle cx="8" cy="8" r="2.3"></circle><path d="M8 1.8v1.9M8 12.3v1.9M14.2 8h-1.9M3.7 8H1.8M12.4 3.6l-1.3 1.3M4.9 11.1l-1.3 1.3M12.4 12.4l-1.3-1.3M4.9 4.9 3.6 3.6" stroke-linecap="round"></path></svg><span data-tx-item="config" style="display:{{ navL }};white-space:nowrap">Configurações</span></a>
+      <a href="Link da Viagem.dc.html?id=VG-3122" target="_blank" rel="noopener" title="Abre em outra aba a página que o motorista recebe pelo WhatsApp" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><rect x="3.5" y="1.8" width="9" height="12.4" rx="2"></rect><line x1="6.5" y1="4" x2="9.5" y2="4"></line><circle cx="8" cy="11.7" r=".65" fill="currentColor" stroke="none"></circle></svg><span data-tx-item="link" style="display:{{ navL }};white-space:nowrap">Link do motorista</span><span style="margin-left:auto;display:{{ navL }};font-size:10px;font-weight:700;letter-spacing:.4px;padding:1px 7px;border-radius:99px;border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.7)">demo</span></a>
+      <a href="versao-anterior.html" title="Versão anterior" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M2.6 8a5.4 5.4 0 1 0 1.6-3.8"></path><path d="M2.4 2.6v2.6H5"></path><path d="M8 5.2V8l1.9 1.3"></path></svg><span data-tx-item="anterior" style="display:{{ navL }};white-space:nowrap">Versão anterior</span></a>
+      <div onClick="{{ navToggle }}" title="Recolher ou expandir o menu" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;cursor:pointer;font-size:13px;font-weight:600;color:rgba(255,255,255,.55)" style-hover="background:rgba(255,255,255,.08);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="transform:{{ navFlip }};transition:transform .25s;flex:none"><path d="M9.5 3 4.5 8l5 5"></path><line x1="12" y1="3" x2="12" y2="13"></line></svg><span style="display:{{ navL }};white-space:nowrap">Recolher menu</span></div>
+      <div style="display:{{ navL }};margin-top:10px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);padding:12px 14px">
+        <div style="font-size:11.5px;color:rgba(255,255,255,.5)">Base IDTF mantida pela Traxium</div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;margin-top:5px"><span style="width:8px;height:8px;border-radius:99px;background:#3ddc97;box-shadow:0 0 0 4px rgba(61,220,151,.18)"></span>{{ baseVersao }} vigente</div>
+      </div>
+    </div>
+  </div>
+  <!-- /TX:SIDEBAR -->
+  <div style="flex:1;display:flex;flex-direction:column;padding:24px 32px 48px;gap:16px;min-width:0">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div><div style="font-size:24px;font-weight:800">Auditoria</div><div style="font-size:13.5px;color:#5c706e;margin-top:2px">Rastrear por placa, CT-e, NF ou período e montar a amostra. O auditor não opera: a qualidade opera ao lado dele.</div></div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px"><!-- TX:PERFIL -->
+        <div data-tx-pop style="position:relative">
+          <div onClick="{{ onPerfil }}" title="{{ uNome }}" data-tx-avatar style="width:38px;height:38px;border-radius:99px;background:linear-gradient(135deg,{{ uG1 }},{{ uG2 }});color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13.5px;box-shadow:0 0 0 3px #fff,0 0 0 4.5px #d8e4e2;cursor:pointer" style-hover="box-shadow:0 0 0 3px #fff,0 0 0 4.5px #127670">{{ uIni }}</div>
+          <sc-if value="{{ perfilOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;right:0;top:48px;background:#fff;border:1px solid #e4eae8;border-radius:16px;box-shadow:0 16px 40px rgba(9,61,68,.16);padding:6px;width:268px;z-index:80;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;gap:11px;padding:11px 12px;border-bottom:1px solid #f0f4f3;margin-bottom:4px">
+                <span style="width:38px;height:38px;border-radius:99px;background:linear-gradient(135deg,{{ uG1 }},{{ uG2 }});color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none">{{ uIni }}</span>
+                <div style="min-width:0"><div style="font-size:13.5px;font-weight:800">{{ uNome }}</div><div style="font-size:11.5px;color:#5c706e">{{ uCargo }}</div></div>
+              </div>
+              <div onClick="{{ abrirPerfil }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer" style-hover="background:#f6f9f8">Meu perfil</div>
+              <div onClick="{{ abrirPrefs }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer" style-hover="background:#f6f9f8">Avisos</div>
+              <div onClick="{{ abrirEntrar }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px" style-hover="background:#f6f9f8">Entrar como<span style="font-size:10.5px;font-weight:700;color:#0C5862;border:1px solid #cfe3e1;border-radius:99px;padding:1px 9px;white-space:nowrap">{{ uPapel }}</span></div>
+              <div style="height:1px;background:#f0f4f3;margin:5px 8px"></div>
+              <div onClick="{{ abrirSair }}" style="font-size:13px;font-weight:600;padding:9px 12px;border-radius:9px;cursor:pointer;color:#c43d3d" style-hover="background:#fdf6f6">Sair</div>
+            </div>
+          </sc-if>
+        </div>
+<!-- /TX:PERFIL --></div>
+    </div>
+
+    <div style="position:relative;overflow:hidden;border-radius:22px;background:linear-gradient(115deg,#093D44,#0C5862 60%,#0E78B5 140%);color:#fff;padding:20px 24px">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:13px;padding:0 14px;display:flex;align-items:center;gap:9px;width:420px">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.6"></circle><line x1="10.5" y1="10.5" x2="13.5" y2="13.5"></line></svg>
+          <input value="{{ q }}" onInput="{{ onQ }}" data-tx-rastrear placeholder="Placa, CT-e, NF ou ordem. Ex.: QWM 4H57" style="border:none;outline:none;background:transparent;font-size:15px;padding:12px 0;flex:1;color:#fff;font-family:'Spline Sans Mono',monospace">
+        </div>
+        <span style="font-size:12.5px;color:rgba(255,255,255,.7)">de</span><input type="date" value="{{ de }}" onInput="{{ onDe }}" data-tx-de style="border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;border-radius:10px;padding:9px 10px;font-size:13px;font-family:'Spline Sans Mono',monospace;color-scheme:dark">
+        <span style="font-size:12.5px;color:rgba(255,255,255,.7)">até</span><input type="date" value="{{ ate }}" onInput="{{ onAte }}" data-tx-ate style="border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;border-radius:10px;padding:9px 10px;font-size:13px;font-family:'Spline Sans Mono',monospace;color-scheme:dark">
+        <sc-for list="{{ tipos }}" as="tp" hint-placeholder-count="3"><span onClick="{{ tp.onClick }}" style="font-size:12.5px;font-weight:700;border-radius:99px;padding:7px 13px;cursor:pointer;background:{{ tp.bg }};color:{{ tp.c }};border:1px solid rgba(255,255,255,.22)">{{ tp.n }}</span></sc-for>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+          <sc-if value="{{ simAtiva }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Spline Sans Mono',monospace;font-size:13px;background:rgba(232,163,61,.25);border:1px solid rgba(232,163,61,.5);border-radius:99px;padding:6px 12px">simulação {{ simTempo }}</span></sc-if>
+          <span onClick="{{ onSim }}" data-tx-simulacao style="background:#fff;color:#093D44;font-size:13px;font-weight:800;border-radius:99px;padding:9px 16px;cursor:pointer">{{ simRot }}</span>
+        </div>
+      </div>
+      <div style="font-size:12px;color:rgba(255,255,255,.65);margin-top:10px">{{ resumoBusca }}</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:start">
+      <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;overflow:hidden">
+        <div style="display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid #eef2f1">
+          <div style="font-size:15px;font-weight:800">Viagens encontradas</div><span style="font-family:'Spline Sans Mono',monospace;font-size:13px;color:#5c706e">{{ nRes }}</span>
+          <span onClick="{{ selTodas }}" style="margin-left:auto;font-size:12.5px;font-weight:800;color:#0C5862;cursor:pointer">{{ selTodasRot }}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:{{ cols }};gap:10px;padding:10px 18px;background:#f7faf9;font-size:10.5px;font-weight:800;letter-spacing:.7px;color:#7c8f8d"><span></span><span>DATA</span><span>CT-E</span><span>NF</span><span>EMBARCADOR E DESTINATÁRIO</span><span>PRODUTO</span><span>PLACAS</span><span>TERMO</span><span>VERIFICAÇÃO</span></div>
+        <sc-for list="{{ linhas }}" as="r" hint-placeholder-count="8">
+          <div data-tx-res="{{ r.id }}" style="display:grid;grid-template-columns:{{ cols }};gap:10px;padding:10px 18px;border-top:1px solid #f0f4f3;align-items:center;font-size:12.5px;background:{{ r.bg }}">
+            <span onClick="{{ r.toggle }}" data-tx-sel="{{ r.id }}" style="width:19px;height:19px;border-radius:6px;border:2px solid {{ r.ckBd }};background:{{ r.ck }};color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer">{{ r.ckI }}</span>
+            <a href="{{ r.href }}" style="font-family:'Spline Sans Mono',monospace;font-weight:600;color:#0b2224">{{ r.data }}</a>
+            <span style="font-family:'Spline Sans Mono',monospace;color:{{ r.cteC }}">{{ r.cte }}</span>
+            <span style="font-family:'Spline Sans Mono',monospace;color:{{ r.cteC }}">{{ r.nf }}</span>
+            <span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.rota }}</span>
+            <span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.produto }}</span>
+            <span style="font-family:'Spline Sans Mono',monospace;font-size:11.5px">{{ r.placas }}</span>
+            <span style="font-family:'Spline Sans Mono',monospace;color:{{ r.termoC }}">{{ r.termo }}</span>
+            <span style="font-family:'Spline Sans Mono',monospace;color:{{ r.verC }}">{{ r.ver }}</span>
+          </div>
+        </sc-for>
+        <sc-if value="{{ vazio }}" hint-placeholder-val="{{ false }}"><div style="padding:40px 18px;text-align:center;font-size:13px;color:#5c706e">Nenhuma viagem assegurada com esta placa, documento ou período.</div></sc-if>
+        <div style="display:flex;align-items:center;gap:8px;padding:12px 18px;border-top:1px solid #eef2f1"><span style="font-size:12.5px;color:#5c706e">{{ pagInfo }}</span><sc-if value="{{ temPaginacao }}" hint-placeholder-val="{{ false }}"><div style="margin-left:auto;display:flex;gap:5px"><sc-for list="{{ paginas }}" as="pg" hint-placeholder-count="2"><span onClick="{{ pg.onClick }}" style="font-family:'Spline Sans Mono',monospace;font-size:12.5px;width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid {{ pg.bd }};background:{{ pg.bg }};color:{{ pg.c }}">{{ pg.n }}</span></sc-for></div></sc-if></div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:18px 20px">
+          <div style="font-size:15px;font-weight:800">Amostra</div>
+          <div style="font-size:12.5px;color:#5c706e;margin-top:3px">{{ amostraTxt }}</div>
+          <span onClick="{{ exportarAmostra }}" data-tx-exportar-amostra style="display:block;text-align:center;margin-top:12px;background:{{ amBg }};color:{{ amC }};box-shadow:{{ amSh }};cursor:{{ amCur }};font-size:13px;font-weight:800;border-radius:99px;padding:10px">Exportar amostra em documento único</span>
+        </div>
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:18px 20px">
+          <div style="font-size:15px;font-weight:800">Listas de apoio</div>
+          <div style="font-size:12.5px;color:#5c706e;margin-top:3px">o que o auditor pede na mesma visita</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px">
+            <sc-for list="{{ apoio }}" as="ap" hint-placeholder-count="3"><div onClick="{{ ap.onClick }}" data-tx-apoio="{{ ap.k }}" style="display:flex;align-items:center;gap:10px;border:1px solid #eef2f1;border-radius:12px;padding:10px 12px;cursor:pointer" style-hover="border-color:#127670"><div style="flex:1"><div style="font-size:13px;font-weight:700">{{ ap.n }}</div><div style="font-size:11.5px;color:#7c8f8d">{{ ap.sub }}</div></div><span style="font-size:12px;font-weight:800;color:#0C5862">Exportar</span></div></sc-for>
+          </div>
+        </div>
+        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:18px 20px">
+          <div style="font-size:15px;font-weight:800">Simulações de rastreabilidade</div>
+          <div style="font-size:12.5px;color:#5c706e;margin-top:3px">limite da auditoria: 4 horas do carregamento à descarga</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px"><sc-for list="{{ sims }}" as="sm" hint-placeholder-count="1"><div data-tx-sim-item style="background:#f7faf9;border-radius:12px;padding:9px 12px;font-size:12.5px"><div style="display:flex;gap:8px"><b>{{ sm.data }}</b><span style="margin-left:auto;font-family:'Spline Sans Mono',monospace;color:#1a8f57;font-weight:600">{{ sm.dur }}</span></div><div style="color:#3c4f4e;margin-top:2px">{{ sm.pedido }}</div><div style="color:#7c8f8d;font-size:11.5px">{{ sm.quem }}, {{ sm.n }} viagens</div></div></sc-for></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- TX:MODAIS -->
+  <sc-if value="{{ modalPerfil }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:470px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Meu perfil</div><span onClick="{{ fecharModalTopo }}" title="Fechar" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;flex:none" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:14px">
+          <span style="width:72px;height:72px;border-radius:99px;background:linear-gradient(135deg,{{ uG1 }},{{ uG2 }});color:#fff;font-size:24px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #fff,0 0 0 6px #e4eae8">{{ uIni }}</span>
+          <div style="font-size:17px;font-weight:800;margin-top:4px">{{ uNome }}</div>
+          <div style="font-size:12.5px;color:#5c706e">{{ uEmail }}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-top:18px">
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Papel</span><span style="font-weight:700;text-align:right">{{ uCargo }}</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Escopo</span><span style="font-weight:700;text-align:right">{{ uFiliais }}</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Alçada de liberação</span><span style="font-weight:700;text-align:right">{{ uAlcada }}</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px;background:#f7faf9;border-radius:12px;padding:10px 14px"><span style="color:#5c706e">Liberações assinadas</span><span style="font-family:'Spline Sans Mono',monospace;font-weight:600">{{ uAssinadas }}</span></div>
+        </div>
+        <div style="font-size:12px;color:#5c706e;margin-top:12px;line-height:1.55">{{ uAlcadaSub }}</div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalPrefs }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:520px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Avisos</div><span onClick="{{ fecharModalTopo }}" title="Fechar" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;flex:none" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:3px">O que chega para você, na tela e no celular.</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:14px">
+          <sc-for list="{{ prefs }}" as="pf" hint-placeholder-count="4">
+            <div onClick="{{ pf.onClick }}" style="display:flex;align-items:center;gap:12px;border:1px solid #eef2f1;border-radius:14px;padding:12px 14px;cursor:pointer" style-hover="border-color:#c9d5d3">
+              <div style="flex:1"><div style="font-size:13.5px;font-weight:700">{{ pf.t }}</div><div style="font-size:11.5px;color:#5c706e">{{ pf.sub }}</div></div>
+              <span style="width:40px;height:23px;border-radius:99px;background:{{ pf.swBg }};position:relative;flex:none;transition:background .2s"><span style="position:absolute;top:2.5px;left:{{ pf.swPos }};width:18px;height:18px;border-radius:99px;background:#fff;box-shadow:0 1px 4px rgba(9,34,36,.25);transition:left .2s"></span></span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalEntrar }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:540px;max-height:88vh;overflow:auto;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">{{ entrarTitulo }}</div><span onClick="{{ fecharModalTopo }}" title="Fechar" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;flex:none" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:3px;line-height:1.55">{{ entrarSub }}</div>
+        <div style="display:flex;flex-direction:column;gap:7px;margin-top:14px">
+          <sc-for list="{{ usuariosLista }}" as="ul" hint-placeholder-count="6">
+            <div onClick="{{ ul.onClick }}" data-tx-usuario="{{ ul.id }}" style="display:flex;align-items:center;gap:12px;border:1.5px solid {{ ul.bd }};background:{{ ul.bg }};border-radius:15px;padding:11px 14px;cursor:pointer;transition:all .15s" style-hover="border-color:#127670">
+              <span style="width:18px;height:18px;border-radius:99px;border:2.5px solid {{ ul.dotBd }};background:{{ ul.dot }};flex:none"></span>
+              <span style="width:34px;height:34px;border-radius:99px;flex:none;background:linear-gradient(135deg,{{ ul.g1 }},{{ ul.g2 }});color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ ul.ini }}</span>
+              <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:800">{{ ul.nome }}</div><div style="font-size:11.5px;color:#5c706e;margin-top:1px">{{ ul.cargo }}, {{ ul.escopo }}</div></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ modalSair }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fecharModalTopo }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
+      <div onClick="{{ pararClique }}" style="background:#fff;border-radius:24px;width:440px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+        <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Sair da conta</div><span onClick="{{ fecharModalTopo }}" title="Fechar" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;flex:none" style-hover="background:#e4ebe9">✕</span></div>
+        <div style="display:flex;align-items:center;gap:12px;background:#f7faf9;border-radius:15px;padding:13px 15px;margin-top:16px">
+          <span style="width:40px;height:40px;border-radius:99px;flex:none;background:linear-gradient(135deg,{{ uG1 }},{{ uG2 }});color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ uIni }}</span>
+          <div><div style="font-size:13.5px;font-weight:800">{{ uNome }}</div><div style="font-size:11.5px;color:#5c706e">{{ uCargo }}</div></div>
+        </div>
+        <div style="font-size:12.5px;color:#5c706e;margin-top:14px;line-height:1.6">O que você registrou continua na viagem, com seu nome e a hora. O que estava aberto num formulário sem confirmar não foi gravado.</div>
+        <div style="display:flex;gap:8px;margin-top:18px;justify-content:flex-end">
+          <span onClick="{{ fecharModalTopo }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer" style-hover="background:#e4ebe9">Cancelar</span>
+          <span onClick="{{ confirmarSair }}" style="background:linear-gradient(135deg,#e46969,#c43d3d);color:#fff;font-size:13.5px;font-weight:800;border-radius:99px;padding:10px 22px;cursor:pointer;box-shadow:0 8px 18px rgba(196,61,61,.3)" style-hover="transform:translateY(-1px)">Sair</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div data-tx-toast style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:1200;background:#0b2224;color:#fff;border-radius:99px;padding:12px 22px;font-size:13.5px;font-weight:600;box-shadow:0 16px 40px rgba(9,34,36,.35);display:flex;align-items:center;gap:10px;max-width:760px"><span style="width:20px;height:20px;border-radius:99px;background:linear-gradient(135deg,#48c78e,#127670);display:flex;align-items:center;justify-content:center;font-size:11px;flex:none">✓</span>{{ toastMsg }}</div>
+  </sc-if>
+<!-- /TX:MODAIS -->
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { loading: true, q: '', de: '2026-09-01', ate: '2026-10-08', tipo: 'todos', sel: [], simIni: null };
+  componentDidMount() { TX.ui.montar(this); this._tick = setInterval(() => { if (this.state.simIni) this.setState({ tick: Date.now() }); }, 1000); const q = TX.ui.param('q'); if (q) this.setState({ q }); }
+  avisar(m) { TX.ui.avisar(this, m); }
+  resultados() {
+    const s = this.state, q = TX.norm(s.q), qd = TX.soDigitos(s.q);
+    return TX.db.viagens.filter(v => v.assegurada && !v.cancelada && v.data >= s.de && v.data <= s.ate && v.data <= TX.HOJE && (s.tipo === 'todos' || (s.tipo === 'propria') === (v.tipo === 'propria'))).filter(v => {
+      if (!q) return true;
+      const pl = TX.norm(TX.placasDoConjunto(v.conjunto).join(' '));
+      return pl.includes(q) || TX.norm(v.ordem).includes(q) || (qd.length >= 4 && v.cte && (v.cte.numero.includes(qd) || v.cte.nf.includes(qd)));
+    }).sort((a, b) => b.data.localeCompare(a.data));
+  }
+  renderVals() {
+    const s = this.state, U = TX.ui, F = TX.fmt, e = U.esc;
+    const res = this.resultados();
+    const pg = U.paginar(this, res, 'viagens');
+    const sel = s.sel.filter(id => res.some(v => v.id === id));
+    const am = U.cta(sel.length > 0);
+    const elapsed = s.simIni ? Math.floor((Date.now() - s.simIni) / 1000) : 0;
+    const pedido = (s.q ? (/\d{5,}/.test(s.q) ? 'Documento ' : 'Placa ') + s.q.toUpperCase() + ', ' : 'Todas as viagens, ') + F.data(s.de) + ' a ' + F.data(s.ate);
+    const itemViagem = v => { const d = TX.decidir(v), t = TX.transportador(v.transportador), mot = TX.pessoa(v.motorista); return '<h2>' + e(v.ordem) + ' (' + e(v.id) + '), ' + e(F.data(v.data)) + '</h2><table>' + [['Nota fiscal', v.cte ? v.cte.nf : 'ausente'], ['DACTE com declaração positiva', v.cte ? v.cte.numero + ': "' + TX.DECLARACAO_CTE + '"' : 'ausente'], ['Embarcador e destinatário', TX.embarcador(v.embarcador).nome + ' para ' + TX.destinatario(v.destinatario).nome], ['Produto', TX.produto(v.produto).nome], ['Filial', TX.filial(v.filial).nome], ['Subcontratado com RNTRC', t ? TX.nomeTransportador(t) + ', RNTRC ' + (t.rntrc ? t.rntrc.numero : 'ausente') : 'frota própria'], ['Motorista', mot.nome], ['Placas do conjunto', TX.placasDoConjunto(v.conjunto).join(', ')], ['Três últimas cargas', d.t3.map(c => c.placa + ' ' + c.pos + ': ' + c.cargas.map(x => F.data(x.data) + ' ' + (x.produto ? x.produto.nome : x.texto)).join('; ')).join(' | ')], ['Termo de compromisso', v.termo ? 'assinado em ' + F.data(v.termo.em.slice(0, 10)) : d.cobertura === 'gatekeeper' ? 'ausente' : 'não se aplica'], ['Verificação de conformidade', v.verificacao && v.verificacao.estado === 'aprovada' ? F.data(v.verificacao.em.slice(0, 10)) + ' por ' + TX.usuario(v.verificacao.por).nome : 'ausente']].map(l => '<tr><th style="width:230px">' + e(l[0]) + '</th><td' + (/ausente/.test(l[1]) ? ' class="aus"' : '') + '>' + e(l[1]) + '</td></tr>').join('') + '</table>'; };
+    const exp = (titulo, html, msg) => { if (U.exportarDocumento(titulo, html)) this.avisar(msg); else this.avisar('O navegador bloqueou a aba nova. Libere pop-ups e tente de novo.'); };
+    const periodoGK = TX.db.viagens.filter(v => !v.cancelada && v.assegurada && v.data >= s.de && v.data <= s.ate && TX.coberturaDe(v) === 'gatekeeper');
+    return Object.assign({}, U.base(this), {
+      q: s.q, onQ: ev => this.setState({ q: ev.target.value, pag: 1 }), de: s.de, ate: s.ate, onDe: ev => this.setState({ de: ev.target.value, pag: 1 }), onAte: ev => this.setState({ ate: ev.target.value, pag: 1 }),
+      tipos: [['todos', 'Todas'], ['afretamento', 'Afretamento'], ['propria', 'Frota própria']].map(([k, n]) => ({ n, onClick: () => this.setState({ tipo: k, pag: 1 }), bg: s.tipo === k ? '#fff' : 'transparent', c: s.tipo === k ? '#093D44' : '#fff' })),
+      resumoBusca: res.length + ' viagens asseguradas de ' + F.data(s.de) + ' a ' + F.data(s.ate) + (s.q ? ' para "' + s.q + '"' : '') + '. Colunas na ordem em que o auditor anota.',
+      simAtiva: !!s.simIni, simTempo: Math.floor(elapsed / 60) + ' min ' + String(elapsed % 60).padStart(2, '0') + ' s', simRot: s.simIni ? 'Registrar simulação' : 'Iniciar simulação de rastreabilidade',
+      onSim: () => {
+        if (!s.simIni) { this.setState({ simIni: Date.now() }); this.avisar('Simulação iniciada. Faça a busca pedida; ao terminar, registre. O tempo fica gravado.'); return; }
+        const min = Math.max(1, Math.round(elapsed / 60));
+        TX.fazer('registrarSimulacao', { pedido, encontradas: res.length, duracaoMin: min });
+        this.setState({ simIni: null }); this.avisar('Simulação registrada: ' + pedido + ', ' + res.length + ' viagens em ' + min + ' min.');
+      },
+      nRes: res.length, cols: '28px 78px 70px 70px 1.5fr 1fr 150px 64px 74px',
+      linhas: s.loading ? [] : pg.itens.map(v => { const on = s.sel.includes(v.id); return { id: v.id, href: 'Viagem.dc.html?id=' + v.id, data: F.data(v.data), cte: v.cte ? v.cte.numero : 'pendente', nf: v.cte ? v.cte.nf : 'pendente', cteC: v.cte ? '#0b2224' : '#b97514', rota: TX.embarcador(v.embarcador).nome + ' para ' + TX.destinatario(v.destinatario).nome, produto: TX.produto(v.produto).nome, placas: TX.placasDoConjunto(v.conjunto).join(' '),
+        termo: v.termo ? F.curta(v.termo.em.slice(0, 10)) : TX.coberturaDe(v) === 'gatekeeper' ? 'falta' : 'n/a', termoC: v.termo || TX.coberturaDe(v) !== 'gatekeeper' ? '#3c4f4e' : '#c43d3d',
+        ver: v.verificacao && v.verificacao.estado === 'aprovada' ? F.curta(v.verificacao.em.slice(0, 10)) : 'falta', verC: v.verificacao && v.verificacao.estado === 'aprovada' ? '#3c4f4e' : '#c43d3d',
+        bg: on ? '#f3faf8' : '#fff', ck: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#fff', ckBd: on ? '#127670' : '#c9d5d3', ckI: on ? '✓' : '',
+        toggle: () => this.setState({ sel: on ? s.sel.filter(x => x !== v.id) : s.sel.concat(v.id) }) }; }),
+      vazio: !s.loading && res.length === 0,
+      selTodasRot: sel.length === res.length && res.length ? 'Tirar todas da amostra' : 'Pôr todas na amostra', selTodas: () => this.setState({ sel: sel.length === res.length ? [] : res.map(v => v.id) }),
+      amostraTxt: sel.length ? sel.length + ' viagens selecionadas (' + sel.filter(id => TX.viagem(id).tipo === 'propria').length + ' de frota própria, ' + sel.filter(id => TX.viagem(id).tipo !== 'propria').length + ' de afretamento).' : 'Marque as viagens que o auditor pediu na lista ao lado.',
+      amBg: am.bg, amC: am.c, amSh: am.sh, amCur: am.cur,
+      exportarAmostra: () => { if (!sel.length) return; exp('Amostra de auditoria', '<h1>Amostra de auditoria</h1><div class="sub">' + e(TX.db.tenant.nome) + ', ' + sel.length + ' viagens. Itens conferidos por viagem.</div>' + sel.map(id => itemViagem(TX.viagem(id))).join(''), 'Amostra com ' + sel.length + ' viagens aberta em outra aba, em documento único.'); },
+      apoio: [
+        { k: 'frota', n: 'Frota no escopo GMP+', sub: TX.db.conjuntos.filter(c => c.dono === 'propria' && c.escopo && c.escopo.no).length + ' conjuntos com placa de cada compartimento', onClick: () => exp('Frota no escopo', '<h1>Frota própria no escopo GMP+</h1><table><tr><th>Cavalo</th><th>Compartimentos</th><th>Desde</th></tr>' + TX.db.conjuntos.filter(c => c.dono === 'propria' && c.escopo && c.escopo.no).map(c => '<tr><td class="mono">' + e(c.cavalo) + '</td><td class="mono">' + e(TX.compsDoConjunto(c).map(k => k.placa + ' ' + k.pos).join(', ')) + '</td><td>' + e(F.data(c.escopo.desde)) + '</td></tr>').join('') + '</table>', 'Lista da frota no escopo aberta em outra aba.') },
+        { k: 'treinos', n: 'Treinamentos registrados', sub: TX.db.treinamentos.length + ' registros com data, tema, instrutor e participantes', onClick: () => exp('Treinamentos', '<h1>Treinamentos registrados</h1><table><tr><th>Data</th><th>Tema</th><th>Instrutor</th><th>Participantes</th></tr>' + TX.db.treinamentos.map(t => '<tr><td>' + e(F.data(t.data)) + '</td><td>' + e(t.tema) + '</td><td>' + e(t.instrutor) + '</td><td>' + e(t.participantes.map(p => (TX.usuario(p) || TX.pessoa(p) || {}).nome).join(', ')) + '</td></tr>').join('') + '</table>', 'Lista de treinamentos aberta em outra aba.') },
+        { k: 'gatekeeper', n: 'Protocolos gatekeeper do período', sub: periodoGK.length + ' viagens e a data de comunicação ao OC por filial', onClick: () => exp('Protocolos gatekeeper', '<h1>Protocolos gatekeeper</h1><div class="sub">' + F.data(s.de) + ' a ' + F.data(s.ate) + '</div><h2>Comunicação ao organismo certificador</h2><table>' + TX.db.filiais.map(f => '<tr><th>' + e(f.nome) + '</th><td>' + (f.comunicacaoOC ? e(F.data(f.comunicacaoOC.data) + ', protocolo ' + f.comunicacaoOC.protocolo) : '<span class="aus">não comunicada</span>') + '</td></tr>').join('') + '</table><h2>Viagens sob gatekeeper</h2><table><tr><th>Data</th><th>Ordem</th><th>Filial</th><th>Transportador</th><th>RNTRC</th></tr>' + periodoGK.map(v => { const t = TX.transportador(v.transportador); return '<tr><td>' + e(F.data(v.data)) + '</td><td>' + e(v.ordem) + '</td><td>' + e(TX.filial(v.filial).nome) + '</td><td>' + e(TX.nomeTransportador(t)) + '</td><td>' + e(t && t.rntrc ? t.rntrc.numero : '') + '</td></tr>'; }).join('') + '</table>', 'Protocolos gatekeeper abertos em outra aba.') }
+      ],
+      sims: TX.db.simulacoes.slice().reverse().map(m => ({ data: F.data(m.em.slice(0, 10)), dur: Math.floor(m.duracaoMin / 60) + 'h' + String(m.duracaoMin % 60).padStart(2, '0'), pedido: m.pedido, quem: TX.usuario(m.por).nome, n: m.encontradas }))
+    }, pg.vals);
+  }
+}
+</script>
+</body>
+</html>
