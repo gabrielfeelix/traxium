@@ -266,6 +266,18 @@ Revisto em 1366 px com a Lima Logística (ETC em revisão) e o João (TAC). A or
 
 **O que mudou.** `TX.ui.montar` acompanha a rolagem lateral: o header se estende até a borda direita do conteúdo e anda junto com ele (`translateX`). Em 1280 px ou mais nada muda, porque não há rolagem lateral.
 
+### Item 8. Sidebar em tela baixa
+
+**Problema.** Em 1366x768 com Cadastros aberto sobravam 14 px de rolagem dentro da sidebar e "Recolher menu" ficava no limite. Num notebook de tela 1366x768, o navegador deixa cerca de 660 px úteis: ali sobravam uns 100 px e "Recolher" sumia.
+
+**Achado no caminho.** O separador entre grupos usava a mesma condição do rótulo: aparecia com a sidebar aberta (21 px vazios sob cada rótulo de grupo) e sumia com ela recolhida, justamente quando deveria separar os ícones. Invertido em `TX.ui.base` (`navSec`).
+
+**O que mudou.**
+
+1. Com o separador certo, a sidebar aberta ganhou 63 px e cabe em 768 px sem rolagem. Recolhida, as divisórias voltam a separar os três grupos.
+2. Abaixo de 730 px de altura, os itens ficam mais justos e a faixa "Base IDTF vigente" sai (a versão continua em Cadastros, Produtos). O gerador passou a usar `sbPad`, `sbSubPad`, `sbGrupoPad` e `sbBaseD`, calculados em `TX.ui.base` e recalculados quando a janela muda de altura.
+3. Medido com Cadastros aberto: sem rolagem de 657 a 768 px; em 600 px sobram 8 px.
+
 ## Situação ao fim de 14/10/2026
 
 - Lacunas 1 a 4 do handoff fechadas: ocorrências exportáveis (etapa 3), fila de assinatura (etapa 2), entradas para o que virou seção (visões em Viagens na etapa 1 e busca global na etapa 7), Cadastros visível (etapa 7). A lacuna 5 continua dependendo do Gabriel e do Rafael.

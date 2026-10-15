@@ -54,11 +54,11 @@ export const RODAPE = [
   { k: 'anterior', n: 'Versão anterior', href: 'versao-anterior.html' }
 ];
 
-const ESTILO_ATIVO = 'display:flex;align-items:center;gap:11px;padding:8px 12px;border-radius:11px;background:linear-gradient(90deg,rgba(26,158,147,.35),rgba(14,120,181,.28));border:1px solid rgba(255,255,255,.14);font-size:14px;font-weight:700;color:#fff';
-const ESTILO_ITEM = 'display:flex;align-items:center;gap:11px;padding:8px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px';
+const ESTILO_ATIVO = 'display:flex;align-items:center;gap:11px;padding:{{ sbPad }};border-radius:11px;background:linear-gradient(90deg,rgba(26,158,147,.35),rgba(14,120,181,.28));border:1px solid rgba(255,255,255,.14);font-size:14px;font-weight:700;color:#fff';
+const ESTILO_ITEM = 'display:flex;align-items:center;gap:11px;padding:{{ sbPad }};border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px';
 const HOVER = 'style-hover="background:rgba(255,255,255,.07);color:#fff"';
 
-const ESTILO_BASE = 'display:flex;align-items:center;gap:11px;padding:8px 12px;border-radius:11px;font-size:14px';
+const ESTILO_BASE = 'display:flex;align-items:center;gap:11px;padding:{{ sbPad }};border-radius:11px;font-size:14px';
 
 function item(def, ativo, detalhe, dinamico) {
   const on = def.k === ativo;
@@ -114,13 +114,13 @@ const HEADER = `<div data-tx-header style="position:fixed;top:0;left:{{ navW }};
     </div>
   </div>`;
 
-const GRUPO = (n) => `<div style="display:{{ navL }};font-size:10px;font-weight:800;letter-spacing:1.4px;color:rgba(255,255,255,.4);padding:10px 12px 3px;text-transform:uppercase">${n}</div><div style="display:{{ navSec }};height:1px;background:rgba(255,255,255,.1);margin:12px 10px 8px"></div>`;
+const GRUPO = (n) => `<div style="display:{{ navL }};font-size:10px;font-weight:800;letter-spacing:1.4px;color:rgba(255,255,255,.4);padding:{{ sbGrupoPad }};text-transform:uppercase">${n}</div><div style="display:{{ navSec }};height:1px;background:rgba(255,255,255,.1);margin:12px 10px 8px"></div>`;
 
 // Sidebar flutuante e arredondada (referência: Autofluxos), com os itens em grupos.
 // Cadastros é a única área que abre outras telas: acordeão, aberto por padrão.
 export function sidebar(ativo, detalhe, dinamico) {
   const cadOn = ativo === 'cadastros';
-  const subs = CADASTROS.map(s => `<a href="Cadastros.dc.html?aba=${s.k}" data-tx-sub="${s.k}" style="display:flex;align-items:center;gap:10px;padding:5px 12px 5px 39px;border-radius:9px;font-size:13px;font-weight:{{ sbc.${s.k}.fw }};color:{{ sbc.${s.k}.c }};background:{{ sbc.${s.k}.bg }}" style-hover="color:#fff;background:rgba(255,255,255,.06)"><span style="width:5px;height:5px;border-radius:99px;background:{{ sbc.${s.k}.dot }};flex:none"></span>${s.n}</a>`).join('\n            ');
+  const subs = CADASTROS.map(s => `<a href="Cadastros.dc.html?aba=${s.k}" data-tx-sub="${s.k}" style="display:flex;align-items:center;gap:10px;padding:{{ sbSubPad }};border-radius:9px;font-size:13px;font-weight:{{ sbc.${s.k}.fw }};color:{{ sbc.${s.k}.c }};background:{{ sbc.${s.k}.bg }}" style-hover="color:#fff;background:rgba(255,255,255,.06)"><span style="width:5px;height:5px;border-radius:99px;background:{{ sbc.${s.k}.dot }};flex:none"></span>${s.n}</a>`).join('\n            ');
   const P = k => item(PRINCIPAIS.find(d => d.k === k), ativo, detalhe, dinamico);
   return `
   <div data-tx-sidebar style="width:{{ navW }};flex:none;padding:12px 0 12px 12px;position:sticky;top:0;height:100vh;transition:width .25s ease;z-index:40">
@@ -151,8 +151,8 @@ export function sidebar(ativo, detalhe, dinamico) {
       </div>
       <div style="margin-top:auto;padding-top:12px;display:flex;flex-direction:column;gap:1px">
         ${RODAPE.map(d => item(d, ativo, detalhe)).join('\n        ')}
-        <div title="Base IDTF mantida pela Traxium" style="display:{{ navL }};margin-top:8px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);padding:8px 12px;font-size:12px;color:rgba(255,255,255,.7);white-space:nowrap"><span style="display:inline-block;width:7px;height:7px;border-radius:99px;background:#3ddc97;box-shadow:0 0 0 3px rgba(61,220,151,.18);margin-right:8px"></span>Base IDTF {{ baseVersao }} vigente</div>
-        <div onClick="{{ navToggle }}" title="Recolher ou expandir o menu" style="display:flex;align-items:center;gap:11px;padding:8px 12px;margin-top:4px;border-radius:11px;cursor:pointer;font-size:13px;font-weight:600;color:rgba(255,255,255,.55)" style-hover="background:rgba(255,255,255,.08);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="transform:{{ navFlip }};transition:transform .25s;flex:none"><path d="M9.5 3 4.5 8l5 5"></path><line x1="12" y1="3" x2="12" y2="13"></line></svg><span style="display:{{ navL }};white-space:nowrap">Recolher menu</span></div>
+        <div title="Base IDTF mantida pela Traxium" style="display:{{ sbBaseD }};margin-top:8px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);padding:8px 12px;font-size:12px;color:rgba(255,255,255,.7);white-space:nowrap"><span style="display:inline-block;width:7px;height:7px;border-radius:99px;background:#3ddc97;box-shadow:0 0 0 3px rgba(61,220,151,.18);margin-right:8px"></span>Base IDTF {{ baseVersao }} vigente</div>
+        <div onClick="{{ navToggle }}" title="Recolher ou expandir o menu" style="display:flex;align-items:center;gap:11px;padding:{{ sbPad }};margin-top:4px;border-radius:11px;cursor:pointer;font-size:13px;font-weight:600;color:rgba(255,255,255,.55)" style-hover="background:rgba(255,255,255,.08);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="transform:{{ navFlip }};transition:transform .25s;flex:none"><path d="M9.5 3 4.5 8l5 5"></path><line x1="12" y1="3" x2="12" y2="13"></line></svg><span style="display:{{ navL }};white-space:nowrap">Recolher menu</span></div>
       </div>
     </div>
   </div>

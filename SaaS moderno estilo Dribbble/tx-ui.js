@@ -69,6 +69,8 @@
     };
     window.addEventListener('scroll', c._txHeader, { passive: true });
     window.addEventListener('resize', c._txHeader);
+    c._txAltura = () => { const b = window.innerHeight < 730; if (b !== c._txBaixa) { c._txBaixa = b; c.setState({ txAlt: b }); } };
+    window.addEventListener('resize', c._txAltura);
     setTimeout(c._txHeader, 0);
     if (o.semCarregar) c.setState({ loading: false });
     else setTimeout(() => c.setState({ loading: false }), o.atraso || 650);
@@ -128,6 +130,7 @@
   function base(c) {
     const s = c.state;
     const recolhida = s.navC != null ? s.navC : lerLS('tx-nav', '0') === '1';
+    const baixa = typeof window !== 'undefined' && window.innerHeight < 730;
     const u = TX.sessao();
     const b = TX.badges(u);
     const cadAtiva = c.cadAtiva ? c.cadAtiva() : null;
@@ -141,7 +144,9 @@
     const alc = u.alcada ? TX.db.alcadas.find(a => a.k === u.alcada) : null;
     const prefsOn = s.prefsOn || { venc: true, link: true, idtf: false };
     return {
-      navW: recolhida ? '84px' : '264px', navPad: recolhida ? '14px' : '16px', navL: recolhida ? 'none' : 'block', navSec: recolhida ? 'none' : 'block', navFlip: recolhida ? 'rotate(180deg)' : 'none',
+      // Tela baixa (abaixo de 730 px; num notebook de 768 px sobram cerca de 660 úteis): itens mais justos e sem a faixa da base IDTF.
+      sbPad: baixa ? '6px 12px' : '8px 12px', sbSubPad: baixa ? '3px 12px 3px 39px' : '5px 12px 5px 39px', sbGrupoPad: baixa ? '6px 12px 2px' : '10px 12px 3px', sbBaseD: recolhida || baixa ? 'none' : 'block',
+      navW: recolhida ? '84px' : '264px', navPad: recolhida ? '14px' : '16px', navL: recolhida ? 'none' : 'block', navSec: recolhida ? 'block' : 'none', navFlip: recolhida ? 'rotate(180deg)' : 'none',
       navToggle: () => { const n = !recolhida; gravarLS('tx-nav', n ? '1' : '0'); c.setState({ navC: n }); },
       sbHoje: b.hoje, sbHojeD: !recolhida && b.hoje ? 'inline-block' : 'none',
       sbTransp: b.transportadores, sbTranspD: !recolhida && b.transportadores ? 'inline-block' : 'none',
