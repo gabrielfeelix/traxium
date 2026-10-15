@@ -217,7 +217,7 @@ input::placeholder{color:#8ba09e}
         <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">{{ mTitulo }}</div><span onClick="{{ fecharModal }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px">✕</span></div>
         <div style="font-size:12.5px;color:#5c706e;margin-top:4px;line-height:1.55">{{ mSub }}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">
-          <sc-for list="{{ mCampos }}" as="mc" hint-placeholder-count="3"><div style="grid-column:{{ mc.col }}"><div style="font-size:12px;font-weight:800;color:#3c4f4e">{{ mc.l }}</div><input type="{{ mc.t }}" value="{{ mc.v }}" onInput="{{ mc.on }}" data-tx-campo="{{ mc.k }}" placeholder="{{ mc.ph }}" style="width:100%;margin-top:5px;border:1px solid #dfe7e5;border-radius:11px;padding:9px 12px;font-size:13.5px;outline:none"></div></sc-for>
+          <sc-for list="{{ mCampos }}" as="mc" hint-placeholder-count="3"><div style="grid-column:{{ mc.col }}"><div style="font-size:12px;font-weight:800;color:#3c4f4e">{{ mc.l }}</div><input value="{{ mc.v }}" onInput="{{ mc.on }}" data-tx-campo="{{ mc.k }}" inputmode="{{ mc.im }}" placeholder="{{ mc.ph }}" style="width:100%;margin-top:5px;border:1px solid #dfe7e5;border-radius:11px;padding:9px 12px;font-size:13.5px;outline:none;font-family:{{ mc.ff }}"><div style="font-size:11.5px;font-weight:700;color:#c43d3d;margin-top:3px">{{ mc.msg }}</div></div></sc-for>
         </div>
         <sc-if value="{{ mTemChips }}" hint-placeholder-val="{{ false }}">
           <div style="font-size:12px;font-weight:800;color:#3c4f4e;margin-top:12px">{{ mChipsRot }}</div>
@@ -379,7 +379,11 @@ class Component extends DCLogic {
   }
   modalVals() {
     const s = this.state, U = TX.ui, F = TX.fmt, m = s.modal, f = s.f || {};
-    const campo = (k, l, t, ph, col) => ({ k, l, t: t || 'text', ph: ph || '', col: col || 'auto', v: f[k] || '', on: e => this.setState({ f: Object.assign({}, s.f, { [k]: e.target.value }) }) });
+    // Campo de data: digita DD/MM/AAAA; f[k] guarda a data em ISO e f[k + 'Txt'] o que foi digitado.
+    const campo = (k, l, t, ph, col) => {
+      if (t === 'date') { const txt = f[k + 'Txt'] != null ? f[k + 'Txt'] : f[k] ? F.data(f[k]) : ''; return { k, l, ph: 'DD/MM/AAAA', col: col || 'auto', im: 'numeric', ff: "'Spline Sans Mono',monospace", v: txt, msg: U.avisoData(txt), on: e => { const t2 = U.mascaraData(e.target.value); this.setState({ f: Object.assign({}, s.f, { [k + 'Txt']: t2, [k]: U.dataIso(t2) || '' }) }); } }; }
+      return { k, l, ph: ph || '', col: col || 'auto', im: 'text', ff: 'inherit', v: f[k] || '', msg: '', on: e => this.setState({ f: Object.assign({}, s.f, { [k]: e.target.value }) }) };
+    };
     const base = { mAberto: !!m, mK: m || '', fecharModal: () => this.setState({ modal: null }), pararClique: e => e.stopPropagation(), mTemChips: false, mChips: [], mChipsRot: '', mCampos: [] };
     const fim = (ok, rot, fn) => { const c = U.cta(ok); return { mCta: rot, ctaBg: c.bg, ctaC: c.c, ctaSh: c.sh, ctaCur: c.cur, confirmar: () => { if (ok) fn(); } }; };
     if (m === 'oc') {

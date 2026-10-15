@@ -245,7 +245,7 @@ input::placeholder{color:#8ba09e}
         <sc-if value="{{ mDoc }}" hint-placeholder-val="{{ false }}">
           <div style="margin-top:14px;font-size:13.5px"><b>{{ docNome }}</b> <span style="color:#5c706e">{{ docAtual }}</span></div>
           <div style="font-size:12px;font-weight:800;color:#3c4f4e;margin-top:12px">NOVA VALIDADE</div>
-          <input type="date" value="{{ docVal }}" onInput="{{ onDocVal }}" data-tx-campo="validade" style="margin-top:6px;border:1px solid #dfe7e5;border-radius:11px;padding:9px 12px;font-size:13.5px;outline:none;font-family:'Spline Sans Mono',monospace">
+          <input value="{{ docVal }}" onInput="{{ onDocVal }}" data-tx-campo="validade" inputmode="numeric" placeholder="DD/MM/AAAA" style="margin-top:6px;width:150px;border:1px solid #dfe7e5;border-radius:11px;padding:9px 12px;font-size:13.5px;outline:none;font-family:'Spline Sans Mono',monospace"><span style="margin-left:10px;font-size:12px;font-weight:700;color:#c43d3d">{{ docAviso }}</span>
           <div style="font-size:12px;color:#7c8f8d;margin-top:8px">O documento anterior continua no histórico; viagens já decididas não mudam.</div>
         </sc-if>
         <sc-if value="{{ mRev }}" hint-placeholder-val="{{ false }}">
@@ -396,7 +396,7 @@ class Component extends DCLogic {
     if (!s.drawer) return { drAberto: false, fecharDrawer: () => {}, pararClique: e => e.stopPropagation() };
     const x = this.info(TX.transportador(s.drawer)), t = x.t;
     const docs = [];
-    const dd = (k, n, val, tipo, ref, refNome) => { const d = TX.docEstado(val); const tm = U.tom(d.estado === 'ok' ? 'ok' : d.estado === 'vence' ? 'falta' : 'bloqueio'); docs.push({ k, n, sub: d.rotulo, c: tm.c, dot: tm.dot, onClick: () => this.setState({ modal: 'doc', fDoc: { tipo, ref, refNome, n, atual: d.rotulo }, fVal: TX.addDias(TX.HOJE, 365) }) }); };
+    const dd = (k, n, val, tipo, ref, refNome) => { const d = TX.docEstado(val); const tm = U.tom(d.estado === 'ok' ? 'ok' : d.estado === 'vence' ? 'falta' : 'bloqueio'); docs.push({ k, n, sub: d.rotulo, c: tm.c, dot: tm.dot, onClick: () => this.setState({ modal: 'doc', fDoc: { tipo, ref, refNome, n, atual: d.rotulo }, fVal: TX.addDias(TX.HOJE, 365), fValTxt: F.data(TX.addDias(TX.HOJE, 365)) }) }); };
     dd('rntrc', 'RNTRC ' + (t.rntrc ? t.rntrc.numero : ''), t.rntrc && t.rntrc.validade, 'RNTRC', t.id, x.nome);
     if (t.certificado) dd('cert', 'Certificado ' + t.certificado.numero + ', ' + t.certificado.escopo, t.certificado.validade, 'Certificado GMP+', t.id, x.nome);
     if (x.p) dd('cnh', 'CNH ' + (x.p.cnh ? x.p.cnh.numero : ''), x.p.cnh && x.p.cnh.validade, 'CNH', x.p.id, x.p.nome);
@@ -452,7 +452,7 @@ class Component extends DCLogic {
     if (m === 'doc') {
       const d = s.fDoc || {};
       const ok = !!s.fVal && s.fVal > TX.HOJE;
-      return Object.assign(base, { mTitulo: 'Atualizar documento', mSub: 'Use quando o documento renovado chegou por fora do link (e-mail, balcão).', docNome: d.n, docAtual: d.atual, docVal: s.fVal || '', onDocVal: e => this.setState({ fVal: e.target.value }) },
+      return Object.assign(base, { mTitulo: 'Atualizar documento', mSub: 'Use quando o documento renovado chegou por fora do link (e-mail, balcão).', docNome: d.n, docAtual: d.atual, docVal: s.fValTxt || '', docAviso: U.avisoData(s.fValTxt) || (s.fVal && s.fVal <= TX.HOJE ? 'A nova validade tem que ser depois de hoje' : ''), onDocVal: e => { const t = U.mascaraData(e.target.value); this.setState({ fValTxt: t, fVal: U.dataIso(t) || '' }); } },
         fim(ok, 'Salvar', () => { TX.fazer('atualizarDocumento', { tipo: d.tipo, ref: d.ref, refNome: d.refNome, validade: s.fVal }); this.setState({ modal: null }); this.avisar(d.tipo + ' atualizado. Viagens de hoje deste transportador já foram reavaliadas.'); }));
     }
     if (m === 'revisar') {

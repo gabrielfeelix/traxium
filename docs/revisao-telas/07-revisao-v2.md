@@ -227,6 +227,20 @@ Testado em 390x844, como o motorista: do envio pelo afretador até o fim, com id
 
 `varrer-texto.cjs` passou de 44 para 61 estados. Telas por endereço: as quatro visões de fábrica de Viagens, Compartimento em quarentena e com conjunto de dois compartimentos, Produtos com busca sem resultado, Fornecedores aberto pelo vencimento e o Link ainda não enviado. Estados por interação: busca global com e sem resultado, período da Auditoria, regime em Produtos, atualizar documento de fornecedor, convite de usuário, Hoje de Direção com todas as filiais (fila com duas viagens) e a Viagem bloqueada vista pelo afretador. Tudo limpo.
 
+### Item 4. Datas em DD/MM/AAAA nas telas de escritório
+
+**Problema.** Os campos de data nativos de Transportadores (atualizar documento) e dos modais de Cadastros (comunicação ao OC, treinamento, fornecedor novo e atualizar documento de fornecedor) mostravam o formato do idioma do navegador. Num navegador em inglês, 08/10/2027 aparecia como 10/08/2027.
+
+**O que mudou.**
+
+1. `mascaraData`, `dataIso` e `avisoData` foram para `TX.ui`. A Auditoria deixou de ter cópia própria.
+2. Os cinco campos passam a ser texto com máscara (DD/MM/AAAA, teclado numérico, fonte mono). O que vem preenchido (hoje no OC, um ano à frente no documento) já aparece no formato. Data completa e impossível mostra "Data inválida"; em Transportadores, validade que não é depois de hoje também é avisada.
+3. O Link da Viagem fica com o campo nativo (etapa 11).
+
+**Achado no caminho.** A conferência da Auditoria aceitava 31/02/2026: comparava o texto com `fmt.data`, que só reordena a data e não confere o calendário. `dataIso` agora monta a data e confere dia, mês e ano.
+
+**Teste.** `e2e-revisao.cjs`: OC já vem com hoje em DD/MM/AAAA; "31022026" vira 31/02/2026 e é recusado; Transportadores sugere a validade no formato e salva a data digitada. A atualização de fornecedor do teste passou a digitar 30/09/2027.
+
 ## Situação ao fim de 14/10/2026
 
 - Lacunas 1 a 4 do handoff fechadas: ocorrências exportáveis (etapa 3), fila de assinatura (etapa 2), entradas para o que virou seção (visões em Viagens na etapa 1 e busca global na etapa 7), Cadastros visível (etapa 7). A lacuna 5 continua dependendo do Gabriel e do Rafael.

@@ -97,6 +97,11 @@
   const ROTULO_PAPEL = { qualidade: 'Qualidade', direcao: 'Direção', afretador: 'Afretador', frota: 'Frota', consultoria: 'Consultoria' };
 
   // Valores comuns: sidebar, sessão, perfil, modais do topo e toast.
+  // Data digitada em DD/MM/AAAA: o campo nativo mostra o formato do idioma do navegador, o que engana numa tela de escritório.
+  function mascaraData(t) { const d = TX.soDigitos(t).slice(0, 8); return d.length > 4 ? d.slice(0, 2) + '/' + d.slice(2, 4) + '/' + d.slice(4) : d.length > 2 ? d.slice(0, 2) + '/' + d.slice(2) : d; }
+  function dataIso(t) { const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(t || ''); if (!m) return null; const dt = new Date(Date.UTC(+m[3], +m[2] - 1, +m[1])); return dt.getUTCFullYear() === +m[3] && dt.getUTCMonth() === +m[2] - 1 && dt.getUTCDate() === +m[1] ? m[3] + '-' + m[2] + '-' + m[1] : null; }
+  function avisoData(t) { return (t || '').length === 10 && !dataIso(t) ? 'Data inválida' : ''; }
+
   // Pedido de liberação de quem não tem a alçada: grava e avisa quem assina (Hoje e Viagem).
   function nomeAlcada(k) { return (TX.db.alcadas.find(a => a.k === k) || {}).n || k; }
   function pedirLiberacao(c, v, lib) {
@@ -236,5 +241,5 @@
   }
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 
-  window.TX.ui = { pedirLiberacao, nomeAlcada, buscaGlobal, tom, tomResultado, TOM, param, lerLS, gravarLS, copiar, montar, avisar, sel, chip, cta, ctaPerigo, base, paginar, exportarDocumento, esc };
+  window.TX.ui = { mascaraData, dataIso, avisoData, pedirLiberacao, nomeAlcada, buscaGlobal, tom, tomResultado, TOM, param, lerLS, gravarLS, copiar, montar, avisar, sel, chip, cta, ctaPerigo, base, paginar, exportarDocumento, esc };
 })();

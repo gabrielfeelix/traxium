@@ -95,9 +95,22 @@ const ok = (c, m) => { console.log((c ? 'ok    ' : 'FALHOU ') + m); if (!c) falh
   await ir('Cadastros.dc.html?aba=fornecedores&id=f-lavarv', 1200);
   ok(await pg.locator('[data-tx-atualizar-doc]').count() === 2, 'Fornecedores: documentos vencendo têm Atualizar (2)');
   await pg.click('[data-tx-atualizar-doc="f-lavarv:Licença ambiental"]');
-  await pg.fill('[data-tx-campo="validade"]', '2027-09-30'); await pg.click('[data-tx-confirmar]'); await pg.waitForTimeout(300);
+  await pg.fill('[data-tx-campo="validade"]', '30/09/2027'); await pg.click('[data-tx-confirmar]'); await pg.waitForTimeout(300);
   ok(await pg.locator('[data-tx-atualizar-doc]').count() === 1, 'Fornecedores: documento atualizado sai da lista a resolver');
   ok(/1 documento vence/.test(await pg.innerText('body')), 'Fornecedores: subtítulo recontado');
+
+  // Datas digitadas em DD/MM/AAAA nos modais de escritório (o campo nativo seguia o idioma do navegador)
+  await ir('Cadastros.dc.html?aba=filiais');
+  await pg.click('[data-tx-registrar-oc="PNG"]'); await pg.waitForTimeout(150);
+  ok(/^\d\d\/\d\d\/2026$/.test(await pg.inputValue('[data-tx-campo="data"]')), 'Datas: comunicação ao OC já vem com hoje em DD/MM/AAAA');
+  await pg.fill('[data-tx-campo="data"]', '31022026'); await pg.waitForTimeout(100);
+  ok(await pg.inputValue('[data-tx-campo="data"]') === '31/02/2026' && /Data inválida/.test(await pg.locator('[data-tx-modal="oc"]').innerText()), 'Datas: máscara põe as barras e 31/02 é recusado');
+  await pg.keyboard.press('Escape'); await pg.click('[data-tx-modal="oc"] >> text=Cancelar').catch(() => {});
+  await ir('Transportadores.dc.html?id=t-joao', 1100);
+  await pg.locator('[data-tx-atualizar-doc]').first().click(); await pg.waitForTimeout(150);
+  ok(/^\d\d\/\d\d\/2027$/.test(await pg.inputValue('[data-tx-campo="validade"]')), 'Datas: atualizar documento em Transportadores sugere a validade em DD/MM/AAAA');
+  await pg.fill('[data-tx-campo="validade"]', '15/03/2028'); await pg.click('[data-tx-confirmar]'); await pg.waitForTimeout(300);
+  ok(/atualizado/.test(await pg.locator('[data-tx-toast]').innerText()), 'Datas: documento salvo com a data digitada');
 
   // Manual: cartões recolhidos por padrão
   await ir('Cadastros.dc.html?aba=manual');
