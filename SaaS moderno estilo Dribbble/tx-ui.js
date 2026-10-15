@@ -97,6 +97,12 @@
   const ROTULO_PAPEL = { qualidade: 'Qualidade', direcao: 'Direção', afretador: 'Afretador', frota: 'Frota', consultoria: 'Consultoria' };
 
   // Valores comuns: sidebar, sessão, perfil, modais do topo e toast.
+  // Item ativo da sidebar escolhido pelo dado, nas telas de detalhe com mais de um pai possível.
+  function sbAtivo(k) {
+    const on = 'background:linear-gradient(90deg,rgba(26,158,147,.35),rgba(14,120,181,.28));border:1px solid rgba(255,255,255,.14);font-weight:700;color:#fff';
+    const off = 'border:1px solid transparent;color:rgba(255,255,255,.66)';
+    return { frota: k === 'frota' ? on : off, transportadores: k === 'transportadores' ? on : off };
+  }
   function base(c) {
     const s = c.state;
     const recolhida = s.navC != null ? s.navC : lerLS('tx-nav', '0') === '1';
@@ -119,7 +125,7 @@
       sbTransp: b.transportadores, sbTranspD: !recolhida && b.transportadores ? 'inline-block' : 'none',
       cadOpen: cadOpen && !recolhida, cadChev: cadOpen ? 'rotate(90deg)' : 'none',
       cadToggle: () => { if (cadAtiva) return; const n = !cadOpen; gravarLS('tx-nav-cad', n ? '1' : '0'); c.setState({ cadOpen: n }); },
-      sbc,
+      sbc, sbd: sbAtivo(c.sbAtivo ? c.sbAtivo() : null),
       tenantNome: TX.db.tenant.nome.replace(' Ltda', ''), baseVersao: TX.db.baseIDTF.versao,
       // sessão e perfil
       uNome: u.nome, uIni: TX.fmt.iniciais(u.nome), uCargo: u.cargo, uPapel: ROTULO_PAPEL[u.papel] || u.papel, uG1: u.g1, uG2: u.g2, uEmail: u.email,

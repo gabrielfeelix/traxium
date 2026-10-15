@@ -37,8 +37,8 @@ input::placeholder{color:#8ba09e}
       </div>
       <div style="display:{{ navL }};font-size:10px;font-weight:800;letter-spacing:1.4px;color:rgba(255,255,255,.4);padding:10px 12px 3px;text-transform:uppercase">Quem transporta</div><div style="display:{{ navSec }};height:1px;background:rgba(255,255,255,.1);margin:12px 10px 8px"></div>
       <div style="display:flex;flex-direction:column;gap:3px">
-        <a href="Transportadores.dc.html" title="Transportadores" style="display:flex;align-items:center;gap:11px;padding:8px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" style="flex:none"><circle cx="5.4" cy="6.2" r="2.4"></circle><circle cx="10.8" cy="6.2" r="2.4"></circle><path d="M2.5 13c.6-2 1.7-3 3-3s2.3 1 2.9 3" stroke-linecap="round"></path></svg><span data-tx-item="transportadores" style="display:{{ navL }};white-space:nowrap">Transportadores</span><span title="documentos vencidos ou vencendo em 15 dias" data-tx-badge="transportadores" style="margin-left:auto;display:{{ sbTranspD }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;font-family:'Spline Sans Mono',monospace">{{ sbTransp }}</span></a>
-        <a href="Frota.dc.html" title="Frota própria" style="display:flex;align-items:center;gap:11px;padding:8px 12px;border-radius:11px;background:linear-gradient(90deg,rgba(26,158,147,.35),rgba(14,120,181,.28));border:1px solid rgba(255,255,255,.14);font-size:14px;font-weight:700;color:#fff" ><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" style="flex:none"><rect x="2" y="4.5" width="8" height="5.5" rx="1.4"></rect><path d="M10 6.5h2.4l1.6 2v1.5h-4z" stroke-linejoin="round"></path><circle cx="5" cy="11.8" r="1.4"></circle><circle cx="11.6" cy="11.8" r="1.4"></circle></svg><span data-tx-item="frota" style="display:{{ navL }};white-space:nowrap">Frota própria</span></a>
+        <a href="Transportadores.dc.html" title="Transportadores" style="display:flex;align-items:center;gap:11px;padding:8px 12px;border-radius:11px;font-size:14px;{{ sbd.transportadores }}" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" style="flex:none"><circle cx="5.4" cy="6.2" r="2.4"></circle><circle cx="10.8" cy="6.2" r="2.4"></circle><path d="M2.5 13c.6-2 1.7-3 3-3s2.3 1 2.9 3" stroke-linecap="round"></path></svg><span data-tx-item="transportadores" style="display:{{ navL }};white-space:nowrap">Transportadores</span><span title="documentos vencidos ou vencendo em 15 dias" data-tx-badge="transportadores" style="margin-left:auto;display:{{ sbTranspD }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;font-family:'Spline Sans Mono',monospace">{{ sbTransp }}</span></a>
+        <a href="Frota.dc.html" title="Frota própria" style="display:flex;align-items:center;gap:11px;padding:8px 12px;border-radius:11px;font-size:14px;{{ sbd.frota }}" style-hover="background:rgba(255,255,255,.07);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" style="flex:none"><rect x="2" y="4.5" width="8" height="5.5" rx="1.4"></rect><path d="M10 6.5h2.4l1.6 2v1.5h-4z" stroke-linejoin="round"></path><circle cx="5" cy="11.8" r="1.4"></circle><circle cx="11.6" cy="11.8" r="1.4"></circle></svg><span data-tx-item="frota" style="display:{{ navL }};white-space:nowrap">Frota própria</span></a>
       </div>
       <div style="display:{{ navL }};font-size:10px;font-weight:800;letter-spacing:1.4px;color:rgba(255,255,255,.4);padding:10px 12px 3px;text-transform:uppercase">Qualidade</div><div style="display:{{ navSec }};height:1px;background:rgba(255,255,255,.1);margin:12px 10px 8px"></div>
       <div style="display:flex;flex-direction:column;gap:3px">
@@ -105,43 +105,46 @@ input::placeholder{color:#8ba09e}
   <!-- /TX:SIDEBAR -->
   <div style="flex:1;display:flex;flex-direction:column;padding:92px 32px 48px;gap:18px;min-width:0">
     <div style="display:flex;align-items:center;gap:12px">
-      <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#5c706e"><a href="{{ voltarHref }}" style="color:#5c706e">{{ voltarRot }}</a><span style="color:#b8c6c4">›</span><span style="font-family:'Spline Sans Mono',monospace;color:#0b2224">{{ titulo }}</span></div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#5c706e"><a href="{{ voltarHref }}" style="color:#5c706e">{{ voltarRot }}</a><sc-if value="{{ temDono }}" hint-placeholder-val="{{ false }}"><span style="color:#b8c6c4">›</span><a href="{{ donoHref }}" style="color:#5c706e">{{ dono }}</a></sc-if><span style="color:#b8c6c4">›</span><span style="font-family:'Spline Sans Mono',monospace;color:#0b2224">{{ titulo }}</span></div>
       <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
         <div onClick="{{ exportar }}" data-tx-exportar style="background:#093D44;color:#fff;border-radius:11px;padding:9px 16px;font-size:13.5px;font-weight:700;cursor:pointer" style-hover="background:#0C5862">Exportar histórico</div>
         <!-- TX:PERFIL --><!-- /TX:PERFIL -->
       </div>
     </div>
-    <div style="position:relative;overflow:hidden;border-radius:22px;background:{{ heroBg }};color:#fff;padding:22px 26px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:22px;align-items:center">
-      <div><div style="font-size:11px;font-weight:700;letter-spacing:1.4px;color:rgba(255,255,255,.6)">COMPARTIMENTO</div><div style="font-family:'Spline Sans Mono',monospace;font-size:26px;font-weight:600;margin-top:4px">{{ titulo }}</div><div style="font-size:12.5px;color:rgba(255,255,255,.75)">{{ modelo }}</div></div>
+    <div data-tx-hero style="position:relative;overflow:hidden;border-radius:22px;background:{{ heroBg }};color:#fff;padding:22px 26px;display:grid;grid-template-columns:1.1fr 1fr 1.25fr 1.15fr;gap:22px;align-items:center">
+      <div><div style="font-size:11px;font-weight:700;letter-spacing:1.4px;color:rgba(255,255,255,.6)">COMPARTIMENTO</div><div style="font-family:'Spline Sans Mono',monospace;font-size:26px;font-weight:600;margin-top:4px;white-space:nowrap">{{ titulo }}</div><div style="font-size:12.5px;color:rgba(255,255,255,.75)">{{ modelo }}</div></div>
       <div style="border-left:1px solid rgba(255,255,255,.15);padding-left:20px"><div style="font-size:12.5px;color:rgba(255,255,255,.7)">Dono hoje</div><div style="font-size:16px;font-weight:800;margin-top:3px">{{ dono }}</div><div style="font-size:11.5px;color:rgba(255,255,255,.6)">{{ conjuntoTxt }}</div></div>
-      <div style="border-left:1px solid rgba(255,255,255,.15);padding-left:20px"><div style="font-size:12.5px;color:rgba(255,255,255,.7)">Próxima carga de ração</div><div style="font-size:16px;font-weight:800;margin-top:3px">{{ proxima }}</div><div style="font-size:11.5px;color:rgba(255,255,255,.6)">{{ proximaSub }}</div></div>
-      <div style="border-left:1px solid rgba(255,255,255,.15);padding-left:20px"><div style="font-size:12.5px;color:rgba(255,255,255,.7)">Cargas registradas</div><div style="font-size:26px;font-weight:800;margin-top:3px">{{ nCargas }}</div><div style="font-size:11.5px;color:rgba(255,255,255,.6)">{{ fontesTxt }}</div></div>
+      <div style="border-left:1px solid rgba(255,255,255,.15);padding-left:20px"><div style="font-size:12.5px;color:rgba(255,255,255,.7)">Pode carregar ração?</div><div data-tx-pode style="display:flex;align-items:center;gap:9px;font-size:16px;font-weight:800;margin-top:3px"><span style="width:9px;height:9px;border-radius:99px;background:{{ podeDot }};box-shadow:0 0 0 3px rgba(255,255,255,.18);flex:none"></span>{{ pode }}</div><div style="font-size:11.5px;color:rgba(255,255,255,.7);margin-top:1px">{{ podeSub }}</div></div>
+      <div style="border-left:1px solid rgba(255,255,255,.15);padding-left:20px"><div style="font-size:12.5px;color:rgba(255,255,255,.7)">Três últimas cargas (T-3)</div>
+        <div style="display:flex;gap:8px;margin-top:6px"><sc-for list="{{ t3 }}" as="t" hint-placeholder-count="3"><div title="{{ t.tip }}" style="flex:1;min-width:0;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:11px;padding:6px 8px;display:flex;align-items:center;gap:7px"><span style="width:22px;height:22px;border-radius:7px;background:{{ t.rBg }};color:{{ t.rC }};font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none">{{ t.r }}</span><div style="min-width:0"><div style="font-size:10.5px;font-weight:800;color:rgba(255,255,255,.6)">{{ t.k }}</div><div style="font-size:11px;font-family:'Spline Sans Mono',monospace;white-space:nowrap">{{ t.data }}</div></div></div></sc-for></div>
+      </div>
+      <sc-if value="{{ quarentena }}" hint-placeholder-val="{{ false }}">
+        <div data-tx-quarentena style="grid-column:1 / -1;display:flex;align-items:center;gap:16px;border-top:1px solid rgba(255,255,255,.15);padding-top:16px">
+          <div style="flex:1;font-size:13px;line-height:1.55;color:rgba(255,255,255,.88)">{{ qTexto }}</div>
+          <sc-if value="{{ qTemViagem }}" hint-placeholder-val="{{ false }}"><a href="{{ qHref }}" data-tx-regularizar-viagem style="background:#fff;color:#6e1f2b;border-radius:99px;padding:10px 18px;font-size:13px;font-weight:800;white-space:nowrap" style-hover="background:#fdf1f1">{{ qRot }} →</a></sc-if>
+        </div>
+      </sc-if>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:start">
-      <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:20px 22px">
-        <div style="display:flex;align-items:baseline;gap:10px"><div style="font-size:16px;font-weight:800">Histórico de cargas</div><div style="font-size:12.5px;color:#5c706e">a mais recente em cima; o T-3 de cada viagem sai daqui</div></div>
-        <div style="display:grid;grid-template-columns:90px 1.4fr 70px 1.2fr 1fr;gap:12px;padding:14px 4px 8px;font-size:10.5px;font-weight:800;letter-spacing:.7px;color:#7c8f8d;border-bottom:1px solid #eef2f1"><span>DATA</span><span>PRODUTO</span><span>REGIME</span><span>ORIGEM DO REGISTRO</span><span>LIMPEZA</span></div>
-        <sc-for list="{{ linhas }}" as="l" hint-placeholder-count="6">
-          <div style="display:grid;grid-template-columns:90px 1.4fr 70px 1.2fr 1fr;gap:12px;padding:11px 4px;border-bottom:1px solid #f0f4f3;align-items:center;background:{{ l.bg }}">
-            <span style="font-family:'Spline Sans Mono',monospace;font-size:12.5px">{{ l.data }}</span>
-            <div><div style="font-size:13.5px;font-weight:700;color:{{ l.nc }}">{{ l.produto }}</div><div style="font-size:11.5px;color:#7c8f8d">{{ l.cat }}</div></div>
-            <span style="width:24px;height:24px;border-radius:8px;background:{{ l.rBg }};color:{{ l.rC }};font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ l.r }}</span>
-            <div style="font-size:12.5px"><sc-if value="{{ l.temHref }}" hint-placeholder-val="{{ false }}"><a href="{{ l.href }}" style="font-weight:700">{{ l.fonte }}</a></sc-if><sc-if value="{{ l.semHref }}" hint-placeholder-val="{{ false }}"><span style="color:#5c706e">{{ l.fonte }}</span></sc-if></div>
-            <span style="font-size:12px;color:#5c706e">{{ l.limpeza }}</span>
-          </div>
-        </sc-for>
-        <sc-if value="{{ vazio }}" hint-placeholder-val="{{ false }}"><div style="padding:28px 4px;font-size:13px;color:#5c706e">Nenhuma carga registrada neste compartimento. O T-3 nasce vazio e a primeira viagem pede as três últimas cargas.</div></sc-if>
+    <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:20px 22px">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div style="font-size:16px;font-weight:800">Histórico de cargas</div><div style="font-size:12.5px;color:#5c706e">a mais recente em cima; as três primeiras são o T-3 da próxima viagem</div>
+        <sc-if value="{{ temIrmaos }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-left:auto;display:flex;align-items:center;gap:8px"><span style="font-size:12px;color:#7c8f8d;font-weight:600">No mesmo conjunto</span><div style="display:flex;background:#f0f4f3;border-radius:11px;padding:3px;gap:2px"><sc-for list="{{ irmaos }}" as="ir" hint-placeholder-count="2"><a href="{{ ir.href }}" data-tx-irmao="{{ ir.n }}" style="font-family:'Spline Sans Mono',monospace;font-size:12px;font-weight:600;border-radius:9px;padding:5px 11px;color:{{ ir.c }};background:{{ ir.bg }};box-shadow:{{ ir.sh }};white-space:nowrap">{{ ir.n }}</a></sc-for></div></div>
+        </sc-if>
       </div>
-      <div style="display:flex;flex-direction:column;gap:16px">
-        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:18px 20px">
-          <div style="font-size:15px;font-weight:800">Como ler</div>
-          <div style="font-size:12.5px;color:#3c4f4e;margin-top:8px;line-height:1.6">O regime de limpeza antes de carregar ração sai da carga anterior pela IDTF. Carga proibida nas últimas três põe o compartimento em quarentena: nenhuma limpeza resolve, só a regularização da TS1.9 registrada na viagem.</div>
+      <div style="display:grid;grid-template-columns:46px 96px 1.4fr 70px 1.3fr 1fr;gap:12px;padding:14px 4px 8px;font-size:10.5px;font-weight:800;letter-spacing:.7px;color:#7c8f8d;border-bottom:1px solid #eef2f1"><span></span><span>DATA</span><span>PRODUTO</span><span>REGIME</span><span>ORIGEM DO REGISTRO</span><span>LIMPEZA</span></div>
+      <sc-for list="{{ linhas }}" as="l" hint-placeholder-count="6">
+        <div data-tx-carga style="display:grid;grid-template-columns:46px 96px 1.4fr 70px 1.3fr 1fr;gap:12px;padding:11px 4px;border-bottom:1px solid #f0f4f3;align-items:center;background:{{ l.bg }};opacity:{{ l.op }}">
+          <span style="font-size:10.5px;font-weight:800;color:{{ l.tC }};border:1px solid {{ l.tBd }};border-radius:7px;padding:2px 0;text-align:center;visibility:{{ l.tVis }}">{{ l.t }}</span>
+          <span style="font-family:'Spline Sans Mono',monospace;font-size:12.5px">{{ l.data }}</span>
+          <div><div style="font-size:13.5px;font-weight:700;color:{{ l.nc }}">{{ l.produto }}</div><div style="font-size:11.5px;color:#7c8f8d">{{ l.cat }}</div></div>
+          <span style="width:24px;height:24px;border-radius:8px;background:{{ l.rBg }};color:{{ l.rC }};font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ l.r }}</span>
+          <div style="font-size:12.5px"><sc-if value="{{ l.temHref }}" hint-placeholder-val="{{ false }}"><a href="{{ l.href }}" style="font-weight:700">{{ l.fonte }}</a></sc-if><sc-if value="{{ l.semHref }}" hint-placeholder-val="{{ false }}"><span style="color:#5c706e">{{ l.fonte }}</span></sc-if></div>
+          <span style="font-size:12px;color:{{ l.lC }}">{{ l.limpeza }}</span>
         </div>
-        <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:18px 20px">
-          <div style="font-size:15px;font-weight:800">Outros compartimentos do conjunto</div>
-          <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px"><sc-for list="{{ irmaos }}" as="ir" hint-placeholder-count="2"><a href="{{ ir.href }}" style="font-family:'Spline Sans Mono',monospace;font-size:13px;font-weight:600;border:1px solid #eef2f1;border-radius:11px;padding:8px 12px;color:{{ ir.c }};background:{{ ir.bg }}">{{ ir.n }}</a></sc-for></div>
-        </div>
-      </div>
+      </sc-for>
+      <sc-if value="{{ vazio }}" hint-placeholder-val="{{ false }}"><div style="padding:28px 4px;font-size:13px;color:#5c706e">Nenhuma carga registrada neste compartimento. O T-3 nasce vazio e a primeira viagem pede as três últimas cargas.</div></sc-if>
+      <div style="font-size:12px;color:#7c8f8d;margin-top:12px;line-height:1.55">A limpeza exigida antes de ração sai da carga anterior, pela base IDTF. Carga proibida no T-3 põe o compartimento em quarentena: limpeza não resolve, só a regularização da TS1.9 registrada na viagem.</div>
     </div>
   </div>
   <!-- TX:MODAIS -->
@@ -224,6 +227,7 @@ class Component extends DCLogic {
   state = { loading: true };
   componentDidMount() { TX.ui.montar(this); }
   avisar(m) { TX.ui.avisar(this, m); }
+  sbAtivo() { const p = TX.placa(this.alvo().placa); return p && p.dono === 'propria' ? 'frota' : 'transportadores'; }
   alvo() { const pl = TX.ui.param('placa'); const pos = TX.ui.param('pos') || 'C1'; const p = pl && TX.placa(pl); return p && p.tipo === 'carreta' ? { placa: pl, pos: (p.comps || ['C1']).includes(pos) ? pos : 'C1' } : { placa: 'SQT 6B77', pos: 'C1' }; }
   renderVals() {
     const U = TX.ui, F = TX.fmt;
@@ -241,24 +245,37 @@ class Component extends DCLogic {
     const t1 = t3[0] && t3[0].produto ? TX.produto(t3[0].produto) : null;
     const quarentena = proib && !regs.length;
     const titulo = a.placa + ' ' + a.pos;
-    const linhas = hist.map(h => {
+    // Viagem de hoje em diante que usa este compartimento e está travada por ele: é onde se regulariza.
+    const vReg = quarentena ? TX.db.viagens.filter(v => !v.cancelada && v.data >= TX.HOJE && TX.compsDoConjunto(v.conjunto).some(k => k.key === key) && TX.decidir(v).resultado === 'tecnico').sort((x, y) => x.data < y.data ? -1 : 1)[0] : null;
+    const foraBase = t3.some(h => !h.produto);
+    const LIMP = { A: 'Sim, com limpeza seca', B: 'Sim, depois de lavar com água', C: 'Sim, depois de lavar com detergente', D: 'Sim, depois de lavar e desinfetar' };
+    let pode, podeSub, podeDot;
+    if (quarentena) { pode = 'Não: em quarentena'; podeSub = TX.produto(proib.produto).nome + ' em ' + F.data(proib.data) + ', carga proibida'; podeDot = '#ff8a8a'; }
+    else if (!t3.length) { pode = 'Ainda não se sabe'; podeSub = 'T-3 vazio: a primeira viagem pede as três últimas cargas'; podeDot = '#e8a33d'; }
+    else if (foraBase) { pode = 'Ainda não'; podeSub = 'carga fora da base IDTF no T-3, esperando classificação'; podeDot = '#e8a33d'; }
+    else if (regs.length) { pode = LIMP.A; podeSub = 'regularizado pela TS1.9, laudo ' + regs[0].laudo; podeDot = '#3ddc97'; }
+    else { pode = LIMP[t1.regime]; podeSub = 'pela última carga: ' + t1.nome.toLowerCase() + ', regime ' + t1.regime; podeDot = '#3ddc97'; }
+    const linhas = hist.map((h, i) => {
       const pr = h.produto ? TX.produto(h.produto) : null;
       const r = pr ? pr.regime : null; const t = regT(r);
       const lp = limpezas.find(l => l.em.slice(0, 10) >= h.data);
       const fonte = h.fonte === 'viagem' ? 'viagem ' + TX.viagem(h.viagem).ordem : h.fonte === 'declarada' ? 'declarada pelo motorista na ' + TX.viagem(h.viagem).ordem : 'registro inicial da frota';
-      return { data: F.data(h.data), produto: pr ? pr.nome : '"' + h.texto + '"', cat: pr ? pr.cat + (pr.racao ? ', ração' : '') : 'fora da base IDTF', nc: r === 'X' ? '#c43d3d' : '#0b2224', bg: r === 'X' ? '#fdf8f8' : '#fff',
+      return { t: i < 3 ? 'T-' + (i + 1) : '', tVis: i < 3 ? 'visible' : 'hidden', tC: r === 'X' ? '#c43d3d' : '#0C5862', tBd: r === 'X' ? '#f1caca' : '#cfe3e1', op: i < 3 ? '1' : '.62', lC: r === 'X' ? '#c43d3d' : '#5c706e', data: F.data(h.data), produto: pr ? pr.nome : '"' + h.texto + '"', cat: pr ? pr.cat + (pr.racao ? ', ração' : '') : 'fora da base IDTF', nc: r === 'X' ? '#c43d3d' : '#0b2224', bg: r === 'X' ? '#fdf8f8' : '#fff',
         r: r === 'X' ? '✕' : r || '?', rBg: t[0], rC: t[1], fonte, temHref: !!h.viagem, semHref: !h.viagem, href: h.viagem ? 'Viagem.dc.html?id=' + h.viagem : '', limpeza: r === 'A' ? 'seca, no checklist' : lp ? 'regime ' + lp.regime + ', ' + lp.comprovante : r === 'X' ? 'não resolve' : 'sem comprovante' };
     });
     return Object.assign({}, U.base(this), {
       titulo, modelo: p.modelo + ', CRLV ' + TX.docEstado(p.crlv && p.crlv.validade).rotulo,
-      voltarHref: propria ? 'Frota.dc.html' : 'Transportadores.dc.html?id=' + p.dono, voltarRot: propria ? 'Frota própria' : 'Transportadores',
+      voltarHref: propria ? 'Frota.dc.html' : 'Transportadores.dc.html', voltarRot: propria ? 'Frota própria' : 'Transportadores',
+      temDono: !propria, donoHref: 'Transportadores.dc.html?id=' + p.dono,
       dono: propria ? 'Frota própria' : TX.nomeTransportador(p.dono), conjuntoTxt: conj ? 'hoje com o cavalo ' + conj.cavalo : 'sem conjunto',
+      pode, podeSub, podeDot,
+      t3: [0, 1, 2].map(i => { const h = t3[i]; const pr = h && h.produto ? TX.produto(h.produto) : null; const r = pr ? pr.regime : null; const t = regT(r); return { k: 'T-' + (i + 1), data: h ? F.data(h.data).slice(0, 5) : 'sem dado', r: !h ? '' : r === 'X' ? '✕' : r || '?', rBg: h ? t[0] : 'rgba(255,255,255,.12)', rC: t[1], tip: h ? (pr ? pr.nome : h.texto) + ', ' + F.data(h.data) : 'sem carga registrada' }; }),
+      quarentena: !!quarentena, qTemViagem: !!vReg, qHref: vReg ? 'Viagem.dc.html?id=' + vReg.id : '', qRot: vReg ? 'Regularizar na ' + vReg.ordem : '',
+      qTexto: quarentena ? 'Limpeza não tira o compartimento da quarentena. Precisa de inspeção independente e laudo, registrados na viagem pela TS1.9.' + (vReg ? ' A ' + vReg.ordem + ', de ' + F.data(vReg.data) + ', está travada por isso.' : ' Faça na próxima viagem que usar esta carreta.') : '',
       heroBg: quarentena ? 'linear-gradient(115deg,#3a1219,#6e1f2b 60%,#93313f 130%)' : 'linear-gradient(115deg,#093D44,#0C5862 60%,#0E78B5 140%)',
-      proxima: quarentena ? 'Em quarentena' : !t3.length ? 'T-3 vazio' : t1 ? 'Regime ' + t1.regime + ', ' + TX.REGIMES[t1.regime].n.toLowerCase() : 'Produto fora da base',
-      proximaSub: quarentena ? TX.produto(proib.produto).nome + ' em ' + F.data(proib.data) + '; regularizar pela TS1.9' : regs.length ? 'regularizado pela TS1.9 (' + regs[0].laudo + ')' : t1 ? 'pela última carga: ' + t1.nome.toLowerCase() : 'a primeira viagem pede as três últimas cargas',
-      nCargas: hist.length, fontesTxt: hist.filter(h => h.fonte === 'viagem').length + ' em viagens do Traxium, ' + hist.filter(h => h.fonte === 'declarada').length + ' declaradas, ' + hist.filter(h => h.fonte === 'registro').length + ' do registro inicial',
       linhas, vazio: !hist.length,
-      irmaos: conj ? TX.compsDoConjunto(conj).map(k => ({ n: k.placa + ' ' + k.pos, href: 'Compartimento v2.dc.html?placa=' + encodeURIComponent(k.placa) + '&pos=' + k.pos, c: k.key === key ? '#fff' : '#0b2224', bg: k.key === key ? '#0b2224' : '#fff' })) : [],
+      temIrmaos: !!conj && TX.compsDoConjunto(conj).length > 1,
+      irmaos: conj ? TX.compsDoConjunto(conj).map(k => ({ n: k.placa + ' ' + k.pos, href: 'Compartimento v2.dc.html?placa=' + encodeURIComponent(k.placa) + '&pos=' + k.pos, c: k.key === key ? '#0b2224' : '#5c706e', bg: k.key === key ? '#fff' : 'transparent', sh: k.key === key ? '0 1px 4px rgba(9,61,68,.12)' : 'none' })) : [],
       exportar: () => { const e = U.esc; const html = '<h1>Histórico do compartimento ' + e(titulo) + '</h1><div class="sub">' + e(p.modelo) + '. Dono: ' + e(propria ? 'frota própria' : TX.nomeTransportador(p.dono)) + '.</div><table><tr><th>Data</th><th>Produto</th><th>Regime IDTF</th><th>Origem</th><th>Limpeza</th></tr>' + linhas.map(l => '<tr><td class="mono">' + e(l.data) + '</td><td>' + e(l.produto) + '</td><td>' + e(l.r) + '</td><td>' + e(l.fonte) + '</td><td>' + e(l.limpeza) + '</td></tr>').join('') + '</table>'; if (U.exportarDocumento('Compartimento ' + titulo, html)) this.avisar('Histórico aberto em outra aba, pronto para imprimir.'); else this.avisar('O navegador bloqueou a aba nova. Libere pop-ups e tente de novo.'); }
     });
   }

@@ -155,6 +155,23 @@ Iniciada em 14/10/2026, a partir da seção 6 e 7 de `HANDOFF.md`. Uma etapa por
 | Convite de Direção e RT fica de fora: a alçada máxima é dada por contrato | Incluir o papel no convite, com confirmação de quem já é Direção |
 | O convite vale até o primeiro acesso, sem prazo de expiração | Expirar em 7 dias e oferecer "Reenviar" |
 
+## Etapa 10. Compartimento (14/10/2026)
+
+**Problema como usuário.** A qualidade abre o compartimento para responder uma pergunta, muitas vezes com o auditor ao lado: esta carreta pode carregar ração, e com que limpeza? O hero dizia "Regime A, seco", que é a resposta em código. Em quarentena, dizia "regularizar pela TS1.9" sem levar a lugar nenhum, e a viagem travada por isso não aparecia. O quarto número do hero ("Cargas registradas: 5") não ajudava a decidir nada; o que decide é o T-3, e a tabela não marcava quais linhas eram o T-3. Na coluna lateral, "Como ler" era texto fixo, e "Outros compartimentos do conjunto" mostrava só o próprio compartimento quando a carreta tinha um só. Na carreta de transportador, a sidebar destacava "Frota própria" e a trilha dizia só "Transportadores", sem o nome.
+
+**O que mudou.**
+
+1. Hero responde "Pode carregar ração?": "Sim, com limpeza seca", "Sim, depois de lavar com água" (e assim por regime), "Não: em quarentena", ou "Ainda não se sabe" com T-3 vazio. A explicação segue a mesma regra do motor: limpeza pela última carga; proibida no T-3 trava.
+2. O quarto bloco do hero mostra o T-3: as três últimas cargas com regime e data.
+3. Em quarentena, uma faixa no hero explica que limpeza não resolve e leva à viagem travada por isso ("Regularizar na OC 48124", que abre a VG-3118). Sem viagem marcada, diz para regularizar na próxima que usar a carreta.
+4. Tabela em largura cheia, com T-1, T-2 e T-3 marcados e as cargas mais antigas esmaecidas. "Como ler" virou uma nota de uma linha embaixo da tabela.
+5. Compartimentos do mesmo conjunto viram um seletor no cabeçalho do histórico, só quando há mais de um.
+6. Trilha com o nome do transportador. A sidebar destaca Frota própria ou Transportadores conforme o dono da carreta.
+
+**Moldura.** `gerar-sidebar.mjs` aceita `dinamico` em `TELAS`: para esses itens, o estilo de ativo sai de `sbd.<item>`, calculado por `TX.ui.base` a partir de `sbAtivo()` da tela. Só Compartimento usa. A assinatura da sidebar continua única.
+
+**Teste.** `e2e-revisao.cjs` cobre a resposta do hero em quarentena e em compartimento limpo, o link para a VG-3118, o T-3 marcado, o seletor do conjunto e o item ativo da sidebar nos dois casos.
+
 ## Situação ao fim de 14/10/2026
 
 - Lacunas 1 a 4 do handoff fechadas: ocorrências exportáveis (etapa 3), fila de assinatura (etapa 2), entradas para o que virou seção (visões em Viagens na etapa 1 e busca global na etapa 7), Cadastros visível (etapa 7). A lacuna 5 continua dependendo do Gabriel e do Rafael.

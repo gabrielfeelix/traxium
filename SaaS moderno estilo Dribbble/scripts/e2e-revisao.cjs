@@ -63,6 +63,16 @@ const ok = (c, m) => { console.log((c ? 'ok    ' : 'FALHOU ') + m); if (!c) falh
   await pg.click('[data-tx-cancelar-convite]'); await pg.waitForTimeout(200);
   ok(await pg.locator('[data-tx-convite]').count() === 0, 'Convite: cancelado sai da lista');
 
+  // Compartimento: responde se pode carregar ração; quarentena leva à viagem que regulariza
+  await ir('Compartimento%20v2.dc.html?placa=RAD%203K20&pos=C1');
+  ok(/Não: em quarentena/.test(await pg.locator('[data-tx-pode]').innerText()), 'Compartimento: quarentena responde que não pode carregar ração');
+  ok((await pg.getAttribute('[data-tx-regularizar-viagem]', 'href')) === 'Viagem.dc.html?id=VG-3118', 'Compartimento: quarentena leva à viagem travada (VG-3118)');
+  ok(/linear-gradient/.test(await pg.getAttribute('a[title="Transportadores"]', 'style')), 'Compartimento de transportador destaca Transportadores na sidebar');
+  ok(await pg.locator('[data-tx-carga]').count() === 3 && (await pg.locator('[data-tx-carga]').first().innerText()).startsWith('T-1'), 'Compartimento: linhas do T-3 marcadas');
+  await ir('Compartimento%20v2.dc.html?placa=SQT%201A02&pos=C2');
+  ok(/Sim, com limpeza seca/.test(await pg.locator('[data-tx-pode]').innerText()), 'Compartimento: frota própria limpa pode carregar com limpeza seca');
+  ok(await pg.locator('[data-tx-irmao]').count() === 2 && /linear-gradient/.test(await pg.getAttribute('a[title="Frota própria"]', 'style')), 'Compartimento: seletor do conjunto e Frota própria ativa');
+
   ok(erros.length === 0, 'sem erro de JavaScript (' + erros.join(' | ') + ')');
   console.log(falhas ? falhas + ' falha(s)' : 'Revisão: tudo certo');
   await browser.close(); process.exit(falhas ? 1 : 0);

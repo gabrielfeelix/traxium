@@ -16,7 +16,8 @@ export const TELAS = {
   'Viagem.dc.html': { ativo: 'viagens', detalhe: true },
   'Transportadores.dc.html': { ativo: 'transportadores' },
   'Frota.dc.html': { ativo: 'frota' },
-  'Compartimento v2.dc.html': { ativo: 'frota', detalhe: true },
+  // Compartimento é de frota própria ou de transportador: o item ativo sai do dado (TX.ui.base, sbd).
+  'Compartimento v2.dc.html': { ativo: 'frota', detalhe: true, dinamico: ['frota', 'transportadores'] },
   'Auditoria.dc.html': { ativo: 'auditoria' },
   'Cadastros.dc.html': { ativo: 'cadastros' },
   'Configuracoes v2.dc.html': { ativo: 'config' }
@@ -57,11 +58,14 @@ const ESTILO_ATIVO = 'display:flex;align-items:center;gap:11px;padding:8px 12px;
 const ESTILO_ITEM = 'display:flex;align-items:center;gap:11px;padding:8px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px';
 const HOVER = 'style-hover="background:rgba(255,255,255,.07);color:#fff"';
 
-function item(def, ativo, detalhe) {
+const ESTILO_BASE = 'display:flex;align-items:center;gap:11px;padding:8px 12px;border-radius:11px;font-size:14px';
+
+function item(def, ativo, detalhe, dinamico) {
   const on = def.k === ativo;
   const badge = def.badge ? `<span title="${def.badgeTip}" data-tx-badge="${def.k}" style="margin-left:auto;display:{{ ${def.badgeD} }};background:rgba(255,255,255,.14);font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;font-family:'Spline Sans Mono',monospace">{{ ${def.badge} }}</span>` : '';
   const tag = def.tag ? `<span style="margin-left:auto;display:{{ navL }};font-size:10px;font-weight:700;letter-spacing:.4px;padding:1px 7px;border-radius:99px;border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.7)">${def.tag}</span>` : '';
   const miolo = `${I[def.k]}<span data-tx-item="${def.k}" style="display:{{ navL }};white-space:nowrap">${def.n}</span>${badge}${tag}`;
+  if (dinamico && dinamico.includes(def.k)) return `<a href="${def.href}" title="${def.tip || def.n}" style="${ESTILO_BASE};{{ sbd.${def.k} }}" ${HOVER}>${miolo}</a>`;
   if (on && !detalhe) return `<div title="${def.n}" style="${ESTILO_ATIVO}">${miolo}</div>`;
   const estilo = on ? ESTILO_ATIVO : ESTILO_ITEM;
   const alvo = def.novaAba ? ' target="_blank" rel="noopener"' : '';
@@ -114,10 +118,10 @@ const GRUPO = (n) => `<div style="display:{{ navL }};font-size:10px;font-weight:
 
 // Sidebar flutuante e arredondada (referência: Autofluxos), com os itens em grupos.
 // Cadastros é a única área que abre outras telas: acordeão, aberto por padrão.
-export function sidebar(ativo, detalhe) {
+export function sidebar(ativo, detalhe, dinamico) {
   const cadOn = ativo === 'cadastros';
   const subs = CADASTROS.map(s => `<a href="Cadastros.dc.html?aba=${s.k}" data-tx-sub="${s.k}" style="display:flex;align-items:center;gap:10px;padding:5px 12px 5px 39px;border-radius:9px;font-size:13px;font-weight:{{ sbc.${s.k}.fw }};color:{{ sbc.${s.k}.c }};background:{{ sbc.${s.k}.bg }}" style-hover="color:#fff;background:rgba(255,255,255,.06)"><span style="width:5px;height:5px;border-radius:99px;background:{{ sbc.${s.k}.dot }};flex:none"></span>${s.n}</a>`).join('\n            ');
-  const P = k => item(PRINCIPAIS.find(d => d.k === k), ativo, detalhe);
+  const P = k => item(PRINCIPAIS.find(d => d.k === k), ativo, detalhe, dinamico);
   return `
   <div data-tx-sidebar style="width:{{ navW }};flex:none;padding:12px 0 12px 12px;position:sticky;top:0;height:100vh;transition:width .25s ease;z-index:40">
     <div style="height:100%;border-radius:22px;background:radial-gradient(120% 55% at 0% 0%,rgba(26,158,147,.42),transparent 62%),radial-gradient(110% 45% at 100% 100%,rgba(14,120,181,.34),transparent 64%),linear-gradient(178deg,#093D44,#0A4650);box-shadow:0 18px 44px rgba(9,61,68,.22),inset 0 1px 0 rgba(255,255,255,.08);color:#fff;display:flex;flex-direction:column;padding:18px {{ navPad }};overflow-x:hidden;overflow-y:auto">
@@ -259,7 +263,7 @@ function principal() {
     if (!fs.existsSync(p)) continue;
     let src = fs.readFileSync(p, 'utf8');
     if (!conferir) {
-      src = trocar(src, 'SIDEBAR', sidebar(cfg.ativo, cfg.detalhe));
+      src = trocar(src, 'SIDEBAR', sidebar(cfg.ativo, cfg.detalhe, cfg.dinamico));
       src = trocar(src, 'PERFIL', PERFIL);
       src = trocar(src, 'MODAIS', MODAIS);
       fs.writeFileSync(p, src);
