@@ -6,12 +6,58 @@ let falhas = 0;
 const ok = (c, m) => { console.log((c ? 'ok    ' : 'FALHOU ') + m); if (!c) falhas++; };
 (async () => {
   const browser = await chromium.launch({ executablePath: process.env.HOME + '/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome' });
-  const ctx = await browser.newContext({ viewport: { width: 1366, height: 768 } });
+  const ctx = await browser.newContext({ viewport: { width: 1366, height: 768 }, acceptDownloads: true });
   const erros = [];
   const pg = await ctx.newPage();
   pg.on('pageerror', e => erros.push(e.message));
   const ir = async (tela, espera) => { await pg.goto(base + '/' + tela); await pg.waitForTimeout(espera || 900); };
   const zerar = async () => { await ir('Hoje.dc.html', 300); await pg.evaluate(() => localStorage.clear()); };
+
+  // Hoje: o afretador sem alçada pede a liberação da VG-3121 pela linha da mesa
+  await zerar();
+  await pg.evaluate(() => localStorage.setItem('tx-v2-sessao', 'u-diego'));
+  await ir('Hoje.dc.html?filial=SOR', 1100);
+  const l3121 = pg.locator('[data-tx-linha="VG-3121"]');
+  ok(await l3121.locator('[data-tx-acao-linha="pedir"]').count() === 1, 'Hoje: Diego vê Pedir liberação na VG-3121');
+  await l3121.locator('[data-tx-acao-linha="pedir"]').click(); await pg.waitForTimeout(300);
+  ok(/liberação pedida às \d\d:\d\d/.test(await l3121.innerText()), 'Hoje: a linha passa a dizer que a liberação foi pedida');
+  ok(await l3121.locator('[data-tx-acao-linha="pedir"]').count() === 0, 'Hoje: Pedir liberação some depois do pedido');
+
+  // Hoje: quem tem a alçada vê a VG-3121 no topo de Esperando sua assinatura e abre o modal
+  await pg.evaluate(() => localStorage.setItem('tx-v2-sessao', 'u-rafael'));
+  await ir('Hoje.dc.html', 1100);
+  ok((await pg.locator('[data-tx-fila-linha]').first().getAttribute('data-tx-fila-linha')) === 'VG-3121', 'Fila: VG-3121, pedida pela filial, vem primeiro em Esperando sua assinatura');
+  await pg.click('[data-tx-assinar="VG-3121"]'); await pg.waitForTimeout(1200);
+  ok(/Viagem\.dc\.html\?id=VG-3121&liberar=1/.test(pg.url()) && await pg.locator('[data-tx-modal="liberar"]').count() === 1, 'Fila: Analisar e assinar abre a Viagem com o modal de liberação');
+
+  // Viagens: abas de visão e visão salva
+  await ir('Viagens%20v2.dc.html?visao=limpeza', 1100);
+  const ids = async () => (await pg.$$eval('[data-tx-linha]', es => es.map(e => e.getAttribute('data-tx-linha')))).sort().join(',');
+  ok(await ids() === 'VG-3116,VG-3119', 'Viagens: visão Limpeza exigida mostra VG-3116 e VG-3119 (' + await ids() + ')');
+  await ir('Viagens%20v2.dc.html?visao=sem_cte', 1100);
+  ok(await pg.locator('[data-tx-linha]').count() === 3, 'Viagens: visão Aguardando CT-e mostra 3');
+  await ir('Viagens%20v2.dc.html', 1100);
+  await pg.click('[data-tx-dd="situacao"]'); await pg.click('[data-tx-situacao="bloqueada"]'); await pg.waitForTimeout(150);
+  await pg.click('[data-tx-salvar-visao]'); await pg.fill('[data-tx-nome-visao]', 'Bloqueadas da semana'); await pg.click('[data-tx-confirmar-visao]'); await pg.waitForTimeout(250);
+  const salvas = await pg.$$eval('[data-tx-apagar-visao]', es => es.filter(e => getComputedStyle(e).display !== 'none').map(e => e.getAttribute('data-tx-apagar-visao')));
+  ok(salvas.length === 1 && /Bloqueadas da semana/.test(await pg.locator('[data-tx-visao="' + salvas[0] + '"]').innerText()), 'Viagens: visão salva vira aba');
+  await ir('Viagens%20v2.dc.html', 1100);
+  ok(await pg.locator('[data-tx-visao="' + salvas[0] + '"]').count() === 1, 'Viagens: visão salva continua depois de recarregar');
+  await pg.click('[data-tx-apagar-visao="' + salvas[0] + '"]'); await pg.waitForTimeout(200);
+  ok(await pg.locator('[data-tx-visao="' + salvas[0] + '"]').count() === 0, 'Viagens: visão salva apagada');
+
+  // Busca global: placa traz viagens e compartimentos; Enter sem resultado vai para Viagens com o termo
+  await pg.click('[data-tx-gbusca]'); await pg.keyboard.type('QVT'); await pg.waitForTimeout(300);
+  const grupos = await pg.locator('[data-tx-gb-resultados]').innerText();
+  ok(/VIAGENS/.test(grupos) && /COMPARTIMENTOS/.test(grupos), 'Busca global: "QVT" traz viagens e compartimentos');
+  await pg.fill('[data-tx-gbusca]', 'zzqx'); await pg.keyboard.press('Enter'); await pg.waitForTimeout(1000);
+  ok(/Viagens%20v2\.dc\.html\?periodo=tudo&q=zzqx/.test(pg.url()), 'Busca global: Enter sem resultado abre Viagens com o termo');
+
+  // Auditoria: ocorrências do período em planilha
+  await ir('Auditoria.dc.html#ocorrencias', 1100);
+  const [csv] = await Promise.all([pg.waitForEvent('download'), pg.click('[data-tx-apoio-csv="ocorrencias"]')]);
+  const txt = require('fs').readFileSync(await csv.path(), 'utf8');
+  ok(/\.csv$/.test(csv.suggestedFilename()) && /Gravidade/i.test(txt) && txt.split('\r\n').length >= 2, 'Auditoria: ocorrências exportadas em planilha (' + csv.suggestedFilename() + ')');
 
   // Cadastros: a sidebar navega; as abas da página só aparecem com a sidebar recolhida
   await zerar();

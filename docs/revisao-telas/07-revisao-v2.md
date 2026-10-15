@@ -197,6 +197,18 @@ Testado em 390x844, como o motorista: do envio pelo afretador até o fim, com id
 | O celular do motorista está em português; o campo nativo mostra DD/MM/AAAA | Trocar pelo campo com máscara também aqui, com teclado numérico |
 | O motorista lembra a data aproximada das três últimas cargas | Aceitar "não lembro a data" e deixar a conferência com o afretador |
 
+## Pente fino (seção 7 do HANDOFF), a partir de 14/10/2026
+
+### Item 1. Testes dos fluxos novos
+
+`e2e-revisao.cjs` passa a cobrir, além do que as etapas 8 a 11 puseram nele:
+
+1. Diego (afretador de Sorriso) pede a liberação da VG-3121 pela linha de `Hoje.dc.html?filial=SOR`; a linha passa a dizer "liberação pedida às HH:MM" e a ação some.
+2. Rafael vê a VG-3121 no topo de "Esperando sua assinatura"; "Analisar e assinar" abre `Viagem.dc.html?id=VG-3121&liberar=1` com o modal de liberação.
+3. Viagens: `?visao=limpeza` mostra VG-3116 e VG-3119; `?visao=sem_cte` mostra 3; visão salva vira aba, continua depois de recarregar e se apaga pelo "×" (que ganhou `data-tx-apagar-visao`).
+4. Busca global: "QVT" traz viagens e compartimentos; Enter sem resultado abre Viagens com `periodo=tudo&q=`.
+5. Auditoria: a planilha de ocorrências baixa um `.csv` com cabeçalho e linhas.
+
 ## Situação ao fim de 14/10/2026
 
 - Lacunas 1 a 4 do handoff fechadas: ocorrências exportáveis (etapa 3), fila de assinatura (etapa 2), entradas para o que virou seção (visões em Viagens na etapa 1 e busca global na etapa 7), Cadastros visível (etapa 7). A lacuna 5 continua dependendo do Gabriel e do Rafael.
