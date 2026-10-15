@@ -82,3 +82,14 @@ Iniciada em 14/10/2026, a partir da seção 6 e 7 de `HANDOFF.md`. Uma etapa por
 **Não feito, de propósito.** Abas internas (Resumo, Cargas e verificação, Linha do tempo), sugeridas no handoff. A viagem é o fluxo inteiro e o auditor confere T-3, verificação e registro lado a lado; abas esconderiam justamente o que ele compara. Com Checagens recolhida, a densidade caiu sem esconder nada que pede decisão. O rail continua com os cinco cartões: cada um responde a uma pergunta diferente (quem é, qual conjunto, onde o motorista está, o que o auditor anota, ocorrências).
 
 **Correção na semente (versão 9).** Na etapa 1 o fosfato da VG-3119 ficou em 06/10, dia em que a VG-3111 levou casca de soja no mesmo conjunto, e a tela mostrava "Fosfato, confere com a VG-3111". O fosfato passou para 07/10 (frete de retorno) e a casca de soja de 06/10 virou o T-2, conferida com a VG-3111.
+
+## Etapa 6. Frota própria (14/10/2026)
+
+**Problema como usuário.** Quatro cartões de resumo para 6 conjuntos. Dois não tinham filtro próprio e, por erro, mudavam o filtro para um valor que a lista lia como "fora do escopo": clicar em "CRLV ou CNH a vencer" mostrava os conjuntos fora do escopo. Em 1366 px a tela estourava e o botão de exportar sumia.
+
+**O que mudou.**
+
+1. Com 6 conjuntos não há volume que peça filtro. Os cartões saíram; os números foram para o subtítulo ("6 conjuntos, 4 no escopo GMP+. 7 viagens nos últimos 30 dias.").
+2. A lista ficou em dois grupos com título e contagem: No escopo GMP+ e Fora do escopo.
+3. Documento da frota vencendo em 30 dias aparece numa faixa âmbar só quando existe; sem vencimento, o subtítulo diz isso.
+4. Colunas do cartão do conjunto rebalanceadas para 1366 px; compartimento sem quebrar linha; `min-width` em 1280 px.
