@@ -286,6 +286,20 @@ Em 1366 px a linha do compartimento fora do escopo cortava "Calcário" e "Fertil
 
 **Decisão.** O primeiro Esc fecha a lista e mantém o texto (quem fechou sem querer reabre digitando); o segundo, com a lista já fechada e o foco no campo, limpa o texto. É o comportamento comum de campo de busca. Feito em `TX.ui.montar`, coberto em `e2e-revisao.cjs`.
 
+### Item 11. Rótulos da mesma situação
+
+A viagem pronta por liberação assinada aparecia com quatro nomes: "Pronta por autoridade" (Hoje), "Pronta, liberada por autoridade" (topo da Viagem e rótulo do motor), "Liberada por autoridade" (aba de Viagens) e "pronta por autoridade" (aviso depois de assinar). Ficou assim:
+
+| Situação | Rótulo da viagem | Plural em grupo e filtro |
+| --- | --- | --- |
+| Pronta pelo motor | Pronta para assegurar | Prontas, Prontas para assegurar |
+| Pronta por liberação assinada | Liberada por autoridade | Liberadas por autoridade |
+| Bloqueada por regra | Bloqueada | Bloqueadas |
+| Bloqueio técnico | Bloqueio técnico | Bloqueio técnico |
+| Falta item | Falta algo | Falta algo |
+
+Também: o subtítulo do topo da viagem liberada dizia "as N checagens aplicáveis passaram", o que não é verdade com uma regra liberada; agora diz que está pronta com a liberação assinada e que o motor continua reprovando a regra. Em Viagens, a segunda linha da situação, que repetia "liberada por autoridade", passou a dizer qual regra foi liberada.
+
 ## Situação ao fim de 14/10/2026
 
 - Lacunas 1 a 4 do handoff fechadas: ocorrências exportáveis (etapa 3), fila de assinatura (etapa 2), entradas para o que virou seção (visões em Viagens na etapa 1 e busca global na etapa 7), Cadastros visível (etapa 7). A lacuna 5 continua dependendo do Gabriel e do Rafael.

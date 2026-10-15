@@ -484,7 +484,7 @@ class Component extends DCLogic {
     const f0 = dec.falta[0];
     const lib = TX.liberacaoDe(v);
     let falta, faltaC, quem;
-    if (dec.resultado === 'pronta') { falta = dec.porAutoridade ? 'Pronta por autoridade' : 'Pronta para assegurar'; faltaC = '#1a8f57'; quem = 'declaração do CT-e liberada'; }
+    if (dec.resultado === 'pronta') { falta = dec.porAutoridade ? 'Liberada por autoridade' : 'Pronta para assegurar'; faltaC = '#1a8f57'; quem = 'declaração do CT-e liberada'; }
     else { falta = dec.resultado === 'tecnico' ? 'Bloqueio técnico: ' + f0.detalhe.split(':')[0] : dec.resultado === 'bloqueada' ? 'Bloqueada: ' + ({ ocorrencia: 'transportador em revisão após ocorrência grave', 'docs-conj': 'CRLV vencido no conjunto', 'docs-mot': 'CNH vencida', 'docs-transp': 'RNTRC vencido', produto: 'produto não é ração' }[f0.k] || (dec.cobertura === 'gatekeeper' && f0.k === 'cobertura' ? 'filial sem comunicação ao organismo certificador' : f0.o.toLowerCase())) : f0.o; faltaC = tomR.c; quem = dec.falta.length > 1 ? f0.quem + ' e mais ' + (dec.falta.length - 1) : f0.quem; }
     if (lib && lib.pedido) quem = 'liberação pedida às ' + F.hora(lib.pedido.em) + ', esperando assinatura de ' + this.nomeAlcada(lib.alcada);
     let acao = null;

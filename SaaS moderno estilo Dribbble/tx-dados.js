@@ -1015,7 +1015,7 @@
     else if (faltas.length) resultado = 'falta';
     else resultado = 'pronta';
     const ROT = {
-      pronta: porAutoridade ? 'Pronta, liberada por autoridade' : 'Pronta para assegurar',
+      pronta: porAutoridade ? 'Liberada por autoridade' : 'Pronta para assegurar',
       falta: 'Falta algo', bloqueada: 'Bloqueada', tecnico: 'Bloqueio técnico', cancelada: 'Cancelada', nao_assegurada: 'Sem declaração GMP+'
     };
     const falta = [...(tecnico ? [tecnico] : []), ...bloq, ...faltas].map(c => ({ k: c.k, o: c.nome, detalhe: c.detalhe, quem: c.quem, estado: c.estado, tecnico: !!c.tecnico, alcada: c.alcada || null, resolver: c.resolver || null, href: c.href || null }));

@@ -472,7 +472,7 @@ class Component extends DCLogic {
           : sit === 'concluida' || sit === 'transito' ? x.cic.sub
           : sit === 'sem_cte' ? 'conciliar com o TMS'
           : fl.length ? fl[0].o + (fl.length > 1 ? ' e mais ' + (fl.length - 1) : '')
-          : x.dec.porAutoridade ? 'liberada por autoridade' : '';
+          : x.dec.porAutoridade ? 'regra liberada: ' + ((x.dec.checagens.find(c => c.liberadaPor) || {}).nome || '') : '';
         return { id: v.id, href: 'Viagem.dc.html?id=' + v.id, data: F.curta(v.data) + ' ' + v.janela, filial: TX.filial(v.filial).nome, ordem: v.ordem,
           ordemSub: v.cte ? 'CT-e ' + v.cte.numero + ', NF ' + v.cte.nf : v.id, subC: v.cte ? '#3c4f4e' : '#9db0ae',
           produto: TX.produto(v.produto).nome, assegTxt: v.assegurada ? '' : '(sem GMP+)', rota: TX.embarcador(v.embarcador).nome + ' → ' + TX.destinatario(v.destinatario).nome + ', ' + TX.destinatario(v.destinatario).cidade,
