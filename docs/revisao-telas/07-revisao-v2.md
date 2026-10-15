@@ -223,6 +223,10 @@ Testado em 390x844, como o motorista: do envio pelo afretador até o fim, com id
 
 **Teste.** `e2e-revisao.cjs`: Diego na VG-3127 vê Pedir liberação e não Liberar; depois do pedido vê o estado; Luiz (Direção e RT) vê o pedido e Liberar por autoridade; título da VG-3121 mantém "CRLV".
 
+### Item 3. Varredura de texto com os estados novos
+
+`varrer-texto.cjs` passou de 44 para 61 estados. Telas por endereço: as quatro visões de fábrica de Viagens, Compartimento em quarentena e com conjunto de dois compartimentos, Produtos com busca sem resultado, Fornecedores aberto pelo vencimento e o Link ainda não enviado. Estados por interação: busca global com e sem resultado, período da Auditoria, regime em Produtos, atualizar documento de fornecedor, convite de usuário, Hoje de Direção com todas as filiais (fila com duas viagens) e a Viagem bloqueada vista pelo afretador. Tudo limpo.
+
 ## Situação ao fim de 14/10/2026
 
 - Lacunas 1 a 4 do handoff fechadas: ocorrências exportáveis (etapa 3), fila de assinatura (etapa 2), entradas para o que virou seção (visões em Viagens na etapa 1 e busca global na etapa 7), Cadastros visível (etapa 7). A lacuna 5 continua dependendo do Gabriel e do Rafael.
