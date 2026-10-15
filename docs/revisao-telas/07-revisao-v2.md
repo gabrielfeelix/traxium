@@ -46,3 +46,16 @@ Iniciada em 14/10/2026, a partir da seção 6 e 7 de `HANDOFF.md`. Uma etapa por
 | --- | --- |
 | O pedido de liberação avisa todos com a alçada na filial; o primeiro com a alçada exata é citado no aviso | Escolher um assinante por filial em Configurações, Alçadas |
 | A fila mostra só viagens de hoje em diante: bloqueio passado sem liberação já é pendência de registro | Incluir as passadas numa seção à parte |
+
+## Etapa 3. Auditoria e ocorrências exportáveis (14/10/2026)
+
+**Problema como usuário.** Os campos de data nativos mostravam o formato do idioma do navegador: num navegador em inglês, 01/09/2026 aparecia como 09/01/2026. Numa tela que o auditor lê junto, isso é erro de leitura certo. As ocorrências não tinham exportação (lacuna 1 do handoff), e o link "Ocorrências do período" posto em Viagens não tinha destino. Em 1366 px a tabela espremia embarcador e produto até sumirem.
+
+**O que mudou.**
+
+1. Período num seletor compacto no hero, com atalhos (últimos 30 e 90 dias, últimos 12 meses, este ano) e datas exatas digitadas em DD/MM/AAAA, com máscara e aviso quando a data está incompleta ou invertida.
+2. Lista de apoio nova, a primeira: "Ocorrências do período", com documento e planilha (CSV). Colunas no formato da consultoria: data, viagem, transportador, tipo, gravidade, descrição, fotos, revisão e quem registrou. Grave sem revisão sai marcada como pendente. `Auditoria.dc.html#ocorrencias` rola até ela e a destaca.
+3. Tabela com CT-e e NF empilhados numa coluna; coluna lateral flexível; `min-width` em 1280 px.
+4. O hero deixou de cortar os popovers.
+
+**Teste.** `e2e-f5.cjs` passa a clicar no botão de exportar da lista de apoio e cobre a exportação de ocorrências.

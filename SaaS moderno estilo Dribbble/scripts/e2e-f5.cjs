@@ -22,9 +22,12 @@ const ok = (c, m) => { console.log((c ? 'ok    ' : 'FALHOU ') + m); if (!c) falh
   await pop.waitForLoadState(); const doc = await pop.innerText('body');
   ok(/Amostra de auditoria/.test(doc) && /assegurado GMP\+FSA/.test(doc) && /Três últimas cargas/.test(doc), 'amostra exportada em documento único com os itens do auditor');
   await pop.close();
-  const [pop2] = await Promise.all([ctx.waitForEvent('page'), pg.click('[data-tx-apoio="gatekeeper"]')]);
+  const [pop2] = await Promise.all([ctx.waitForEvent('page'), pg.click('[data-tx-apoio-doc="gatekeeper"]')]);
   await pop2.waitForLoadState(); ok(/Comunicação ao organismo certificador/.test(await pop2.innerText('body')), 'protocolos gatekeeper exportados com a comunicação ao OC');
   await pop2.close();
+  const [pop3] = await Promise.all([ctx.waitForEvent('page'), pg.click('[data-tx-apoio-doc="ocorrencias"]')]);
+  await pop3.waitForLoadState(); ok(/Ocorrências do período/.test(await pop3.innerText('body')) && /Resíduo no compartimento/.test(await pop3.innerText('body')), 'ocorrências do período exportadas com tipo, gravidade e revisão');
+  await pop3.close();
   await pg.click('[data-tx-simulacao]'); await pg.waitForTimeout(300);
   ok(await pg.locator('[data-tx-sim-item]').count() === 2, 'simulação de rastreabilidade registrada com tempo');
   await pg.screenshot({ path: out + '/e-auditoria.png' });

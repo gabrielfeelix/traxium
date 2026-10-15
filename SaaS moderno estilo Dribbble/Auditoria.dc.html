@@ -22,7 +22,7 @@ input::placeholder{color:#8ba09e}
 @keyframes txsh{from{background-position:-600px 0}to{background-position:600px 0}}
 </style>
 </helmet>
-<div style="display:flex;min-height:100vh;min-width:1560px" data-screen-label="Auditoria">
+<div style="display:flex;min-height:100vh;min-width:1280px" data-screen-label="Auditoria">
   <!-- TX:SIDEBAR -->
   <div data-tx-sidebar style="width:{{ navW }};flex:none;background:linear-gradient(178deg,#093D44,#0A4650);color:#fff;display:flex;flex-direction:column;padding:22px {{ navPad }};position:sticky;top:0;height:100vh;transition:width .25s ease;overflow-x:hidden;overflow-y:auto;z-index:20">
     <a href="Hoje.dc.html" title="Traxium: ir para Hoje" style="display:flex;align-items:center;gap:10px;padding:4px 8px 20px;color:#fff">
@@ -82,14 +82,29 @@ input::placeholder{color:#8ba09e}
 <!-- /TX:PERFIL --></div>
     </div>
 
-    <div style="position:relative;overflow:hidden;border-radius:22px;background:linear-gradient(115deg,#093D44,#0C5862 60%,#0E78B5 140%);color:#fff;padding:20px 24px">
+    <div style="position:relative;z-index:5;border-radius:22px;background:linear-gradient(115deg,#093D44,#0C5862 60%,#0E78B5 140%);color:#fff;padding:20px 24px">
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-        <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:13px;padding:0 14px;display:flex;align-items:center;gap:9px;width:420px">
+        <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:13px;padding:0 14px;display:flex;align-items:center;gap:9px;flex:1;min-width:260px;max-width:440px">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.6"></circle><line x1="10.5" y1="10.5" x2="13.5" y2="13.5"></line></svg>
           <input value="{{ q }}" onInput="{{ onQ }}" data-tx-rastrear placeholder="Placa, CT-e, NF ou ordem. Ex.: QWM 4H57" style="border:none;outline:none;background:transparent;font-size:15px;padding:12px 0;flex:1;color:#fff;font-family:'Spline Sans Mono',monospace">
         </div>
-        <span style="font-size:12.5px;color:rgba(255,255,255,.7)">de</span><input type="date" value="{{ de }}" onInput="{{ onDe }}" data-tx-de style="border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;border-radius:10px;padding:9px 10px;font-size:13px;font-family:'Spline Sans Mono',monospace;color-scheme:dark">
-        <span style="font-size:12.5px;color:rgba(255,255,255,.7)">até</span><input type="date" value="{{ ate }}" onInput="{{ onAte }}" data-tx-ate style="border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;border-radius:10px;padding:9px 10px;font-size:13px;font-family:'Spline Sans Mono',monospace;color-scheme:dark">
+        <div data-tx-pop style="position:relative">
+          <div onClick="{{ abrirPeriodo }}" data-tx-dd="periodo" style="display:flex;align-items:center;gap:8px;height:44px;padding:0 14px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);font-size:13px;cursor:pointer;white-space:nowrap" style-hover="border-color:rgba(255,255,255,.55)"><span style="color:rgba(255,255,255,.7);font-weight:600">Período</span><span style="font-family:'Spline Sans Mono',monospace;font-weight:600">{{ perRot }}</span><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5 6 7.5l3-3"></path></svg></div>
+          <sc-if value="{{ popPeriodo }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;left:0;top:50px;background:#fff;color:#0b2224;border:1px solid #e4eae8;border-radius:14px;box-shadow:0 16px 40px rgba(9,61,68,.22);padding:6px;width:280px;z-index:60">
+              <sc-for list="{{ atalhos }}" as="at" hint-placeholder-count="4"><div onClick="{{ at.onClick }}" data-tx-atalho="{{ at.k }}" style="display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:9px;font-size:13px;font-weight:{{ at.fw }};cursor:pointer" style-hover="background:#f6f9f8">{{ at.n }}<span style="margin-left:auto;font-family:'Spline Sans Mono',monospace;font-size:11px;color:#7c8f8d">{{ at.sub }}</span></div></sc-for>
+              <div style="border-top:1px solid #f0f4f3;margin-top:4px;padding:10px 11px 6px">
+                <div style="font-size:10.5px;font-weight:800;letter-spacing:.8px;color:#7c8f8d">DATAS EXATAS</div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:7px">
+                  <input value="{{ deTxt }}" onInput="{{ onDeTxt }}" data-tx-de placeholder="DD/MM/AAAA" maxlength="10" style="width:108px;border:1px solid {{ deBd }};border-radius:9px;padding:8px 9px;font-size:12.5px;font-family:'Spline Sans Mono',monospace;outline:none">
+                  <span style="font-size:12px;color:#7c8f8d">a</span>
+                  <input value="{{ ateTxt }}" onInput="{{ onAteTxt }}" data-tx-ate placeholder="DD/MM/AAAA" maxlength="10" style="width:108px;border:1px solid {{ ateBd }};border-radius:9px;padding:8px 9px;font-size:12.5px;font-family:'Spline Sans Mono',monospace;outline:none">
+                </div>
+                <div style="font-size:11.5px;color:{{ dataMsgC }};margin-top:6px">{{ dataMsg }}</div>
+              </div>
+            </div>
+          </sc-if>
+        </div>
         <sc-for list="{{ tipos }}" as="tp" hint-placeholder-count="3"><span onClick="{{ tp.onClick }}" style="font-size:12.5px;font-weight:700;border-radius:99px;padding:7px 13px;cursor:pointer;background:{{ tp.bg }};color:{{ tp.c }};border:1px solid rgba(255,255,255,.22)">{{ tp.n }}</span></sc-for>
         <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
           <sc-if value="{{ simAtiva }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Spline Sans Mono',monospace;font-size:13px;background:rgba(232,163,61,.25);border:1px solid rgba(232,163,61,.5);border-radius:99px;padding:6px 12px">simulação {{ simTempo }}</span></sc-if>
@@ -99,19 +114,18 @@ input::placeholder{color:#8ba09e}
       <div style="font-size:12px;color:rgba(255,255,255,.65);margin-top:10px">{{ resumoBusca }}</div>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:start">
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,340px);gap:20px;align-items:start">
       <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;overflow:hidden">
         <div style="display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid #eef2f1">
           <div style="font-size:15px;font-weight:800">Viagens encontradas</div><span style="font-family:'Spline Sans Mono',monospace;font-size:13px;color:#5c706e">{{ nRes }}</span>
           <span onClick="{{ selTodas }}" style="margin-left:auto;font-size:12.5px;font-weight:800;color:#0C5862;cursor:pointer">{{ selTodasRot }}</span>
         </div>
-        <div style="display:grid;grid-template-columns:{{ cols }};gap:10px;padding:10px 18px;background:#f7faf9;font-size:10.5px;font-weight:800;letter-spacing:.7px;color:#7c8f8d"><span></span><span>DATA</span><span>CT-E</span><span>NF</span><span>EMBARCADOR E DESTINATÁRIO</span><span>PRODUTO</span><span>PLACAS</span><span>TERMO</span><span>VERIFICAÇÃO</span></div>
+        <div style="display:grid;grid-template-columns:{{ cols }};gap:10px;padding:10px 18px;background:#f7faf9;font-size:10.5px;font-weight:800;letter-spacing:.7px;color:#7c8f8d"><span></span><span>DATA</span><span>CT-E E NF</span><span>EMBARCADOR E DESTINATÁRIO</span><span>PRODUTO</span><span>PLACAS</span><span>TERMO</span><span>VERIFICAÇÃO</span></div>
         <sc-for list="{{ linhas }}" as="r" hint-placeholder-count="8">
           <div data-tx-res="{{ r.id }}" style="display:grid;grid-template-columns:{{ cols }};gap:10px;padding:10px 18px;border-top:1px solid #f0f4f3;align-items:center;font-size:12.5px;background:{{ r.bg }}">
             <span onClick="{{ r.toggle }}" data-tx-sel="{{ r.id }}" style="width:19px;height:19px;border-radius:6px;border:2px solid {{ r.ckBd }};background:{{ r.ck }};color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer">{{ r.ckI }}</span>
             <a href="{{ r.href }}" style="font-family:'Spline Sans Mono',monospace;font-weight:600;color:#0b2224">{{ r.data }}</a>
-            <span style="font-family:'Spline Sans Mono',monospace;color:{{ r.cteC }}">{{ r.cte }}</span>
-            <span style="font-family:'Spline Sans Mono',monospace;color:{{ r.cteC }}">{{ r.nf }}</span>
+            <span style="font-family:'Spline Sans Mono',monospace;color:{{ r.cteC }};line-height:1.45">{{ r.cte }}<br>{{ r.nf }}</span>
             <span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.rota }}</span>
             <span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.produto }}</span>
             <span style="font-family:'Spline Sans Mono',monospace;font-size:11.5px">{{ r.placas }}</span>
@@ -133,7 +147,7 @@ input::placeholder{color:#8ba09e}
           <div style="font-size:15px;font-weight:800">Listas de apoio</div>
           <div style="font-size:12.5px;color:#5c706e;margin-top:3px">o que o auditor pede na mesma visita</div>
           <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px">
-            <sc-for list="{{ apoio }}" as="ap" hint-placeholder-count="3"><div onClick="{{ ap.onClick }}" data-tx-apoio="{{ ap.k }}" style="display:flex;align-items:center;gap:10px;border:1px solid #eef2f1;border-radius:12px;padding:10px 12px;cursor:pointer" style-hover="border-color:#127670"><div style="flex:1"><div style="font-size:13px;font-weight:700">{{ ap.n }}</div><div style="font-size:11.5px;color:#7c8f8d">{{ ap.sub }}</div></div><span style="font-size:12px;font-weight:800;color:#0C5862">Exportar</span></div></sc-for>
+            <sc-for list="{{ apoio }}" as="ap" hint-placeholder-count="4"><div id="{{ ap.ancora }}" data-tx-apoio="{{ ap.k }}" style="display:flex;align-items:center;gap:10px;border:1px solid {{ ap.bd }};border-radius:12px;padding:10px 12px;scroll-margin-top:24px"><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700">{{ ap.n }}</div><div style="font-size:11.5px;color:#7c8f8d">{{ ap.sub }}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px"><span onClick="{{ ap.onClick }}" data-tx-apoio-doc="{{ ap.k }}" style="font-size:12px;font-weight:800;color:#0C5862;cursor:pointer;white-space:nowrap" style-hover="color:#127670">{{ ap.rot }}</span><span onClick="{{ ap.onCsv }}" data-tx-apoio-csv="{{ ap.k }}" style="display:{{ ap.csvD }};font-size:12px;font-weight:700;color:#5c706e;cursor:pointer;white-space:nowrap" style-hover="color:#127670">Planilha</span></div></div></sc-for>
           </div>
         </div>
         <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:18px 20px">
@@ -222,7 +236,7 @@ input::placeholder{color:#8ba09e}
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
   state = { loading: true, q: '', de: '2026-09-01', ate: '2026-10-08', tipo: 'todos', sel: [], simIni: null };
-  componentDidMount() { TX.ui.montar(this); this._tick = setInterval(() => { if (this.state.simIni) this.setState({ tick: Date.now() }); }, 1000); const q = TX.ui.param('q'); if (q) this.setState({ q }); }
+  componentDidMount() { TX.ui.montar(this); if (location.hash) setTimeout(() => { const el = document.getElementById(location.hash.slice(1)); if (el) el.scrollIntoView({ block: 'center' }); }, 900); this._tick = setInterval(() => { if (this.state.simIni) this.setState({ tick: Date.now() }); }, 1000); const q = TX.ui.param('q'); if (q) this.setState({ q }); }
   avisar(m) { TX.ui.avisar(this, m); }
   resultados() {
     const s = this.state, q = TX.norm(s.q), qd = TX.soDigitos(s.q);
@@ -243,8 +257,24 @@ class Component extends DCLogic {
     const itemViagem = v => { const d = TX.decidir(v), t = TX.transportador(v.transportador), mot = TX.pessoa(v.motorista); return '<h2>' + e(v.ordem) + ' (' + e(v.id) + '), ' + e(F.data(v.data)) + '</h2><table>' + [['Nota fiscal', v.cte ? v.cte.nf : 'ausente'], ['DACTE com declaração positiva', v.cte ? v.cte.numero + ': "' + TX.DECLARACAO_CTE + '"' : 'ausente'], ['Embarcador e destinatário', TX.embarcador(v.embarcador).nome + ' para ' + TX.destinatario(v.destinatario).nome], ['Produto', TX.produto(v.produto).nome], ['Filial', TX.filial(v.filial).nome], ['Subcontratado com RNTRC', t ? TX.nomeTransportador(t) + ', RNTRC ' + (t.rntrc ? t.rntrc.numero : 'ausente') : 'frota própria'], ['Motorista', mot.nome], ['Placas do conjunto', TX.placasDoConjunto(v.conjunto).join(', ')], ['Três últimas cargas', d.t3.map(c => c.placa + ' ' + c.pos + ': ' + c.cargas.map(x => F.data(x.data) + ' ' + (x.produto ? x.produto.nome : x.texto)).join('; ')).join(' | ')], ['Termo de compromisso', v.termo ? 'assinado em ' + F.data(v.termo.em.slice(0, 10)) : d.cobertura === 'gatekeeper' ? 'ausente' : 'não se aplica'], ['Verificação de conformidade', v.verificacao && v.verificacao.estado === 'aprovada' ? F.data(v.verificacao.em.slice(0, 10)) + ' por ' + TX.usuario(v.verificacao.por).nome : 'ausente']].map(l => '<tr><th style="width:230px">' + e(l[0]) + '</th><td' + (/ausente/.test(l[1]) ? ' class="aus"' : '') + '>' + e(l[1]) + '</td></tr>').join('') + '</table>'; };
     const exp = (titulo, html, msg) => { if (U.exportarDocumento(titulo, html)) this.avisar(msg); else this.avisar('O navegador bloqueou a aba nova. Libere pop-ups e tente de novo.'); };
     const periodoGK = TX.db.viagens.filter(v => !v.cancelada && v.assegurada && v.data >= s.de && v.data <= s.ate && TX.coberturaDe(v) === 'gatekeeper');
+    // Datas digitadas em DD/MM/AAAA: o campo nativo mostra o formato do idioma do navegador.
+    const iso = t => { const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(t || ''); if (!m) return null; const d = m[3] + '-' + m[2] + '-' + m[1]; return F.data(d) === t && +m[2] >= 1 && +m[2] <= 12 && +m[1] >= 1 && +m[1] <= 31 ? d : null; };
+    const mascara = t => { const d = TX.soDigitos(t).slice(0, 8); return d.length > 4 ? d.slice(0, 2) + '/' + d.slice(2, 4) + '/' + d.slice(4) : d.length > 2 ? d.slice(0, 2) + '/' + d.slice(2) : d; };
+    const deTxt = s.deTxt != null ? s.deTxt : F.data(s.de), ateTxt = s.ateTxt != null ? s.ateTxt : F.data(s.ate);
+    const deOk = !!iso(deTxt), ateOk = !!iso(ateTxt);
+    const ATALHOS = [['30', 'Últimos 30 dias', TX.addDias(TX.HOJE, -30)], ['90', 'Últimos 90 dias', TX.addDias(TX.HOJE, -90)], ['365', 'Últimos 12 meses', TX.addDias(TX.HOJE, -365)], ['ano', 'Este ano', TX.HOJE.slice(0, 4) + '-01-01']];
+    const ocs = TX.db.ocorrencias.filter(o => o.em.slice(0, 10) >= s.de && o.em.slice(0, 10) <= s.ate).sort((a, b) => b.em.localeCompare(a.em));
+    const ocLinha = o => { const v = TX.viagem(o.viagem), t = TX.transportador(o.transportador); return [F.data(o.em.slice(0, 10)), v ? v.ordem + ' (' + v.id + ')' : '', t ? TX.nomeTransportador(t) : 'Frota própria', o.tipo, o.gravidade, o.descricao, o.fotos, o.revisao ? F.data(o.revisao.em.slice(0, 10)) + ', ' + TX.usuario(o.revisao.por).nome + ': ' + o.revisao.motivo : (o.gravidade === 'grave' ? 'pendente' : 'não exigida'), TX.usuario(o.por).nome]; };
+    const OC_CAB = ['Data', 'Viagem', 'Transportador', 'Tipo', 'Gravidade', 'Descrição', 'Fotos', 'Revisão', 'Registrada por'];
     return Object.assign({}, U.base(this), {
-      q: s.q, onQ: ev => this.setState({ q: ev.target.value, pag: 1 }), de: s.de, ate: s.ate, onDe: ev => this.setState({ de: ev.target.value, pag: 1 }), onAte: ev => this.setState({ ate: ev.target.value, pag: 1 }),
+      q: s.q, onQ: ev => this.setState({ q: ev.target.value, pag: 1 }),
+      popPeriodo: s.popAberto === 'periodo', abrirPeriodo: () => this.setState(st => ({ popAberto: st.popAberto === 'periodo' ? null : 'periodo', deTxt: null, ateTxt: null })),
+      perRot: F.data(s.de) + ' a ' + F.data(s.ate),
+      atalhos: ATALHOS.map(([k, n, de]) => ({ k, n, sub: F.curta(de) + ' a ' + F.curta(TX.HOJE), fw: s.de === de && s.ate === TX.HOJE ? '800' : '600', onClick: () => this.setState({ de, ate: TX.HOJE, pag: 1, popAberto: null, deTxt: null, ateTxt: null }) })),
+      deTxt, ateTxt, deBd: deOk ? '#e0e7e5' : '#e8a33d', ateBd: ateOk ? '#e0e7e5' : '#e8a33d',
+      onDeTxt: ev => { const t = mascara(ev.target.value); const d = iso(t); this.setState(Object.assign({ deTxt: t }, d ? { de: d, pag: 1 } : {})); },
+      onAteTxt: ev => { const t = mascara(ev.target.value); const d = iso(t); this.setState(Object.assign({ ateTxt: t }, d ? { ate: d, pag: 1 } : {})); },
+      dataMsg: deOk && ateOk ? (s.de > s.ate ? 'A data inicial é depois da final.' : 'A lista atualiza enquanto você digita.') : 'Digite dia, mês e ano: 01/09/2026.', dataMsgC: deOk && ateOk && s.de <= s.ate ? '#7c8f8d' : '#b97514',
       tipos: [['todos', 'Todas'], ['afretamento', 'Afretamento'], ['propria', 'Frota própria']].map(([k, n]) => ({ n, onClick: () => this.setState({ tipo: k, pag: 1 }), bg: s.tipo === k ? '#fff' : 'transparent', c: s.tipo === k ? '#093D44' : '#fff' })),
       resumoBusca: res.length + ' viagens asseguradas de ' + F.data(s.de) + ' a ' + F.data(s.ate) + (s.q ? ' para "' + s.q + '"' : '') + '. Colunas na ordem em que o auditor anota.',
       simAtiva: !!s.simIni, simTempo: Math.floor(elapsed / 60) + ' min ' + String(elapsed % 60).padStart(2, '0') + ' s', simRot: s.simIni ? 'Registrar simulação' : 'Iniciar simulação de rastreabilidade',
@@ -254,8 +284,8 @@ class Component extends DCLogic {
         TX.fazer('registrarSimulacao', { pedido, encontradas: res.length, duracaoMin: min });
         this.setState({ simIni: null }); this.avisar('Simulação registrada: ' + pedido + ', ' + res.length + ' viagens em ' + min + ' min.');
       },
-      nRes: res.length, cols: '28px 78px 70px 70px 1.5fr 1fr 150px 64px 74px',
-      linhas: s.loading ? [] : pg.itens.map(v => { const on = s.sel.includes(v.id); return { id: v.id, href: 'Viagem.dc.html?id=' + v.id, data: F.data(v.data), cte: v.cte ? v.cte.numero : 'pendente', nf: v.cte ? v.cte.nf : 'pendente', cteC: v.cte ? '#0b2224' : '#b97514', rota: TX.embarcador(v.embarcador).nome + ' para ' + TX.destinatario(v.destinatario).nome, produto: TX.produto(v.produto).nome, placas: TX.placasDoConjunto(v.conjunto).join(' '),
+      nRes: res.length, cols: '22px 82px 70px minmax(0,1.4fr) minmax(0,1fr) 124px 50px 74px',
+      linhas: s.loading ? [] : pg.itens.map(v => { const on = s.sel.includes(v.id); return { id: v.id, href: 'Viagem.dc.html?id=' + v.id, data: F.data(v.data), cte: v.cte ? v.cte.numero : 'pendente', nf: v.cte ? v.cte.nf : '', cteC: v.cte ? '#0b2224' : '#b97514', rota: TX.embarcador(v.embarcador).nome + ' para ' + TX.destinatario(v.destinatario).nome, produto: TX.produto(v.produto).nome, placas: TX.placasDoConjunto(v.conjunto).join(' '),
         termo: v.termo ? F.curta(v.termo.em.slice(0, 10)) : TX.coberturaDe(v) === 'gatekeeper' ? 'falta' : 'n/a', termoC: v.termo || TX.coberturaDe(v) !== 'gatekeeper' ? '#3c4f4e' : '#c43d3d',
         ver: v.verificacao && v.verificacao.estado === 'aprovada' ? F.curta(v.verificacao.em.slice(0, 10)) : 'falta', verC: v.verificacao && v.verificacao.estado === 'aprovada' ? '#3c4f4e' : '#c43d3d',
         bg: on ? '#f3faf8' : '#fff', ck: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#fff', ckBd: on ? '#127670' : '#c9d5d3', ckI: on ? '✓' : '',
@@ -266,10 +296,13 @@ class Component extends DCLogic {
       amBg: am.bg, amC: am.c, amSh: am.sh, amCur: am.cur,
       exportarAmostra: () => { if (!sel.length) return; exp('Amostra de auditoria', '<h1>Amostra de auditoria</h1><div class="sub">' + e(TX.db.tenant.nome) + ', ' + sel.length + ' viagens. Itens conferidos por viagem.</div>' + sel.map(id => itemViagem(TX.viagem(id))).join(''), 'Amostra com ' + sel.length + ' viagens aberta em outra aba, em documento único.'); },
       apoio: [
+        { k: 'ocorrencias', ancora: 'ocorrencias', n: 'Ocorrências do período', sub: ocs.length ? ocs.length + ' registradas, ' + ocs.filter(o => o.gravidade === 'grave').length + ' grave' + (ocs.filter(o => o.gravidade === 'grave').length === 1 ? '' : 's') + ', com descrição e revisão' : 'nenhuma ocorrência no período', rot: 'Documento', csvD: 'inline',
+          onClick: () => exp('Ocorrências do período', '<h1>Ocorrências do período</h1><div class="sub">' + e(TX.db.tenant.nome) + ', ' + F.data(s.de) + ' a ' + F.data(s.ate) + ', ' + ocs.length + ' ocorrências</div><table><tr>' + OC_CAB.map(c => '<th>' + e(c) + '</th>').join('') + '</tr>' + ocs.map(o => '<tr>' + ocLinha(o).map((c, i) => '<td' + (i === 7 && c === 'pendente' ? ' class="aus"' : '') + '>' + e(c) + '</td>').join('') + '</tr>').join('') + '</table>', ocs.length + ' ocorrências abertas em outra aba, prontas para o SGQ.'),
+          onCsv: () => { const csv = '\ufeff' + [OC_CAB].concat(ocs.map(ocLinha)).map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(';')).join('\r\n'); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); a.download = 'ocorrencias-' + s.de + '-a-' + s.ate + '.csv'; document.body.appendChild(a); a.click(); a.remove(); this.avisar(ocs.length + ' ocorrências exportadas em planilha (CSV) para o SGQ.'); } },
         { k: 'frota', n: 'Frota no escopo GMP+', sub: TX.db.conjuntos.filter(c => c.dono === 'propria' && c.escopo && c.escopo.no).length + ' conjuntos com placa de cada compartimento', onClick: () => exp('Frota no escopo', '<h1>Frota própria no escopo GMP+</h1><table><tr><th>Cavalo</th><th>Compartimentos</th><th>Desde</th></tr>' + TX.db.conjuntos.filter(c => c.dono === 'propria' && c.escopo && c.escopo.no).map(c => '<tr><td class="mono">' + e(c.cavalo) + '</td><td class="mono">' + e(TX.compsDoConjunto(c).map(k => k.placa + ' ' + k.pos).join(', ')) + '</td><td>' + e(F.data(c.escopo.desde)) + '</td></tr>').join('') + '</table>', 'Lista da frota no escopo aberta em outra aba.') },
         { k: 'treinos', n: 'Treinamentos registrados', sub: TX.db.treinamentos.length + ' registros com data, tema, instrutor e participantes', onClick: () => exp('Treinamentos', '<h1>Treinamentos registrados</h1><table><tr><th>Data</th><th>Tema</th><th>Instrutor</th><th>Participantes</th></tr>' + TX.db.treinamentos.map(t => '<tr><td>' + e(F.data(t.data)) + '</td><td>' + e(t.tema) + '</td><td>' + e(t.instrutor) + '</td><td>' + e(t.participantes.map(p => (TX.usuario(p) || TX.pessoa(p) || {}).nome).join(', ')) + '</td></tr>').join('') + '</table>', 'Lista de treinamentos aberta em outra aba.') },
         { k: 'gatekeeper', n: 'Protocolos gatekeeper do período', sub: periodoGK.length + ' viagens e a data de comunicação ao OC por filial', onClick: () => exp('Protocolos gatekeeper', '<h1>Protocolos gatekeeper</h1><div class="sub">' + F.data(s.de) + ' a ' + F.data(s.ate) + '</div><h2>Comunicação ao organismo certificador</h2><table>' + TX.db.filiais.map(f => '<tr><th>' + e(f.nome) + '</th><td>' + (f.comunicacaoOC ? e(F.data(f.comunicacaoOC.data) + ', protocolo ' + f.comunicacaoOC.protocolo) : '<span class="aus">não comunicada</span>') + '</td></tr>').join('') + '</table><h2>Viagens sob gatekeeper</h2><table><tr><th>Data</th><th>Ordem</th><th>Filial</th><th>Transportador</th><th>RNTRC</th></tr>' + periodoGK.map(v => { const t = TX.transportador(v.transportador); return '<tr><td>' + e(F.data(v.data)) + '</td><td>' + e(v.ordem) + '</td><td>' + e(TX.filial(v.filial).nome) + '</td><td>' + e(TX.nomeTransportador(t)) + '</td><td>' + e(t && t.rntrc ? t.rntrc.numero : '') + '</td></tr>'; }).join('') + '</table>', 'Protocolos gatekeeper abertos em outra aba.') }
-      ],
+      ].map(ap => Object.assign({ ancora: 'apoio-' + ap.k, rot: 'Exportar', csvD: 'none', onCsv: () => {} }, ap, { bd: ap.ancora && location.hash === '#' + ap.ancora ? '#127670' : '#eef2f1' })),
       sims: TX.db.simulacoes.slice().reverse().map(m => ({ data: F.data(m.em.slice(0, 10)), dur: Math.floor(m.duracaoMin / 60) + 'h' + String(m.duracaoMin % 60).padStart(2, '0'), pedido: m.pedido, quem: TX.usuario(m.por).nome, n: m.encontradas }))
     }, pg.vals);
   }
