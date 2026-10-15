@@ -107,6 +107,31 @@ Iniciada em 14/10/2026, a partir da seção 6 e 7 de `HANDOFF.md`. Uma etapa por
 5. Base IDTF reduzida a uma linha no rodapé da sidebar; espaçamentos apertados para caber em 768 px de altura.
 6. Conteúdo das 9 telas com 92 px no topo para o header; `min-width` em 1280 px em todas (Compartimento, Cadastros e Configurações eram as que faltavam).
 
+## Etapa 8. Cadastros (14/10/2026)
+
+**Problema como usuário.** A sidebar abre Cadastros em quatro subitens e, logo abaixo do título, a página repetia os mesmos quatro como abas: duas navegações para a mesma coisa. Em Produtos, cinco chips de regime espremiam a busca até cortar o exemplo do campo em 1366 px, e o regime C (água e detergente) nem aparecia; o cartão "Base IDTF" repetia o rodapé da sidebar; a busca sem resultado mandava "pedir ao lado" sem levar o termo. Em Manual, os cinco cartões do manual ocupavam a coluna inteira sem pedir decisão nenhuma, e "Publicar nova versão" quebrava em duas linhas. Em Fornecedores, documento com "vence em 17 dias" não tinha ação; o vencimento listado em Hoje levava para cá e parava ali.
+
+**O que mudou.**
+
+1. O título passa a ser a seção ("Produtos e regimes", com "Cadastros" acima, pequeno). As abas da página só aparecem com a sidebar recolhida, quando o acordeão some e a página precisa navegar sozinha.
+2. Produtos: regime virou um seletor compacto ("Depois dele: Todos") com as seis opções, a contagem de cada uma conforme a busca e a opção vazia apagada. A contagem ("5 de 30") fica no fim da linha. O cartão da base IDTF saiu; a versão foi para o subtítulo. Busca sem resultado oferece "Pedir classificação de "escória de cobre"", que grava o pedido na hora; se o termo já foi pedido, a linha diz isso.
+3. Manual: cartões do manual recolhidos numa linha ("5 cartões, o que o motorista lê na v3.2", Ver os cartões). Ações das duas colunas sem quebra.
+4. Fornecedores: documento vencido ou vencendo ganha "Atualizar", que pede a nova validade. O subtítulo conta os documentos que vencem em 30 dias. O vencimento de fornecedor em Hoje abre `Cadastros.dc.html?aba=fornecedores&id=`, que rola até o fornecedor e o destaca.
+5. Filiais: subtítulo conta as filiais sem comunicação ao organismo certificador. Fora isso, sem mudança: a filial pendente já se destaca em vermelho e tem a ação.
+
+**Base.** `atualizarDocumento` aceita `fornecedor` (atualiza o documento pelo nome). Três conferências novas no teste da base (672 no total).
+
+**Teste.** `scripts/e2e-revisao.cjs` novo, que vai juntar os fluxos desta rodada. Nesta etapa cobre abas e sidebar, seletor de regime, pedido de classificação pela busca, atualizar documento de fornecedor e cartões do manual.
+
+**Pendente para o pente fino.** Os campos de data dos modais de Cadastros (comunicação ao OC, treinamento, fornecedor e o novo de validade) usam o campo nativo, que mostra o formato do idioma do navegador. Entram no item 4 junto com Transportadores.
+
+**Premissas.**
+
+| Premissa | O que muda se a resposta vier diferente |
+| --- | --- |
+| A sidebar é a navegação de Cadastros; a página não repete as abas | Voltar as abas na página e tirar os subitens da sidebar (um só lugar) |
+| Atualizar documento de fornecedor pede só a nova validade, como em Transportadores | Pedir também o arquivo do documento quando houver anexo de verdade |
+
 ## Situação ao fim de 14/10/2026
 
 - Lacunas 1 a 4 do handoff fechadas: ocorrências exportáveis (etapa 3), fila de assinatura (etapa 2), entradas para o que virou seção (visões em Viagens na etapa 1 e busca global na etapa 7), Cadastros visível (etapa 7). A lacuna 5 continua dependendo do Gabriel e do Rafael.

@@ -646,6 +646,7 @@
         if (d.tipo === 'CNH') { const p = db.pessoas.find(x => x.id === d.ref); p.cnh = Object.assign({}, p.cnh || { categoria: 'E', numero: '0' + soDigitos(p.cpf).slice(0, 10) }, { validade: d.validade, origem: 'cadastro' }); }
         if (d.tipo === 'RNTRC') { const t = db.transportadores.find(x => x.id === d.ref); t.rntrc = Object.assign({}, t.rntrc || { numero: d.numero || '0' + soDigitos(op.em).slice(-8) }, { validade: d.validade, origem: 'cadastro' }); }
         if (d.tipo === 'Certificado GMP+') { const t = db.transportadores.find(x => x.id === d.ref); t.certificado = Object.assign({}, t.certificado, { validade: d.validade }); }
+        if (d.fornecedor) { const f = db.fornecedores.find(x => x.id === d.fornecedor); const doc = f && f.docs.find(x => x.n === d.tipo); if (doc) doc.validade = d.validade; }
         evento(db, op, null, d.tipo + ' de ' + d.refNome + ' atualizado: válido até ' + fmt.data(d.validade));
         return;
       }
@@ -1078,7 +1079,7 @@
     });
     db().conjuntos.filter(c => c.dono === 'propria').forEach(c => placasDoConjunto(c).forEach(pl => { const p = placa(pl); if (p && p.crlv) push('CRLV', pl, 'Frota própria', p.crlv.validade, 'Frota.dc.html', { placa: pl }); }));
     db().pessoas.filter(p => p.vinculo === 'propria').forEach(p => { if (p.cnh) push('CNH', p.nome, 'Frota própria, motorista ' + p.nome, p.cnh.validade, 'Frota.dc.html', { pessoa: p.id }); });
-    db().fornecedores.forEach(f => f.docs.forEach(d => push(d.n, f.nome, f.nome, d.validade, 'Cadastros.dc.html?aba=fornecedores', { fornecedor: f.id })));
+    db().fornecedores.forEach(f => f.docs.forEach(d => push(d.n, f.nome, f.nome, d.validade, 'Cadastros.dc.html?aba=fornecedores&id=' + f.id, { fornecedor: f.id })));
     return out.sort((a, b) => a.dias - b.dias);
   }
 

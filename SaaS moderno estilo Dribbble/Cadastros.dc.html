@@ -105,23 +105,33 @@ input::placeholder{color:#8ba09e}
   <!-- /TX:SIDEBAR -->
   <div style="flex:1;display:flex;flex-direction:column;padding:92px 32px 48px;gap:16px;min-width:0">
     <div style="display:flex;align-items:center;gap:14px">
-      <div><div style="font-size:24px;font-weight:800">Cadastros</div><div style="font-size:13.5px;color:#5c706e;margin-top:2px">{{ abaSub }}</div></div>
+      <div><div style="font-size:11px;font-weight:800;letter-spacing:1.2px;color:#7c8f8d;text-transform:uppercase">Cadastros</div><div data-tx-titulo style="font-size:24px;font-weight:800;margin-top:1px">{{ abaNome }}</div><div style="font-size:13.5px;color:#5c706e;margin-top:2px">{{ abaSub }}</div></div>
       <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
         <sc-if value="{{ temAcao }}" hint-placeholder-val="{{ false }}"><span onClick="{{ acao }}" data-tx-acao-aba style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;border-radius:99px;padding:10px 20px;font-size:13.5px;font-weight:800;cursor:pointer;box-shadow:0 6px 14px rgba(18,118,112,.3)">{{ acaoRot }}</span></sc-if>
         <!-- TX:PERFIL --><!-- /TX:PERFIL -->
       </div>
     </div>
+    <sc-if value="{{ mostrarAbas }}" hint-placeholder-val="{{ false }}">
     <div style="display:flex;gap:6px;border-bottom:1px solid #e0e7e5">
       <sc-for list="{{ abas }}" as="ab" hint-placeholder-count="4"><span onClick="{{ ab.onClick }}" data-tx-aba="{{ ab.k }}" style="font-size:14px;font-weight:700;padding:10px 16px;cursor:pointer;color:{{ ab.c }};border-bottom:2.5px solid {{ ab.bd }};margin-bottom:-1px">{{ ab.n }}</span></sc-for>
     </div>
+    </sc-if>
 
     <!-- PRODUTOS -->
     <sc-if value="{{ aProdutos }}" hint-placeholder-val="{{ false }}">
       <div style="display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:start">
         <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;overflow:hidden">
           <div style="display:flex;align-items:center;gap:10px;padding:14px 18px">
-            <div style="background:#f7faf9;border:1px solid #e0e7e5;border-radius:11px;padding:0 13px;display:flex;gap:8px;align-items:center;width:380px"><input value="{{ pq }}" onInput="{{ onPq }}" data-tx-busca placeholder="Nome popular, comercial ou em inglês: casquinha, adubo…" style="border:none;outline:none;background:transparent;font-size:13.5px;padding:9px 0;flex:1"></div>
-            <sc-for list="{{ pRegimes }}" as="pr" hint-placeholder-count="5"><span onClick="{{ pr.onClick }}" style="font-size:12.5px;font-weight:700;border-radius:99px;padding:6px 12px;cursor:pointer;border:1.5px solid {{ pr.bd }};background:{{ pr.bg }};color:{{ pr.c }}">{{ pr.n }}</span></sc-for>
+            <div style="background:#f7faf9;border:1px solid #e0e7e5;border-radius:11px;padding:0 13px;display:flex;gap:8px;align-items:center;flex:1;max-width:440px;min-width:0"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#7c8f8d" stroke-width="1.6" stroke-linecap="round" style="flex:none"><circle cx="7" cy="7" r="4.6"></circle><line x1="10.5" y1="10.5" x2="13.5" y2="13.5"></line></svg><input value="{{ pq }}" onInput="{{ onPq }}" data-tx-busca placeholder="Nome popular, comercial ou em inglês" style="border:none;outline:none;background:transparent;font-size:13.5px;padding:9px 0;flex:1;min-width:0"></div>
+            <div data-tx-pop style="position:relative">
+              <div onClick="{{ abrirRegime }}" data-tx-dd="regime" style="display:flex;align-items:center;gap:7px;height:38px;padding:0 12px 0 13px;border-radius:11px;border:1px solid {{ regBd }};background:#fff;font-size:13px;cursor:pointer;white-space:nowrap" style-hover="border-color:#127670"><span style="color:#7c8f8d;font-weight:600">Depois dele</span><span style="font-weight:700">{{ regRot }}</span><svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#7c8f8d" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5 6 7.5l3-3"></path></svg></div>
+              <sc-if value="{{ popRegime }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;left:0;top:44px;background:#fff;border:1px solid #e4eae8;border-radius:14px;box-shadow:0 16px 40px rgba(9,61,68,.16);padding:6px;min-width:250px;z-index:60">
+                  <sc-for list="{{ pRegimes }}" as="pr" hint-placeholder-count="6"><div onClick="{{ pr.onClick }}" data-tx-regime="{{ pr.k }}" style="display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:9px;font-size:13px;font-weight:{{ pr.fw }};color:{{ pr.cor }};cursor:{{ pr.cur }}" style-hover="background:#f6f9f8"><span style="width:20px;height:20px;border-radius:6px;background:{{ pr.rBg }};color:{{ pr.rT }};font-size:10.5px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none">{{ pr.r }}</span>{{ pr.n }}<span style="margin-left:auto;font-family:'Spline Sans Mono',monospace;font-size:11.5px;color:#7c8f8d">{{ pr.q }}</span><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="#127670" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;opacity:{{ pr.ckOp }}"><path d="M3.5 8.5 6.5 11.5 12.5 4.5"></path></svg></div></sc-for>
+                </div>
+              </sc-if>
+            </div>
+            <span style="margin-left:auto;font-size:12.5px;color:#7c8f8d;white-space:nowrap">{{ pContagem }}</span>
           </div>
           <div style="display:grid;grid-template-columns:1.3fr 1.4fr 1fr 110px 80px;gap:12px;padding:10px 18px;background:#f7faf9;font-size:10.5px;font-weight:800;letter-spacing:.7px;color:#7c8f8d"><span>PRODUTO</span><span>TAMBÉM CHAMADO DE</span><span>CATEGORIA</span><span>DEPOIS DELE</span><span>É RAÇÃO</span></div>
           <sc-for list="{{ produtos }}" as="p" hint-placeholder-count="10">
@@ -132,15 +142,12 @@ input::placeholder{color:#8ba09e}
               <span style="font-size:12px;color:#5c706e">{{ p.racao }}</span>
             </div>
           </sc-for>
-          <sc-if value="{{ pVazio }}" hint-placeholder-val="{{ false }}"><div style="padding:22px 18px;font-size:13px;color:#5c706e">Não está na base IDTF. Carga não classificada não pode ser carga anterior: peça a classificação ao lado.</div></sc-if>
+          <sc-if value="{{ pVazio }}" hint-placeholder-val="{{ false }}"><div data-tx-vazio style="padding:22px 18px;font-size:13px;color:#5c706e;display:flex;align-items:center;gap:14px"><div style="flex:1;line-height:1.5">{{ pVazioTxt }}</div><sc-if value="{{ pVazioPede }}" hint-placeholder-val="{{ false }}"><span onClick="{{ pedirDaBusca }}" data-tx-pedir-da-busca style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;font-size:12.5px;font-weight:800;border-radius:99px;padding:8px 16px;cursor:pointer;white-space:nowrap">{{ pVazioRot }}</span></sc-if></div></sc-if>
         </div>
         <div style="display:flex;flex-direction:column;gap:16px">
           <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:18px 20px">
-            <div style="font-size:15px;font-weight:800">Base IDTF {{ baseVersao }}</div>
-            <div style="font-size:12.5px;color:#5c706e;margin-top:4px;line-height:1.55">Mantida pela Traxium para todos os clientes. A versão vigente fica gravada em cada decisão; viagem decidida numa versão continua com ela.</div>
-          </div>
-          <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:18px 20px">
             <div style="font-size:15px;font-weight:800">Pedir classificação à Traxium</div>
+            <div style="font-size:12.5px;color:#5c706e;margin-top:3px;line-height:1.5">Para carga que não está na base. Até a classificação, viagem com ela como carga anterior fica travada.</div>
             <input value="{{ pcTexto }}" onInput="{{ onPcTexto }}" data-tx-campo="classificar" placeholder="Ex.: escória de alto-forno" style="width:100%;margin-top:10px;border:1px solid #dfe7e5;border-radius:11px;padding:9px 12px;font-size:13.5px;outline:none">
             <span onClick="{{ pedirClass }}" data-tx-pedir-classificacao style="display:block;text-align:center;margin-top:8px;background:{{ pcBg }};color:{{ pcC }};cursor:{{ pcCur }};font-size:13px;font-weight:800;border-radius:99px;padding:9px">Enviar pedido</span>
             <div style="display:flex;flex-direction:column;gap:6px;margin-top:12px"><sc-for list="{{ pedidos }}" as="pd" hint-placeholder-count="1"><div style="font-size:12.5px;background:#f7faf9;border-radius:11px;padding:8px 11px"><b>"{{ pd.t }}"</b><div style="color:#7c8f8d">{{ pd.sub }}</div></div></sc-for></div>
@@ -153,13 +160,16 @@ input::placeholder{color:#8ba09e}
     <sc-if value="{{ aManual }}" hint-placeholder-val="{{ false }}">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
         <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:20px 22px">
-          <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">{{ manualTitulo }}</div><span onClick="{{ abrirPublicar }}" data-tx-publicar style="margin-left:auto;font-size:12.5px;font-weight:800;color:#0C5862;cursor:pointer">Publicar nova versão</span></div>
+          <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">{{ manualTitulo }}</div><span onClick="{{ abrirPublicar }}" data-tx-publicar style="margin-left:auto;padding-left:12px;font-size:12.5px;font-weight:800;color:#0C5862;cursor:pointer;white-space:nowrap">Publicar nova versão</span></div>
           <div style="font-size:12.5px;color:#5c706e;margin-top:3px">O motorista lê no link, em cartões, e a ciência grava a versão na viagem.</div>
           <div style="display:flex;flex-direction:column;gap:7px;margin-top:12px"><sc-for list="{{ versoes }}" as="vs" hint-placeholder-count="2"><div style="border:1px solid {{ vs.bd }};border-radius:13px;padding:10px 13px"><div style="display:flex;gap:8px;align-items:center"><b style="font-family:'Spline Sans Mono',monospace">v{{ vs.v }}</b><span style="font-size:11.5px;font-weight:700;color:{{ vs.c }}">{{ vs.st }}</span><span style="margin-left:auto;font-size:12px;color:#5c706e">{{ vs.ciencias }}</span></div><div style="font-size:12.5px;color:#5c706e;margin-top:3px">{{ vs.mud }}</div></div></sc-for></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px"><sc-for list="{{ cartoes }}" as="ct" hint-placeholder-count="5"><div style="background:#f7faf9;border-radius:13px;padding:11px 13px"><div style="font-size:13px;font-weight:800">{{ ct.t }}</div><div style="font-size:12px;color:#5c706e;margin-top:3px;line-height:1.45">{{ ct.txt }}</div></div></sc-for></div>
+          <div onClick="{{ alternarCartoes }}" data-tx-ver-cartoes style="display:flex;align-items:center;gap:8px;margin-top:14px;padding:10px 13px;border-radius:12px;background:#f7faf9;cursor:pointer;font-size:13px" style-hover="background:#eef4f2"><b>{{ cartoesRot }}</b><span style="color:#5c706e">{{ cartoesSub }}</span><span style="margin-left:auto;font-size:12.5px;font-weight:800;color:#0C5862">{{ cartoesAcao }}</span></div>
+          <sc-if value="{{ verCartoes }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px"><sc-for list="{{ cartoes }}" as="ct" hint-placeholder-count="5"><div style="background:#f7faf9;border-radius:13px;padding:11px 13px"><div style="font-size:13px;font-weight:800">{{ ct.t }}</div><div style="font-size:12px;color:#5c706e;margin-top:3px;line-height:1.45">{{ ct.txt }}</div></div></sc-for></div>
+          </sc-if>
         </div>
         <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:20px 22px">
-          <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Treinamentos registrados</div><span onClick="{{ abrirTreino }}" data-tx-novo-treino style="margin-left:auto;font-size:12.5px;font-weight:800;color:#0C5862;cursor:pointer">Registrar treinamento</span></div>
+          <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">Treinamentos registrados</div><span onClick="{{ abrirTreino }}" data-tx-novo-treino style="margin-left:auto;padding-left:12px;font-size:12.5px;font-weight:800;color:#0C5862;cursor:pointer;white-space:nowrap">Registrar treinamento</span></div>
           <div style="font-size:12.5px;color:#5c706e;margin-top:3px">Lista datada com tema, instrutor e participantes: o registro que o auditor confere.</div>
           <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px"><sc-for list="{{ treinos }}" as="tr" hint-placeholder-count="3"><div style="border:1px solid #eef2f1;border-radius:13px;padding:11px 13px"><div style="display:flex;gap:10px"><b style="font-family:'Spline Sans Mono',monospace;font-size:12.5px">{{ tr.data }}</b><b style="font-size:13px">{{ tr.tema }}</b></div><div style="font-size:12px;color:#5c706e;margin-top:3px">{{ tr.instrutor }}, {{ tr.carga }}, {{ tr.n }} participantes</div><div style="font-size:11.5px;color:#7c8f8d;margin-top:2px">{{ tr.quem }}</div></div></sc-for></div>
         </div>
@@ -170,11 +180,11 @@ input::placeholder{color:#8ba09e}
     <sc-if value="{{ aFornecedores }}" hint-placeholder-val="{{ false }}">
       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px">
         <sc-for list="{{ fornecedores }}" as="fo" hint-placeholder-count="4">
-          <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:16px 18px">
+          <div data-tx-forn="{{ fo.id }}" style="background:#fff;border:1.5px solid {{ fo.bd }};box-shadow:{{ fo.sh }};border-radius:18px;padding:16px 18px;scroll-margin-top:96px">
             <div style="display:flex;align-items:center;gap:10px"><div style="font-size:15px;font-weight:800">{{ fo.nome }}</div><span style="font-size:11.5px;font-weight:700;color:#0C5862;border:1px solid #cfe3e1;border-radius:99px;padding:2px 9px">{{ fo.servico }}</span><span style="margin-left:auto;font-size:12px;color:#5c706e">{{ fo.cidade }}</span></div>
             <div style="font-size:12px;color:#7c8f8d;margin-top:3px;font-family:'Spline Sans Mono',monospace">{{ fo.cnpj }}</div>
             <div style="font-size:12.5px;color:#3c4f4e;margin-top:6px">{{ fo.regime }}</div>
-            <div style="display:flex;flex-direction:column;gap:5px;margin-top:10px"><sc-for list="{{ fo.docs }}" as="fd" hint-placeholder-count="2"><div style="display:flex;align-items:center;gap:9px;font-size:12.5px;background:#f7faf9;border-radius:10px;padding:7px 11px"><span style="width:7px;height:7px;border-radius:99px;background:{{ fd.dot }}"></span><span style="flex:1">{{ fd.n }}</span><span style="color:{{ fd.c }};font-weight:700">{{ fd.r }}</span></div></sc-for></div>
+            <div style="display:flex;flex-direction:column;gap:5px;margin-top:10px"><sc-for list="{{ fo.docs }}" as="fd" hint-placeholder-count="2"><div style="display:flex;align-items:center;gap:9px;font-size:12.5px;background:#f7faf9;border-radius:10px;padding:7px 11px"><span style="width:7px;height:7px;border-radius:99px;background:{{ fd.dot }}"></span><span style="flex:1">{{ fd.n }}</span><span style="color:{{ fd.c }};font-weight:700">{{ fd.r }}</span><sc-if value="{{ fd.atualiza }}" hint-placeholder-val="{{ false }}"><span onClick="{{ fd.onAtualizar }}" data-tx-atualizar-doc="{{ fd.k }}" style="font-weight:800;color:#0C5862;cursor:pointer;padding-left:6px" style-hover="color:#127670">Atualizar</span></sc-if></div></sc-for></div>
           </div>
         </sc-for>
       </div>
@@ -297,42 +307,70 @@ input::placeholder{color:#8ba09e}
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { loading: true, aba: null, pq: '', pReg: 'todos', modal: null, f: {} };
-  componentDidMount() { TX.ui.montar(this); const q = TX.ui.param('q'); if (q) this.setState({ pq: q }); }
+  state = { loading: true, aba: null, pq: '', pReg: 'todos', modal: null, f: {}, popAberto: null, verCartoes: false, hl: null };
+  componentDidMount() {
+    TX.ui.montar(this);
+    const q = TX.ui.param('q'); if (q) this.setState({ pq: q });
+    const id = TX.ui.param('id');
+    if (id && this.cadAtiva() === 'fornecedores') { this.setState({ hl: id }); setTimeout(() => { const el = document.querySelector('[data-tx-forn="' + id + '"]'); if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' }); }, 400); }
+  }
   avisar(m) { TX.ui.avisar(this, m); }
   cadAtiva() { const a = this.state.aba || TX.ui.param('aba'); return ['produtos', 'manual', 'fornecedores', 'filiais'].includes(a) ? a : 'produtos'; }
   irAba(k) { this.setState({ aba: k }); try { history.replaceState(null, '', 'Cadastros.dc.html?aba=' + k); } catch (e) {} }
   renderVals() {
     const s = this.state, U = TX.ui, F = TX.fmt, aba = this.cadAtiva();
     const regT = r => ({ A: ['linear-gradient(135deg,#48c78e,#1a8f57)', '#fff'], B: ['linear-gradient(135deg,#f1d55a,#e3c235)', '#5b4b05'], C: ['linear-gradient(135deg,#f4c15d,#e8a33d)', '#fff'], D: ['linear-gradient(135deg,#e88a5f,#d06a3c)', '#fff'], X: ['linear-gradient(135deg,#e46969,#c43d3d)', '#fff'] }[r]);
-    const SUB = { produtos: 'Produtos e regimes de limpeza pela IDTF, para consulta e pedido de classificação.', manual: 'Manual do motorista versionado e lista de treinamentos da equipe e da frota própria.', fornecedores: 'Lavadores e outros fornecedores que tocam a viagem, com documentos e validade.', filiais: 'Cada filial é uma unidade com registro GMP+, afretador e comunicação do gatekeeper ao organismo certificador.' };
-    const vals = Object.assign({}, U.base(this), {
-      abaSub: SUB[aba], aProdutos: aba === 'produtos', aManual: aba === 'manual', aFornecedores: aba === 'fornecedores', aFiliais: aba === 'filiais',
-      abas: [['produtos', 'Produtos e regimes'], ['manual', 'Manual e treinamentos'], ['fornecedores', 'Fornecedores'], ['filiais', 'Filiais']].map(([k, n]) => ({ k, n, onClick: () => this.irAba(k), c: aba === k ? '#0b2224' : '#7c8f8d', bd: aba === k ? '#127670' : 'transparent' })),
+    const ABAS = [['produtos', 'Produtos e regimes'], ['manual', 'Manual e treinamentos'], ['fornecedores', 'Fornecedores'], ['filiais', 'Filiais']];
+    const docsForn = [].concat.apply([], TX.db.fornecedores.map(f => f.docs.map(d => TX.docEstado(d.validade))));
+    const fVence = docsForn.filter(de => de.estado !== 'ok' && de.dias <= 30).length;
+    const semOC = TX.db.filiais.filter(f => !f.comunicacaoOC).length;
+    const SUB = {
+      produtos: TX.db.produtos.length + ' produtos da base IDTF ' + TX.db.baseIDTF.versao + ', mantida pela Traxium, com a limpeza que cada um exige da carga seguinte.',
+      manual: 'Manual do motorista com versões e ciências, e treinamentos da equipe e da frota própria.',
+      fornecedores: TX.db.fornecedores.length + ' fornecedores que tocam a viagem. ' + (fVence ? (fVence === 1 ? '1 documento vence' : fVence + ' documentos vencem') + ' em até 30 dias.' : 'Nenhum documento vence nos próximos 30 dias.'),
+      filiais: TX.db.filiais.length + ' filiais com registro GMP+ próprio. ' + (semOC ? (semOC === 1 ? '1 ainda não comunicou' : semOC + ' ainda não comunicaram') + ' o gatekeeper ao organismo certificador.' : 'Todas comunicaram o gatekeeper ao organismo certificador.')
+    };
+    const vals = Object.assign({}, U.base(this));
+    Object.assign(vals, {
+      abaNome: ABAS.find(x => x[0] === aba)[1], abaSub: SUB[aba], aProdutos: aba === 'produtos', aManual: aba === 'manual', aFornecedores: aba === 'fornecedores', aFiliais: aba === 'filiais',
+      mostrarAbas: vals.navL === 'none',
+      abas: ABAS.map(([k, n]) => ({ k, n, onClick: () => this.irAba(k), c: aba === k ? '#0b2224' : '#7c8f8d', bd: aba === k ? '#127670' : 'transparent' })),
       temAcao: aba === 'fornecedores', acaoRot: 'Cadastrar fornecedor', acao: () => this.setState({ modal: 'fornecedor', f: { servico: 'lavagem', regimeMax: 'B' } })
     });
     // produtos
-    const lista = (s.pq ? TX.buscarProdutos(s.pq, 40).map(r => r.produto) : TX.db.produtos).filter(p => s.pReg === 'todos' || p.regime === s.pReg);
+    const achados = s.pq ? TX.buscarProdutos(s.pq, 40).map(r => r.produto) : TX.db.produtos;
+    const lista = achados.filter(p => s.pReg === 'todos' || p.regime === s.pReg);
     const pc = U.cta((s.pcTexto || '').trim().length >= 3);
+    const REGS = [['todos', 'Todos os regimes'], ['A', 'Seco'], ['B', 'Água'], ['C', 'Água e detergente'], ['D', 'Desinfecção'], ['X', 'Proibida para ração']];
+    const pedir = t => { if (t.length < 3) return; if (TX.produtoPorTexto(t)) { this.avisar('"' + t + '" já está na base como ' + TX.produtoPorTexto(t).nome + '.'); return; } TX.fazer('pedirClassificacao', { texto: t }); this.setState({ pcTexto: '' }); this.avisar('Pedido enviado à Traxium. Viagens com esta carga anterior seguem travadas até a classificação.'); };
+    const termo = (s.pq || '').trim(), jaPedido = TX.db.pedidosClassificacao.some(p => p.texto.toLowerCase() === termo.toLowerCase());
     Object.assign(vals, {
       pq: s.pq, onPq: e => this.setState({ pq: e.target.value }), pVazio: lista.length === 0,
-      pRegimes: [['todos', 'Todos'], ['A', 'Seco'], ['B', 'Água'], ['D', 'Desinfecção'], ['X', 'Proibidas']].map(([k, n]) => Object.assign({ n, onClick: () => this.setState({ pReg: k }) }, U.chip(s.pReg === k))),
+      pVazioPede: achados.length === 0 && termo.length >= 3 && !jaPedido,
+      pVazioTxt: achados.length ? 'Nenhum produto com esse regime ' + (termo ? 'para "' + termo + '"' : '') + '.' : jaPedido ? '"' + termo + '" não está na base IDTF e a classificação já foi pedida. Até lá, não pode ser carga anterior.' : (termo ? '"' + termo + '" não está na base IDTF.' : 'Não está na base IDTF.') + ' Carga não classificada não pode ser carga anterior.',
+      pVazioRot: 'Pedir classificação de "' + termo + '"', pedirDaBusca: () => pedir(termo),
+      pContagem: lista.length === TX.db.produtos.length ? lista.length + ' produtos' : lista.length + ' de ' + TX.db.produtos.length,
+      regRot: s.pReg === 'todos' ? 'Todos' : REGS.find(x => x[0] === s.pReg)[1], regBd: s.pReg !== 'todos' ? '#127670' : '#e0e7e5',
+      popRegime: s.popAberto === 'regime', abrirRegime: () => this.setState(st => ({ popAberto: st.popAberto === 'regime' ? null : 'regime' })),
+      pRegimes: REGS.map(([k, n]) => { const q = k === 'todos' ? achados.length : achados.filter(p => p.regime === k).length; const t = k === 'todos' ? ['transparent', '#7c8f8d'] : regT(k); const pode = q > 0 || k === s.pReg; return { k, n, q, r: k === 'todos' ? '' : k === 'X' ? '✕' : k, rBg: t[0], rT: t[1], fw: s.pReg === k ? '800' : '600', cor: pode ? '#0b2224' : '#9db0ae', cur: pode ? 'pointer' : 'default', ckOp: s.pReg === k ? '1' : '0', onClick: () => { if (pode) this.setState({ pReg: k, popAberto: null }); } }; }),
       produtos: lista.map(p => { const t = regT(p.regime); return { nome: p.nome, en: p.en, sin: p.sin.join(', '), cat: p.cat, r: p.regime === 'X' ? '✕' : p.regime, rBg: t[0], rT: t[1], rn: TX.REGIMES[p.regime].n.toLowerCase(), rc: p.regime === 'X' ? '#c43d3d' : '#3c4f4e', racao: p.racao ? 'sim' : 'não' }; }),
       pcTexto: s.pcTexto || '', onPcTexto: e => this.setState({ pcTexto: e.target.value }), pcBg: pc.bg, pcC: pc.c, pcCur: pc.cur,
-      pedirClass: () => { const t = (s.pcTexto || '').trim(); if (t.length < 3) return; if (TX.produtoPorTexto(t)) { this.avisar('"' + t + '" já está na base como ' + TX.produtoPorTexto(t).nome + '.'); return; } TX.fazer('pedirClassificacao', { texto: t }); this.setState({ pcTexto: '' }); this.avisar('Pedido enviado à Traxium. Viagens com esta carga anterior seguem travadas até a classificação.'); },
+      pedirClass: () => pedir((s.pcTexto || '').trim()),
       pedidos: TX.db.pedidosClassificacao.slice().reverse().map(p => ({ t: p.texto, sub: p.id + ', ' + F.data(p.pedidoEm) + ', ' + (TX.usuario(p.por) || {}).nome + ': ' + p.estado }))
     });
     // manual e treinamentos
     const vig = TX.manualVigente();
     Object.assign(vals, {
-      manualTitulo: TX.db.manual.titulo, cartoes: TX.db.manual.cartoes,
+      manualTitulo: TX.db.manual.titulo, cartoes: TX.db.manual.cartoes, verCartoes: s.verCartoes,
+      cartoesRot: TX.db.manual.cartoes.length + ' cartões', cartoesSub: 'o que o motorista lê na v' + vig.v, cartoesAcao: s.verCartoes ? 'Recolher' : 'Ver os cartões', alternarCartoes: () => this.setState({ verCartoes: !s.verCartoes }),
       versoes: TX.db.manual.versoes.slice().reverse().map(x => { const n = TX.db.viagens.filter(v => v.manual && v.manual.versao === x.v).length; const on = x.v === vig.v; return { v: x.v, st: on ? 'vigente desde ' + F.data(x.desde) : 'de ' + F.data(x.desde) + ' a ' + F.data(x.ate), c: on ? '#1a8f57' : '#7c8f8d', bd: on ? '#cfe9dc' : '#eef2f1', mud: x.mudancas, ciencias: n + ' ciências em viagens' }; }),
       abrirPublicar: () => this.setState({ modal: 'manual', f: { versao: (parseFloat(vig.v) + 0.1).toFixed(1) } }),
       treinos: TX.db.treinamentos.slice().reverse().map(t => ({ data: F.data(t.data), tema: t.tema, instrutor: t.instrutor, carga: t.carga, n: t.participantes.length, quem: t.participantes.map(p => (TX.usuario(p) || TX.pessoa(p) || {}).nome).join(', ') })),
       abrirTreino: () => this.setState({ modal: 'treino', f: { data: TX.HOJE, carga: '1 h', instrutor: TX.sessao().nome, part: [] } })
     });
     // fornecedores
-    Object.assign(vals, { fornecedores: TX.db.fornecedores.map(f => ({ nome: f.nome, servico: f.servico, cidade: f.cidade, cnpj: f.cnpj, regime: f.regimeMax ? 'Credenciado para limpeza até regime ' + f.regimeMax + ' (' + TX.REGIMES[f.regimeMax].n.toLowerCase() + ')' : 'Não faz limpeza', docs: f.docs.map(d => { const de = TX.docEstado(d.validade); const tm = U.tom(de.estado === 'ok' ? 'ok' : de.estado === 'vence' ? 'falta' : 'bloqueio'); return { n: d.n, r: de.rotulo, dot: tm.dot, c: tm.c }; }) })) });
+    Object.assign(vals, { fornecedores: TX.db.fornecedores.map(f => ({ id: f.id, nome: f.nome, servico: f.servico, cidade: f.cidade, cnpj: f.cnpj, bd: s.hl === f.id ? '#127670' : '#e4eae8', sh: s.hl === f.id ? '0 0 0 4px rgba(18,118,112,.12)' : 'none', regime: f.regimeMax ? 'Credenciado para limpeza até regime ' + f.regimeMax + ' (' + TX.REGIMES[f.regimeMax].n.toLowerCase() + ')' : 'Não faz limpeza',
+      docs: f.docs.map(d => { const de = TX.docEstado(d.validade); const tm = U.tom(de.estado === 'ok' ? 'ok' : de.estado === 'vence' ? 'falta' : 'bloqueio'); return { k: f.id + ':' + d.n, n: d.n, r: de.rotulo, dot: tm.dot, c: tm.c, atualiza: de.estado !== 'ok', onAtualizar: () => this.setState({ modal: 'docForn', fForn: f.id, fDoc: d.n, f: { validade: '' } }) }; }) })) });
     // filiais
     Object.assign(vals, { filiais: TX.db.filiais.map(f => { const oc = f.comunicacaoOC; const tm = U.tom(oc ? 'ok' : 'bloqueio'); const gk = TX.db.viagens.filter(v => v.filial === f.id && !v.cancelada && v.data >= TX.addDias(TX.HOJE, -45) && v.data <= TX.HOJE && TX.coberturaDe(v) === 'gatekeeper').length; return { id: f.id, nome: f.nome + ' ' + f.uf + (f.matriz ? ', matriz' : ''), reg: f.registro, afretador: TX.usuario(f.afretador).nome, gk, hrefMesa: 'Hoje.dc.html?filial=' + f.id, bd: oc ? '#e4eae8' : '#f1caca',
       oc: oc ? 'Gatekeeper comunicado ao organismo certificador' : 'Gatekeeper ainda não comunicado', ocSub: oc ? F.data(oc.data) + ', protocolo ' + oc.protocolo : 'A TS1.2 exige comunicar antes do primeiro protocolo. Viagens de TAC desta filial ficam bloqueadas.', ocC: tm.c, ocDot: tm.dot, ocRing: tm.ring, ocBd: oc ? '#eef2f1' : '#f1caca', semOc: !oc,
@@ -362,6 +400,12 @@ class Component extends DCLogic {
       const ok = /^\d+\.\d+$/.test(f.versao || '') && (f.mudancas || '').trim().length >= 10 && !TX.db.manual.versoes.some(x => x.v === f.versao);
       return Object.assign(base, { mTitulo: 'Publicar nova versão do manual', mSub: 'Vale a partir de hoje. Ciências já dadas continuam gravadas na versão antiga; o link pede a nova nas próximas viagens.', mCampos: [campo('versao', 'Versão', 'text', '3.3'), campo('mudancas', 'O que mudou', 'text', 'Ex.: novo cartão sobre chuva na carga', '1 / span 2')] },
         fim(ok, 'Publicar', () => { TX.fazer('publicarManual', { versao: f.versao, mudancas: f.mudancas.trim() }); this.setState({ modal: null }); this.avisar('Manual v' + f.versao + ' publicado. Viagens de hoje sem ciência nesta versão voltam a pedir leitura.'); }));
+    }
+    if (m === 'docForn') {
+      const fo = TX.fornecedor(s.fForn), doc = fo.docs.find(x => x.n === s.fDoc);
+      const ok = !!f.validade && f.validade > TX.HOJE;
+      return Object.assign(base, { mTitulo: s.fDoc + ': ' + fo.nome, mSub: 'O documento atual ' + TX.docEstado(doc.validade).rotulo + '. Informe a validade do documento novo: o aviso de vencimento sai de Hoje.', mCampos: [campo('validade', 'Nova validade', 'date')] },
+        fim(ok, 'Atualizar', () => { TX.fazer('atualizarDocumento', { tipo: s.fDoc, fornecedor: fo.id, ref: fo.id, refNome: fo.nome, validade: f.validade }); this.setState({ modal: null, hl: fo.id }); this.avisar('Documento atualizado: ' + s.fDoc.toLowerCase() + ' de ' + fo.nome + ', válido até ' + F.data(f.validade) + '.'); }));
     }
     if (m === 'fornecedor') {
       const lav = f.servico === 'lavagem';

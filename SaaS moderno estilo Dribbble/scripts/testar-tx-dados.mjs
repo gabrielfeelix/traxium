@@ -175,6 +175,11 @@ confere(TX.decidir('VG-3126').resultado === 'pronta', 'TS1.2: comunicação ao O
 TX.entrarComo('u-luiz');
 TX.fazer('revisarTransportador', { transportador: 'e-lima', motivo: 'Treinamento de limpeza refeito e inspeção da carreta aprovada' });
 confere(TX.decidir('VG-3127').resultado === 'pronta', 'F6: revisão da ocorrência grave reabilita a Lima');
+// Documento de fornecedor atualizado em Cadastros
+TX.fazer('atualizarDocumento', { tipo: 'Laudo de potabilidade da água', fornecedor: 'f-br163', ref: 'f-br163', refNome: 'Estação de Lavagem BR-163', validade: '2027-11-02' });
+confere(TX.fornecedor('f-br163').docs.find(x => x.n === 'Laudo de potabilidade da água').validade === '2027-11-02', 'Cadastros: documento de fornecedor atualizado');
+confere(!TX.vencimentos(60).some(x => x.fornecedor === 'f-br163' && x.tipo === 'Laudo de potabilidade da água'), 'Cadastros: documento atualizado sai dos vencimentos');
+confere(TX.vencimentos(60).filter(x => x.fornecedor).every(x => x.href === 'Cadastros.dc.html?aba=fornecedores&id=' + x.fornecedor), 'Cadastros: vencimento de fornecedor abre o fornecedor');
 // Criação de viagem com TAC novo
 TX.entrarComo('u-diego');
 const novo = TX.fazer('criarViagem', { filial: 'SOR', produto: 'farelo-soja', peso: 37, embarcador: 'em-agrosorriso', destinatario: 'de-nutrimax', data: TX.HOJE, janela: '18:30', ordem: 'OC 48140', origemOrdem: 'pdf', novoTAC: { nome: 'Teodoro Lins', telefone: '(66) 99100-2030', cpf: '11122233396', placas: ['RZZ 1A11', 'RZZ 1A12'] } });
