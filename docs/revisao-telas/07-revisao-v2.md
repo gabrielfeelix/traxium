@@ -132,6 +132,29 @@ Iniciada em 14/10/2026, a partir da seção 6 e 7 de `HANDOFF.md`. Uma etapa por
 | A sidebar é a navegação de Cadastros; a página não repete as abas | Voltar as abas na página e tirar os subitens da sidebar (um só lugar) |
 | Atualizar documento de fornecedor pede só a nova validade, como em Transportadores | Pedir também o arquivo do documento quando houver anexo de verdade |
 
+## Etapa 9. Configurações (14/10/2026)
+
+**Problema como usuário.** A navegação lateral por âncoras levava a seção para o topo da janela, embaixo do header fixo de 72 px: clicar em "Regras" escondia o título de Regras. A própria navegação, presa a 20 px do topo, também sumia sob o header ao rolar, e o item ativo só mudava no clique, nunca na rolagem. Em "Usuários e papéis" não havia como pôr ninguém: o gestor da qualidade que contrata um afretador novo não tinha por onde dar o acesso. O subtítulo da página repetia a lista de seções do menu lateral, e as regras diziam "piso: alerta", termo que só faz sentido para quem escreveu o motor.
+
+**O que mudou.**
+
+1. Seções com `scroll-margin-top` de 92 px: a âncora para logo abaixo do header. Navegação lateral presa a 92 px.
+2. O item ativo acompanha a rolagem (a última seção cujo topo passou do header; no fim da página, a última). Durante a rolagem suave disparada pelo clique, o acompanhamento espera, para o destaque não pular de item em item.
+3. "Convidar usuário" no cabeçalho de Usuários: nome, e-mail, papel (afretador, gestor da qualidade, gestor de frota, consultoria externa) e filial quando é afretador. E-mail de quem já tem acesso ou convite pendente é recusado no próprio modal. O convite aparece na lista com avatar tracejado, "convite enviado hoje 10:52, sem primeiro acesso" e "Cancelar convite".
+4. Subtítulo diz para que serve a tela ("Quem acessa, quem assina e o que trava a viagem"). Regras: "regra interna: pode passar a só alertar" no lugar de "piso: alerta".
+
+**Base (versão 10 da semente).** Lista nova `convitesUsuario` e operações `convidarUsuario` e `cancelarConviteUsuario`. O convite fica fora de `usuarios` até o primeiro acesso, que o protótipo não simula: não entra em "Entrar como", na fila de assinatura nem nos avisos de liberação. Duas conferências novas (674 no total).
+
+**Teste.** `e2e-revisao.cjs` cobre âncora abaixo do header, seção ativa com a rolagem, recusa de e-mail repetido, convite pendente e cancelamento. `e2e-f5.cjs` passou a achar o botão da classe da regra por `data-tx-classe`, e não pelo texto.
+
+**Premissas.**
+
+| Premissa | O que muda se a resposta vier diferente |
+| --- | --- |
+| Quem administra a conta (gestor da qualidade) convida os usuários; Direção e RT não se convida pela tela | Se a Traxium criar os acessos na implantação, trocar o botão por "Pedir acesso à Traxium" |
+| Convite de Direção e RT fica de fora: a alçada máxima é dada por contrato | Incluir o papel no convite, com confirmação de quem já é Direção |
+| O convite vale até o primeiro acesso, sem prazo de expiração | Expirar em 7 dias e oferecer "Reenviar" |
+
 ## Situação ao fim de 14/10/2026
 
 - Lacunas 1 a 4 do handoff fechadas: ocorrências exportáveis (etapa 3), fila de assinatura (etapa 2), entradas para o que virou seção (visões em Viagens na etapa 1 e busca global na etapa 7), Cadastros visível (etapa 7). A lacuna 5 continua dependendo do Gabriel e do Rafael.

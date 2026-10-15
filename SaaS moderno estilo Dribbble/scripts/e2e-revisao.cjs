@@ -46,6 +46,23 @@ const ok = (c, m) => { console.log((c ? 'ok    ' : 'FALHOU ') + m); if (!c) falh
   ok(!antes && /Antes de carregar/.test(await pg.innerText('body')), 'Manual: cartões recolhidos abrem com Ver os cartões');
   await pg.screenshot({ path: out + '/revisao-cadastros.png' });
 
+  // Configurações: âncora abaixo do header, seção ativa acompanha a rolagem, convite de usuário
+  await ir('Configuracoes%20v2.dc.html');
+  await pg.click('[data-tx-secao="regras"]'); await pg.waitForTimeout(1200);
+  const topo = await pg.evaluate(() => document.getElementById('sec-regras').getBoundingClientRect().top);
+  ok(topo >= 80 && topo <= 100, 'Configurações: âncora para logo abaixo do header (' + Math.round(topo) + ' px)');
+  const ativa = () => pg.evaluate(() => [...document.querySelectorAll('[data-tx-secao]')].find(e => getComputedStyle(e).backgroundColor !== 'rgba(0, 0, 0, 0)').dataset.txSecao);
+  await pg.mouse.wheel(0, 900); await pg.waitForTimeout(500);
+  ok(await ativa() !== 'regras', 'Configurações: seção ativa muda com a rolagem (' + await ativa() + ')');
+  await pg.click('[data-tx-secao="usuarios"]'); await pg.waitForTimeout(1000);
+  await pg.click('[data-tx-convidar]'); await pg.fill('[data-tx-campo="nome"]', 'Joana Freitas'); await pg.fill('[data-tx-campo="email"]', 'diego.saldanha@transrural.com.br');
+  await pg.click('[data-tx-papel="afretador"]'); await pg.click('[data-tx-cv-filial="SOR"]'); await pg.waitForTimeout(150);
+  ok(/já tem acesso/.test(await pg.locator('[data-tx-modal="convite"]').innerText()), 'Convite: e-mail de quem já tem acesso é recusado');
+  await pg.fill('[data-tx-campo="email"]', 'joana.freitas@transrural.com.br'); await pg.click('[data-tx-confirmar]'); await pg.waitForTimeout(250);
+  ok(await pg.locator('[data-tx-convite]').count() === 1, 'Convite: aparece na lista de usuários como pendente');
+  await pg.click('[data-tx-cancelar-convite]'); await pg.waitForTimeout(200);
+  ok(await pg.locator('[data-tx-convite]').count() === 0, 'Convite: cancelado sai da lista');
+
   ok(erros.length === 0, 'sem erro de JavaScript (' + erros.join(' | ') + ')');
   console.log(falhas ? falhas + ' falha(s)' : 'Revisão: tudo certo');
   await browser.close(); process.exit(falhas ? 1 : 0);

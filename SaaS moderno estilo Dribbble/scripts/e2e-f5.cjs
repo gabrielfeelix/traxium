@@ -39,7 +39,7 @@ const ok = (c, m) => { console.log((c ? 'ok    ' : 'FALHOU ') + m); if (!c) falh
   ok(await pg.locator('[data-tx-resultado="pronta"]').count() === 1, 'comunicação ao OC em Cadastros deixa a VG-3126 pronta');
   // Configurações: regra de documentos vira alerta e libera a VG-3121
   await pg.goto(base + '/Configuracoes%20v2.dc.html'); await pg.waitForTimeout(1100);
-  await pg.locator('[data-tx-regra="docs"] >> text=Só alerta').click(); await pg.fill('[data-tx-campo="motivo"]', 'Teste de configuração da demonstração'); await pg.click('[data-tx-confirmar]'); await pg.waitForTimeout(200);
+  await pg.locator('[data-tx-regra="docs"] [data-tx-classe="alerta"]').click(); await pg.fill('[data-tx-campo="motivo"]', 'Teste de configuração da demonstração'); await pg.click('[data-tx-confirmar]'); await pg.waitForTimeout(200);
   await pg.screenshot({ path: out + '/e-config.png' });
   await pg.goto(base + '/Viagem.dc.html?id=VG-3121'); await pg.waitForTimeout(1100);
   ok(await pg.locator('[data-tx-resultado="pronta"]').count() === 1, 'regra de documentos como alerta: VG-3121 deixa de travar');

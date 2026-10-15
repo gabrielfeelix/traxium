@@ -105,16 +105,16 @@ input::placeholder{color:#8ba09e}
   <!-- /TX:SIDEBAR -->
   <div style="flex:1;display:flex;flex-direction:column;padding:92px 32px 48px;gap:16px;min-width:0">
     <div style="display:flex;align-items:center;gap:14px">
-      <div><div style="font-size:24px;font-weight:800">Configurações</div><div style="font-size:13.5px;color:#5c706e;margin-top:2px">Usuários, alçadas, regras com piso, modelos, LGPD e integrações. Mudar uma regra hoje não altera decisão já registrada.</div></div>
+      <div><div style="font-size:24px;font-weight:800">Configurações</div><div style="font-size:13.5px;color:#5c706e;margin-top:2px">Quem acessa, quem assina e o que trava a viagem. Mudar uma regra hoje não altera decisão já registrada.</div></div>
       <div style="margin-left:auto;display:flex;align-items:center;gap:10px"><!-- TX:PERFIL --><!-- /TX:PERFIL --></div>
     </div>
     <div style="display:grid;grid-template-columns:220px 1fr;gap:20px;align-items:start">
-      <div style="position:sticky;top:20px;background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:8px;display:flex;flex-direction:column;gap:2px">
+      <div style="position:sticky;top:92px;background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:8px;display:flex;flex-direction:column;gap:2px">
         <sc-for list="{{ secoes }}" as="sc" hint-placeholder-count="7"><span onClick="{{ sc.onClick }}" data-tx-secao="{{ sc.k }}" style="font-size:13.5px;font-weight:700;padding:9px 12px;border-radius:10px;cursor:pointer;color:{{ sc.c }};background:{{ sc.bg }}">{{ sc.n }}</span></sc-for>
       </div>
       <div style="display:flex;flex-direction:column;gap:16px">
-        <div id="sec-usuarios" style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:20px 22px">
-          <div style="font-size:16px;font-weight:800">Usuários e papéis</div>
+        <div id="sec-usuarios" data-tx-sec="usuarios" style="scroll-margin-top:92px;background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:20px 22px">
+          <div style="display:flex;align-items:center;gap:12px"><div style="font-size:16px;font-weight:800">Usuários e papéis</div><span onClick="{{ abrirConvite }}" data-tx-convidar style="margin-left:auto;background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;border-radius:99px;padding:8px 16px;font-size:12.5px;font-weight:800;cursor:pointer;box-shadow:0 6px 14px rgba(18,118,112,.25);white-space:nowrap">Convidar usuário</span></div>
           <div style="font-size:12.5px;color:#5c706e;margin-top:3px">O papel define o escopo de filiais e a alçada. Na demonstração, "Entrar como" troca o usuário da sessão.</div>
           <div style="display:flex;flex-direction:column;margin-top:10px">
             <sc-for list="{{ usuarios }}" as="us" hint-placeholder-count="8">
@@ -125,41 +125,49 @@ input::placeholder{color:#8ba09e}
                 <span onClick="{{ us.entrar }}" data-tx-entrar-como="{{ us.id }}" style="font-size:12px;font-weight:800;color:{{ us.ec }};cursor:pointer;text-align:right">{{ us.er }}</span>
               </div>
             </sc-for>
+            <sc-for list="{{ convites }}" as="cv" hint-placeholder-count="1">
+              <div data-tx-convite="{{ cv.id }}" style="display:grid;grid-template-columns:38px 1.3fr 1.3fr 1.2fr 150px;gap:12px;align-items:center;padding:10px 4px;border-bottom:1px solid #f0f4f3">
+                <span style="width:34px;height:34px;border-radius:99px;border:1.5px dashed #b9c9c6;color:#7c8f8d;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center">{{ cv.ini }}</span>
+                <div><div style="font-size:13.5px;font-weight:700">{{ cv.nome }}</div><div style="font-size:11.5px;color:#7c8f8d">{{ cv.email }}</div></div>
+                <div><div style="font-size:12.5px">{{ cv.cargo }}</div><div style="font-size:11.5px;color:#b97514;font-weight:700">{{ cv.estado }}</div></div><span style="font-size:12.5px;color:#5c706e">{{ cv.escopo }}</span>
+                <span onClick="{{ cv.cancelar }}" data-tx-cancelar-convite="{{ cv.id }}" style="font-size:12px;font-weight:800;color:#c43d3d;cursor:pointer;text-align:right">Cancelar convite</span>
+              </div>
+            </sc-for>
           </div>
         </div>
-        <div id="sec-alcadas" style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:20px 22px">
+        <div id="sec-alcadas" data-tx-sec="alcadas" style="scroll-margin-top:92px;background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:20px 22px">
           <div style="font-size:16px;font-weight:800">Alçadas de liberação</div>
           <div style="font-size:12.5px;color:#5c706e;margin-top:3px">Três alçadas. Liberação por autoridade exige o registro de 9 campos e o motor continua reprovando.</div>
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px"><sc-for list="{{ alcadas }}" as="al" hint-placeholder-count="3"><div style="border:1px solid #eef2f1;border-radius:15px;padding:13px 15px"><div style="display:flex;align-items:center;gap:8px"><span style="width:9px;height:9px;border-radius:99px;background:{{ al.dot }}"></span><b style="font-size:14px">{{ al.n }}</b></div><div style="font-size:12.5px;color:#3c4f4e;margin-top:6px;line-height:1.5">{{ al.libera }}</div><div style="font-size:11.5px;color:#7c8f8d;margin-top:6px">{{ al.quem }}</div></div></sc-for></div>
         </div>
-        <div id="sec-regras" style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:20px 22px">
+        <div id="sec-regras" data-tx-sec="regras" style="scroll-margin-top:92px;background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:20px 22px">
           <div style="font-size:16px;font-weight:800">Regras</div>
-          <div style="font-size:12.5px;color:#5c706e;margin-top:3px">Cada regra tem uma classe e um piso. As de norma ficam travadas em bloqueio; as internas podem virar alerta, com motivo registrado.</div>
+          <div style="font-size:12.5px;color:#5c706e;margin-top:3px">As regras de norma ficam travadas em bloqueio. As internas podem passar a só alertar, com motivo registrado.</div>
           <div style="display:flex;flex-direction:column;margin-top:10px">
             <sc-for list="{{ regras }}" as="rg" hint-placeholder-count="7">
               <div data-tx-regra="{{ rg.k }}" style="display:grid;grid-template-columns:1.6fr 1fr 210px;gap:12px;align-items:center;padding:11px 4px;border-bottom:1px solid #f0f4f3">
                 <div><div style="font-size:13.5px;font-weight:700">{{ rg.n }}</div><div style="font-size:11.5px;color:#7c8f8d">{{ rg.sub }}</div></div>
                 <span style="font-size:12px;color:#5c706e">{{ rg.base }}</span>
-                <div style="display:flex;gap:6px;justify-content:flex-end"><sc-for list="{{ rg.classes }}" as="cl" hint-placeholder-count="2"><span onClick="{{ cl.onClick }}" style="font-size:12px;font-weight:700;border-radius:99px;padding:5px 12px;cursor:{{ cl.cur }};border:1.5px solid {{ cl.bd }};background:{{ cl.bg }};color:{{ cl.c }};opacity:{{ cl.op }}">{{ cl.n }}</span></sc-for></div>
+                <div style="display:flex;gap:6px;justify-content:flex-end"><sc-for list="{{ rg.classes }}" as="cl" hint-placeholder-count="2"><span onClick="{{ cl.onClick }}" data-tx-classe="{{ cl.k }}" style="font-size:12px;font-weight:700;border-radius:99px;padding:5px 12px;cursor:{{ cl.cur }};border:1.5px solid {{ cl.bd }};background:{{ cl.bg }};color:{{ cl.c }};opacity:{{ cl.op }}">{{ cl.n }}</span></sc-for></div>
               </div>
             </sc-for>
           </div>
         </div>
-        <div id="sec-modelos" style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:20px 22px">
+        <div id="sec-modelos" data-tx-sec="modelos" style="scroll-margin-top:92px;background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:20px 22px">
           <div style="font-size:16px;font-weight:800">Modelos</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
             <sc-for list="{{ modelos }}" as="md" hint-placeholder-count="3"><div style="border:1px solid #eef2f1;border-radius:15px;padding:13px 15px"><div style="display:flex;align-items:center"><b style="font-size:13.5px">{{ md.n }}</b><span style="margin-left:8px;font-size:11.5px;color:#7c8f8d">{{ md.v }}</span><span onClick="{{ md.copiar }}" style="margin-left:auto;font-size:12px;font-weight:800;color:#0C5862;cursor:pointer">Copiar</span></div><div style="font-size:12.5px;color:#3c4f4e;margin-top:6px;line-height:1.5;font-family:{{ md.font }}">{{ md.txt }}</div></div></sc-for>
           </div>
         </div>
-        <div id="sec-lgpd" style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:20px 22px">
+        <div id="sec-lgpd" data-tx-sec="lgpd" style="scroll-margin-top:92px;background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:20px 22px">
           <div style="font-size:16px;font-weight:800">LGPD e retenção</div>
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px"><sc-for list="{{ lgpd }}" as="lg" hint-placeholder-count="3"><div style="background:#f7faf9;border-radius:13px;padding:11px 13px"><div style="font-size:11.5px;color:#7c8f8d">{{ lg.l }}</div><div style="font-size:13px;font-weight:700;margin-top:3px;line-height:1.45">{{ lg.v }}</div></div></sc-for></div>
         </div>
-        <div id="sec-integracoes" style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:20px 22px">
+        <div id="sec-integracoes" data-tx-sec="integracoes" style="scroll-margin-top:92px;background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:20px 22px">
           <div style="font-size:16px;font-weight:800">Integrações</div>
           <div style="display:flex;flex-direction:column;margin-top:8px"><sc-for list="{{ integracoes }}" as="ig" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid #f0f4f3"><span style="width:8px;height:8px;border-radius:99px;background:{{ ig.dot }}"></span><div style="flex:1"><div style="font-size:13.5px;font-weight:700">{{ ig.n }}</div><div style="font-size:11.5px;color:#7c8f8d">{{ ig.sub }}</div></div><span style="font-size:12px;font-weight:700;color:{{ ig.c }}">{{ ig.e }}</span></div></sc-for></div>
         </div>
-        <div id="sec-dados" style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:20px 22px">
+        <div id="sec-dados" data-tx-sec="dados" style="scroll-margin-top:92px;background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:20px 22px">
           <div style="font-size:16px;font-weight:800">Dados do protótipo</div>
           <div style="font-size:12.5px;color:#5c706e;margin-top:3px;line-height:1.55">{{ dadosTxt }}</div>
           <span onClick="{{ abrirReset }}" data-tx-reset style="display:inline-block;margin-top:12px;background:#fff;border:1.5px solid #f1caca;color:#c43d3d;font-size:13px;font-weight:800;border-radius:99px;padding:9px 18px;cursor:pointer">Voltar à semente</span>
@@ -169,9 +177,21 @@ input::placeholder{color:#8ba09e}
   </div>
   <sc-if value="{{ mAberto }}" hint-placeholder-val="{{ false }}">
     <div onClick="{{ fecharModal }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">
-      <div onClick="{{ pararClique }}" data-tx-modal="{{ mK }}" style="background:#fff;border-radius:24px;width:520px;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
+      <div onClick="{{ pararClique }}" data-tx-modal="{{ mK }}" style="background:#fff;border-radius:24px;width:540px;max-height:90vh;overflow:auto;box-shadow:0 40px 100px rgba(9,34,36,.4);padding:26px 28px">
         <div style="display:flex;align-items:center"><div style="font-size:16px;font-weight:800">{{ mTitulo }}</div><span onClick="{{ fecharModal }}" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px">✕</span></div>
         <div style="font-size:12.5px;color:#5c706e;margin-top:4px;line-height:1.55">{{ mSub }}</div>
+        <sc-if value="{{ mConvite }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">
+            <div><div style="font-size:12px;font-weight:800;color:#3c4f4e">Nome</div><input value="{{ cvNome }}" onInput="{{ onCvNome }}" data-tx-campo="nome" style="width:100%;margin-top:5px;border:1px solid #dfe7e5;border-radius:11px;padding:9px 12px;font-size:13.5px;outline:none"></div>
+            <div><div style="font-size:12px;font-weight:800;color:#3c4f4e">E-mail</div><input value="{{ cvEmail }}" onInput="{{ onCvEmail }}" data-tx-campo="email" placeholder="nome@transrural.com.br" style="width:100%;margin-top:5px;border:1px solid #dfe7e5;border-radius:11px;padding:9px 12px;font-size:13.5px;outline:none"></div>
+          </div>
+          <div style="font-size:12px;font-weight:800;color:#3c4f4e;margin-top:12px">PAPEL</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px"><sc-for list="{{ cvPapeis }}" as="pp" hint-placeholder-count="4"><div onClick="{{ pp.onClick }}" data-tx-papel="{{ pp.k }}" style="display:flex;align-items:center;gap:10px;border:1.5px solid {{ pp.bd }};background:{{ pp.bg }};border-radius:12px;padding:9px 12px;cursor:pointer"><span style="width:16px;height:16px;border-radius:99px;border:2.5px solid {{ pp.dotBd }};background:{{ pp.dot }};flex:none"></span><div><div style="font-size:13px;font-weight:700">{{ pp.n }}</div><div style="font-size:11.5px;color:#5c706e">{{ pp.sub }}</div></div></div></sc-for></div>
+          <sc-if value="{{ cvTemFilial }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:12px;font-weight:800;color:#3c4f4e;margin-top:12px">FILIAL</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"><sc-for list="{{ cvFiliais }}" as="cf" hint-placeholder-count="4"><span onClick="{{ cf.onClick }}" data-tx-cv-filial="{{ cf.k }}" style="font-size:12px;font-weight:700;border-radius:99px;padding:5px 11px;cursor:pointer;border:1.5px solid {{ cf.bd }};background:{{ cf.bg }};color:{{ cf.c }}">{{ cf.n }}</span></sc-for></div>
+          </sc-if>
+        </sc-if>
         <sc-if value="{{ mTemMotivo }}" hint-placeholder-val="{{ false }}"><input value="{{ fMotivo }}" onInput="{{ onMotivo }}" data-tx-campo="motivo" placeholder="Motivo (mínimo 10 caracteres)" style="width:100%;margin-top:12px;border:1px solid #dfe7e5;border-radius:12px;padding:10px 12px;font-size:13.5px;outline:none"></sc-if>
         <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
           <span onClick="{{ fecharModal }}" style="background:#f0f4f3;font-size:13.5px;font-weight:700;border-radius:99px;padding:10px 20px;cursor:pointer">Cancelar</span>
@@ -258,21 +278,34 @@ input::placeholder{color:#8ba09e}
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
   state = { loading: true, modal: null, secao: 'usuarios' };
-  componentDidMount() { TX.ui.montar(this); }
+  componentDidMount() {
+    TX.ui.montar(this);
+    // A seção ativa acompanha a rolagem: a última cujo topo passou da linha do header.
+    this._spy = () => { if (Date.now() < (this._spyPausa || 0)) return; const secs = Array.from(document.querySelectorAll('[data-tx-sec]')); let at = secs.length ? secs[0].dataset.txSec : 'usuarios'; secs.forEach(el => { if (el.getBoundingClientRect().top <= 140) at = el.dataset.txSec; }); if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 4 && secs.length) at = secs[secs.length - 1].dataset.txSec; if (at !== this.state.secao) this.setState({ secao: at }); };
+    window.addEventListener('scroll', this._spy, { passive: true });
+  }
   avisar(m) { TX.ui.avisar(this, m); }
   renderVals() {
     const s = this.state, U = TX.ui, F = TX.fmt, u = TX.sessao(), db = TX.db;
     const SEC = [['usuarios', 'Usuários e papéis'], ['alcadas', 'Alçadas'], ['regras', 'Regras'], ['modelos', 'Modelos'], ['lgpd', 'LGPD e retenção'], ['integracoes', 'Integrações'], ['dados', 'Dados do protótipo']];
     const regra = s.modal && s.modal.regra ? db.config.regras.find(r => r.k === s.modal.regra) : null;
-    const reset = s.modal && s.modal.reset;
-    const okM = reset || (s.fMotivo || '').trim().length >= 10;
+    const reset = s.modal && s.modal.reset, conv = s.modal && s.modal.convite;
+    const PAPEIS = [['afretador', 'Afretador', 'Monta e acompanha as viagens de uma filial. Sem alçada de liberação.'], ['qualidade', 'Gestor da qualidade', 'Todas as filiais. Libera pendência corrigível.'], ['frota', 'Gestor de frota', 'Todas as filiais. Cuida da frota própria e dos documentos dela.'], ['consultoria', 'Consultoria externa', 'Todas as filiais, só leitura e exportação.']];
+    const cv = s.cv || {}, emailOk = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test((cv.email || '').trim()), emailNovo = !db.usuarios.concat(db.convitesUsuario.filter(x => x.estado === 'enviado')).some(x => x.email.toLowerCase() === (cv.email || '').trim().toLowerCase());
+    const okC = (cv.nome || '').trim().length >= 5 && emailOk && emailNovo && !!cv.papel && (cv.papel !== 'afretador' || !!cv.filial);
+    const okM = reset || (conv ? okC : (s.fMotivo || '').trim().length >= 10);
     const c = reset ? U.ctaPerigo(true) : U.cta(okM);
+    const setCv = o => this.setState({ cv: Object.assign({}, cv, o) });
+    const todas = db.filiais.map(f => f.id);
     return Object.assign({}, U.base(this), {
-      secoes: SEC.map(([k, n]) => ({ k, n, c: s.secao === k ? '#0C5862' : '#3c4f4e', bg: s.secao === k ? '#eef7f6' : 'transparent', onClick: () => { this.setState({ secao: k }); const el = document.getElementById('sec-' + k); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } })),
+      secoes: SEC.map(([k, n]) => ({ k, n, c: s.secao === k ? '#0C5862' : '#3c4f4e', bg: s.secao === k ? '#eef7f6' : 'transparent', onClick: () => { this._spyPausa = Date.now() + 900; this.setState({ secao: k }); const el = document.getElementById('sec-' + k); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } })),
+      abrirConvite: () => this.setState({ modal: { convite: true }, cv: {} }),
+      convites: db.convitesUsuario.filter(x => x.estado === 'enviado').map(x => { const p = PAPEIS.find(pp => pp[0] === x.papel); return { id: x.id, nome: x.nome, email: x.email, ini: F.iniciais(x.nome), cargo: p ? p[1] : x.papel, estado: 'convite enviado ' + F.quando(x.em) + ', sem primeiro acesso', escopo: x.filiais.length === db.filiais.length ? 'todas as filiais' : 'filial ' + x.filiais.map(f => TX.filial(f).nome).join(', '),
+        cancelar: () => { TX.fazer('cancelarConviteUsuario', { convite: x.id }); this.avisar('Convite de ' + x.nome + ' cancelado. O link enviado deixa de valer.'); } }; }),
       usuarios: db.usuarios.map(x => ({ id: x.id, nome: x.nome, ini: F.iniciais(x.nome), g1: x.g1, g2: x.g2, email: x.email, cargo: x.cargo, escopo: x.filiais.length === 4 ? 'todas as filiais' : 'filial ' + x.filiais.map(f => TX.filial(f).nome).join(', '), er: x.id === u.id ? 'você está aqui' : 'Entrar como', ec: x.id === u.id ? '#9db0ae' : '#0C5862', entrar: () => { if (x.id === u.id) return; TX.entrarComo(x.id); this.avisar('Agora você está como ' + x.nome + '.'); } })),
       alcadas: db.alcadas.map(a => ({ n: a.n, libera: a.libera, dot: a.k === 'tecnico' ? U.tom('tecnico').dot : a.k === 'direcao' ? U.tom('autoridade').dot : U.tom('ok').dot, quem: a.k === 'tecnico' ? 'nenhum usuário' : db.usuarios.filter(x => x.alcada === a.k).map(x => x.nome).join(', ') })),
-      regras: db.config.regras.map(r => ({ k: r.k, n: r.n, base: 'Base: ' + r.base, sub: r.travada ? 'travada em bloqueio pela norma' : r.alteradaEm ? 'alterada por ' + TX.usuario(r.alteradaPor).nome + ' ' + F.quando(r.alteradaEm) + ': ' + r.motivo : 'piso: ' + r.piso,
-        classes: ['bloqueio', 'alerta'].map(cl => { const on = r.classe === cl; const pode = !r.travada && !on && (cl === 'bloqueio' || r.piso === 'alerta'); return { n: cl === 'bloqueio' ? 'Bloqueia' : 'Só alerta', bd: on ? '#0b2224' : '#e0e7e5', bg: on ? '#0b2224' : '#fff', c: on ? '#fff' : '#3c4f4e', cur: pode ? 'pointer' : 'default', op: r.travada && !on ? '.4' : '1', onClick: () => { if (r.travada) { this.avisar('Regra de norma: fica em bloqueio.'); return; } if (pode) this.setState({ modal: { regra: r.k, classe: cl }, fMotivo: '' }); } }; }) })),
+      regras: db.config.regras.map(r => ({ k: r.k, n: r.n, base: 'Base: ' + r.base, sub: r.travada ? 'travada em bloqueio pela norma' : r.alteradaEm ? 'alterada por ' + TX.usuario(r.alteradaPor).nome + ' ' + F.quando(r.alteradaEm) + ': ' + r.motivo : r.piso === 'alerta' ? 'regra interna: pode passar a só alertar' : 'regra interna, fica em bloqueio',
+        classes: ['bloqueio', 'alerta'].map(cl => { const on = r.classe === cl; const pode = !r.travada && !on && (cl === 'bloqueio' || r.piso === 'alerta'); return { k: cl, n: cl === 'bloqueio' ? 'Bloqueia' : 'Só alerta', bd: on ? '#0b2224' : '#e0e7e5', bg: on ? '#0b2224' : '#fff', c: on ? '#fff' : '#3c4f4e', cur: pode ? 'pointer' : 'default', op: r.travada && !on ? '.4' : '1', onClick: () => { if (r.travada) { this.avisar('Regra de norma: fica em bloqueio.'); return; } if (pode) this.setState({ modal: { regra: r.k, classe: cl }, fMotivo: '' }); } }; }) })),
       modelos: [
         { n: 'Declaração positiva do CT-e', v: 'texto fixo', txt: TX.DECLARACAO_CTE, font: "'Spline Sans Mono',monospace" },
         { n: db.termo.titulo, v: 'versão ' + db.termo.versao, txt: db.termo.texto, font: 'inherit' },
@@ -283,11 +316,14 @@ class Component extends DCLogic {
       integracoes: db.config.integracoes.map(i => ({ n: i.n, sub: i.sub, e: i.estado === 'ativo' ? 'ativa' : 'importação manual', c: i.estado === 'ativo' ? '#1a8f57' : '#b97514', dot: i.estado === 'ativo' ? U.tom('ok').dot : U.tom('falta').dot })),
       dadosTxt: 'Tudo o que foi feito nas telas fica gravado neste navegador como ' + TX.ops.length + ' operações sobre a semente (30 viagens, 4 filiais). Voltar à semente apaga só essas operações.',
       abrirReset: () => this.setState({ modal: { reset: true } }),
-      mAberto: !!s.modal, mK: reset ? 'reset' : 'regra', fecharModal: () => this.setState({ modal: null }), pararClique: e => e.stopPropagation(),
-      mTitulo: reset ? 'Voltar à semente' : 'Mudar a classe da regra', mSub: reset ? 'Apaga as ' + TX.ops.length + ' operações feitas neste navegador e volta às 30 viagens iniciais. Usado para repetir a demonstração.' : regra ? '"' + regra.n + '" passa a ' + (s.modal.classe === 'alerta' ? 'só alertar: a viagem não trava por ela, mas o aviso fica escrito.' : 'bloquear a viagem.') + ' Decisões já registradas não mudam.' : '',
-      mTemMotivo: !reset, fMotivo: s.fMotivo || '', onMotivo: e => this.setState({ fMotivo: e.target.value }), mCta: reset ? 'Voltar à semente' : 'Mudar regra',
+      mConvite: !!conv, cvNome: cv.nome || '', cvEmail: cv.email || '', onCvNome: e => setCv({ nome: e.target.value }), onCvEmail: e => setCv({ email: e.target.value }),
+      cvPapeis: PAPEIS.map(([k, n, sub]) => Object.assign({ k, n, sub, onClick: () => setCv({ papel: k, filial: k === 'afretador' ? cv.filial : null }) }, U.sel(cv.papel === k, true))),
+      cvTemFilial: cv.papel === 'afretador', cvFiliais: db.filiais.map(f => Object.assign({ k: f.id, n: f.nome, onClick: () => setCv({ filial: f.id }) }, U.chip(cv.filial === f.id))),
+      mAberto: !!s.modal, mK: reset ? 'reset' : conv ? 'convite' : 'regra', fecharModal: () => this.setState({ modal: null }), pararClique: e => e.stopPropagation(),
+      mTitulo: reset ? 'Voltar à semente' : conv ? 'Convidar usuário' : 'Mudar a classe da regra', mSub: conv ? (cv.email && emailOk && !emailNovo ? 'Esse e-mail já tem acesso ou convite pendente.' : 'A pessoa recebe um link por e-mail, cria a senha e entra com o papel escolhido. Até o primeiro acesso, o convite fica na lista e pode ser cancelado.') : reset ? 'Apaga as ' + TX.ops.length + ' operações feitas neste navegador e volta às 30 viagens iniciais. Usado para repetir a demonstração.' : regra ? '"' + regra.n + '" passa a ' + (s.modal.classe === 'alerta' ? 'só alertar: a viagem não trava por ela, mas o aviso fica escrito.' : 'bloquear a viagem.') + ' Decisões já registradas não mudam.' : '',
+      mTemMotivo: !reset && !conv, fMotivo: s.fMotivo || '', onMotivo: e => this.setState({ fMotivo: e.target.value }), mCta: reset ? 'Voltar à semente' : conv ? 'Enviar convite' : 'Mudar regra',
       ctaBg: c.bg, ctaC: c.c, ctaSh: c.sh, ctaCur: c.cur,
-      confirmar: () => { if (!okM) return; if (reset) { TX.reset(); this.setState({ modal: null }); this.avisar('Dados voltaram à semente.'); return; } TX.fazer('classeRegra', { regra: regra.k, classe: s.modal.classe, motivo: s.fMotivo.trim() }); this.setState({ modal: null }); this.avisar('Regra alterada. As viagens abertas foram reavaliadas.'); }
+      confirmar: () => { if (!okM) return; if (conv) { TX.fazer('convidarUsuario', { nome: cv.nome.trim(), email: cv.email.trim().toLowerCase(), papel: cv.papel, filiais: cv.papel === 'afretador' ? [cv.filial] : todas }); this.setState({ modal: null }); this.avisar('Convite enviado para ' + cv.email.trim().toLowerCase() + '.'); return; } if (reset) { TX.reset(); this.setState({ modal: null }); this.avisar('Dados voltaram à semente.'); return; } TX.fazer('classeRegra', { regra: regra.k, classe: s.modal.classe, motivo: s.fMotivo.trim() }); this.setState({ modal: null }); this.avisar('Regra alterada. As viagens abertas foram reavaliadas.'); }
     });
   }
 }

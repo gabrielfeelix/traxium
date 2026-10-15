@@ -7,7 +7,7 @@
   'use strict';
 
   const HOJE = '2026-10-08';
-  const VERSAO_SEMENTE = 9;
+  const VERSAO_SEMENTE = 10;
   const CHAVE = 'tx-v2';
   const CHAVE_SESSAO = 'tx-v2-sessao';
   const DECLARACAO_CTE = 'O serviço fornecido é assegurado GMP+FSA';
@@ -89,6 +89,9 @@
       { id: 'u-sergio', nome: 'Sérgio Okada', papel: 'frota', cargo: 'Gestor de frota', filiais: ['RON', 'SOR', 'RVD', 'PNG'], alcada: null, email: 'sergio.okada@transrural.com.br', g1: '#7c8f8d', g2: '#3c4f4e' },
       { id: 'u-ana', nome: 'Ana Prates', papel: 'consultoria', cargo: 'Consultoria externa (leitura e exportação)', filiais: ['RON', 'SOR', 'RVD', 'PNG'], alcada: null, email: 'ana.prates@consultoria.com.br', g1: '#9fc9c6', g2: '#6ba8a4' }
     ];
+
+    // Convites de acesso: viram usuário no primeiro acesso, que o protótipo não simula.
+    db.convitesUsuario = [];
 
     // Produtos e regimes (consulta à base IDTF mantida pela Traxium, v2026.09).
     // regime: limpeza exigida DEPOIS de transportar este produto, antes de carregar ração. X = proibida.
@@ -706,6 +709,19 @@
         db.fornecedores.push({ id, nome: d.nome, servico: d.servico, cidade: d.cidade, cnpj: d.cnpj, regimeMax: d.regimeMax || null, docs: d.docs || [] });
         evento(db, op, null, 'Fornecedor cadastrado: ' + d.nome);
         op.resultado = id;
+        return;
+      }
+      case 'convidarUsuario': {
+        const id = 'CV-' + String(db.convitesUsuario.length + 1).padStart(2, '0');
+        db.convitesUsuario.push({ id, nome: d.nome, email: d.email, papel: d.papel, filiais: d.filiais, em: op.em, por: op.por, estado: 'enviado' });
+        evento(db, op, null, 'Convite de acesso enviado para ' + d.nome + ' (' + d.email + ')');
+        op.resultado = id;
+        return;
+      }
+      case 'cancelarConviteUsuario': {
+        const c = db.convitesUsuario.find(x => x.id === d.convite);
+        c.estado = 'cancelado';
+        evento(db, op, null, 'Convite de acesso de ' + c.nome + ' cancelado');
         return;
       }
       case 'publicarManual': {
