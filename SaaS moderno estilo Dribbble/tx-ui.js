@@ -97,6 +97,13 @@
   const ROTULO_PAPEL = { qualidade: 'Qualidade', direcao: 'Direção', afretador: 'Afretador', frota: 'Frota', consultoria: 'Consultoria' };
 
   // Valores comuns: sidebar, sessão, perfil, modais do topo e toast.
+  // Pedido de liberação de quem não tem a alçada: grava e avisa quem assina (Hoje e Viagem).
+  function nomeAlcada(k) { return (TX.db.alcadas.find(a => a.k === k) || {}).n || k; }
+  function pedirLiberacao(c, v, lib) {
+    TX.fazer('pedirLiberacao', { id: v.id, checagem: lib.item.k, alcada: lib.alcada });
+    const quem = TX.db.usuarios.filter(x => x.filiais.includes(v.filial) && TX.podeAssinar(x, lib.alcada)).sort((a, b) => (a.alcada === lib.alcada ? 0 : 1) - (b.alcada === lib.alcada ? 0 : 1))[0];
+    avisar(c, 'Pedido enviado' + (quem ? ' a ' + quem.nome + ' (' + nomeAlcada(lib.alcada) + ')' : '') + '. A ' + v.ordem + ' entra na fila de assinatura com o prazo das ' + v.janela + '.');
+  }
   // Item ativo da sidebar escolhido pelo dado, nas telas de detalhe com mais de um pai possível.
   function sbAtivo(k) {
     const on = 'background:linear-gradient(90deg,rgba(26,158,147,.35),rgba(14,120,181,.28));border:1px solid rgba(255,255,255,.14);font-weight:700;color:#fff';
@@ -229,5 +236,5 @@
   }
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 
-  window.TX.ui = { buscaGlobal, tom, tomResultado, TOM, param, lerLS, gravarLS, copiar, montar, avisar, sel, chip, cta, ctaPerigo, base, paginar, exportarDocumento, esc };
+  window.TX.ui = { pedirLiberacao, nomeAlcada, buscaGlobal, tom, tomResultado, TOM, param, lerLS, gravarLS, copiar, montar, avisar, sel, chip, cta, ctaPerigo, base, paginar, exportarDocumento, esc };
 })();

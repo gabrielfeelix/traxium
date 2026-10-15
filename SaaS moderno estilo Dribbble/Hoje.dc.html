@@ -506,13 +506,8 @@ class Component extends DCLogic {
       acaoBg: acao && acao.prim ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#f0f4f3', acaoC: acao && acao.prim ? '#fff' : '#0b2224', acaoSh: acao && acao.prim ? '0 6px 14px rgba(18,118,112,.28)' : 'none',
       _r: dec.resultado, _busca: TX.norm([v.ordem, v.id, mot.nome, prod.nome, dest.nome, TX.placasDoConjunto(conj).join(' '), TX.nomeTransportador(t)].join(' ')) };
   }
-  nomeAlcada(k) { return (TX.db.alcadas.find(a => a.k === k) || {}).n || k; }
-  assinantes(alcada, filial) { return TX.db.usuarios.filter(x => x.filiais.includes(filial) && TX.podeAssinar(x, alcada)).sort((a, b) => (a.alcada === alcada ? 0 : 1) - (b.alcada === alcada ? 0 : 1)); }
-  pedirLiberacao(v, lib) {
-    TX.fazer('pedirLiberacao', { id: v.id, checagem: lib.item.k, alcada: lib.alcada });
-    const quem = this.assinantes(lib.alcada, v.filial)[0];
-    this.avisar('Pedido enviado' + (quem ? ' a ' + quem.nome + ' (' + this.nomeAlcada(lib.alcada) + ')' : '') + '. A ' + v.ordem + ' entra na fila de assinatura com o prazo das ' + v.janela + '.');
-  }
+  nomeAlcada(k) { return TX.ui.nomeAlcada(k); }
+  pedirLiberacao(v, lib) { TX.ui.pedirLiberacao(this, v, lib); }
   mandarLink(v) {
     TX.ui.copiar(TX.mensagemLink(v));
     TX.fazer('enviarLink', { id: v.id, canal: 'copiado' });

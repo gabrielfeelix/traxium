@@ -196,6 +196,8 @@ input::placeholder,textarea::placeholder{color:#8ba09e}
           <div style="font-size:13px;color:#0C5862;font-weight:700;margin-top:6px">{{ bloqResolver }}</div>
         </div>
         <div style="display:flex;flex-direction:column;gap:7px;align-items:flex-end;flex:none">
+          <sc-if value="{{ podePedir }}" hint-placeholder-val="{{ false }}"><span onClick="{{ pedirLib }}" data-tx-pedir-liberacao style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;font-size:13px;font-weight:800;border-radius:99px;padding:9px 18px;cursor:pointer;box-shadow:0 6px 14px rgba(18,118,112,.3)" style-hover="transform:translateY(-1px)">Pedir liberação</span></sc-if>
+          <sc-if value="{{ temPedido }}" hint-placeholder-val="{{ false }}"><span data-tx-pedido-lib style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:#b97514;max-width:250px;text-align:right;line-height:1.4"><span style="width:7px;height:7px;border-radius:99px;background:#e8a33d;box-shadow:0 0 0 3px rgba(232,163,61,.2);flex:none"></span>{{ pedidoTxt }}</span></sc-if>
           <sc-if value="{{ podeLiberar }}" hint-placeholder-val="{{ false }}"><span onClick="{{ abrirLiberar }}" data-tx-liberar style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;font-size:13px;font-weight:800;border-radius:99px;padding:9px 18px;cursor:pointer;box-shadow:0 6px 14px rgba(18,118,112,.3)" style-hover="transform:translateY(-1px)">Liberar por autoridade</span></sc-if>
           <sc-if value="{{ bloqTemHref }}" hint-placeholder-val="{{ false }}"><a href="{{ bloqHref }}" style="background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;font-size:13px;font-weight:800;border-radius:99px;padding:9px 18px;box-shadow:0 6px 14px rgba(18,118,112,.3)" style-hover="color:#fff;transform:translateY(-1px)">Resolver em Cadastros</a></sc-if>
           <span onClick="{{ abrirManter }}" style="background:#f0f4f3;color:#0b2224;font-size:13px;font-weight:700;border-radius:99px;padding:9px 18px;cursor:pointer" style-hover="background:#e4ebe9">Manter bloqueio</span>
@@ -686,13 +688,17 @@ class Component extends DCLogic {
     // decisão
     const fl = dec.falta;
     const primeiro = fl[0] || {};
+    // Só a primeira letra desce, e só quando não é sigla ("CRLV das placas" continua CRLV).
+    const minusc = t => /^[A-ZÀ-Ý][a-zà-ÿ]/.test(t) ? t[0].toLowerCase() + t.slice(1) : t;
     const motivoNA = !prod.racao ? prod.nome + ' não é ração.' : 'Destinatário sem certificação GMP+.';
-    const heroTitulo = { pronta: dec.porAutoridade ? 'Pronta, liberada por autoridade' : 'Pronta para assegurar', falta: fl.length === 1 ? 'Falta 1 item para assegurar' : 'Faltam ' + fl.length + ' itens para assegurar', bloqueada: 'Bloqueada: ' + (primeiro.o || '').toLowerCase(), tecnico: primeiro.k === 'regime' ? (/proibida/.test(primeiro.detalhe || '') ? 'Carga anterior proibida no compartimento' : 'Carga anterior fora da base IDTF') : primeiro.k === 'verificacao' ? 'Resto de carga no compartimento' : 'Produto fora da base IDTF', nao_assegurada: 'Viagem sem declaração GMP+', cancelada: 'Viagem cancelada' }[dec.resultado];
+    const heroTitulo = { pronta: dec.porAutoridade ? 'Pronta, liberada por autoridade' : 'Pronta para assegurar', falta: fl.length === 1 ? 'Falta 1 item para assegurar' : 'Faltam ' + fl.length + ' itens para assegurar', bloqueada: 'Bloqueada: ' + minusc(primeiro.o || ''), tecnico: primeiro.k === 'regime' ? (/proibida/.test(primeiro.detalhe || '') ? 'Carga anterior proibida no compartimento' : 'Carga anterior fora da base IDTF') : primeiro.k === 'verificacao' ? 'Resto de carga no compartimento' : 'Produto fora da base IDTF', nao_assegurada: 'Viagem sem declaração GMP+', cancelada: 'Viagem cancelada' }[dec.resultado];
     const heroSub = { pronta: 'As ' + dec.total + ' checagens aplicáveis passaram. Copie a declaração no CT-e emitido no TMS.', falta: 'quem resolve cada um está ao lado', bloqueada: primeiro.detalhe, tecnico: primeiro.detalhe, nao_assegurada: motivoNA + ' A viagem segue sem a declaração positiva no CT-e e não entra na amostra de afretamento GMP+.', cancelada: v.cancelada ? v.cancelada.motivo : '' }[dec.resultado];
     const lib = (v.liberacoes || [])[0];
     const libCheck = dec.checagens.find(c => c.liberadaPor);
     const bloqItem = fl.find(f => f.estado === 'bloqueio' && !f.tecnico) || {};
     const podeLib = ['qualidade', 'direcao'].includes(bloqItem.alcada);
+    // Quem tem a alçada libera; quem não tem pede a liberação, como na linha da mesa em Hoje.
+    const libV = TX.liberacaoDe(v), assina = !!libV && TX.podeAssinar(TX.sessao(), libV.alcada);
     const tecPrimeiro = fl.find(f => f.tecnico) || {};
 
     const acaoFalta = f => {
@@ -863,7 +869,9 @@ class Component extends DCLogic {
       verRegistro: () => this.abrir('registro'),
       faltaLista,
       bloqResolver: bloqItem.resolver || (podeLib ? 'Pode ser liberada com registro de ' + (bloqItem.alcada === 'direcao' ? 'Direção e RT' : 'Gestor da qualidade') + ', ou resolvida corrigindo o fato.' : ''),
-      podeLiberar: podeLib && !cancel, abrirLiberar: () => this.abrir('liberar', { fEscopo: false }),
+      podeLiberar: podeLib && !cancel && (!libV || assina), abrirLiberar: () => this.abrir('liberar', { fEscopo: false }),
+      podePedir: !!libV && !assina && !libV.pedido, pedirLib: () => TX.ui.pedirLiberacao(this, v, libV),
+      temPedido: !!(libV && libV.pedido), pedidoTxt: libV && libV.pedido ? (assina ? 'Pedida por ' + TX.usuario(libV.pedido.por).nome + ' às ' + F.hora(libV.pedido.em) : 'Liberação pedida às ' + F.hora(libV.pedido.em) + ', esperando assinatura de ' + TX.ui.nomeAlcada(libV.alcada)) : '',
       bloqTemHref: !!bloqItem.href, bloqHref: bloqItem.href || '',
       semLiberacao: !podeLib, semLiberacaoTxt: 'Esta regra não tem liberação por autoridade: resolve-se corrigindo o fato.',
       abrirManter: () => this.abrir('manter', { fAcao: 'Aguardar documento' }),

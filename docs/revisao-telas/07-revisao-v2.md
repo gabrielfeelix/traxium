@@ -209,6 +209,20 @@ Testado em 390x844, como o motorista: do envio pelo afretador até o fim, com id
 4. Busca global: "QVT" traz viagens e compartimentos; Enter sem resultado abre Viagens com `periodo=tudo&q=`.
 5. Auditoria: a planilha de ocorrências baixa um `.csv` com cabeçalho e linhas.
 
+### Item 2. Pedir liberação na Viagem
+
+**Problema.** A Viagem mostrava "Liberar por autoridade" para qualquer pessoa sempre que a regra tinha alçada. O afretador clicava e só no modal descobria que a alçada dele não assinava. Pedir a liberação só era possível pela linha da mesa em Hoje.
+
+**O que mudou.**
+
+1. No cartão de bloqueio, quem não tem a alçada vê "Pedir liberação" (a mesma operação `pedirLiberacao` de Hoje). Depois do pedido, o botão dá lugar a "Liberação pedida às 10:13, esperando assinatura de Gestor da qualidade".
+2. Quem tem a alçada vê "Liberar por autoridade" e, se a filial pediu, "Pedida por Diego Saldanha às 10:13" ao lado.
+3. O envio do pedido e o aviso a quem assina saíram de Hoje para `TX.ui.pedirLiberacao`, usado pelas duas telas. `TX.ui.nomeAlcada` também.
+
+**Achado no caminho.** O título do bloqueio baixava a caixa da frase inteira: "Bloqueada: crlv das placas do conjunto". Agora só a primeira letra desce, e só quando não é sigla.
+
+**Teste.** `e2e-revisao.cjs`: Diego na VG-3127 vê Pedir liberação e não Liberar; depois do pedido vê o estado; Luiz (Direção e RT) vê o pedido e Liberar por autoridade; título da VG-3121 mantém "CRLV".
+
 ## Situação ao fim de 14/10/2026
 
 - Lacunas 1 a 4 do handoff fechadas: ocorrências exportáveis (etapa 3), fila de assinatura (etapa 2), entradas para o que virou seção (visões em Viagens na etapa 1 e busca global na etapa 7), Cadastros visível (etapa 7). A lacuna 5 continua dependendo do Gabriel e do Rafael.

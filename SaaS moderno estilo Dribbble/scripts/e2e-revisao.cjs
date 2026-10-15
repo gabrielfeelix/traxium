@@ -30,6 +30,20 @@ const ok = (c, m) => { console.log((c ? 'ok    ' : 'FALHOU ') + m); if (!c) falh
   await pg.click('[data-tx-assinar="VG-3121"]'); await pg.waitForTimeout(1200);
   ok(/Viagem\.dc\.html\?id=VG-3121&liberar=1/.test(pg.url()) && await pg.locator('[data-tx-modal="liberar"]').count() === 1, 'Fila: Analisar e assinar abre a Viagem com o modal de liberação');
 
+  // Viagem: quem não tem alçada pede a liberação ali mesmo; quem tem vê de quem é o pedido
+  await zerar();
+  await pg.evaluate(() => localStorage.setItem('tx-v2-sessao', 'u-diego'));
+  await ir('Viagem.dc.html?id=VG-3127', 1100);
+  ok(await pg.locator('[data-tx-pedir-liberacao]').count() === 1 && await pg.locator('[data-tx-liberar]').count() === 0, 'Viagem: Diego vê Pedir liberação, não Liberar por autoridade');
+  await pg.click('[data-tx-pedir-liberacao]'); await pg.waitForTimeout(300);
+  ok(/Liberação pedida às \d\d:\d\d, esperando assinatura de Direção e RT/.test(await pg.locator('[data-tx-pedido-lib]').innerText()) && await pg.locator('[data-tx-pedir-liberacao]').count() === 0, 'Viagem: depois do pedido, a ação vira o estado do pedido');
+  await pg.evaluate(() => localStorage.setItem('tx-v2-sessao', 'u-luiz'));
+  await ir('Viagem.dc.html?id=VG-3127', 1100);
+  ok(/Pedida por Diego Saldanha/.test(await pg.locator('[data-tx-pedido-lib]').innerText()) && await pg.locator('[data-tx-liberar]').count() === 1, 'Viagem: quem assina vê o pedido e Liberar por autoridade');
+  await ir('Viagem.dc.html?id=VG-3121', 1100);
+  ok(/Bloqueada: CRLV/.test(await pg.locator('[data-tx-hero="bloqueada"]').innerText()), 'Viagem: título do bloqueio mantém a sigla (CRLV)');
+  await pg.evaluate(() => localStorage.setItem('tx-v2-sessao', 'u-rafael'));
+
   // Viagens: abas de visão e visão salva
   await ir('Viagens%20v2.dc.html?visao=limpeza', 1100);
   const ids = async () => (await pg.$$eval('[data-tx-linha]', es => es.map(e => e.getAttribute('data-tx-linha')))).sort().join(',');
