@@ -2,6 +2,8 @@
 
 Atualizado em 15/10/2026, ao fim da segunda rodada (quatro telas restantes e pente fino). Ponto de entrada para quem continuar. Substitui as versões de 08/10 e de 14/10 deste arquivo. As regras visuais de `SaaS moderno estilo Dribbble/CLAUDE.md` e `SaaS moderno estilo Dribbble/HANDOFF.md` (v1) continuam valendo.
 
+> **Próxima etapa (15/10/2026):** virar um sistema com moldura única e revisar UI e UX página por página. O plano está em `09-handoff-sistema-e-ui.md`; leia este arquivo para o contexto e aquele para o que fazer.
+
 ## 1. Situação
 
 1. O protótipo v2 (10 telas em `SaaS moderno estilo Dribbble/`) foi construído nas fases A a F (`05-plano-de-construcao.md`) e aprovado pelo Gabriel: "preferi bem mais a versão atual". É a base daqui em diante. O v1 continua no disco, listado em `versao-anterior.html`.
@@ -115,6 +117,8 @@ Repositórios em `/home/gabfelix/dev/4yu-apps/` (`autofluxos-ux` é o mais recen
 
 | Arquivo | Conteúdo |
 | --- | --- |
+| `09-handoff-sistema-e-ui.md` | **Próxima etapa**: moldura única (sistema, não páginas) e revisão de UI e UX com boas práticas, com o Autofluxos como referência |
+| `08-resposta-pm-mvp.md` | Rascunho de resposta ao PM sobre estágio, MVP, prazos e riscos (15/10/2026) |
 | `07-revisao-v2.md` | **Revisão do v2 (14 e 15/10/2026)**: etapas 1 a 11, os doze itens do pente fino, premissas e a situação ao fim |
 | `00-plano.md` | Etapas da revisão do v1 e os seis critérios |
 | `01-inventario.md` e `inventario/*.md` | Inventário factual das 21 telas do v1 |
