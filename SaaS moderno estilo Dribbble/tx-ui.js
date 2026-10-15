@@ -49,6 +49,8 @@
     c._txEsc = ev => {
       if (ev.key !== 'Escape') return;
       if (c.state.modal || c.state.modalTopo || c.state.drawer || c.state.nova) c.setState({ modal: null, modalTopo: null, drawer: null, nova: false });
+      // Na busca global, o primeiro Esc fecha a lista e o segundo limpa o texto.
+      else if (ev.target && ev.target.matches && ev.target.matches('[data-tx-gbusca]') && !c.state.buscaOpen && c.state.gbQ) c.setState({ gbQ: '' });
       else c.setState(FECHAR_POPS);
     };
     c._txBarra = ev => {

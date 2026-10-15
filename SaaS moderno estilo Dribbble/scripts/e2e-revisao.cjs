@@ -64,6 +64,10 @@ const ok = (c, m) => { console.log((c ? 'ok    ' : 'FALHOU ') + m); if (!c) falh
   await pg.click('[data-tx-gbusca]'); await pg.keyboard.type('QVT'); await pg.waitForTimeout(300);
   const grupos = await pg.locator('[data-tx-gb-resultados]').innerText();
   ok(/VIAGENS/.test(grupos) && /COMPARTIMENTOS/.test(grupos), 'Busca global: "QVT" traz viagens e compartimentos');
+  await pg.keyboard.press('Escape'); await pg.waitForTimeout(150);
+  ok(await pg.locator('[data-tx-gb-resultados]').count() === 0 && await pg.inputValue('[data-tx-gbusca]') === 'QVT', 'Busca global: primeiro Esc fecha a lista e mantém o texto');
+  await pg.keyboard.press('Escape'); await pg.waitForTimeout(150);
+  ok(await pg.inputValue('[data-tx-gbusca]') === '', 'Busca global: segundo Esc limpa o texto');
   await pg.fill('[data-tx-gbusca]', 'zzqx'); await pg.keyboard.press('Enter'); await pg.waitForTimeout(1000);
   ok(/Viagens%20v2\.dc\.html\?periodo=tudo&q=zzqx/.test(pg.url()), 'Busca global: Enter sem resultado abre Viagens com o termo');
 
