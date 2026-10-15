@@ -112,7 +112,7 @@ input::placeholder{color:#8ba09e}
             <sc-if value="{{ tc.temAtalho }}" hint-placeholder-val="{{ false }}"><span onClick="{{ tc.atalho }}" data-tx-atalho style="display:inline-block;margin-top:10px;font-size:12.5px;font-weight:800;color:#0C5862;border:1.5px solid #cfe3e1;border-radius:99px;padding:6px 12px;cursor:pointer">Carregou o mesmo que a {{ tc.atalhoPlaca }}</span></sc-if>
             <div style="display:flex;flex-direction:column;gap:9px;margin-top:12px">
               <sc-for list="{{ tc.linhas }}" as="tl" hint-placeholder-count="3">
-                <div style="border:1.5px solid {{ tl.bd }};border-radius:14px;padding:10px 12px;position:relative">
+                <div data-tx-t3-linha="{{ tl.key }}" style="border:1.5px solid {{ tl.bd }};border-radius:14px;padding:10px 12px;position:relative;scroll-margin:120px;transition:border-color .2s">
                   <div style="display:flex;align-items:center;gap:8px"><span style="font-size:11px;font-weight:800;color:#7c8f8d;width:76px">{{ tl.rot }}</span><input type="date" value="{{ tl.data }}" onInput="{{ tl.onData }}" data-tx-t3-data="{{ tl.key }}" style="border:1px solid #dfe7e5;border-radius:9px;padding:5px 8px;font-size:13px;outline:none;font-family:'Spline Sans Mono',monospace;margin-left:auto"></div>
                   <input value="{{ tl.texto }}" onInput="{{ tl.onTexto }}" data-tx-t3-produto="{{ tl.key }}" placeholder="Ex.: soja, adubo, casquinha" style="width:100%;margin-top:8px;border:none;border-bottom:1.5px solid #dfe7e5;padding:6px 2px;font-size:15px;font-weight:700;outline:none;background:transparent">
                   <div style="font-size:12px;color:{{ tl.msgC }};margin-top:5px;min-height:15px">{{ tl.msg }}</div>
@@ -127,7 +127,7 @@ input::placeholder{color:#8ba09e}
       <!-- checklist -->
       <sc-if value="{{ eCheck }}" hint-placeholder-val="{{ false }}">
         <sc-for list="{{ ckItens }}" as="ci" hint-placeholder-count="5">
-          <div data-tx-ck="{{ ci.k }}" style="background:#fff;border-radius:20px;padding:16px;border:1.5px solid {{ ci.bd }}">
+          <div data-tx-ck="{{ ci.k }}" style="background:#fff;border-radius:20px;padding:16px;border:1.5px solid {{ ci.bd }};transition:border-color .2s">
             <div style="display:flex;align-items:center;gap:8px"><span style="font-size:11px;font-weight:800;letter-spacing:.8px;color:#7c8f8d">{{ ci.i }} DE 5</span><span style="font-size:15px;font-weight:800">{{ ci.n }}</span><sc-if value="{{ ci.critico }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px;font-weight:800;color:#93313f;border:1px solid #ebc3c8;border-radius:99px;padding:1px 8px">item crítico</span></sc-if></div>
             <div style="font-size:14px;color:#3c4f4e;margin-top:6px;line-height:1.45">{{ ci.pergunta }}</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
@@ -161,7 +161,7 @@ input::placeholder{color:#8ba09e}
           <div style="font-size:11.5px;color:#7c8f8d;margin-top:2px">versão {{ termoVersao }}</div>
           <div style="font-size:14px;color:#3c4f4e;margin-top:10px;line-height:1.6">{{ termoTexto }}</div>
           <div style="font-size:12.5px;font-weight:800;color:#3c4f4e;margin-top:14px">Assine com o dedo</div>
-          <div onPointerDown="{{ assDown }}" onPointerMove="{{ assMove }}" onPointerUp="{{ assUp }}" onPointerLeave="{{ assUp }}" data-tx-assinatura style="margin-top:6px;height:150px;border-radius:14px;border:1.5px dashed {{ assBd }};background:#fbfdfc;position:relative;touch-action:none;cursor:crosshair">
+          <div onPointerDown="{{ assDown }}" onPointerMove="{{ assMove }}" onPointerUp="{{ assUp }}" onPointerLeave="{{ assUp }}" data-tx-assinatura style="margin-top:6px;height:150px;border-radius:14px;border:1.5px dashed {{ assBd }};background:#fbfdfc;position:relative;touch-action:none;cursor:crosshair;user-select:none;-webkit-user-select:none">
             <svg width="100%" height="100%" style="position:absolute;inset:0;pointer-events:none"><path d="{{ assPath }}" fill="none" stroke="#0b2224" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
             <span style="position:absolute;left:14px;bottom:10px;font-size:11.5px;color:#9db0ae;pointer-events:none">{{ motNome }}, {{ hojeTxt }}</span>
             <span onClick="{{ limparAss }}" style="position:absolute;right:10px;top:8px;font-size:11.5px;font-weight:700;color:#7c8f8d;cursor:pointer">limpar</span>
@@ -188,7 +188,7 @@ input::placeholder{color:#8ba09e}
       </div>
     </sc-if>
     <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
-      <div style="position:fixed;bottom:96px;left:50%;transform:translateX(-50%);z-index:50;background:#0b2224;color:#fff;border-radius:14px;padding:11px 16px;font-size:13px;font-weight:600;max-width:390px;box-shadow:0 16px 40px rgba(9,34,36,.35)">{{ toastMsg }}</div>
+      <div data-tx-toast style="position:fixed;bottom:96px;left:50%;transform:translateX(-50%);z-index:50;background:#0b2224;color:#fff;border-radius:14px;padding:11px 16px;font-size:13px;font-weight:600;width:max-content;max-width:min(398px,calc(100vw - 32px));text-align:center;box-shadow:0 16px 40px rgba(9,34,36,.35)">{{ toastMsg }}</div>
     </sc-if>
   </div>
 </div>
@@ -285,6 +285,9 @@ class Component extends DCLogic {
       toast: !!s.toast, toastMsg: s.toast || ''
     };
     let pode = true, rot = 'Continuar', acao = prox;
+    // Botão apagado diz o que falta e, tocado, leva até lá.
+    let falta = null, irFalta = () => {};
+    const rolar = (sel, k) => { const el = document.querySelector(sel); if (el) el.scrollIntoView({ block: 'center', behavior: 'smooth' }); if (k) { this.setState({ realce: k }); clearTimeout(this._realce); this._realce = setTimeout(() => this.setState({ realce: null }), 1600); } };
 
     if (p === 'capa') { rot = devolvido ? 'Refazer as fotos pedidas' : 'Começar'; acao = () => ir(devolvido ? 'check' : 'id'); }
     if (p === 'id') {
@@ -292,6 +295,7 @@ class Component extends DCLogic {
       const errado = s.cpfIn.length === 3 && !ok;
       Object.assign(vals, { cpfIn: s.cpfIn, onCpf: e => this.setState({ cpfIn: TX.soDigitos(e.target.value).slice(0, 3) }), cpfBd: ok ? '#1a8f57' : errado ? '#c43d3d' : '#dfe7e5', cpfMsg: ok ? 'Confere, ' + mot.nome.split(' ')[0] + '.' : errado ? 'Não confere com o CPF desta viagem. Confira ou fale com o afretador.' : '', cpfMsgC: ok ? '#1a8f57' : '#c43d3d', placasConf: TX.placasDoConjunto(conj).map((pl, i) => ({ papel: i === 0 ? 'CAVALO' : 'CARRETA ' + i, placa: pl })) });
       pode = ok; rot = 'Confirmar';
+      falta = errado ? 'CPF não confere' : 'Digite os 3 números do CPF'; irFalta = () => { const el = document.querySelector('[data-tx-campo="cpf"]'); if (el) el.focus(); };
       acao = () => { if (!ok) return; this.enviar('linkCpf', {}); prox(); };
     }
     if (p === 'docs') {
@@ -300,6 +304,8 @@ class Component extends DCLogic {
       const todos = faltam.every(d => tirados[d.k]);
       Object.assign(vals, { docsPedidos: faltam.map(d => { const ok = !!tirados[d.k]; return { k: d.k, n: d.n, sub: ok ? 'foto pronta para enviar' : d.sub, subC: ok ? '#1a8f57' : '#b97514', bd: ok ? '#cfe9dc' : '#f3dfb8', bt: ok ? 'Tirar de novo' : 'Tirar foto', btBg: ok ? '#f0f4f3' : 'linear-gradient(135deg,#127670,#0E78B5)', btC: ok ? '#0b2224' : '#fff', onClick: () => this.setState({ docsTirados: Object.assign({}, tirados, { [d.k]: true }) }) }; }) });
       pode = todos && faltam.length > 0; rot = faltam.length ? 'Enviar documentos' : 'Continuar';
+      const semFoto = faltam.filter(d => !tirados[d.k]);
+      falta = semFoto.length === 1 ? 'Falta a foto de 1 documento' : 'Faltam fotos de ' + semFoto.length + ' documentos'; irFalta = () => { if (semFoto[0]) rolar('[data-tx-doc="' + semFoto[0].k + '"]'); };
       acao = () => { if (!faltam.length) return prox(); if (!todos) return; this.enviar('linkDocs', { docs: faltam.map(d => ({ tipo: d.tipo, placa: d.placa, validade: d.tipo === 'CNH' ? TX.addDias(TX.HOJE, 1825) : TX.addDias(TX.HOJE, 365) })) }); this.setState({ docsTirados: {} }); prox(); };
     }
     if (p === 't3') {
@@ -313,8 +319,9 @@ class Component extends DCLogic {
           linhas: t3[c.key].map((l, i) => {
             const pr = l.produto ? TX.produto(l.produto) : null;
             const sugs = !pr && (l.texto || '').length >= 2 ? TX.buscarProdutos(l.texto, 3) : [];
-            const msg = pr ? (pr.regime === 'X' ? 'Carga proibida para quem leva ração. O afretador vai falar com você.' : 'Entendido: ' + pr.nome + (pr.regime !== 'A' ? ', pede lavagem (regime ' + pr.regime + ')' : '')) : l.texto && !sugs.length ? 'Não achamos na lista. Vai como está e a transportadora confere.' : '';
-            return { key: c.key + '-' + i, rot: i === 0 ? 'ÚLTIMA' : i === 1 ? 'PENÚLTIMA' : 'ANTEPENÚLTIMA', data: l.data, texto: l.texto, bd: linhaOk(l) ? '#cfe9dc' : '#eef2f1', msg, msgC: pr && pr.regime === 'X' ? '#c43d3d' : pr ? '#1a8f57' : '#b97514',
+            const dataRuim = l.data && l.data >= v.data;
+            const msg = dataRuim ? 'A data tem que ser antes desta carga (' + F.data(v.data) + ').' : pr ? (pr.regime === 'X' ? 'Carga proibida para quem leva ração. O afretador vai falar com você.' : 'Entendido: ' + pr.nome + (pr.regime !== 'A' ? ', pede lavagem (regime ' + pr.regime + ')' : '')) : l.texto && !sugs.length ? 'Não achamos na lista. Vai como está e a transportadora confere.' : '';
+            return { key: c.key + '-' + i, rot: i === 0 ? 'ÚLTIMA' : i === 1 ? 'PENÚLTIMA' : 'ANTEPENÚLTIMA', data: l.data, texto: l.texto, bd: s.realce === c.key + '-' + i ? '#e8a33d' : linhaOk(l) ? '#cfe9dc' : '#eef2f1', msg, msgC: dataRuim || (pr && pr.regime === 'X') ? '#c43d3d' : pr ? '#1a8f57' : '#b97514',
               onData: e => set(c.key, i, 'data', e.target.value), onTexto: e => set(c.key, i, 'texto', e.target.value), temSug: sugs.length > 0,
               sugs: sugs.map(r => ({ id: r.produto.id, n: r.produto.nome, onClick: () => set(c.key, i, 'texto', r.produto.nome) })) };
           }) };
@@ -322,6 +329,8 @@ class Component extends DCLogic {
       const ok = comps.every(c => t3[c.key].every(linhaOk));
       Object.assign(vals, { t3Carretas: carretas });
       pode = ok; rot = 'Enviar as cargas';
+      const incompletas = [].concat.apply([], comps.map(c => t3[c.key].map((l, i) => ({ k: c.key + '-' + i, l })))).filter(x => !linhaOk(x.l));
+      falta = incompletas.length === 1 ? 'Falta 1 carga' : 'Faltam ' + incompletas.length + ' cargas'; irFalta = () => { if (incompletas[0]) rolar('[data-tx-t3-linha="' + incompletas[0].k + '"]', incompletas[0].k); };
       acao = () => { if (!ok) return; const out = {}; comps.forEach(c => { out[c.key] = t3[c.key].map(l => l.produto ? { data: l.data, produto: l.produto } : { data: l.data, texto: l.texto }); }); this.enviar('linkT3', { t3: out }); prox(); };
     }
     if (p === 'check') {
@@ -336,7 +345,7 @@ class Component extends DCLogic {
         const bt = on => ({ bd: on ? '#127670' : '#dfe7e5', bg: on ? '#eef7f6' : '#fff', c: on ? '#0C5862' : '#3c4f4e' });
         const bn = r === 'nao' ? { bd: '#c43d3d', bg: '#fdf6f6', c: '#c43d3d' } : bt(false);
         const bs = bt(r === 'ok');
-        return { k: it.k, i: TX.ITENS_CHECKLIST.indexOf(it) + 1, n: it.n, pergunta: it.pergunta, critico: it.critico, bd: r && f ? '#cfe9dc' : '#fff',
+        return { k: it.k, i: TX.ITENS_CHECKLIST.indexOf(it) + 1, n: it.n, pergunta: it.pergunta, critico: it.critico, bd: s.realce === it.k ? '#e8a33d' : r && f ? '#cfe9dc' : '#fff',
           sim: () => this.setState({ itens: Object.assign({}, s.itens, { [it.k]: 'ok' }) }), nao: () => this.setState({ itens: Object.assign({}, s.itens, { [it.k]: 'nao' }) }),
           simBd: bs.bd, simBg: bs.bg, simC: bs.c, naoBd: bn.bd, naoBg: bn.bg, naoC: bn.c,
           foto: () => { this.setState({ fotos: Object.assign({}, s.fotos, { [it.k]: 1 }) }); this.avisar('Foto salva com hora e local: ' + it.n.toLowerCase() + '.'); },
@@ -345,6 +354,8 @@ class Component extends DCLogic {
       }) });
       const ok = lista.every(it => itens[it.k] && fotos[it.k]);
       pode = ok; rot = devolvido ? 'Reenviar à filial' : 'Enviar checklist';
+      const abertos = lista.filter(it => !(itens[it.k] && fotos[it.k]));
+      falta = abertos.length === 1 ? 'Falta 1 item' : 'Faltam ' + abertos.length + ' de ' + lista.length + ' itens'; irFalta = () => { if (abertos[0]) rolar('[data-tx-ck="' + abertos[0].k + '"]', abertos[0].k); };
       acao = () => { if (!ok) return; const its = {}, fts = {}; TX.ITENS_CHECKLIST.forEach(it => { its[it.k] = itens[it.k] || 'ok'; fts[it.k] = fotos[it.k] || 1; }); this.enviar('linkChecklist', { itens: its, fotos: fts, gps: TX.embarcador(v.embarcador).nome }); this.setState({ itens: {}, fotos: {} }); if (devolvido) ir('fim'); else prox(); };
     }
     if (p === 'manual') {
@@ -364,16 +375,17 @@ class Component extends DCLogic {
         assMove: e => { if (!this._des) return; const q = pos(e); this.setState(st => ({ pontos: st.pontos.concat([q]) })); },
         assUp: () => { this._des = false; }, limparAss: () => this.setState({ pontos: [] }) });
       pode = pts.length > 12; rot = 'Assinar e enviar';
+      falta = 'Assine no quadro para enviar'; irFalta = () => rolar('[data-tx-assinatura]');
       acao = () => { if (!pode) return; this.enviar('linkAssinar', { versao: TX.db.termo.versao }); prox(); };
     }
     if (p === 'fim') {
       const l = v.link;
       const pend = s.fila.length > 0;
-      Object.assign(vals, { fimTitulo: pend ? 'Salvo no celular' : devolvido ? 'Esperando a filial' : 'Enviado à filial ' + fil.nome, fimSub: pend ? 'Assim que o sinal voltar, tudo vai para a filial sozinho. Não feche o navegador.' : 'O afretador confere as fotos e libera a carga. Se precisar de algo, ele avisa por aqui mesmo.',
+      Object.assign(vals, { fimTitulo: pend ? 'Salvo no celular' : devolvido ? 'Esperando a filial' : 'Enviado à filial ' + fil.nome, fimSub: pend ? 'Assim que o sinal voltar, tudo vai para a filial sozinho. Não feche o navegador.' : 'Pode fechar esta página. O afretador confere as fotos e libera a carga; se precisar de foto nova, ele manda mensagem e este mesmo link mostra o que refazer.',
         fimItens: [['Dados confirmados', l.cpfEm], ['Três últimas cargas', v.tipo === 'propria' ? 'histórico' : l.t3Em], ['Checklist com fotos', l.checklistEm], ['Manual lido', l.manualEm], ['Termo assinado', dec.cobertura === 'gatekeeper' ? l.assinadoEm : 'não se aplica']].filter(x => x[1]).map(x => ({ n: x[0], v: x[1].length > 10 ? F.hora(x[1]) : x[1] })) });
     }
     const b = TX.ui.cta(pode);
-    return Object.assign(vals, { temBotao: !naoEnviado && p !== 'fim', temVoltar: idx > 1 && p !== 'capa', voltar: () => ir(ps[Math.max(1, idx - 1)]), avancar: () => { if (pode) acao(); }, btRot: rot, btBg: b.bg, btC: b.c, btSh: b.sh, btCur: b.cur });
+    return Object.assign(vals, { temBotao: !naoEnviado && p !== 'fim', temVoltar: idx > 1 && p !== 'capa', voltar: () => ir(ps[Math.max(1, idx - 1)]), avancar: () => { if (pode) acao(); else irFalta(); }, btRot: pode || !falta ? rot : falta, btBg: b.bg, btC: b.c, btSh: b.sh, btCur: pode || falta ? 'pointer' : b.cur });
   }
   // Segunda viagem do mesmo TAC: as cargas que ele já informou voltam preenchidas para conferir.
   t3Inicial(v, comps) {

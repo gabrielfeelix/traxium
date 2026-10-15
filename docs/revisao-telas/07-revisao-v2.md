@@ -172,6 +172,31 @@ Iniciada em 14/10/2026, a partir da seção 6 e 7 de `HANDOFF.md`. Uma etapa por
 
 **Teste.** `e2e-revisao.cjs` cobre a resposta do hero em quarentena e em compartimento limpo, o link para a VG-3118, o T-3 marcado, o seletor do conjunto e o item ativo da sidebar nos dois casos.
 
+## Etapa 11. Link da Viagem (14/10/2026)
+
+Testado em 390x844, como o motorista: do envio pelo afretador até o fim, com identidade, T-3, checklist, manual e termo. A tela continua sem sidebar e sem header.
+
+**Problema como usuário.** O botão de baixo fica apagado até a etapa estar completa, mas não dizia o que faltava, e tocar nele não fazia nada. No checklist de cinco itens com foto, quem esquece uma foto no meio da rolagem fica sem saber qual. No T-3, uma data igual ou posterior à da carga deixava a linha incompleta sem explicar por quê. Arrastar o dedo para assinar selecionava o texto da página (o nome e "limpar" ficavam marcados). O aviso flutuante ocupava metade da largura e quebrava em três linhas. O fim dizia "ele avisa por aqui mesmo", o que leva o motorista a ficar olhando a página.
+
+**O que mudou.**
+
+1. Botão apagado diz o que falta: "Digite os 3 números do CPF", "CPF não confere", "Faltam 2 cargas", "Falta 1 item", "Falta a foto de 1 documento", "Assine no quadro para enviar". Tocado, leva até o que falta: foca o CPF, rola até a carga ou o item e realça a borda em âmbar por um instante.
+2. Data do T-3 igual ou depois da carga mostra "A data tem que ser antes desta carga (08/10/2026)." em vermelho.
+3. Quadro da assinatura sem seleção de texto.
+4. Aviso flutuante na largura do aparelho (até 398 px), centralizado.
+5. Fim: "Pode fechar esta página. O afretador confere as fotos e libera a carga; se precisar de foto nova, ele manda mensagem e este mesmo link mostra o que refazer."
+
+**Campo de data.** Conferido: o campo nativo segue o idioma do navegador. Com o navegador em português, mostra 05/10/2026; em inglês, 10/05/2026. No celular do motorista o idioma é o do aparelho, e o seletor nativo (calendário) é mais fácil que digitar. Fica o campo nativo aqui; nas telas de escritório, a troca pelo DD/MM/AAAA com máscara é o item 4 do pente fino.
+
+**Teste.** `e2e-revisao.cjs` percorre o link em 390x844 e confere cada rótulo do botão, o aviso da data, o realce do item que falta, a assinatura sem seleção e o texto do fim.
+
+**Premissas.**
+
+| Premissa | O que muda se a resposta vier diferente |
+| --- | --- |
+| O celular do motorista está em português; o campo nativo mostra DD/MM/AAAA | Trocar pelo campo com máscara também aqui, com teclado numérico |
+| O motorista lembra a data aproximada das três últimas cargas | Aceitar "não lembro a data" e deixar a conferência com o afretador |
+
 ## Situação ao fim de 14/10/2026
 
 - Lacunas 1 a 4 do handoff fechadas: ocorrências exportáveis (etapa 3), fila de assinatura (etapa 2), entradas para o que virou seção (visões em Viagens na etapa 1 e busca global na etapa 7), Cadastros visível (etapa 7). A lacuna 5 continua dependendo do Gabriel e do Rafael.
