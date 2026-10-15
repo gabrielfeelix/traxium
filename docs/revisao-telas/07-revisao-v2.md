@@ -278,6 +278,10 @@ Revisto em 1366 px com a Lima Logística (ETC em revisão) e o João (TAC). A or
 2. Abaixo de 730 px de altura, os itens ficam mais justos e a faixa "Base IDTF vigente" sai (a versão continua em Cadastros, Produtos). O gerador passou a usar `sbPad`, `sbSubPad`, `sbGrupoPad` e `sbBaseD`, calculados em `TX.ui.base` e recalculados quando a janela muda de altura.
 3. Medido com Cadastros aberto: sem rolagem de 657 a 768 px; em 600 px sobram 8 px.
 
+### Item 9. Frota: nome da carga cortado
+
+Em 1366 px a linha do compartimento fora do escopo cortava "Calcário" e "Fertilizante". A linha inteira já é link para o histórico; o texto "histórico →" (uns 70 px) virou só a seta, com `title` "Ver o histórico de cargas de SQT 4A66 C1". O nome da carga ganhou reticências para o caso extremo. As três cargas cabem inteiras em 1366 px.
+
 ## Situação ao fim de 14/10/2026
 
 - Lacunas 1 a 4 do handoff fechadas: ocorrências exportáveis (etapa 3), fila de assinatura (etapa 2), entradas para o que virou seção (visões em Viagens na etapa 1 e busca global na etapa 7), Cadastros visível (etapa 7). A lacuna 5 continua dependendo do Gabriel e do Rafael.
