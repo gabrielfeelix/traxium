@@ -575,6 +575,14 @@
         v.liberacoes.push(Object.assign({}, d.registro, { em: op.em, assinante: op.por }));
         evento(db, op, v.id, 'Liberada por autoridade (' + d.registro.alcadaNome + '): ' + d.registro.motivo);
         return;
+      case 'pedirLiberacao': {
+        // O afretador não assina: pede a quem tem a alçada. O pedido entra na fila de assinatura.
+        if (!v) return;
+        v.pedidosLib = (v.pedidosLib || []).concat([{ checagem: d.checagem, alcada: d.alcada, nota: d.nota || '', em: op.em, por: op.por }]);
+        const alc = db.alcadas.find(a => a.k === d.alcada);
+        evento(db, op, v.id, 'Liberação pedida a ' + (alc ? alc.n : d.alcada) + ' por ' + nome(op.por));
+        return;
+      }
       case 'manterBloqueio':
         v.manutencoes.push({ checagem: d.checagem, motivo: d.motivo, acao: d.acao, em: op.em, por: op.por });
         evento(db, op, v.id, 'Bloqueio mantido por ' + nome(op.por) + ': ' + d.motivo);
@@ -1023,6 +1031,7 @@
     (v.limpezas || []).forEach(x => e(x.em, 'Limpeza regime ' + x.regime + ' em ' + x.comp.replace('#', ' ') + ', comprovante ' + x.comprovante, nomeU(x.por), 'equipe'));
     (v.regularizacoes || []).forEach(x => e(x.em, 'Regularização TS1.9 opção ' + x.opcao + ' em ' + x.comp.replace('#', ' ') + ', inspetor ' + x.inspetor, nomeU(x.por), 'equipe'));
     (v.liberacoes || []).forEach(x => e(x.em, 'Liberada por autoridade: ' + x.motivo + '. O motor continua reprovando a regra.', nomeU(x.assinante), 'alerta'));
+    (v.pedidosLib || []).forEach(x => e(x.em, 'Pediu liberação a ' + ((db().alcadas.find(a => a.k === x.alcada) || {}).n || x.alcada) + (x.nota ? ': ' + x.nota : ''), nomeU(x.por), 'equipe'));
     (v.manutencoes || []).forEach(x => e(x.em, 'Bloqueio mantido: ' + x.motivo, nomeU(x.por), 'alerta'));
     (v.retificacoes || []).forEach(x => e(x.em, 'Retificação de ' + x.campo + ' (' + x.motivo + ')', nomeU(x.por), 'equipe'));
     db().ocorrencias.filter(o => o.viagem === v.id).forEach(o => e(o.em, 'Ocorrência ' + o.id + ' (' + o.gravidade + '): ' + o.tipo, nomeU(o.por), 'alerta'));
@@ -1074,6 +1083,26 @@
   }
 
   // Pendências de registro da qualidade: viagens asseguradas carregadas sem algum item.
+  // Fila de assinatura: viagens de hoje em diante bloqueadas só por regra que uma alçada libera.
+  // "minhas" são as que a alçada do usuário assina; "acima" esperam alçada maior.
+  const NIVEL_ALCADA = { qualidade: 1, direcao: 2 };
+  function liberacaoDe(v) {
+    const dec = decidir(v);
+    if (v.cancelada || dec.resultado !== 'bloqueada') return null;
+    const bloq = dec.falta.filter(f => f.estado === 'bloqueio' && !f.tecnico);
+    if (!bloq.length || !bloq.every(f => NIVEL_ALCADA[f.alcada])) return null;
+    const alvo = bloq.reduce((m, f) => (NIVEL_ALCADA[f.alcada] > NIVEL_ALCADA[m.alcada] ? f : m), bloq[0]);
+    const pedido = (v.pedidosLib || []).filter(p => p.checagem === alvo.k).slice(-1)[0] || null;
+    return { viagem: v, dec, item: alvo, alcada: alvo.alcada, nivel: NIVEL_ALCADA[alvo.alcada], pedido };
+  }
+  function podeAssinar(u, alcada) { return !!(u && u.alcada && NIVEL_ALCADA[u.alcada] >= (NIVEL_ALCADA[alcada] || 99)); }
+  function filaAssinatura(u) {
+    const us = u || sessao();
+    const lista = db().viagens.filter(v => us.filiais.includes(v.filial) && v.data >= HOJE).map(liberacaoDe).filter(Boolean)
+      .sort((a, b) => (!!b.pedido - !!a.pedido) || (a.viagem.data + a.viagem.janela).localeCompare(b.viagem.data + b.viagem.janela));
+    return { minhas: lista.filter(x => podeAssinar(us, x.alcada)), acima: lista.filter(x => !podeAssinar(us, x.alcada)) };
+  }
+
   function pendenciasRegistro(filialId, desde) {
     const ini = desde || addDias(HOJE, -45);
     const out = [];
@@ -1188,7 +1217,7 @@
     fmt, norm, soDigitos, addDias, difDias,
     produto, pessoa, transportador, conjunto, placa, filial, usuario, viagem, embarcador, destinatario, fornecedor,
     nomeTransportador, produtoPorTexto, buscarProdutos, compsDoConjunto, placasDoConjunto, docEstado, historico, t3,
-    linkEstado, coberturaDe, ocorrenciaGraveAberta, manualVigente, ciclo, decidir, linhaDoTempo,
+    linkEstado, coberturaDe, ocorrenciaGraveAberta, liberacaoDe, podeAssinar, filaAssinatura, manualVigente, ciclo, decidir, linhaDoTempo,
     viagensDaFilial, viagensDoDia, sessao, entrarComo, vencimentos, pendenciasRegistro, prontidao, badges, qualificacao,
     mensagemLink, urlLink, loteCTe, fazer, ouvir, reset, recarregar
   };

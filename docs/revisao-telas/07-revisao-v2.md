@@ -24,3 +24,25 @@ Iniciada em 14/10/2026, a partir da seção 6 e 7 de `HANDOFF.md`. Uma etapa por
 | --- | --- |
 | Quem procurava a antiga tela Limpezas quer ver as viagens que pediram lavagem, com as pendentes destacadas, e não um cadastro de lavagens | Criar uma lista de lavagens por fornecedor em Cadastros, Fornecedores |
 | Visões salvas ficam no navegador do usuário | Passar a gravar por usuário na base quando houver backend |
+
+## Etapa 2. Hoje e fila de assinatura (14/10/2026)
+
+**Problema como usuário.** Na mesa do afretador, três dos quatro contadores repetiam os cabeçalhos dos grupos logo abaixo. As linhas bloqueadas diziam quem resolve ("Qualidade", "Direção e RT"), mas não davam ação: o afretador não tinha como pedir a liberação. No painel da qualidade não havia o que a Direção via no v1 em Exceções: o que espera a assinatura dela (lacuna 2 do handoff). Em 1366 px o painel estourava para a direita.
+
+**O que mudou.**
+
+1. Mesa: os quatro cartões viraram uma barra de resumo numa linha (total de viagens de hoje, barra segmentada, legenda por grupo e "motoristas no link agora"). Clicar na legenda abre o grupo e rola até ele.
+2. Linha bloqueada por regra que uma alçada libera ganha ação. Quem tem a alçada vê "Liberar", que abre a Viagem com o modal de liberação. Quem não tem vê "Pedir liberação": grava o pedido, avisa quem assina e a linha passa a dizer "liberação pedida às 10:52, esperando assinatura de Gestor da qualidade".
+3. Painel: bloco "Esperando sua assinatura", logo abaixo da prontidão, só para quem tem alçada. Lista as viagens de hoje em diante bloqueadas só por regra que a alçada do usuário libera, com prazo de carregamento, motivo, se a filial pediu e o botão "Analisar e assinar". Pedidos vêm primeiro. O que espera alçada maior aparece numa linha abaixo ("A OC 48131 também está bloqueada e espera Direção e RT").
+4. Bloqueio técnico e falta de comunicação ao OC não entram na fila: o primeiro ninguém assina, o segundo se resolve registrando o fato.
+5. `Viagem.dc.html?id=&liberar=1` abre o modal de liberação quando a viagem tem o que liberar.
+6. `min-width` de Hoje caiu para 1280 px; grade de baixo do painel com coluna lateral flexível; texto da simulação sem a placa em minúsculas.
+
+**Base.** Operação nova `pedirLiberacao` (grava em `v.pedidosLib`, entra na linha do tempo) e funções `liberacaoDe`, `podeAssinar` e `filaAssinatura`. Nove conferências novas no teste da base (669 no total).
+
+**Premissas.**
+
+| Premissa | O que muda se a resposta vier diferente |
+| --- | --- |
+| O pedido de liberação avisa todos com a alçada na filial; o primeiro com a alçada exata é citado no aviso | Escolher um assinante por filial em Configurações, Alçadas |
+| A fila mostra só viagens de hoje em diante: bloqueio passado sem liberação já é pendência de registro | Incluir as passadas numa seção à parte |

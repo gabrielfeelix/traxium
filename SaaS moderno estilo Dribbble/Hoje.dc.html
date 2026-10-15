@@ -23,7 +23,7 @@ input::placeholder{color:#8ba09e}
 @keyframes pulso{0%{box-shadow:0 0 0 0 rgba(14,120,181,.45)}70%{box-shadow:0 0 0 7px rgba(14,120,181,0)}100%{box-shadow:0 0 0 0 rgba(14,120,181,0)}}
 </style>
 </helmet>
-<div style="display:flex;min-height:100vh;min-width:1560px" data-screen-label="Hoje">
+<div style="display:flex;min-height:100vh;min-width:1280px" data-screen-label="Hoje">
   <!-- TX:SIDEBAR -->
   <div data-tx-sidebar style="width:{{ navW }};flex:none;background:linear-gradient(178deg,#093D44,#0A4650);color:#fff;display:flex;flex-direction:column;padding:22px {{ navPad }};position:sticky;top:0;height:100vh;transition:width .25s ease;overflow-x:hidden;overflow-y:auto;z-index:20">
     <a href="Hoje.dc.html" title="Traxium: ir para Hoje" style="display:flex;align-items:center;gap:10px;padding:4px 8px 20px;color:#fff">
@@ -110,15 +110,18 @@ input::placeholder{color:#8ba09e}
 
     <!-- MESA DO AFRETADOR -->
     <sc-if value="{{ modoMesa }}" hint-placeholder-val="{{ false }}">
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
-        <sc-for list="{{ contadores }}" as="ct" hint-placeholder-count="4">
-          <div onClick="{{ ct.onClick }}" style="background:#fff;border:1.5px solid {{ ct.bd }};border-radius:18px;padding:16px 20px;cursor:pointer;transition:all .15s" style-hover="box-shadow:0 10px 24px rgba(9,61,68,.08)">
-            <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#5c706e"><span style="width:9px;height:9px;border-radius:99px;background:{{ ct.dot }};box-shadow:0 0 0 3px {{ ct.ring }}"></span>{{ ct.n }}</div>
-            <div style="font-size:32px;font-weight:800;margin-top:4px;font-variant-numeric:tabular-nums">{{ ct.v }}</div>
-            <div style="font-size:12px;color:#7c8f8d">{{ ct.sub }}</div>
+      <sc-if value="{{ temResumo }}" hint-placeholder-val="{{ true }}">
+        <div data-tx-resumo style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:14px 20px;display:flex;align-items:center;gap:22px">
+          <div style="flex:none"><span style="font-size:22px;font-weight:800;font-variant-numeric:tabular-nums">{{ resTotal }}</span><span style="font-size:13px;color:#5c706e;margin-left:6px">{{ resTotalRot }}</span></div>
+          <div style="flex:1;min-width:140px;height:10px;border-radius:99px;overflow:hidden;display:flex;gap:3px;background:repeating-linear-gradient(-45deg,#f0f4f3 0 5px,#e4ebe9 5px 10px)">
+            <sc-for list="{{ resSeg }}" as="sg" hint-placeholder-count="3"><div style="width:{{ sg.w }};background:{{ sg.bg }};border-radius:99px"></div></sc-for>
           </div>
-        </sc-for>
-      </div>
+          <sc-for list="{{ resItens }}" as="ri" hint-placeholder-count="3"><span onClick="{{ ri.onClick }}" data-tx-ir-grupo="{{ ri.k }}" style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:700;color:#3c4f4e;cursor:pointer;white-space:nowrap" style-hover="color:#127670"><span style="width:8px;height:8px;border-radius:99px;background:{{ ri.dot }};box-shadow:0 0 0 3px {{ ri.ring }}"></span><b style="font-variant-numeric:tabular-nums">{{ ri.q }}</b>{{ ri.n }}</span></sc-for>
+          <sc-if value="{{ temNoLink }}" hint-placeholder-val="{{ false }}">
+            <span title="abriram o link e ainda não terminaram" style="display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:#0E78B5;white-space:nowrap;padding-left:18px;border-left:1px solid #eef2f1"><span style="width:8px;height:8px;border-radius:99px;background:#0E78B5;animation:pulso 1.6s infinite"></span>{{ noLinkRot }}</span>
+          </sc-if>
+        </div>
+      </sc-if>
 
       <sc-if value="{{ mesaVazia }}" hint-placeholder-val="{{ false }}">
         <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:50px 20px;display:flex;flex-direction:column;align-items:center;gap:10px">
@@ -129,7 +132,7 @@ input::placeholder{color:#8ba09e}
       </sc-if>
 
       <sc-for list="{{ grupos }}" as="gr" hint-placeholder-count="3">
-        <div style="display:flex;flex-direction:column;gap:10px">
+        <div id="{{ gr.ancora }}" style="display:flex;flex-direction:column;gap:10px;scroll-margin-top:16px">
           <div onClick="{{ gr.toggle }}" style="display:flex;align-items:center;gap:10px;padding:4px 4px 0;cursor:pointer">
             <span style="width:10px;height:10px;border-radius:99px;background:{{ gr.dot }};box-shadow:0 0 0 3px {{ gr.ring }}"></span>
             <div style="font-size:16px;font-weight:800">{{ gr.n }}</div>
@@ -182,6 +185,29 @@ input::placeholder{color:#8ba09e}
         </sc-for>
       </div>
 
+      <sc-if value="{{ temFila }}" hint-placeholder-val="{{ true }}">
+        <div data-tx-fila style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:18px 22px">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <div style="font-size:16px;font-weight:800">Esperando sua assinatura</div>
+            <span style="display:{{ filaQD }};font-family:'Spline Sans Mono',monospace;font-size:12px;font-weight:600;color:#b85a2e;border:1px solid #f0d3bf;border-radius:99px;padding:1px 9px">{{ filaQ }}</span>
+            <div style="font-size:12.5px;color:#5c706e">{{ filaSub }}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;margin-top:8px">
+            <sc-for list="{{ fila }}" as="fq" hint-placeholder-count="2">
+              <div data-tx-fila-linha="{{ fq.id }}" style="display:flex;align-items:center;gap:16px;padding:11px 0;border-bottom:1px solid #f0f4f3">
+                <div style="width:58px;flex:none"><div style="font-family:'Spline Sans Mono',monospace;font-size:15px;font-weight:600">{{ fq.janela }}</div><div style="font-size:10.5px;font-weight:700;color:{{ fq.prazoC }}">{{ fq.prazo }}</div></div>
+                <div style="width:230px;flex:none;min-width:0"><div style="font-size:13.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ fq.motorista }}</div><div style="font-family:'Spline Sans Mono',monospace;font-size:11.5px;color:#5c706e">{{ fq.ordem }}, {{ fq.filial }}</div></div>
+                <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:#c43d3d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ fq.motivo }}</div><div style="font-size:11.5px;color:#7c8f8d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ fq.detalhe }}</div></div>
+                <div style="width:190px;flex:none;font-size:12px;font-weight:{{ fq.pedFw }};color:{{ fq.pedC }}">{{ fq.pedido }}</div>
+                <a href="{{ fq.href }}" data-tx-assinar="{{ fq.id }}" style="flex:none;background:linear-gradient(135deg,#127670,#0E78B5);color:#fff;font-size:12.5px;font-weight:800;border-radius:99px;padding:8px 16px;white-space:nowrap;box-shadow:0 6px 14px rgba(18,118,112,.25)" style-hover="color:#fff;transform:translateY(-1px)">Analisar e assinar</a>
+              </div>
+            </sc-for>
+            <sc-if value="{{ filaVazia }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;color:#5c706e;padding:12px 0 4px">Nada esperando a sua assinatura. Viagem bloqueada por regra que a sua alçada libera aparece aqui, com o prazo de carregamento.</div></sc-if>
+            <sc-if value="{{ temAcima }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;color:#5c706e;padding-top:10px">{{ acimaTxt }} <a href="{{ acimaHref }}" style="font-weight:800">{{ acimaLink }} →</a></div></sc-if>
+          </div>
+        </div>
+      </sc-if>
+
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
         <sc-for list="{{ cardsFilial }}" as="cf" hint-placeholder-count="4">
           <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:16px 18px;display:flex;flex-direction:column;gap:8px">
@@ -194,9 +220,10 @@ input::placeholder{color:#8ba09e}
         </sc-for>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 420px;gap:20px;align-items:start">
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,400px);gap:20px;align-items:start">
         <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;padding:20px 22px">
-          <div style="display:flex;align-items:center;gap:10px"><div style="font-size:16px;font-weight:800">Pendências de registro</div><div style="font-size:12.5px;color:#5c706e">viagens asseguradas já carregadas com item faltando; quem trata é a qualidade</div><a href="Viagens v2.dc.html?conciliar=1" style="margin-left:auto;font-size:12.5px;font-weight:800">Conciliar CT-e em lote →</a></div>
+          <div style="display:flex;align-items:center;gap:10px"><div style="font-size:16px;font-weight:800">Pendências de registro</div><a href="Viagens v2.dc.html?conciliar=1" style="margin-left:auto;font-size:12.5px;font-weight:800;white-space:nowrap">Conciliar CT-e em lote →</a></div>
+          <div style="font-size:12.5px;color:#5c706e;margin-top:2px">Viagens asseguradas já carregadas com item faltando. Quem trata é a qualidade.</div>
           <div style="display:flex;flex-direction:column;margin-top:10px">
             <sc-for list="{{ pendRegs }}" as="pr" hint-placeholder-count="4">
               <a href="{{ pr.href }}" style="display:flex;align-items:center;gap:12px;padding:11px 4px;border-bottom:1px solid #f0f4f3;color:inherit" style-hover="background:#f7faf9">
@@ -428,12 +455,18 @@ class Component extends DCLogic {
     ];
     const ltom = { nao_enviado: U.tom('falta'), enviado: U.tom('info'), aberto: U.tom('info'), preenchendo: U.tom('info'), concluido: U.tom('ok'), cancelado: U.tom('na') }[le.k];
     const f0 = dec.falta[0];
+    const lib = TX.liberacaoDe(v);
     let falta, faltaC, quem;
     if (dec.resultado === 'pronta') { falta = dec.porAutoridade ? 'Pronta por autoridade' : 'Pronta para assegurar'; faltaC = '#1a8f57'; quem = 'declaração do CT-e liberada'; }
     else { falta = dec.resultado === 'tecnico' ? 'Bloqueio técnico: ' + f0.detalhe.split(':')[0] : dec.resultado === 'bloqueada' ? 'Bloqueada: ' + ({ ocorrencia: 'transportador em revisão após ocorrência grave', 'docs-conj': 'CRLV vencido no conjunto', 'docs-mot': 'CNH vencida', 'docs-transp': 'RNTRC vencido', produto: 'produto não é ração' }[f0.k] || (dec.cobertura === 'gatekeeper' && f0.k === 'cobertura' ? 'filial sem comunicação ao organismo certificador' : f0.o.toLowerCase())) : f0.o; faltaC = tomR.c; quem = dec.falta.length > 1 ? f0.quem + ' e mais ' + (dec.falta.length - 1) : f0.quem; }
+    if (lib && lib.pedido) quem = 'liberação pedida às ' + F.hora(lib.pedido.em) + ', esperando assinatura de ' + this.nomeAlcada(lib.alcada);
     let acao = null;
     if (le.k === 'nao_enviado' && !v.cancelada) acao = { k: 'link', n: 'Enviar link', fn: () => this.mandarLink(v), prim: true };
     else if (conferir) acao = { k: 'conferir', n: 'Conferir fotos', fn: () => { location.href = 'Viagem.dc.html?id=' + v.id + '#tx-verif'; }, prim: true };
+    else if (dec.resultado === 'bloqueada' && lib) {
+      if (TX.podeAssinar(TX.sessao(), lib.alcada)) acao = { k: 'liberar', n: 'Liberar', fn: () => { location.href = 'Viagem.dc.html?id=' + v.id + '&liberar=1'; }, prim: true };
+      else if (!lib.pedido) acao = { k: 'pedir', n: 'Pedir liberação', fn: () => this.pedirLiberacao(v, lib), prim: false };
+    }
     else if (dec.resultado === 'pronta') acao = { k: 'declaracao', n: 'Copiar declaração', fn: () => { U.copiar(TX.DECLARACAO_CTE); this.avisar('Declaração copiada: "' + TX.DECLARACAO_CTE + '". Cole no CT-e da ' + v.ordem + '.'); }, prim: false };
     const min = (+v.janela.slice(0, 2)) * 60 + (+v.janela.slice(3, 5));
     const hm = TX.agoraHM(); const ag = (+hm.slice(0, 2)) * 60 + (+hm.slice(3, 5));
@@ -445,6 +478,13 @@ class Component extends DCLogic {
       falta, faltaC, quem, temAcao: !!acao, acao: acao ? acao.n : '', acaoK: acao ? acao.k : '', onAcao: acao ? acao.fn : null,
       acaoBg: acao && acao.prim ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#f0f4f3', acaoC: acao && acao.prim ? '#fff' : '#0b2224', acaoSh: acao && acao.prim ? '0 6px 14px rgba(18,118,112,.28)' : 'none',
       _r: dec.resultado, _busca: TX.norm([v.ordem, v.id, mot.nome, prod.nome, dest.nome, TX.placasDoConjunto(conj).join(' '), TX.nomeTransportador(t)].join(' ')) };
+  }
+  nomeAlcada(k) { return (TX.db.alcadas.find(a => a.k === k) || {}).n || k; }
+  assinantes(alcada, filial) { return TX.db.usuarios.filter(x => x.filiais.includes(filial) && TX.podeAssinar(x, alcada)).sort((a, b) => (a.alcada === alcada ? 0 : 1) - (b.alcada === alcada ? 0 : 1)); }
+  pedirLiberacao(v, lib) {
+    TX.fazer('pedirLiberacao', { id: v.id, checagem: lib.item.k, alcada: lib.alcada });
+    const quem = this.assinantes(lib.alcada, v.filial)[0];
+    this.avisar('Pedido enviado' + (quem ? ' a ' + quem.nome + ' (' + this.nomeAlcada(lib.alcada) + ')' : '') + '. A ' + v.ordem + ' entra na fila de assinatura com o prazo das ' + v.janela + '.');
   }
   mandarLink(v) {
     TX.ui.copiar(TX.mensagemLink(v));
@@ -473,18 +513,18 @@ class Component extends DCLogic {
     const linhas = TX.viagensDoDia(fil).filter(v => !v.cancelada).map(v => this.linha(v)).filter(l => !q || l._busca.includes(q)).sort((a, b) => a.janela.localeCompare(b.janela));
     const g = k => linhas.filter(l => k === 'bloq' ? (l._r === 'bloqueada' || l._r === 'tecnico') : k === 'pronta' ? (l._r === 'pronta' || l._r === 'nao_assegurada') : l._r === 'falta');
     const abertos = s.abertos;
-    const conferir = linhas.filter(l => l.acaoK === 'conferir').length;
-    const semLink = linhas.filter(l => l.acaoK === 'link').length;
     const GR = [['falta', 'Falta algo', U.tom('falta'), 'o que falta e quem resolve, por ordem de carregamento'], ['bloq', 'Bloqueadas', U.tom('bloqueio'), 'cada uma diz o motivo e o caminho'], ['pronta', 'Prontas para assegurar', U.tom('ok'), 'declaração do CT-e liberada']];
-    const grupos = GR.map(([k, n, tm, sub]) => { const ls = g(k); return { k, n, q: ls.length, sub, dot: tm.dot, ring: tm.ring, aberto: !!abertos[k] && ls.length > 0, linhas: ls, toggleRot: ls.length ? (abertos[k] ? 'recolher' : 'mostrar') : '', toggle: () => this.setState({ abertos: Object.assign({}, abertos, { [k]: !abertos[k] }) }) }; }).filter(x => x.q > 0);
-    const cont = (n, v, sub, tm, k) => ({ n, v, sub, dot: tm.dot, ring: tm.ring, bd: '#e4eae8', onClick: () => this.setState({ abertos: { falta: k === 'falta' || k === 'todas', bloq: k === 'bloq' || k === 'todas', pronta: k === 'pronta' } }) });
+    const grupos = GR.map(([k, n, tm, sub]) => { const ls = g(k); return { k, n, q: ls.length, sub, ancora: 'tx-grupo-' + k, dot: tm.dot, ring: tm.ring, aberto: !!abertos[k] && ls.length > 0, linhas: ls, toggleRot: ls.length ? (abertos[k] ? 'recolher' : 'mostrar') : '', toggle: () => this.setState({ abertos: Object.assign({}, abertos, { [k]: !abertos[k] }) }) }; }).filter(x => x.q > 0);
+    const irGrupo = k => () => { this.setState({ abertos: Object.assign({}, abertos, { [k]: true }) }); setTimeout(() => { const el = document.getElementById('tx-grupo-' + k); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60); };
+    const RES = [['falta', 'falta algo', U.tom('falta'), 'linear-gradient(90deg,#f4c15d,#e8a33d)'], ['bloq', 'bloqueadas', U.tom('bloqueio'), 'linear-gradient(90deg,#e46969,#c43d3d)'], ['pronta', 'prontas', U.tom('ok'), 'linear-gradient(90deg,#48c78e,#1a8f57)']];
+    const noLink = linhas.filter(l => /preenchimento|aberto/.test(l.linkRot)).length;
+    const tot = Math.max(1, linhas.length);
     return Object.assign(base, {
-      contadores: [
-        cont('Falta algo', g('falta').length, conferir + ' com fotos a conferir, ' + semLink + ' sem link', U.tom('falta'), 'falta'),
-        cont('Bloqueadas', g('bloq').length, g('bloq').filter(l => l._r === 'tecnico').length + ' bloqueio técnico', U.tom('bloqueio'), 'bloq'),
-        cont('Prontas', g('pronta').length, 'declaração liberada', U.tom('ok'), 'pronta'),
-        cont('Motoristas no link agora', linhas.filter(l => /preenchimento|aberto/.test(l.linkRot)).length, 'abriram e ainda não terminaram', U.tom('info'), 'todas')
-      ],
+      temResumo: linhas.length > 0 && !q,
+      resTotal: linhas.length, resTotalRot: linhas.length === 1 ? 'viagem hoje' : 'viagens hoje',
+      resSeg: RES.map(([k, n, tm, bg]) => ({ w: (g(k).length / tot * 100) + '%', bg })).filter(x => x.w !== '0%'),
+      resItens: RES.filter(([k]) => g(k).length).map(([k, n, tm]) => ({ k, n: ' ' + n, q: g(k).length, dot: tm.dot, ring: tm.ring, onClick: irGrupo(k) })),
+      temNoLink: noLink > 0, noLinkRot: noLink === 1 ? '1 motorista no link agora' : noLink + ' motoristas no link agora',
       grupos, mesaVazia: linhas.length === 0,
       vazioTitulo: q ? 'Nada encontrado' : 'Nenhuma viagem hoje em ' + TX.filial(fil).nome,
       vazioSub: q ? 'Nenhuma viagem de hoje bate com "' + s.busca + '". Busque por placa, ordem ou nome do motorista.' : 'Crie a viagem a partir da ordem de carregamento em Nova viagem.'
@@ -501,7 +541,22 @@ class Component extends DCLogic {
     const gk = assegPeriodo.filter(v => TX.coberturaDe(v) === 'gatekeeper').length;
     const sim = TX.db.simulacoes[TX.db.simulacoes.length - 1];
     const v15 = venc.filter(x => x.dias <= 15).length, v30 = venc.filter(x => x.dias > 15 && x.dias <= 30).length, v60 = venc.filter(x => x.dias > 30).length, vt = Math.max(1, venc.length);
+    const fila = TX.filaAssinatura(u);
+    const alcN = this.nomeAlcada(u.alcada);
+    const acima = fila.acima;
+    const prazoDe = v => { if (v.data !== TX.HOJE) return { t: F.curta(v.data), c: '#7c8f8d' }; const hm = TX.agoraHM(); const dif = (+v.janela.slice(0, 2)) * 60 + (+v.janela.slice(3, 5)) - ((+hm.slice(0, 2)) * 60 + (+hm.slice(3, 5))); return { t: dif < 0 ? 'passou' : dif < 120 ? 'em ' + dif + ' min' : 'em ' + Math.round(dif / 60) + ' h', c: dif < 120 ? '#c43d3d' : '#7c8f8d' }; };
     return {
+      temFila: !!u.alcada,
+      filaQ: fila.minhas.length, filaQD: fila.minhas.length ? 'inline-block' : 'none',
+      filaSub: 'viagens bloqueadas que a sua alçada (' + alcN + ') libera, com o prazo de carregamento',
+      filaVazia: fila.minhas.length === 0,
+      fila: fila.minhas.map(x => { const v = x.viagem, pz = prazoDe(v); return { id: v.id, href: 'Viagem.dc.html?id=' + v.id + '&liberar=1', janela: v.janela, prazo: pz.t, prazoC: pz.c,
+        motorista: TX.pessoa(v.motorista).nome, ordem: v.ordem, filial: TX.filial(v.filial).nome,
+        motivo: x.item.o, detalhe: x.item.detalhe,
+        pedido: x.pedido ? 'pedida por ' + TX.usuario(x.pedido.por).nome.split(' ')[0] + ' às ' + F.hora(x.pedido.em) : 'sem pedido da filial', pedC: x.pedido ? '#b85a2e' : '#9db0ae', pedFw: x.pedido ? '700' : '500' }; }),
+      temAcima: acima.length > 0,
+      acimaTxt: acima.length === 1 ? 'A ' + acima[0].viagem.ordem + ' (' + TX.filial(acima[0].viagem.filial).nome + ', ' + acima[0].viagem.janela + ') também está bloqueada e espera ' + this.nomeAlcada(acima[0].alcada) + '.' : acima.length + ' viagens bloqueadas esperam alçada acima da sua.',
+      acimaHref: acima.length ? 'Viagem.dc.html?id=' + acima[0].viagem.id : '#', acimaLink: acima.length === 1 ? 'Ver a viagem' : 'Ver a primeira',
       prPct: pr.pct + '%', prSub: pr.completas + ' de ' + pr.total + ' viagens asseguradas completas',
       heroNums: [
         { n: 'Viagens hoje', v: hojeTodas.length, sub: hojeTodas.filter(v => TX.decidir(v).resultado !== 'pronta').length + ' com pendência' },
@@ -513,7 +568,7 @@ class Component extends DCLogic {
       semPend: pend.length === 0,
       vW1: Math.round(v15 / vt * 100) + '%', vW2: Math.round(v30 / vt * 100) + '%', vW3: Math.round(v60 / vt * 100) + '%', v15, v30, v60,
       vencs: venc.slice(0, 6).map(x => ({ t: x.tipo + ' ' + x.ref, dono: x.dono, href: x.href, d: x.estado === 'vencido' ? 'vencido' : x.dias + ' dias', c: x.dias <= 15 ? '#c43d3d' : x.dias <= 30 ? '#b97514' : '#5c706e' })),
-      simTxt: sim ? 'Última simulação de rastreabilidade: ' + F.data(sim.em.slice(0, 10)) + ', ' + sim.pedido.toLowerCase() + ', em ' + Math.floor(sim.duracaoMin / 60) + 'h' + String(sim.duracaoMin % 60).padStart(2, '0') + '. O limite da auditoria é 4 horas.' : 'Nenhuma simulação registrada.'
+      simTxt: sim ? 'Última simulação de rastreabilidade: ' + F.data(sim.em.slice(0, 10)) + ', ' + sim.pedido.replace(/^./, c => c.toLowerCase()) + ', em ' + Math.floor(sim.duracaoMin / 60) + 'h' + String(sim.duracaoMin % 60).padStart(2, '0') + '. O limite da auditoria é 4 horas.' : 'Nenhuma simulação registrada.'
     };
   }
 

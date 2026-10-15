@@ -140,6 +140,22 @@ TX.recarregar();
 confere(TX.decidir(F1).resultado === 'pronta', 'F1: estado reconstruído do log continua pronto');
 confere(TX.linhaDoTempo(F1).some(e => e.tipo === 'motorista') && TX.linhaDoTempo(F1).some(e => /aprovada/.test(e.texto)), 'F1: linha do tempo mostra motorista e conferência');
 
+// F3a: fila de assinatura e pedido de liberação
+const filaR = TX.filaAssinatura(TX.db.usuarios.find(u => u.id === 'u-rafael'));
+const filaL = TX.filaAssinatura(TX.db.usuarios.find(u => u.id === 'u-luiz'));
+const filaD = TX.filaAssinatura(TX.db.usuarios.find(u => u.id === 'u-diego'));
+confere(filaR.minhas.some(x => x.viagem.id === 'VG-3121') && !filaR.minhas.some(x => x.viagem.id === 'VG-3127'), 'fila: qualidade assina a VG-3121 (CRLV) e não a VG-3127 (ocorrência)');
+confere(filaR.acima.some(x => x.viagem.id === 'VG-3127'), 'fila: VG-3127 aparece para a qualidade como esperando a Direção');
+confere(filaL.minhas.some(x => x.viagem.id === 'VG-3121') && filaL.minhas.some(x => x.viagem.id === 'VG-3127'), 'fila: Direção assina as duas');
+confere(filaD.minhas.length === 0, 'fila: afretador não tem alçada');
+confere(![...filaL.minhas, ...filaL.acima].some(x => ['VG-3118', 'VG-3126'].includes(x.viagem.id)), 'fila: bloqueio técnico e falta de comunicação ao OC não entram');
+TX.entrarComo('u-diego');
+TX.fazer('pedirLiberacao', { id: 'VG-3121', checagem: 'docs-conj', alcada: 'qualidade', nota: 'Motorista diz que o licenciamento foi pago' });
+const lib3121 = TX.liberacaoDe(TX.viagem('VG-3121'));
+confere(lib3121 && lib3121.pedido && lib3121.pedido.por === 'u-diego', 'pedido: fica registrado com autor');
+confere(TX.filaAssinatura(TX.db.usuarios.find(u => u.id === 'u-rafael')).minhas[0].viagem.id === 'VG-3121', 'pedido: viagem pedida vai para o topo da fila');
+confere(TX.linhaDoTempo(TX.viagem('VG-3121')).some(e => /Pediu liberação/.test(e.texto)), 'pedido: aparece na linha do tempo');
+
 // F3: liberação por autoridade (documento) e alçada
 TX.entrarComo('u-rafael');
 const reg = { checagem: 'docs-conj', motivo: 'Licenciamento pago, aguardando CRLV digital', justificativa: 'Comprovante de pagamento do licenciamento 2026 apresentado.', alcada: 'qualidade', alcadaNome: 'Gestor da qualidade', risco: 'Baixo', validade: 'Somente esta viagem', evidencia: 'boleto.pdf', escopo: 'Só a VG-3121', ciencia: true };
@@ -147,6 +163,7 @@ TX.fazer('liberar', { id: 'VG-3121', registro: reg });
 const d3121 = TX.decidir('VG-3121');
 confere(d3121.resultado === 'pronta' && d3121.porAutoridade, 'F3: VG-3121 pronta por autoridade');
 confere(d3121.checagens.find(c => c.k === 'docs-conj').estado === 'bloqueio', 'F3: o motor continua reprovando a regra liberada');
+confere(!TX.filaAssinatura(TX.db.usuarios.find(u => u.id === 'u-rafael')).minhas.some(x => x.viagem.id === 'VG-3121'), 'F3: viagem liberada sai da fila de assinatura');
 // Bloqueio técnico não aceita liberação
 TX.fazer('liberar', { id: 'VG-3118', registro: Object.assign({}, reg, { checagem: 'regime' }) });
 confere(TX.decidir('VG-3118').resultado === 'tecnico', 'F3: bloqueio técnico ignora liberação por autoridade');
