@@ -7,7 +7,7 @@
   'use strict';
 
   const HOJE = '2026-10-08';
-  const VERSAO_SEMENTE = 8;
+  const VERSAO_SEMENTE = 9;
   const CHAVE = 'tx-v2';
   const CHAVE_SESSAO = 'tx-v2-sessao';
   const DECLARACAO_CTE = 'O serviço fornecido é assegurado GMP+FSA';
@@ -402,8 +402,8 @@
       criadaEm: HOJE + 'T07:20', criadaPor: 'u-diego' }, linkCompleto(HOJE, '07:35', { afretador: 'u-diego', docs: true, gps: 'Coop. Vale do Teles Pires, fila externa' }))));
     // Em preenchimento pelo motorista.
     vs.push(V({ id: 'VG-3119', filial: 'SOR', data: HOJE, janela: '13:00', descarga: '2026-10-09', transportador: 't-valmir', motorista: 'p-valmir', conjunto: 'c-valmir', produto: 'casca-soja', peso: 34, embarcador: 'em-telespires', destinatario: 'de-santaclara', ordem: 'OC 48121',
-      // Voltou de frete de fosfato (regime B): a lavagem ainda não tem comprovante.
-      t3: { 'QVT 1A91#C1': [C('2026-10-06', 'map'), C('2026-10-01', 'milho'), C('2026-09-25', 'soja')], 'QVT 1A92#C1': [C('2026-10-06', 'map'), C('2026-10-01', 'milho'), C('2026-09-25', 'soja')] },
+      // Depois da VG-3111 (casca de soja, 06/10) fez frete de retorno com fosfato (regime B): a lavagem ainda não tem comprovante.
+      t3: { 'QVT 1A91#C1': [C('2026-10-07', 'map'), C('2026-10-06', 'casca-soja'), C('2026-10-01', 'milho')], 'QVT 1A92#C1': [C('2026-10-07', 'map'), C('2026-10-06', 'casca-soja'), C('2026-10-01', 'milho')] },
       link: { enviadoEm: HOJE + 'T08:40', abertoEm: HOJE + 'T09:05', cpfEm: HOJE + 'T09:06', t3Em: HOJE + 'T09:09' },
       checklist: { enviadoEm: null, itens: { lona: 'ok', correntes: 'ok' }, fotos: { lona: 1, correntes: 1 } }, criadaEm: HOJE + 'T08:30', criadaPor: 'u-diego' }));
     // Fotos a conferir.

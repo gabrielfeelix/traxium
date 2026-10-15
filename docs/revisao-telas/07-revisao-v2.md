@@ -69,3 +69,16 @@ Iniciada em 14/10/2026, a partir da seção 6 e 7 de `HANDOFF.md`. Uma etapa por
 1. Cartões e chips viraram abas da tabela: Todos, Documento a resolver, Em revisão, Convite pendente e Em dia. As três que pedem ação mostram contagem e uma linha de explicação. `?filtro=vencendo` continua abrindo em Documento a resolver.
 2. Tipo (Todos, TAC, ETC) virou um seletor segmentado ao lado da busca.
 3. Nome, tipo e documento com RNTRC ficam na mesma célula; tabela com 6 colunas; `min-width` em 1280 px.
+
+## Etapa 5. Viagem (14/10/2026)
+
+**Problema como usuário.** O cartão de decisão no topo já lista o que falta, com quem resolve e a ação de cada item. Logo abaixo, Checagens repetia os mesmos itens no meio das que passaram (10 linhas), empurrando o T-3 e a verificação para baixo.
+
+**O que mudou.**
+
+1. Checagens fica recolhida por padrão: barra de progresso, "6 de 10" e um resumo ("6 passaram. As 4 que não passaram estão no topo da tela, com quem resolve"). "Ver as 10" abre a lista completa com detalhe e origem de cada dado. A página da VG-3119 encurtou cerca de 20%.
+2. `min-width` em 1280 px.
+
+**Não feito, de propósito.** Abas internas (Resumo, Cargas e verificação, Linha do tempo), sugeridas no handoff. A viagem é o fluxo inteiro e o auditor confere T-3, verificação e registro lado a lado; abas esconderiam justamente o que ele compara. Com Checagens recolhida, a densidade caiu sem esconder nada que pede decisão. O rail continua com os cinco cartões: cada um responde a uma pergunta diferente (quem é, qual conjunto, onde o motorista está, o que o auditor anota, ocorrências).
+
+**Correção na semente (versão 9).** Na etapa 1 o fosfato da VG-3119 ficou em 06/10, dia em que a VG-3111 levou casca de soja no mesmo conjunto, e a tela mostrava "Fosfato, confere com a VG-3111". O fosfato passou para 07/10 (frete de retorno) e a casca de soja de 06/10 virou o T-2, conferida com a VG-3111.
