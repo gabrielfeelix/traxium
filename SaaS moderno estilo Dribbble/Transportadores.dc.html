@@ -23,7 +23,7 @@ input::placeholder{color:#8ba09e}
 @keyframes deslizar{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
 </style>
 </helmet>
-<div style="display:flex;min-height:100vh;min-width:1560px" data-screen-label="Transportadores">
+<div style="display:flex;min-height:100vh;min-width:1280px" data-screen-label="Transportadores">
   <!-- TX:SIDEBAR -->
   <div data-tx-sidebar style="width:{{ navW }};flex:none;background:linear-gradient(178deg,#093D44,#0A4650);color:#fff;display:flex;flex-direction:column;padding:22px {{ navPad }};position:sticky;top:0;height:100vh;transition:width .25s ease;overflow-x:hidden;overflow-y:auto;z-index:20">
     <a href="Hoje.dc.html" title="Traxium: ir para Hoje" style="display:flex;align-items:center;gap:10px;padding:4px 8px 20px;color:#fff">
@@ -87,36 +87,34 @@ input::placeholder{color:#8ba09e}
       </div>
     </div>
 
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
-      <sc-for list="{{ resumo }}" as="rs" hint-placeholder-count="4">
-        <div onClick="{{ rs.onClick }}" style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:15px 18px;cursor:pointer" style-hover="box-shadow:0 10px 24px rgba(9,61,68,.08)">
-          <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#5c706e"><span style="width:9px;height:9px;border-radius:99px;background:{{ rs.dot }};box-shadow:0 0 0 3px {{ rs.ring }}"></span>{{ rs.n }}</div>
-          <div style="font-size:28px;font-weight:800;margin-top:4px">{{ rs.v }}</div><div style="font-size:12px;color:#7c8f8d">{{ rs.sub }}</div>
-        </div>
-      </sc-for>
-    </div>
-
-    <div style="background:#fff;border:1px solid #e4eae8;border-radius:18px;padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-      <div style="background:#f7faf9;border:1px solid #e0e7e5;border-radius:11px;padding:0 13px;display:flex;gap:8px;align-items:center;width:380px">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#7c8f8d" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.6"></circle><line x1="10.5" y1="10.5" x2="13.5" y2="13.5"></line></svg>
-        <input value="{{ busca }}" onInput="{{ onBusca }}" data-tx-busca placeholder="Nome, CPF, CNPJ, placa, telefone ou RNTRC" style="border:none;outline:none;background:transparent;font-size:13.5px;padding:9px 0;flex:1">
-      </div>
-      <sc-for list="{{ tipos }}" as="tp" hint-placeholder-count="3"><span onClick="{{ tp.onClick }}" style="font-size:12.5px;font-weight:700;border-radius:99px;padding:6px 13px;cursor:pointer;border:1.5px solid {{ tp.bd }};background:{{ tp.bg }};color:{{ tp.c }}">{{ tp.n }}</span></sc-for>
-      <span style="width:1px;height:22px;background:#e4eae8;margin:0 4px"></span>
-      <sc-for list="{{ filtros }}" as="ft" hint-placeholder-count="4"><span onClick="{{ ft.onClick }}" data-tx-filtro="{{ ft.k }}" style="font-size:12.5px;font-weight:700;border-radius:99px;padding:6px 13px;cursor:pointer;border:1.5px solid {{ ft.bd }};background:{{ ft.bg }};color:{{ ft.c }}">{{ ft.n }}</span></sc-for>
-    </div>
-
     <div style="background:#fff;border:1px solid #e4eae8;border-radius:20px;overflow:hidden">
-      <div style="display:grid;grid-template-columns:{{ cols }};gap:12px;padding:12px 20px;background:#f7faf9;border-bottom:1px solid #eef2f1;font-size:11px;font-weight:800;letter-spacing:.7px;color:#7c8f8d">
-        <span>TRANSPORTADOR</span><span>DOCUMENTO</span><span>CONJUNTOS</span><span>DOCUMENTOS</span><span>VIAGENS</span><span>OCORRÊNCIAS</span><span>CONVITE</span>
+      <div style="display:flex;align-items:flex-end;gap:4px;padding:0 20px;border-bottom:1px solid #eef2f1;overflow-x:auto">
+        <sc-for list="{{ abas }}" as="ab" hint-placeholder-count="5">
+          <div onClick="{{ ab.onClick }}" data-tx-filtro="{{ ab.k }}" style="display:flex;align-items:center;gap:7px;padding:15px 12px 12px;font-size:13.5px;font-weight:{{ ab.fw }};color:{{ ab.c }};border-bottom:2.5px solid {{ ab.bd }};margin-bottom:-1px;cursor:pointer;white-space:nowrap" style-hover="color:#0b2224"><span style="display:{{ ab.dotD }};width:7px;height:7px;border-radius:99px;background:{{ ab.dot }}"></span>{{ ab.n }}<span style="display:{{ ab.qD }};font-family:'Spline Sans Mono',monospace;font-size:11px;font-weight:600;color:{{ ab.qC }};border:1px solid {{ ab.qBd }};border-radius:99px;padding:0 7px">{{ ab.q }}</span></div>
+        </sc-for>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:14px 20px;flex-wrap:wrap">
+        <div style="background:#f7faf9;border:1px solid #e0e7e5;border-radius:11px;padding:0 13px;display:flex;gap:8px;align-items:center;flex:1;min-width:240px;max-width:400px;height:38px">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#7c8f8d" stroke-width="1.6" stroke-linecap="round" style="flex:none"><circle cx="7" cy="7" r="4.6"></circle><line x1="10.5" y1="10.5" x2="13.5" y2="13.5"></line></svg>
+          <input value="{{ busca }}" onInput="{{ onBusca }}" data-tx-busca placeholder="Nome, CPF, CNPJ, placa, telefone ou RNTRC" style="border:none;outline:none;background:transparent;font-size:13.5px;flex:1;min-width:0">
+        </div>
+        <div style="display:flex;background:#f0f4f3;border-radius:11px;padding:3px;gap:2px">
+          <sc-for list="{{ tipos }}" as="tp" hint-placeholder-count="3"><span onClick="{{ tp.onClick }}" data-tx-tipo="{{ tp.k }}" style="font-size:12.5px;font-weight:700;border-radius:9px;padding:7px 14px;cursor:pointer;background:{{ tp.bg }};color:{{ tp.c }};box-shadow:{{ tp.sh }}">{{ tp.n }}</span></sc-for>
+        </div>
+        <span style="margin-left:auto;font-size:12.5px;color:#7c8f8d;font-family:'Spline Sans Mono',monospace">{{ contagem }}</span>
+      </div>
+      <sc-if value="{{ temDica }}" hint-placeholder-val="{{ false }}">
+        <div style="margin:0 20px 14px;padding:11px 14px;border-radius:13px;border:1px solid #e4eae8;border-left:3px solid {{ dicaCor }};font-size:12.5px;color:#3c4f4e;line-height:1.5">{{ dica }}</div>
+      </sc-if>
+      <div style="display:grid;grid-template-columns:{{ cols }};gap:12px;padding:12px 20px;background:#f7faf9;border-top:1px solid #eef2f1;border-bottom:1px solid #eef2f1;font-size:11px;font-weight:800;letter-spacing:.7px;color:#7c8f8d">
+        <span>TRANSPORTADOR</span><span>CONJUNTOS</span><span>DOCUMENTOS</span><span>VIAGENS</span><span>OCORRÊNCIAS</span><span>CONVITE</span>
       </div>
       <sc-for list="{{ linhas }}" as="r" hint-placeholder-count="8">
         <div data-tx-linha="{{ r.id }}" style="display:grid;grid-template-columns:{{ cols }};gap:12px;padding:12px 20px;border-bottom:1px solid #f0f4f3;align-items:center">
           <div onClick="{{ r.abrir }}" style="display:flex;align-items:center;gap:11px;cursor:pointer;min-width:0">
             <span style="width:38px;height:38px;border-radius:99px;flex:none;background:linear-gradient(135deg,{{ r.g1 }},{{ r.g2 }});color:#fff;font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #fff,0 0 0 4.5px {{ r.anel }}">{{ r.ini }}</span>
-            <div style="min-width:0"><div style="font-size:13.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.nome }}</div><div style="font-size:11.5px;color:#7c8f8d">{{ r.tipo }}</div></div>
+            <div style="min-width:0"><div style="font-size:13.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.nome }}</div><div style="font-size:11.5px;color:#7c8f8d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.tipo }}</div><div style="font-family:'Spline Sans Mono',monospace;font-size:11px;color:#5c706e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.doc }}  RNTRC {{ r.rntrc }}</div></div>
           </div>
-          <div style="font-family:'Spline Sans Mono',monospace;font-size:12px;color:#3c4f4e;line-height:1.5"><div>{{ r.doc }}</div><div style="color:#7c8f8d">RNTRC {{ r.rntrc }}</div></div>
           <div style="font-family:'Spline Sans Mono',monospace;font-size:12px;color:#3c4f4e;line-height:1.5">{{ r.placas }}</div>
           <div><div style="display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:{{ r.qc }}"><span style="width:8px;height:8px;border-radius:99px;background:{{ r.qdot }};box-shadow:0 0 0 3px {{ r.qring }}"></span>{{ r.qn }}</div><div style="font-size:11.5px;color:#7c8f8d;margin-top:1px">{{ r.qsub }}</div></div>
           <div style="font-size:12.5px"><b style="font-family:'Spline Sans Mono',monospace">{{ r.nv }}</b> <span style="color:#7c8f8d">{{ r.ultima }}</span></div>
@@ -338,14 +336,17 @@ class Component extends DCLogic {
     const tq = k => U.tom({ apto: 'ok', restricao: 'falta', pendente: 'falta', bloqueado: 'bloqueio' }[k]);
     const CV = { nao_convidado: ['não convidado', '#7c8f8d', '#e4eae8', 'Convidar'], enviado: ['convite enviado', '#0E78B5', '#cfe1ef', 'Reenviar'], aceito: ['aceito', '#1a8f57', '#cfe9dc', 'Revogar'], expirado: ['expirado', '#b97514', '#f3dfb8', 'Reenviar'], revogado: ['revogado', '#c43d3d', '#f1caca', 'Convidar de novo'] };
     const nTac = todos.filter(x => x.t.tipo === 'TAC').length, nEtc = todos.length - nTac;
-    const res = (n, v, sub, tm, f) => ({ n, v, sub, dot: tm.dot, ring: tm.ring, onClick: () => this.setState({ filtro: f, pag: 1 }) });
+    const ABAS = [['todos', 'Todos', null, false], ['docs', 'Documento a resolver', U.tom('falta'), true], ['revisao', 'Em revisão', U.tom('bloqueio'), true], ['convite', 'Convite pendente', U.tom('info'), true], ['dia', 'Em dia', U.tom('ok'), false]];
+    const DICA = { docs: 'Documento vencido ou vencendo em 15 dias. O aviso sai aos 60, 30 e 15 dias; abra o transportador para atualizar.', revisao: 'Transportador com ocorrência grave sem revisão: viagem assegurada fica suspensa até a Direção revisar.', convite: 'Convite enviado e ainda não aceito. O convite deixa o próprio transportador manter os documentos.' };
     return Object.assign({
       subtitulo: nTac + ' TACs e ' + nEtc + ' ETCs, base compartilhada entre as filiais. A qualificação do TAC é feita viagem a viagem.',
-      resumo: [res('Documento vencido ou vencendo em 15 dias', todos.filter(x => venc15.has(x.t.id) || x.q.k === 'pendente').length, 'avisos aos 60, 30 e 15 dias', U.tom('falta'), 'docs'), res('Em revisão após ocorrência', todos.filter(x => x.q.k === 'bloqueado').length, 'sem viagem assegurada até a revisão', U.tom('bloqueio'), 'revisao'), res('Documentos em dia', todos.filter(x => x.q.k === 'apto').length, 'prontos para a próxima viagem', U.tom('ok'), 'dia'), res('Convites pendentes', todos.filter(x => x.t.convite.estado === 'enviado').length, 'enviados e ainda não aceitos', U.tom('info'), 'convite')],
+      abas: ABAS.map(([k, n, tm, conta]) => { const on = s.filtro === k; const q = todos.filter(x => (s.tipo === 'todos' || x.t.tipo === s.tipo) && FILT[k](x)).length;
+        return { k, n, fw: on ? '800' : '600', c: on ? '#0b2224' : '#5c706e', bd: on ? '#127670' : 'transparent', dot: tm ? tm.dot : '', dotD: tm ? 'inline-block' : 'none', q, qD: conta && q ? 'inline-block' : 'none', qC: tm ? tm.c : '#5c706e', qBd: tm ? tm.bd : '#e4eae8', onClick: () => this.setState({ filtro: k, pag: 1 }) }; }),
       busca: s.busca, onBusca: e => this.setState({ busca: e.target.value, pag: 1 }),
-      tipos: [['todos', 'Todos'], ['TAC', 'TAC'], ['ETC', 'ETC']].map(([k, n]) => Object.assign({ n, onClick: () => this.setState({ tipo: k, pag: 1 }) }, U.chip(s.tipo === k))),
-      filtros: [['todos', 'Qualquer situação'], ['docs', 'Documento a resolver'], ['revisao', 'Em revisão'], ['dia', 'Em dia']].map(([k, n]) => Object.assign({ k, n, onClick: () => this.setState({ filtro: k, pag: 1 }) }, U.chip(s.filtro === k))),
-      cols: '1.3fr 150px 1.1fr 1fr 110px 110px 190px',
+      tipos: [['todos', 'Todos'], ['TAC', 'TAC'], ['ETC', 'ETC']].map(([k, n]) => { const on = s.tipo === k; return { k, n, bg: on ? '#fff' : 'transparent', c: on ? '#0b2224' : '#5c706e', sh: on ? '0 1px 3px rgba(9,61,68,.12)' : 'none', onClick: () => this.setState({ tipo: k, pag: 1 }) }; }),
+      contagem: lista.length === 1 ? '1 transportador' : lista.length + ' transportadores',
+      temDica: !!DICA[s.filtro], dica: DICA[s.filtro] || '', dicaCor: (ABAS.find(a => a[0] === s.filtro)[2] || U.tom('na')).c,
+      cols: 'minmax(0,1.7fr) minmax(0,1fr) minmax(0,1fr) 92px 100px 186px',
       linhas: s.loading ? [] : pg.itens.map(x => {
         const t = x.t, tm = tq(x.q.k), cv = CV[t.convite.estado];
         const ruins = x.q.docs.filter(d => d.estado !== 'ok');

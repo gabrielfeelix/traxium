@@ -59,3 +59,13 @@ Iniciada em 14/10/2026, a partir da seção 6 e 7 de `HANDOFF.md`. Uma etapa por
 4. O hero deixou de cortar os popovers.
 
 **Teste.** `e2e-f5.cjs` passa a clicar no botão de exportar da lista de apoio e cobre a exportação de ocorrências.
+
+## Etapa 4. Transportadores (14/10/2026)
+
+**Problema como usuário.** Quatro cartões de resumo filtravam a lista, e logo abaixo quatro chips de situação filtravam a mesma coisa. "Convites pendentes" só existia como cartão. A tabela tinha 7 colunas, com documento e RNTRC numa coluna à parte, e em 1366 px as colunas de convite ficavam fora da tela.
+
+**O que mudou.**
+
+1. Cartões e chips viraram abas da tabela: Todos, Documento a resolver, Em revisão, Convite pendente e Em dia. As três que pedem ação mostram contagem e uma linha de explicação. `?filtro=vencendo` continua abrindo em Documento a resolver.
+2. Tipo (Todos, TAC, ETC) virou um seletor segmentado ao lado da busca.
+3. Nome, tipo e documento com RNTRC ficam na mesma célula; tabela com 6 colunas; `min-width` em 1280 px.
