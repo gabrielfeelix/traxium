@@ -7,7 +7,7 @@
   'use strict';
 
   const HOJE = '2026-10-08';
-  const VERSAO_SEMENTE = 7;
+  const VERSAO_SEMENTE = 8;
   const CHAVE = 'tx-v2';
   const CHAVE_SESSAO = 'tx-v2-sessao';
   const DECLARACAO_CTE = 'O serviço fornecido é assegurado GMP+FSA';
@@ -389,7 +389,9 @@
     // ---------- hoje (08/10/2026)
     // Canônica 1: TAC liberada, pronta para assegurar.
     vs.push(V(Object.assign({ id: 'VG-3116', filial: 'SOR', data: HOJE, janela: '14:00', descarga: '2026-10-10', transportador: 't-josue', motorista: 'p-josue', conjunto: 'c-josue', produto: 'farelo-soja', peso: 37, embarcador: 'em-agrosorriso', destinatario: 'de-nutrimax', ordem: 'OC 48120',
-      t3: { 'QWM 4H57#C1': [C('2026-10-03', 'npk'), C('2026-09-24', 'milho'), C('2026-09-18', 'soja')], 'QWM 4H58#C1': [C('2026-10-03', 'npk'), C('2026-09-24', 'milho'), C('2026-09-18', 'soja')] },
+      t3: { 'QWM 4H57#C1': [C('2026-10-03', 'map'), C('2026-09-24', 'milho'), C('2026-09-18', 'soja')], 'QWM 4H58#C1': [C('2026-10-03', 'map'), C('2026-09-24', 'milho'), C('2026-09-18', 'soja')] },
+      // Frete de retorno com fosfato (regime B): lavagem com comprovante já anexado.
+      limpezas: [{ comp: 'QWM 4H57#C1', regime: 'B', lavador: 'f-trevo', comprovante: 'LPT 2210', em: HOJE + 'T06:40', por: 'u-diego' }, { comp: 'QWM 4H58#C1', regime: 'B', lavador: 'f-trevo', comprovante: 'LPT 2210', em: HOJE + 'T06:40', por: 'u-diego' }],
       criadaEm: '2026-10-07T17:30', criadaPor: 'u-diego' }, linkCompleto(HOJE, '07:12', { afretador: 'u-diego', gps: 'Agro Sorriso Armazéns, pátio 2', conf: 41 }))));
     // Canônica 2: frota própria liberada.
     vs.push(V(Object.assign({ id: 'VG-3117', filial: 'RON', data: HOJE, janela: '11:00', descarga: '2026-10-09', tipo: 'propria', transportador: 'propria', motorista: 'p-paulo', conjunto: 'c-p01', produto: 'farelo-soja', peso: 38, embarcador: 'em-planalto', destinatario: 'de-belavista', ordem: 'OC 48118',
@@ -400,7 +402,8 @@
       criadaEm: HOJE + 'T07:20', criadaPor: 'u-diego' }, linkCompleto(HOJE, '07:35', { afretador: 'u-diego', docs: true, gps: 'Coop. Vale do Teles Pires, fila externa' }))));
     // Em preenchimento pelo motorista.
     vs.push(V({ id: 'VG-3119', filial: 'SOR', data: HOJE, janela: '13:00', descarga: '2026-10-09', transportador: 't-valmir', motorista: 'p-valmir', conjunto: 'c-valmir', produto: 'casca-soja', peso: 34, embarcador: 'em-telespires', destinatario: 'de-santaclara', ordem: 'OC 48121',
-      t3: { 'QVT 1A91#C1': [C('2026-10-06', 'casca-soja'), C('2026-10-01', 'milho'), C('2026-09-25', 'soja')], 'QVT 1A92#C1': [C('2026-10-06', 'casca-soja'), C('2026-10-01', 'milho'), C('2026-09-25', 'soja')] },
+      // Voltou de frete de fosfato (regime B): a lavagem ainda não tem comprovante.
+      t3: { 'QVT 1A91#C1': [C('2026-10-06', 'map'), C('2026-10-01', 'milho'), C('2026-09-25', 'soja')], 'QVT 1A92#C1': [C('2026-10-06', 'map'), C('2026-10-01', 'milho'), C('2026-09-25', 'soja')] },
       link: { enviadoEm: HOJE + 'T08:40', abertoEm: HOJE + 'T09:05', cpfEm: HOJE + 'T09:06', t3Em: HOJE + 'T09:09' },
       checklist: { enviadoEm: null, itens: { lona: 'ok', correntes: 'ok' }, fotos: { lona: 1, correntes: 1 } }, criadaEm: HOJE + 'T08:30', criadaPor: 'u-diego' }));
     // Fotos a conferir.
