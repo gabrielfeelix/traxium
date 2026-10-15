@@ -1,6 +1,6 @@
 # Handoff: protótipo v2 construído, próxima etapa é lacunas e revisão de interface
 
-Atualizado em 14/10/2026. Ponto de entrada para quem continuar. Substitui a versão de 08/10/2026 deste arquivo. As regras visuais de `SaaS moderno estilo Dribbble/CLAUDE.md` e `SaaS moderno estilo Dribbble/HANDOFF.md` (v1) continuam valendo.
+Atualizado em 14/10/2026. Ponto de entrada para quem continuar. **A revisão de lacunas e interface pedida nesta data foi feita em sete etapas, uma por commit, e está registrada em `07-revisao-v2.md`: leia lá o que mudou depois das seções 6 e 7 abaixo.** A sidebar descrita na seção 4 virou flutuante, com grupos, Cadastros aberto e header fixo com busca global (etapa 7). Substitui a versão de 08/10/2026 deste arquivo. As regras visuais de `SaaS moderno estilo Dribbble/CLAUDE.md` e `SaaS moderno estilo Dribbble/HANDOFF.md` (v1) continuam valendo.
 
 ## 1. Situação
 
@@ -190,5 +190,6 @@ Leitura inicial, a validar com o Gabriel:
 | `03-diagnostico.md` | Veredito por tela do v1, perguntas ao Rafael, divergências com a diretriz |
 | `04-arquitetura-proposta.md` | Navegação v2, fluxos F1 a F6, modelo de dados |
 | `05-plano-de-construcao.md` | Premissas, telas, base comum, fases A a F e registro de execução |
+| `07-revisao-v2.md` | Revisão de 14/10/2026: lacunas fechadas e interface tela a tela, com premissas |
 | `06-analise-como-usuario.md` | Caminhada como afretador, motorista e qualidade |
 | `reports/Concorrentes e fluxos do Traxium.md` e `research_notes/` | Pesquisa de mercado (Quali-e, ATUA, padrões B2B, apps de campo, GMP+, EUDR) |

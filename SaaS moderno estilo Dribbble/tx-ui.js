@@ -51,6 +51,12 @@
       if (c.state.modal || c.state.modalTopo || c.state.drawer || c.state.nova) c.setState({ modal: null, modalTopo: null, drawer: null, nova: false });
       else c.setState(FECHAR_POPS);
     };
+    c._txBarra = ev => {
+      if (ev.key !== '/' || ev.ctrlKey || ev.metaKey) return;
+      const t = ev.target; if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      const el = document.querySelector('[data-tx-gbusca]'); if (el) { ev.preventDefault(); el.focus(); }
+    };
+    document.addEventListener('keydown', c._txBarra);
     document.addEventListener('mousedown', c._txFora);
     document.addEventListener('keydown', c._txEsc);
     c._txOff = TX.ouvir(v => c.setState({ txv: v }));
@@ -97,7 +103,7 @@
     const u = TX.sessao();
     const b = TX.badges(u);
     const cadAtiva = c.cadAtiva ? c.cadAtiva() : null;
-    const cadOpen = cadAtiva ? true : (s.cadOpen != null ? s.cadOpen : lerLS('tx-nav-cad', '0') === '1');
+    const cadOpen = cadAtiva ? true : (s.cadOpen != null ? s.cadOpen : lerLS('tx-nav-cad', '1') === '1');
     const sbc = {};
     ['produtos', 'manual', 'fornecedores', 'filiais'].forEach(k => {
       const on = cadAtiva === k;
@@ -149,9 +155,40 @@
         return Object.assign({}, p, { swBg: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#dde5e3', swPos: on ? '19.5px' : '2.5px',
           onClick: () => { if (p.lock) { avisar(c, 'O aviso de bloqueio técnico não desliga: é requisito da certificação.'); return; } c.setState({ prefsOn: Object.assign({}, prefsOn, { [p.k]: !prefsOn[p.k] }) }); } });
       }),
+      // busca global do header
+      gbQ: s.gbQ || '', gbBd: s.buscaOpen ? '#127670' : '#e0e7e5',
+      onGb: e => c.setState({ gbQ: e.target.value, buscaOpen: true }),
+      gbTecla: e => { if (e.key === 'Enter') { const g = buscaGlobal(e.target.value); const prim = g[0] && g[0].itens[0]; location.href = prim ? prim.href : 'Viagens v2.dc.html?periodo=tudo&q=' + encodeURIComponent(e.target.value); } },
+      gbAberta: !!s.buscaOpen && TX.norm(s.gbQ || '').length >= 2,
+      gbGrupos: s.buscaOpen ? buscaGlobal(s.gbQ || '') : [],
+      gbVazio: !!s.buscaOpen && buscaGlobal(s.gbQ || '').length === 0,
+      gbVazioTxt: 'Nada encontrado para "' + (s.gbQ || '') + '". A busca aceita ordem, CT-e, NF, placa, nome, CPF, RNTRC e produto.',
+      gbTodasRot: 'Buscar "' + (s.gbQ || '') + '" em todas as viagens', gbTodasHref: 'Viagens v2.dc.html?periodo=tudo&q=' + encodeURIComponent(s.gbQ || ''),
       toast: !!s.toast, toastMsg: s.toast || '',
       loading: !!s.loading
     };
+  }
+
+  // Busca global do header: viagem, placa e compartimento, transportador e produto, no escopo do usuário.
+  function buscaGlobal(texto) {
+    const q = TX.norm(texto), qd = TX.soDigitos(texto);
+    if (q.length < 2) return [];
+    const F = TX.fmt, u = TX.sessao();
+    const tem = (s, dig) => TX.norm(s).includes(q) || (qd.length >= 3 && dig && TX.soDigitos(s).includes(qd));
+    const grupos = [];
+    const vs = TX.db.viagens.filter(v => u.filiais.includes(v.filial)).filter(v => {
+      const conj = TX.conjunto(v.conjunto);
+      return tem([v.ordem, v.id].join(' '), true) || (v.cte && tem(v.cte.numero + ' ' + v.cte.nf, true)) || tem(TX.placasDoConjunto(conj).join(' ')) || tem(TX.pessoa(v.motorista).nome);
+    }).sort((a, b) => (b.data + b.janela).localeCompare(a.data + a.janela));
+    if (vs.length) grupos.push({ n: 'VIAGENS', total: vs.length, itens: vs.slice(0, 4).map(v => { const d = TX.decidir(v), tm = tomResultado(d); return { t: v.ordem + ', ' + TX.pessoa(v.motorista).nome, sub: TX.produto(v.produto).nome + ', ' + TX.filial(v.filial).nome + ', ' + F.curta(v.data) + ' ' + v.janela + (v.cte ? ', CT-e ' + v.cte.numero : ''), href: 'Viagem.dc.html?id=' + v.id, dot: tm.dot, tag: v.cancelada ? 'cancelada' : d.rotulo, tagC: tm.c }; }) });
+    const ts = TX.db.transportadores.filter(t => { const p = t.pessoa ? TX.pessoa(t.pessoa) : null; return tem(TX.nomeTransportador(t)) || tem([p && p.cpf, t.cnpj, t.rntrc && t.rntrc.numero].join(' '), true); });
+    if (ts.length) grupos.push({ n: 'TRANSPORTADORES', total: ts.length, itens: ts.slice(0, 3).map(t => ({ t: TX.nomeTransportador(t), sub: (t.tipo === 'TAC' ? 'TAC' : 'ETC') + (t.rntrc ? ', RNTRC ' + t.rntrc.numero : ''), href: 'Transportadores.dc.html?id=' + t.id, dot: TOM.info.dot, tag: '', tagC: '#5c706e' })) });
+    const comps = [];
+    TX.db.placas.filter(p => p.tipo === 'carreta' && tem(p.placa)).forEach(p => (p.comps || ['C1']).forEach(pos => comps.push({ placa: p.placa, pos, dono: p.dono })));
+    if (comps.length) grupos.push({ n: 'COMPARTIMENTOS', total: comps.length, itens: comps.slice(0, 3).map(c => { const h = TX.historico(c.placa, c.pos)[0]; const pr = h && h.produto ? TX.produto(h.produto) : null; return { t: c.placa + ' ' + c.pos, sub: 'última carga: ' + (pr ? pr.nome + ' em ' + F.data(h.data) : 'sem registro'), href: 'Compartimento v2.dc.html?placa=' + encodeURIComponent(c.placa) + '&pos=' + c.pos, dot: TOM.na.dot, tag: c.dono === 'propria' ? 'frota própria' : '', tagC: '#5c706e' }; }) });
+    const ps = TX.buscarProdutos(texto, 3);
+    if (ps.length) grupos.push({ n: 'PRODUTOS', total: ps.length, itens: ps.map(x => { const p = x.produto || x; return { t: p.nome, sub: 'regime ' + p.regime + (p.racao ? ', pode ser ração' : ', não é ração'), href: 'Cadastros.dc.html?aba=produtos&q=' + encodeURIComponent(p.nome), dot: p.regime === 'X' ? TOM.bloqueio.dot : TOM.ok.dot, tag: '', tagC: '#5c706e' }; }) });
+    return grupos;
   }
 
   // Paginação padrão: 25 por página, total visível.
@@ -186,5 +223,5 @@
   }
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 
-  window.TX.ui = { tom, tomResultado, TOM, param, lerLS, gravarLS, copiar, montar, avisar, sel, chip, cta, ctaPerigo, base, paginar, exportarDocumento, esc };
+  window.TX.ui = { buscaGlobal, tom, tomResultado, TOM, param, lerLS, gravarLS, copiar, montar, avisar, sel, chip, cta, ctaPerigo, base, paginar, exportarDocumento, esc };
 })();

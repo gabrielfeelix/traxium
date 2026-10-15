@@ -53,8 +53,8 @@ export const RODAPE = [
   { k: 'anterior', n: 'Versão anterior', href: 'versao-anterior.html' }
 ];
 
-const ESTILO_ATIVO = 'display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px;background:linear-gradient(90deg,rgba(26,158,147,.35),rgba(14,120,181,.28));border:1px solid rgba(255,255,255,.14);font-size:14px;font-weight:700;color:#fff';
-const ESTILO_ITEM = 'display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px';
+const ESTILO_ATIVO = 'display:flex;align-items:center;gap:11px;padding:8px 12px;border-radius:11px;background:linear-gradient(90deg,rgba(26,158,147,.35),rgba(14,120,181,.28));border:1px solid rgba(255,255,255,.14);font-size:14px;font-weight:700;color:#fff';
+const ESTILO_ITEM = 'display:flex;align-items:center;gap:11px;padding:8px 12px;border-radius:11px;border:1px solid transparent;color:rgba(255,255,255,.66);font-size:14px';
 const HOVER = 'style-hover="background:rgba(255,255,255,.07);color:#fff"';
 
 function item(def, ativo, detalhe) {
@@ -68,39 +68,29 @@ function item(def, ativo, detalhe) {
   return `<a href="${def.href}"${alvo} title="${def.tip || def.n}" style="${estilo}" ${on ? '' : HOVER}>${miolo}</a>`;
 }
 
-export function sidebar(ativo, detalhe) {
-  const cadOn = ativo === 'cadastros';
-  const subs = CADASTROS.map(s => `<a href="Cadastros.dc.html?aba=${s.k}" data-tx-sub="${s.k}" style="display:flex;align-items:center;gap:10px;padding:7px 12px 7px 39px;border-radius:9px;font-size:13px;font-weight:{{ sbc.${s.k}.fw }};color:{{ sbc.${s.k}.c }};background:{{ sbc.${s.k}.bg }}" style-hover="color:#fff;background:rgba(255,255,255,.06)"><span style="width:5px;height:5px;border-radius:99px;background:{{ sbc.${s.k}.dot }};flex:none"></span>${s.n}</a>`).join('\n          ');
-  return `
-  <div data-tx-sidebar style="width:{{ navW }};flex:none;background:linear-gradient(178deg,#093D44,#0A4650);color:#fff;display:flex;flex-direction:column;padding:22px {{ navPad }};position:sticky;top:0;height:100vh;transition:width .25s ease;overflow-x:hidden;overflow-y:auto;z-index:20">
-    <a href="Hoje.dc.html" title="Traxium: ir para Hoje" style="display:flex;align-items:center;gap:10px;padding:4px 8px 20px;color:#fff">
-      <svg width="34" height="34" viewBox="0 0 32 32" style="flex:none"><defs><linearGradient id="txLogo" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1a9e93"></stop><stop offset="1" stop-color="#0E78B5"></stop></linearGradient></defs><polygon points="16,2.5 27.5,9 27.5,23 16,29.5 4.5,23 4.5,9" fill="url(#txLogo)"></polygon><polyline points="9,20 13,13 18,17 23,10" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></polyline><circle cx="9" cy="20" r="1.6" fill="#fff"></circle><circle cx="13" cy="13" r="1.6" fill="#fff"></circle><circle cx="18" cy="17" r="1.6" fill="#fff"></circle><circle cx="23" cy="10" r="1.6" fill="#fff"></circle></svg>
-      <div style="display:{{ navL }}"><div style="font-weight:800;font-size:17px;letter-spacing:.2px">Traxium</div><div style="font-size:10.5px;letter-spacing:1.6px;color:rgba(255,255,255,.5);text-transform:uppercase;white-space:nowrap">{{ tenantNome }}</div></div>
-    </a>
-    <div style="display:flex;flex-direction:column;gap:3px">
-      ${PRINCIPAIS.map(d => item(d, ativo, detalhe)).join('\n      ')}
-    </div>
-    <div style="margin-top:14px;display:flex;flex-direction:column;gap:2px">
-      <div onClick="{{ cadToggle }}" title="Cadastros" style="${cadOn ? ESTILO_ATIVO : ESTILO_ITEM};cursor:pointer" ${cadOn ? '' : HOVER}>${I.cadastros}<span data-tx-item="cadastros" style="display:{{ navL }};white-space:nowrap">Cadastros</span><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto;display:{{ navL }};transform:{{ cadChev }};transition:transform .2s;opacity:.7"><path d="M4.5 2.5 8 6l-3.5 3.5"></path></svg></div>
-      <sc-if value="{{ cadOpen }}" hint-placeholder-val="{{ false }}">
-        <div style="display:flex;flex-direction:column;gap:1px;margin-top:2px">
-          ${subs}
+// Header fixo: busca global (viagem, placa, CT-e, transportador, produto) e o menu da pessoa.
+const HEADER = `<div data-tx-header style="position:fixed;top:0;left:{{ navW }};right:0;height:72px;z-index:35;display:flex;align-items:center;gap:14px;padding:0 32px 0 20px;background:linear-gradient(180deg,rgba(242,245,244,.97),rgba(242,245,244,.86));backdrop-filter:blur(10px);transition:left .25s ease">
+    <div data-tx-pop style="position:relative;flex:1;max-width:560px">
+      <div style="display:flex;align-items:center;gap:10px;height:44px;padding:0 14px;background:#fff;border:1px solid {{ gbBd }};border-radius:14px;box-shadow:0 2px 10px rgba(9,61,68,.04)">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#7c8f8d" stroke-width="1.6" stroke-linecap="round" style="flex:none"><circle cx="7" cy="7" r="4.6"></circle><line x1="10.5" y1="10.5" x2="13.5" y2="13.5"></line></svg>
+        <input value="{{ gbQ }}" onInput="{{ onGb }}" onKeyDown="{{ gbTecla }}" data-tx-gbusca placeholder="Buscar viagem, placa, CT-e, NF, transportador ou produto" style="border:none;outline:none;background:transparent;font-size:14px;flex:1;min-width:0">
+        <span title="Atalho: tecla barra" style="font-family:'Spline Sans Mono',monospace;font-size:11px;color:#7c8f8d;border:1px solid #e0e7e5;border-radius:6px;padding:1px 7px">/</span>
+      </div>
+      <sc-if value="{{ gbAberta }}" hint-placeholder-val="{{ false }}">
+        <div data-tx-gb-resultados style="position:absolute;left:0;right:0;top:52px;background:#fff;border:1px solid #e4eae8;border-radius:16px;box-shadow:0 18px 44px rgba(9,61,68,.18);padding:8px;z-index:90;max-height:70vh;overflow:auto">
+          <sc-for list="{{ gbGrupos }}" as="gg" hint-placeholder-count="2">
+            <div style="font-size:10.5px;font-weight:800;letter-spacing:.8px;color:#7c8f8d;padding:8px 10px 4px">{{ gg.n }}</div>
+            <sc-for list="{{ gg.itens }}" as="gi" hint-placeholder-count="3">
+              <a href="{{ gi.href }}" data-tx-gb-item style="display:flex;align-items:center;gap:11px;padding:8px 10px;border-radius:10px;color:inherit" style-hover="background:#f6f9f8"><span style="width:8px;height:8px;border-radius:99px;background:{{ gi.dot }};flex:none"></span><div style="min-width:0;flex:1"><div style="font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ gi.t }}</div><div style="font-size:11.5px;color:#5c706e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ gi.sub }}</div></div><span style="font-size:11.5px;font-weight:700;color:{{ gi.tagC }};white-space:nowrap">{{ gi.tag }}</span></a>
+            </sc-for>
+          </sc-for>
+          <sc-if value="{{ gbVazio }}" hint-placeholder-val="{{ false }}"><div style="padding:14px 10px;font-size:13px;color:#5c706e">{{ gbVazioTxt }}</div></sc-if>
+          <a href="{{ gbTodasHref }}" style="display:block;margin-top:4px;border-top:1px solid #f0f4f3;padding:10px 10px 4px;font-size:12.5px;font-weight:800">{{ gbTodasRot }} →</a>
         </div>
       </sc-if>
     </div>
-    <div style="margin-top:auto;padding-top:18px;display:flex;flex-direction:column;gap:2px">
-      ${RODAPE.map(d => item(d, ativo, detalhe)).join('\n      ')}
-      <div onClick="{{ navToggle }}" title="Recolher ou expandir o menu" style="display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;cursor:pointer;font-size:13px;font-weight:600;color:rgba(255,255,255,.55)" style-hover="background:rgba(255,255,255,.08);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="transform:{{ navFlip }};transition:transform .25s;flex:none"><path d="M9.5 3 4.5 8l5 5"></path><line x1="12" y1="3" x2="12" y2="13"></line></svg><span style="display:{{ navL }};white-space:nowrap">Recolher menu</span></div>
-      <div style="display:{{ navL }};margin-top:10px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);padding:12px 14px">
-        <div style="font-size:11.5px;color:rgba(255,255,255,.5)">Base IDTF mantida pela Traxium</div>
-        <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;margin-top:5px"><span style="width:8px;height:8px;border-radius:99px;background:#3ddc97;box-shadow:0 0 0 4px rgba(61,220,151,.18)"></span>{{ baseVersao }} vigente</div>
-      </div>
-    </div>
-  </div>
-  `;
-}
-
-export const PERFIL = `
+    <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
+      <div style="text-align:right;line-height:1.25"><div style="font-size:13px;font-weight:800">{{ uNome }}</div><div style="font-size:11.5px;color:#5c706e">{{ uCargo }}</div></div>
         <div data-tx-pop style="position:relative">
           <div onClick="{{ onPerfil }}" title="{{ uNome }}" data-tx-avatar style="width:38px;height:38px;border-radius:99px;background:linear-gradient(135deg,{{ uG1 }},{{ uG2 }});color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13.5px;box-shadow:0 0 0 3px #fff,0 0 0 4.5px #d8e4e2;cursor:pointer" style-hover="box-shadow:0 0 0 3px #fff,0 0 0 4.5px #127670">{{ uIni }}</div>
           <sc-if value="{{ perfilOpen }}" hint-placeholder-val="{{ false }}">
@@ -117,7 +107,56 @@ export const PERFIL = `
             </div>
           </sc-if>
         </div>
-`;
+    </div>
+  </div>`;
+
+const GRUPO = (n) => `<div style="display:{{ navL }};font-size:10px;font-weight:800;letter-spacing:1.4px;color:rgba(255,255,255,.4);padding:10px 12px 3px;text-transform:uppercase">${n}</div><div style="display:{{ navSec }};height:1px;background:rgba(255,255,255,.1);margin:12px 10px 8px"></div>`;
+
+// Sidebar flutuante e arredondada (referência: Autofluxos), com os itens em grupos.
+// Cadastros é a única área que abre outras telas: acordeão, aberto por padrão.
+export function sidebar(ativo, detalhe) {
+  const cadOn = ativo === 'cadastros';
+  const subs = CADASTROS.map(s => `<a href="Cadastros.dc.html?aba=${s.k}" data-tx-sub="${s.k}" style="display:flex;align-items:center;gap:10px;padding:5px 12px 5px 39px;border-radius:9px;font-size:13px;font-weight:{{ sbc.${s.k}.fw }};color:{{ sbc.${s.k}.c }};background:{{ sbc.${s.k}.bg }}" style-hover="color:#fff;background:rgba(255,255,255,.06)"><span style="width:5px;height:5px;border-radius:99px;background:{{ sbc.${s.k}.dot }};flex:none"></span>${s.n}</a>`).join('\n            ');
+  const P = k => item(PRINCIPAIS.find(d => d.k === k), ativo, detalhe);
+  return `
+  <div data-tx-sidebar style="width:{{ navW }};flex:none;padding:12px 0 12px 12px;position:sticky;top:0;height:100vh;transition:width .25s ease;z-index:40">
+    <div style="height:100%;border-radius:22px;background:radial-gradient(120% 55% at 0% 0%,rgba(26,158,147,.42),transparent 62%),radial-gradient(110% 45% at 100% 100%,rgba(14,120,181,.34),transparent 64%),linear-gradient(178deg,#093D44,#0A4650);box-shadow:0 18px 44px rgba(9,61,68,.22),inset 0 1px 0 rgba(255,255,255,.08);color:#fff;display:flex;flex-direction:column;padding:18px {{ navPad }};overflow-x:hidden;overflow-y:auto">
+      <a href="Hoje.dc.html" title="Traxium: ir para Hoje" style="display:flex;align-items:center;gap:10px;padding:2px 6px 4px;color:#fff">
+        <svg width="34" height="34" viewBox="0 0 32 32" style="flex:none"><defs><linearGradient id="txLogo" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1a9e93"></stop><stop offset="1" stop-color="#0E78B5"></stop></linearGradient></defs><polygon points="16,2.5 27.5,9 27.5,23 16,29.5 4.5,23 4.5,9" fill="url(#txLogo)"></polygon><polyline points="9,20 13,13 18,17 23,10" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></polyline><circle cx="9" cy="20" r="1.6" fill="#fff"></circle><circle cx="13" cy="13" r="1.6" fill="#fff"></circle><circle cx="18" cy="17" r="1.6" fill="#fff"></circle><circle cx="23" cy="10" r="1.6" fill="#fff"></circle></svg>
+        <div style="display:{{ navL }}"><div style="font-weight:800;font-size:17px;letter-spacing:.2px">Traxium</div><div style="font-size:10.5px;letter-spacing:1.6px;color:rgba(255,255,255,.5);text-transform:uppercase;white-space:nowrap">{{ tenantNome }}</div></div>
+      </a>
+      ${GRUPO('Operação')}
+      <div style="display:flex;flex-direction:column;gap:3px">
+        ${P('hoje')}
+        ${P('viagens')}
+      </div>
+      ${GRUPO('Quem transporta')}
+      <div style="display:flex;flex-direction:column;gap:3px">
+        ${P('transportadores')}
+        ${P('frota')}
+      </div>
+      ${GRUPO('Qualidade')}
+      <div style="display:flex;flex-direction:column;gap:3px">
+        ${P('auditoria')}
+        <div onClick="{{ cadToggle }}" title="Cadastros" style="${cadOn ? ESTILO_ATIVO : ESTILO_ITEM};cursor:pointer" ${cadOn ? '' : HOVER}>${I.cadastros}<span data-tx-item="cadastros" style="display:{{ navL }};white-space:nowrap">Cadastros</span><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto;display:{{ navL }};transform:{{ cadChev }};transition:transform .2s;opacity:.7"><path d="M4.5 2.5 8 6l-3.5 3.5"></path></svg></div>
+        <sc-if value="{{ cadOpen }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;gap:1px">
+            ${subs}
+          </div>
+        </sc-if>
+      </div>
+      <div style="margin-top:auto;padding-top:12px;display:flex;flex-direction:column;gap:1px">
+        ${RODAPE.map(d => item(d, ativo, detalhe)).join('\n        ')}
+        <div title="Base IDTF mantida pela Traxium" style="display:{{ navL }};margin-top:8px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);padding:8px 12px;font-size:12px;color:rgba(255,255,255,.7);white-space:nowrap"><span style="display:inline-block;width:7px;height:7px;border-radius:99px;background:#3ddc97;box-shadow:0 0 0 3px rgba(61,220,151,.18);margin-right:8px"></span>Base IDTF {{ baseVersao }} vigente</div>
+        <div onClick="{{ navToggle }}" title="Recolher ou expandir o menu" style="display:flex;align-items:center;gap:11px;padding:8px 12px;margin-top:4px;border-radius:11px;cursor:pointer;font-size:13px;font-weight:600;color:rgba(255,255,255,.55)" style-hover="background:rgba(255,255,255,.08);color:#fff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="transform:{{ navFlip }};transition:transform .25s;flex:none"><path d="M9.5 3 4.5 8l5 5"></path><line x1="12" y1="3" x2="12" y2="13"></line></svg><span style="display:{{ navL }};white-space:nowrap">Recolher menu</span></div>
+      </div>
+    </div>
+  </div>
+  ${HEADER}
+  `;
+}
+
+export const PERFIL = ``;
 
 const FECHAR = (acao) => `<span onClick="{{ ${acao} }}" title="Fechar" style="margin-left:auto;width:32px;height:32px;border-radius:99px;background:#f0f4f3;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;flex:none" style-hover="background:#e4ebe9">✕</span>`;
 const OVERLAY = (acao) => `<div onClick="{{ ${acao} }}" style="position:fixed;inset:0;background:rgba(9,34,36,.45);backdrop-filter:blur(3px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:32px">`;

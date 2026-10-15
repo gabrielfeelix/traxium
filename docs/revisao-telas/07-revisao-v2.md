@@ -93,3 +93,22 @@ Iniciada em 14/10/2026, a partir da seção 6 e 7 de `HANDOFF.md`. Uma etapa por
 2. A lista ficou em dois grupos com título e contagem: No escopo GMP+ e Fora do escopo.
 3. Documento da frota vencendo em 30 dias aparece numa faixa âmbar só quando existe; sem vencimento, o subtítulo diz isso.
 4. Colunas do cartão do conjunto rebalanceadas para 1366 px; compartimento sem quebrar linha; `min-width` em 1280 px.
+
+## Etapa 7. Moldura: sidebar, header fixo e busca global (14/10/2026)
+
+**Referência.** O Autofluxos (`~/dev/4yu-apps/autofluxos-ux`) foi avaliado, não copiado. De lá vieram os rótulos de grupo na navegação, o header fixo e a sidebar retrátil. A sidebar de lá é clara e com borda; a do Traxium manteve o teal e o item ativo em degradê, agora flutuante e arredondada, com brilho radial no fundo.
+
+**O que mudou (tudo gerado por `scripts/gerar-sidebar.mjs`).**
+
+1. Sidebar flutuante (margem de 12 px, raio de 22 px, sombra), com três grupos: Operação (Hoje, Viagens), Quem transporta (Transportadores, Frota própria) e Qualidade (Auditoria, Cadastros). Recolhida, vira coluna de ícones com divisórias no lugar dos rótulos.
+2. Cadastros continua acordeão, porque é a única área central que abre outras telas, e agora começa aberto (lacuna 4). Quem recolher fica com a escolha salva no navegador.
+3. Header fixo em todas as telas com sidebar: busca global à esquerda, nome, papel e avatar à direita. O avatar saiu do título de cada tela; o bloco `TX:PERFIL` ficou vazio e continua marcado.
+4. Busca global (lacuna 3): viagens (ordem, código, CT-e, NF, placa, motorista), transportadores (nome, CPF, CNPJ, RNTRC), compartimentos (placa da carreta, com a última carga) e produtos (nome e sinônimos, abre Cadastros já filtrado por `?q=`). Atalho "/", Esc fecha, Enter abre o primeiro resultado ou, sem resultado, Viagens com o termo em todo o período.
+5. Base IDTF reduzida a uma linha no rodapé da sidebar; espaçamentos apertados para caber em 768 px de altura.
+6. Conteúdo das 9 telas com 92 px no topo para o header; `min-width` em 1280 px em todas (Compartimento, Cadastros e Configurações eram as que faltavam).
+
+## Situação ao fim de 14/10/2026
+
+- Lacunas 1 a 4 do handoff fechadas: ocorrências exportáveis (etapa 3), fila de assinatura (etapa 2), entradas para o que virou seção (visões em Viagens na etapa 1 e busca global na etapa 7), Cadastros visível (etapa 7). A lacuna 5 continua dependendo do Gabriel e do Rafael.
+- Revisão de interface feita em Viagens, Hoje, Auditoria, Transportadores, Viagem e Frota. Não revistas uma a uma: Compartimento, Cadastros, Configurações e Link da Viagem; ganharam só a moldura nova e o `min-width`.
+- Nada publicado na Vercel e nada enviado ao GitHub nesta rodada.
