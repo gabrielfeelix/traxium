@@ -250,6 +250,16 @@ Revisto em 1366 px com a Lima Logística (ETC em revisão) e o João (TAC). A or
 3. "2 compartimento(s); toque na carreta" virou "2 compartimentos. Clique na carreta para ver o histórico de cargas."
 4. Rótulo de validade neutro em todas as telas: "vale até 15/09/2028" no lugar de "válido até", que ficava errado com CNH e licença.
 
+### Item 6. Busca local e busca global
+
+**Decisão.** A busca local fica em Hoje, Viagens e Transportadores. Ela faz outra coisa: filtra a lista que está na tela e respeita a filial, a visão e o período escolhidos. A global, no header, procura em tudo e salta para um item. A diferença passa a estar no verbo: o header diz "Buscar", a lista diz "Filtrar".
+
+**O que mudou.** Hoje: "Filtrar esta mesa" (com dica no `title`: placa, ordem ou motorista); a versão longa cortava em 1366 px. Viagens: "Filtrar a lista: placa, CT-e, NF, ordem ou motorista" (o RNTRC continua filtrando; saiu do texto para caber). Transportadores: "Filtrar: nome, CPF, CNPJ, placa ou RNTRC".
+
+| Premissa | O que muda se a resposta vier diferente |
+| --- | --- |
+| Quem está numa lista quer estreitar a lista, não sair dela | Se a busca local confundir em teste com usuário, tirá-la e deixar o header filtrar a lista da tela atual |
+
 ## Situação ao fim de 14/10/2026
 
 - Lacunas 1 a 4 do handoff fechadas: ocorrências exportáveis (etapa 3), fila de assinatura (etapa 2), entradas para o que virou seção (visões em Viagens na etapa 1 e busca global na etapa 7), Cadastros visível (etapa 7). A lacuna 5 continua dependendo do Gabriel e do Rafael.

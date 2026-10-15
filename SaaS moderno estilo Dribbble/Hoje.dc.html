@@ -110,7 +110,7 @@ input::placeholder{color:#8ba09e}
       <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
         <div style="background:#fff;border:1px solid #e0e7e5;border-radius:11px;padding:0 14px;display:flex;gap:8px;align-items:center">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#7c8f8d" stroke-width="1.6" stroke-linecap="round"><circle cx="7" cy="7" r="4.6"></circle><line x1="10.5" y1="10.5" x2="13.5" y2="13.5"></line></svg>
-          <input value="{{ busca }}" onInput="{{ onBusca }}" data-tx-busca placeholder="Placa, ordem, motorista…" style="border:none;outline:none;background:transparent;font-size:13.5px;padding:10px 0;width:210px">
+          <input value="{{ busca }}" onInput="{{ onBusca }}" data-tx-busca placeholder="Filtrar esta mesa" title="Filtra só as viagens desta mesa: placa, ordem ou motorista" style="border:none;outline:none;background:transparent;font-size:13.5px;padding:10px 0;width:210px">
         </div>
         <sc-if value="{{ temFiliais }}" hint-placeholder-val="{{ false }}">
           <div data-tx-pop style="position:relative">

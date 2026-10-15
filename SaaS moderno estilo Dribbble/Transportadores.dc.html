@@ -123,7 +123,7 @@ input::placeholder{color:#8ba09e}
       <div style="display:flex;align-items:center;gap:10px;padding:14px 20px;flex-wrap:wrap">
         <div style="background:#f7faf9;border:1px solid #e0e7e5;border-radius:11px;padding:0 13px;display:flex;gap:8px;align-items:center;flex:1;min-width:240px;max-width:400px;height:38px">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#7c8f8d" stroke-width="1.6" stroke-linecap="round" style="flex:none"><circle cx="7" cy="7" r="4.6"></circle><line x1="10.5" y1="10.5" x2="13.5" y2="13.5"></line></svg>
-          <input value="{{ busca }}" onInput="{{ onBusca }}" data-tx-busca placeholder="Nome, CPF, CNPJ, placa, telefone ou RNTRC" style="border:none;outline:none;background:transparent;font-size:13.5px;flex:1;min-width:0">
+          <input value="{{ busca }}" onInput="{{ onBusca }}" data-tx-busca placeholder="Filtrar: nome, CPF, CNPJ, placa ou RNTRC" style="border:none;outline:none;background:transparent;font-size:13.5px;flex:1;min-width:0">
         </div>
         <div style="display:flex;background:#f0f4f3;border-radius:11px;padding:3px;gap:2px">
           <sc-for list="{{ tipos }}" as="tp" hint-placeholder-count="3"><span onClick="{{ tp.onClick }}" data-tx-tipo="{{ tp.k }}" style="font-size:12.5px;font-weight:700;border-radius:9px;padding:7px 14px;cursor:pointer;background:{{ tp.bg }};color:{{ tp.c }};box-shadow:{{ tp.sh }}">{{ tp.n }}</span></sc-for>
