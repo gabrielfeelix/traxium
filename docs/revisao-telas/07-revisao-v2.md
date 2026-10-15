@@ -300,6 +300,19 @@ A viagem pronta por liberação assinada aparecia com quatro nomes: "Pronta por 
 
 Também: o subtítulo do topo da viagem liberada dizia "as N checagens aplicáveis passaram", o que não é verdade com uma regra liberada; agora diz que está pronta com a liberação assinada e que o motor continua reprovando a regra. Em Viagens, a segunda linha da situação, que repetia "liberada por autoridade", passou a dizer qual regra foi liberada.
 
+### Item 12. Revisão de texto
+
+Texto renderizado de oito telas que o afretador usa (Hoje de Sorriso, Viagens, quatro viagens em situações diferentes, Transportadores e um drawer), lido com Diego na sessão, atrás de frase acima de 170 caracteres e de termo técnico. Nenhuma frase longa. Os termos que aparecem são os do trabalho do afretador: "OC" é a ordem de carregamento dele, "gatekeeper" é o protocolo GMP+ que a filial usa, "regime" vem com o nome por extenso ("regime B (água)"). Mudou uma coisa: o chip de identificação da viagem usava a cobertura como rótulo do código interno ("TAC SOB GATEKEEPER  VG-3113"), o que fazia a cobertura parecer o código. Passou a "Código VG-3113"; a cobertura continua no cartão do transportador.
+
+Ao longo dos itens 1 a 11 a varredura rodou a cada mudança e ficou limpa; os textos corrigidos no caminho estão registrados em cada item (sigla em minúsculas no título do bloqueio, "válido" com CNH, "compartimento(s)", "toque" em tela de escritório, os quatro nomes da viagem liberada).
+
+## Situação ao fim de 15/10/2026
+
+- As quatro telas que faltavam foram revistas (etapas 8 a 11): Cadastros, Configurações, Compartimento e Link da Viagem. Com isso, as dez telas do v2 passaram pela revisão de interface.
+- Os doze itens do pente fino da seção 7 do HANDOFF foram resolvidos, um commit por item. Achados no caminho, todos corrigidos: separador da sidebar invertido, 31/02 aceito como data, sigla em minúsculas no título do bloqueio, rótulo de validade com gênero errado, ocorrência repetida no drawer, convite aceito com "Enviar convite".
+- Testes: `e2e-revisao.cjs` novo cobre os fluxos das duas rodadas; `varrer-texto.cjs` passou de 44 para 61 estados; `testar-tx-dados.mjs` tem 674 conferências. Semente na versão 10.
+- Nada publicado na Vercel e nada enviado ao GitHub.
+
 ## Situação ao fim de 14/10/2026
 
 - Lacunas 1 a 4 do handoff fechadas: ocorrências exportáveis (etapa 3), fila de assinatura (etapa 2), entradas para o que virou seção (visões em Viagens na etapa 1 e busca global na etapa 7), Cadastros visível (etapa 7). A lacuna 5 continua dependendo do Gabriel e do Rafael.

@@ -860,7 +860,7 @@ class Component extends DCLogic {
       vOrdem: v.ordem || v.id, vTitulo: prod.nome + ', ' + F.peso(v.peso),
       resK: dec.resultado, resRotulo: dec.rotulo, resDot: tom.dot, resRing: tom.ring, resC: tom.c, resBd: tom.bd,
       cicloN: cic.n, cicloSub: cic.sub || '', embNome: emb.nome, embCidade: emb.cidade, destNome: dest.nome, destCidade: dest.cidade,
-      ids: [{ l: 'Ordem', v: v.ordem, c: '#0b2224' }, { l: 'CT-e', v: v.cte ? v.cte.numero : 'a conciliar', c: v.cte ? '#0b2224' : '#b97514' }, { l: 'NF', v: v.cte ? v.cte.nf : 'a conciliar', c: v.cte ? '#0b2224' : '#b97514' }, { l: 'Filial', v: fil.nome, c: '#0b2224' }, { l: cobTxt, v: v.id, c: '#5c706e' }],
+      ids: [{ l: 'Ordem', v: v.ordem, c: '#0b2224' }, { l: 'CT-e', v: v.cte ? v.cte.numero : 'a conciliar', c: v.cte ? '#0b2224' : '#b97514' }, { l: 'NF', v: v.cte ? v.cte.nf : 'a conciliar', c: v.cte ? '#0b2224' : '#b97514' }, { l: 'Filial', v: fil.nome, c: '#0b2224' }, { l: 'Código', v: v.id, c: '#5c706e' }],
       placasTxt: TX.placasDoConjunto(conj).join('  '),
       heroPronta: dec.resultado === 'pronta', heroFalta: dec.resultado === 'falta', heroBloq: dec.resultado === 'bloqueada', heroTec: dec.resultado === 'tecnico', heroNeutro: dec.resultado === 'nao_assegurada' || dec.resultado === 'cancelada',
       heroTitulo, heroSub, declaracao: TX.DECLARACAO_CTE,
