@@ -60,6 +60,16 @@
     document.addEventListener('mousedown', c._txFora);
     document.addEventListener('keydown', c._txEsc);
     c._txOff = TX.ouvir(v => c.setState({ txv: v }));
+    // Abaixo de 1280 px a página rola de lado; o header fixo acompanha, alinhado ao conteúdo.
+    c._txHeader = () => {
+      const h = document.querySelector('[data-tx-header]'); if (!h) return;
+      const sobra = Math.max(0, document.documentElement.scrollWidth - window.innerWidth);
+      h.style.right = sobra ? -sobra + 'px' : '0';
+      h.style.transform = window.scrollX ? 'translateX(' + -window.scrollX + 'px)' : 'none';
+    };
+    window.addEventListener('scroll', c._txHeader, { passive: true });
+    window.addEventListener('resize', c._txHeader);
+    setTimeout(c._txHeader, 0);
     if (o.semCarregar) c.setState({ loading: false });
     else setTimeout(() => c.setState({ loading: false }), o.atraso || 650);
   }

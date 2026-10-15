@@ -260,6 +260,12 @@ Revisto em 1366 px com a Lima Logística (ETC em revisão) e o João (TAC). A or
 | --- | --- |
 | Quem está numa lista quer estreitar a lista, não sair dela | Se a busca local confundir em teste com usuário, tirá-la e deixar o header filtrar a lista da tela atual |
 
+### Item 7. Header fixo abaixo de 1280 px
+
+**Problema.** Abaixo de 1280 px a página rola de lado (o wrapper tem `min-width:1280px`), mas o header é `position:fixed` e ficava parado: rolando 80 px, a busca e o avatar se desalinhavam do título e da tabela.
+
+**O que mudou.** `TX.ui.montar` acompanha a rolagem lateral: o header se estende até a borda direita do conteúdo e anda junto com ele (`translateX`). Em 1280 px ou mais nada muda, porque não há rolagem lateral.
+
 ## Situação ao fim de 14/10/2026
 
 - Lacunas 1 a 4 do handoff fechadas: ocorrências exportáveis (etapa 3), fila de assinatura (etapa 2), entradas para o que virou seção (visões em Viagens na etapa 1 e busca global na etapa 7), Cadastros visível (etapa 7). A lacuna 5 continua dependendo do Gabriel e do Rafael.
