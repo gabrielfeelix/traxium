@@ -112,6 +112,13 @@ const ok = (c, m) => { console.log((c ? 'ok    ' : 'FALHOU ') + m); if (!c) falh
   await pg.fill('[data-tx-campo="validade"]', '15/03/2028'); await pg.click('[data-tx-confirmar]'); await pg.waitForTimeout(300);
   ok(/atualizado/.test(await pg.locator('[data-tx-toast]').innerText()), 'Datas: documento salvo com a data digitada');
 
+  // Drawer de Transportadores: convite aceito não oferece novo convite; ocorrência do alerta não se repete
+  await ir('Transportadores.dc.html?id=e-lima', 1100);
+  const corpo = await pg.innerText('body');
+  ok(await pg.locator('[data-tx-d-convidar]').count() === 0 && /Revogar acesso/.test(corpo), 'Drawer: convite aceito mostra só Revogar acesso');
+  ok((corpo.match(/encontrou resto de adubo/g) || []).length === 1 && /descrita no alerta acima/.test(corpo), 'Drawer: ocorrência grave descrita uma vez só');
+  ok(/2 compartimentos\. Clique na carreta/.test(corpo) && /CNH vale até/.test(corpo), 'Drawer: plural e rótulo de validade neutro');
+
   // Manual: cartões recolhidos por padrão
   await ir('Cadastros.dc.html?aba=manual');
   const antes = /Antes de carregar/.test(await pg.innerText('body'));

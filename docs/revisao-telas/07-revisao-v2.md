@@ -241,6 +241,15 @@ Testado em 390x844, como o motorista: do envio pelo afretador até o fim, com id
 
 **Teste.** `e2e-revisao.cjs`: OC já vem com hoje em DD/MM/AAAA; "31022026" vira 31/02/2026 e é recusado; Transportadores sugere a validade no formato e salva a data digitada. A atualização de fornecedor do teste passou a digitar 30/09/2027.
 
+### Item 5. Drawer de Transportadores
+
+Revisto em 1366 px com a Lima Logística (ETC em revisão) e o João (TAC). A ordem já servia: o alerta de revisão vem primeiro, depois documentos, conjuntos, motoristas, viagens, ocorrências e convite. Largura de 540 px cabe bem. O que mudou:
+
+1. A ocorrência grave sem revisão aparecia duas vezes com o mesmo texto: no alerta do topo e no cartão Ocorrências. No cartão fica só a linha ("Resíduo no compartimento, 22/09, grave, descrita no alerta acima").
+2. Convite aceito oferecia "Enviar convite". Agora mostra só "Revogar acesso"; enviado ou expirado mostra "Reenviar convite".
+3. "2 compartimento(s); toque na carreta" virou "2 compartimentos. Clique na carreta para ver o histórico de cargas."
+4. Rótulo de validade neutro em todas as telas: "vale até 15/09/2028" no lugar de "válido até", que ficava errado com CNH e licença.
+
 ## Situação ao fim de 14/10/2026
 
 - Lacunas 1 a 4 do handoff fechadas: ocorrências exportáveis (etapa 3), fila de assinatura (etapa 2), entradas para o que virou seção (visões em Viagens na etapa 1 e busca global na etapa 7), Cadastros visível (etapa 7). A lacuna 5 continua dependendo do Gabriel e do Rafael.

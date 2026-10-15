@@ -650,7 +650,7 @@
         if (d.tipo === 'RNTRC') { const t = db.transportadores.find(x => x.id === d.ref); t.rntrc = Object.assign({}, t.rntrc || { numero: d.numero || '0' + soDigitos(op.em).slice(-8) }, { validade: d.validade, origem: 'cadastro' }); }
         if (d.tipo === 'Certificado GMP+') { const t = db.transportadores.find(x => x.id === d.ref); t.certificado = Object.assign({}, t.certificado, { validade: d.validade }); }
         if (d.fornecedor) { const f = db.fornecedores.find(x => x.id === d.fornecedor); const doc = f && f.docs.find(x => x.n === d.tipo); if (doc) doc.validade = d.validade; }
-        evento(db, op, null, d.tipo + ' de ' + d.refNome + ' atualizado: válido até ' + fmt.data(d.validade));
+        evento(db, op, null, d.tipo + ' de ' + d.refNome + ' atualizado: vale até ' + fmt.data(d.validade));
         return;
       }
       case 'escopoFrota': {
@@ -799,7 +799,7 @@
     const dias = difDias(validade, base);
     if (dias < 0) return { estado: 'vencido', dias, rotulo: 'vencido em ' + fmt.data(validade) };
     if (dias <= 30) return { estado: 'vence', dias, rotulo: 'vence em ' + dias + (dias === 1 ? ' dia' : ' dias') };
-    return { estado: 'ok', dias, rotulo: 'válido até ' + fmt.data(validade) };
+    return { estado: 'ok', dias, rotulo: 'vale até ' + fmt.data(validade) };
   }
 
   // Histórico do compartimento: cargas das viagens carregadas + cargas declaradas no link + registro inicial.
