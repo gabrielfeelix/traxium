@@ -182,7 +182,7 @@ export default class Frota extends Tela {
               <div style={{ fontSize: '13.5px', color: 'var(--texto-sec)', marginTop: '2px' }}>{v.subtitulo}</div>
             </div>
             <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div
+              <div role="button" tabIndex={0}
                 onClick={v.exportarEscopo}
                 data-tx-exportar=""
                 style={{
@@ -418,7 +418,7 @@ export default class Frota extends Tela {
                       {cj?.esc}
                     </span>
                     <span style={{ fontSize: '11.5px', color: 'var(--texto-apagado)', textAlign: 'right' }}>{cj?.escSub}</span>
-                    <span
+                    <span role="button" tabIndex={0}
                       onClick={cj?.alternar}
                       data-tx-escopo={cj?.id}
                       style={{ fontSize: '12px', fontWeight: '800', color: cj?.altC, cursor: 'pointer' }}
@@ -452,7 +452,7 @@ export default class Frota extends Tela {
                 padding: '32px',
               }}
             >
-              <div
+              <div role="dialog" aria-modal="true"
                 onClick={v.pararClique}
                 data-tx-modal="escopo"
                 style={{
@@ -465,7 +465,7 @@ export default class Frota extends Tela {
               >
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <div style={{ fontSize: '16px', fontWeight: '800' }}>{v.mTitulo}</div>
-                  <span
+                  <span role="button" tabIndex={0}
                     onClick={v.fecharModal}
                     style={{
                       marginLeft: 'auto',
@@ -502,7 +502,7 @@ export default class Frota extends Tela {
                   }}
                 />
                 <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
-                  <span
+                  <span role="button" tabIndex={0}
                     onClick={v.fecharModal}
                     style={{
                       background: 'var(--superficie-2)',
@@ -515,7 +515,7 @@ export default class Frota extends Tela {
                   >
                     Cancelar
                   </span>
-                  <span
+                  <span role="button" tabIndex={0}
                     onClick={v.confirmar}
                     data-tx-confirmar=""
                     style={{

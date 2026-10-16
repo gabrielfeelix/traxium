@@ -539,7 +539,7 @@ export default class Auditoria extends Tela {
                 />
               </div>
               <div data-tx-pop="" style={{ position: 'relative' }}>
-                <div
+                <div role="button" tabIndex={0}
                   onClick={v.abrirPeriodo}
                   data-tx-dd="periodo"
                   style={{
@@ -591,7 +591,7 @@ export default class Auditoria extends Tela {
                     >
                       {(Array.isArray(v.atalhos) ? v.atalhos : []).map((at, $index) => (
                         <Fragment key={$index}>
-                          <div
+                          <div role="button" tabIndex={0}
                             onClick={at?.onClick}
                             data-tx-atalho={at?.k}
                             style={{
@@ -660,7 +660,7 @@ export default class Auditoria extends Tela {
               </div>
               {(Array.isArray(v.tipos) ? v.tipos : []).map((tp, $index) => (
                 <Fragment key={$index}>
-                  <span
+                  <span role="button" tabIndex={0}
                     onClick={tp?.onClick}
                     style={{
                       fontSize: '12.5px',
@@ -695,7 +695,7 @@ export default class Auditoria extends Tela {
                     </span>
                   </>
                 ) : null}
-                <span
+                <span role="button" tabIndex={0}
                   onClick={v.onSim}
                   data-tx-simulacao=""
                   style={{
@@ -719,7 +719,7 @@ export default class Auditoria extends Tela {
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '14px 18px', borderBottom: '1px solid var(--borda-suave)' }}>
                 <div style={{ fontSize: '15px', fontWeight: '800' }}>Viagens encontradas</div>
                 <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '13px', color: 'var(--texto-sec)' }}>{v.nRes}</span>
-                <span
+                <span role="button" tabIndex={0}
                   onClick={v.selTodas}
                   style={{ marginLeft: 'auto', fontSize: '12.5px', fontWeight: '800', color: 'var(--primario-2)', cursor: 'pointer' }}
                 >
@@ -763,7 +763,7 @@ export default class Auditoria extends Tela {
                       background: r?.bg,
                     }}
                   >
-                    <span
+                    <span role="button" tabIndex={0}
                       onClick={r?.toggle}
                       data-tx-sel={r?.id}
                       style={{
@@ -813,7 +813,7 @@ export default class Auditoria extends Tela {
                     <div style={{ marginLeft: 'auto', display: 'flex', gap: '5px' }}>
                       {(Array.isArray(v.paginas) ? v.paginas : []).map((pg, $index) => (
                         <Fragment key={$index}>
-                          <span
+                          <span role="button" tabIndex={0}
                             onClick={pg?.onClick}
                             style={{
                               fontFamily: "'Spline Sans Mono',monospace",
@@ -843,7 +843,7 @@ export default class Auditoria extends Tela {
               <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '18px 20px' }}>
                 <div style={{ fontSize: '15px', fontWeight: '800' }}>Amostra</div>
                 <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '3px' }}>{v.amostraTxt}</div>{' '}
-                <span
+                <span role="button" tabIndex={0}
                   onClick={v.exportarAmostra}
                   data-tx-exportar-amostra=""
                   style={{
@@ -887,7 +887,7 @@ export default class Auditoria extends Tela {
                           <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)' }}>{ap?.sub}</div>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '3px' }}>
-                          <span
+                          <span role="button" tabIndex={0}
                             onClick={ap?.onClick}
                             data-tx-apoio-doc={ap?.k}
                             style={{ fontSize: '12px', fontWeight: '800', color: 'var(--primario-2)', cursor: 'pointer', whiteSpace: 'nowrap' }}
@@ -895,7 +895,7 @@ export default class Auditoria extends Tela {
                           >
                             {ap?.rot}
                           </span>
-                          <span
+                          <span role="button" tabIndex={0}
                             onClick={ap?.onCsv}
                             data-tx-apoio-csv={ap?.k}
                             style={{

@@ -574,7 +574,7 @@ export default class LinkDaViagem extends Tela {
                   {v.afretador}
                 </div>
               </div>
-              <span
+              <span role="button" tabIndex={0}
                 data-tx-sinal={v.sinalK}
                 onClick={v.alternarSinal}
                 title="Demonstração: simular falta de sinal"
@@ -658,7 +658,7 @@ export default class LinkDaViagem extends Tela {
                   <div style={{ fontSize: '13.5px', color: 'var(--texto-sec)', marginTop: '6px', lineHeight: '1.5' }}>
                     Na operação real, o motorista só recebe o link depois que o afretador manda a mensagem pelo WhatsApp.
                   </div>{' '}
-                  <span
+                  <span role="button" tabIndex={0}
                     onClick={v.simularEnvio}
                     data-tx-simular-envio=""
                     style={{
@@ -809,7 +809,7 @@ export default class LinkDaViagem extends Tela {
                             <div style={{ fontSize: '14.5px', fontWeight: '800' }}>{dp?.n}</div>
                             <div style={{ fontSize: '12px', color: dp?.subC }}>{dp?.sub}</div>
                           </div>
-                          <span
+                          <span role="button" tabIndex={0}
                             onClick={dp?.onClick}
                             data-tx-doc={dp?.k}
                             style={{
@@ -854,7 +854,7 @@ export default class LinkDaViagem extends Tela {
                       </div>
                       {tc?.temAtalho ? (
                         <>
-                          <span
+                          <span role="button" tabIndex={0}
                             onClick={tc?.atalho}
                             data-tx-atalho=""
                             style={{
@@ -929,7 +929,7 @@ export default class LinkDaViagem extends Tela {
                                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '4px' }}>
                                     {(Array.isArray(tl?.sugs) ? tl?.sugs : []).map((sg, $index) => (
                                       <Fragment key={$index}>
-                                        <span
+                                        <span role="button" tabIndex={0}
                                           onClick={sg?.onClick}
                                           data-tx-sug={sg?.id}
                                           style={{
@@ -997,7 +997,7 @@ export default class LinkDaViagem extends Tela {
                       </div>
                       <div style={{ fontSize: '14px', color: 'var(--texto-2)', marginTop: '6px', lineHeight: '1.45' }}>{ci?.pergunta}</div>
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '10px' }}>
-                        <span
+                        <span role="button" tabIndex={0}
                           onClick={ci?.sim}
                           data-tx-sim={ci?.k}
                           style={{
@@ -1014,7 +1014,7 @@ export default class LinkDaViagem extends Tela {
                         >
                           Sim
                         </span>
-                        <span
+                        <span role="button" tabIndex={0}
                           onClick={ci?.nao}
                           data-tx-nao={ci?.k}
                           style={{
@@ -1032,7 +1032,7 @@ export default class LinkDaViagem extends Tela {
                           Não
                         </span>
                       </div>
-                      <div
+                      <div role="button" tabIndex={0}
                         onClick={ci?.foto}
                         data-tx-foto-ck={ci?.k}
                         style={{
@@ -1157,7 +1157,7 @@ export default class LinkDaViagem extends Tela {
                         left: '14px',
                         bottom: '10px',
                         fontSize: '11.5px',
-                        color: 'var(--texto-desab)',
+                        color: 'var(--texto-apagado)',
                         pointerEvents: 'none',
                       }}
                     >
@@ -1165,7 +1165,7 @@ export default class LinkDaViagem extends Tela {
                       {', '}
                       {v.hojeTxt}
                     </span>{' '}
-                    <span
+                    <span role="button" tabIndex={0}
                       onClick={v.limparAss}
                       style={{
                         position: 'absolute',
@@ -1260,7 +1260,7 @@ export default class LinkDaViagem extends Tela {
               >
                 {v.temVoltar ? (
                   <>
-                    <span
+                    <span role="button" tabIndex={0}
                       onClick={v.voltar}
                       style={{
                         background: 'var(--painel)',
@@ -1277,7 +1277,7 @@ export default class LinkDaViagem extends Tela {
                     </span>
                   </>
                 ) : null}
-                <span
+                <span role="button" tabIndex={0}
                   onClick={v.avancar}
                   data-tx-avancar=""
                   style={{

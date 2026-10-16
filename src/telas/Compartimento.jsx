@@ -236,7 +236,7 @@ export default class Compartimento extends Tela {
               <span style={{ fontFamily: "'Spline Sans Mono',monospace", color: 'var(--texto)' }}>{v.titulo}</span>
             </div>
             <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div
+              <div role="button" tabIndex={0}
                 onClick={v.exportar}
                 data-tx-exportar=""
                 style={{

@@ -160,7 +160,7 @@ export default class Transportadores extends Tela {
                 nv: x.vs.length,
                 ultima: x.vs[0] ? 'última ' + F.curta(x.vs[0].data) : 'nenhuma',
                 oc: x.ocs.length ? x.ocs.length + (ocAb ? ', 1 grave aberta' : '') : 'nenhuma',
-                ocC: ocAb ? 'var(--perigo)' : x.ocs.length ? 'var(--aviso)' : 'var(--texto-desab)',
+                ocC: ocAb ? 'var(--perigo)' : x.ocs.length ? 'var(--aviso)' : 'var(--texto-apagado)',
                 cv: cv[0],
                 cvC: cv[1],
                 cvBd: cv[2],
@@ -523,7 +523,7 @@ export default class Transportadores extends Tela {
               <div style={{ fontSize: '13.5px', color: 'var(--texto-sec)', marginTop: '2px' }}>{v.subtitulo}</div>
             </div>
             <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div
+              <div role="button" tabIndex={0}
                 onClick={v.abrirImportar}
                 data-tx-importar=""
                 style={{
@@ -539,7 +539,7 @@ export default class Transportadores extends Tela {
               >
                 Importar planilha
               </div>
-              <span
+              <span role="button" tabIndex={0}
                 onClick={v.abrirCadastro}
                 data-tx-cadastrar=""
                 style={{
@@ -571,7 +571,7 @@ export default class Transportadores extends Tela {
             >
               {(Array.isArray(v.abas) ? v.abas : []).map((ab, $index) => (
                 <Fragment key={$index}>
-                  <div
+                  <div role="button" tabIndex={0}
                     onClick={ab?.onClick}
                     data-tx-filtro={ab?.k}
                     style={{
@@ -649,7 +649,7 @@ export default class Transportadores extends Tela {
               <div style={{ display: 'flex', background: 'var(--superficie-2)', borderRadius: '11px', padding: '3px', gap: '2px' }}>
                 {(Array.isArray(v.tipos) ? v.tipos : []).map((tp, $index) => (
                   <Fragment key={$index}>
-                    <span
+                    <span role="button" tabIndex={0}
                       onClick={tp?.onClick}
                       data-tx-tipo={tp?.k}
                       style={{
@@ -725,7 +725,7 @@ export default class Transportadores extends Tela {
                     alignItems: 'center',
                   }}
                 >
-                  <div onClick={r?.abrir} style={{ display: 'flex', alignItems: 'center', gap: '11px', cursor: 'pointer', minWidth: '0' }}>
+                  <div role="button" tabIndex={0} onClick={r?.abrir} style={{ display: 'flex', alignItems: 'center', gap: '11px', cursor: 'pointer', minWidth: '0' }}>
                     <span
                       style={{
                         width: '38px',
@@ -823,7 +823,7 @@ export default class Transportadores extends Tela {
                     >
                       {r?.cv}
                     </span>
-                    <span
+                    <span role="button" tabIndex={0}
                       onClick={r?.cvAcao}
                       data-tx-convite={r?.id}
                       style={{ fontSize: '12px', fontWeight: '800', color: 'var(--primario-2)', cursor: 'pointer', whiteSpace: 'nowrap' }}
@@ -851,7 +851,7 @@ export default class Transportadores extends Tela {
                   <div style={{ marginLeft: 'auto', display: 'flex', gap: '5px' }}>
                     {(Array.isArray(v.paginas) ? v.paginas : []).map((pg, $index) => (
                       <Fragment key={$index}>
-                        <span
+                        <span role="button" tabIndex={0}
                           onClick={pg?.onClick}
                           style={{
                             fontFamily: "'Spline Sans Mono',monospace",
@@ -892,7 +892,7 @@ export default class Transportadores extends Tela {
                 justifyContent: 'flex-end',
               }}
             >
-              <div
+              <div role="dialog" aria-modal="true"
                 onClick={v.pararClique}
                 data-tx-drawer={v.dId}
                 style={{
@@ -928,7 +928,7 @@ export default class Transportadores extends Tela {
                       <div style={{ fontSize: '18px', fontWeight: '800' }}>{v.dNome}</div>
                       <div style={{ fontSize: '12.5px', color: 'rgba(255,255,255,.72)' }}>{v.dTipo}</div>
                     </div>
-                    <span
+                    <span role="button" tabIndex={0}
                       onClick={v.fecharDrawer}
                       style={{
                         width: '32px',
@@ -970,7 +970,7 @@ export default class Transportadores extends Tela {
                       <div style={{ background: 'var(--painel)', border: '1.5px solid var(--perigo-borda)', borderRadius: '16px', padding: '14px 16px' }}>
                         <div style={{ fontSize: '14px', fontWeight: '800', color: 'var(--tecnico)' }}>Em revisão após ocorrência grave</div>
                         <div style={{ fontSize: '12.5px', color: 'var(--texto-2)', marginTop: '4px', lineHeight: '1.5' }}>{v.dOcTxt}</div>{' '}
-                        <span
+                        <span role="button" tabIndex={0}
                           onClick={v.abrirRevisar}
                           data-tx-revisar=""
                           style={{
@@ -1010,7 +1010,7 @@ export default class Transportadores extends Tela {
                               <div style={{ fontSize: '13px', fontWeight: '700' }}>{dd?.n}</div>
                               <div style={{ fontSize: '11.5px', color: dd?.c }}>{dd?.sub}</div>
                             </div>
-                            <span
+                            <span role="button" tabIndex={0}
                               onClick={dd?.onClick}
                               data-tx-atualizar-doc={dd?.k}
                               style={{ fontSize: '12px', fontWeight: '800', color: 'var(--primario-2)', cursor: 'pointer' }}
@@ -1153,7 +1153,7 @@ export default class Transportadores extends Tela {
                     <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
                       {v.dPodeConvidar ? (
                         <>
-                          <span
+                          <span role="button" tabIndex={0}
                             onClick={v.dConvidar}
                             data-tx-d-convidar=""
                             style={{
@@ -1171,7 +1171,7 @@ export default class Transportadores extends Tela {
                       ) : null}
                       {v.dPodeRevogar ? (
                         <>
-                          <span
+                          <span role="button" tabIndex={0}
                             onClick={v.dRevogar}
                             style={{
                               fontSize: '12.5px',
@@ -1209,7 +1209,7 @@ export default class Transportadores extends Tela {
                 padding: '32px',
               }}
             >
-              <div
+              <div role="dialog" aria-modal="true"
                 onClick={v.pararClique}
                 data-tx-modal={v.mK}
                 style={{
@@ -1224,7 +1224,7 @@ export default class Transportadores extends Tela {
               >
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <div style={{ fontSize: '16px', fontWeight: '800' }}>{v.mTitulo}</div>
-                  <span
+                  <span role="button" tabIndex={0}
                     onClick={v.fecharModal}
                     style={{
                       marginLeft: 'auto',
@@ -1248,7 +1248,7 @@ export default class Transportadores extends Tela {
                     <div style={{ display: 'flex', gap: '7px', marginTop: '14px' }}>
                       {(Array.isArray(v.cadTipos) ? v.cadTipos : []).map((ct, $index) => (
                         <Fragment key={$index}>
-                          <span
+                          <span role="button" tabIndex={0}
                             onClick={ct?.onClick}
                             style={{
                               fontSize: '12.5px',
@@ -1324,7 +1324,7 @@ export default class Transportadores extends Tela {
                     >
                       <input type="file" accept=".csv,.xlsx" onChange={v.onImpArq} style={{ display: 'none' }} />
                       <div style={{ flex: '1', fontSize: '13.5px', fontWeight: '800' }}>{v.impTitulo}</div>
-                      <span onClick={v.impExemplo} data-tx-imp-exemplo="" style={{ fontSize: '12px', fontWeight: '800', color: 'var(--primario-2)' }}>
+                      <span role="button" tabIndex={0} onClick={v.impExemplo} data-tx-imp-exemplo="" style={{ fontSize: '12px', fontWeight: '800', color: 'var(--primario-2)' }}>
                         usar planilha de exemplo
                       </span>
                     </label>
@@ -1417,7 +1417,7 @@ export default class Transportadores extends Tela {
                     ></textarea>
                     {v.revTrocar ? (
                       <>
-                        <span
+                        <span role="button" tabIndex={0}
                           onClick={v.abrirEntrar}
                           style={{
                             display: 'inline-block',
@@ -1435,7 +1435,7 @@ export default class Transportadores extends Tela {
                   </>
                 ) : null}
                 <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
-                  <span
+                  <span role="button" tabIndex={0}
                     onClick={v.fecharModal}
                     style={{
                       background: 'var(--superficie-2)',
@@ -1448,7 +1448,7 @@ export default class Transportadores extends Tela {
                   >
                     Cancelar
                   </span>
-                  <span
+                  <span role="button" tabIndex={0}
                     onClick={v.confirmar}
                     data-tx-confirmar=""
                     style={{

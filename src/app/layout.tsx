@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import '@/telas/estados.css';
+import { TecladoClicavel } from '@/components/tela/teclado';
 
 export const metadata: Metadata = {
   title: 'Traxium',
@@ -17,7 +18,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@500;600&display=swap" rel="stylesheet" />
       </head>
-      <body>{children}</body>
+      <body>
+        <TecladoClicavel />
+        {children}
+      </body>
     </html>
   );
 }

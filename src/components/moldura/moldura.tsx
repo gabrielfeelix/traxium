@@ -431,7 +431,7 @@ function Dialogo({ titulo, largura, onFechar, children }: { titulo: string; larg
     return () => el.removeEventListener('keydown', tab);
   }, [titulo]);
   return (
-    <div ref={ref} role="dialog" aria-modal="true" aria-label={titulo} className="mo-modal" style={{ width: largura }} onClick={e => e.stopPropagation()}>
+    <div ref={ref} role="dialog" aria-modal="true" data-foco-proprio aria-label={titulo} className="mo-modal" style={{ width: largura }} onClick={e => e.stopPropagation()}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <div className="mo-modal-tit">{titulo}</div>
         <button type="button" title="Fechar" aria-label="Fechar" className="mo-fechar" onClick={onFechar}>✕</button>

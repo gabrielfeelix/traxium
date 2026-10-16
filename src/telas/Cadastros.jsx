@@ -150,7 +150,7 @@ export default class Cadastros extends Tela {
           rBg: t[0],
           rT: t[1],
           fw: s.pReg === k ? '800' : '600',
-          cor: pode ? 'var(--texto)' : 'var(--texto-desab)',
+          cor: pode ? 'var(--texto)' : 'var(--texto-apagado)',
           cur: pode ? 'pointer' : 'default',
           ckOp: s.pReg === k ? '1' : '0',
           onClick: () => {
@@ -527,7 +527,7 @@ export default class Cadastros extends Tela {
             <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
               {v.temAcao ? (
                 <>
-                  <span
+                  <span role="button" tabIndex={0}
                     onClick={v.acao}
                     data-tx-acao-aba=""
                     style={{
@@ -552,7 +552,7 @@ export default class Cadastros extends Tela {
               <div style={{ display: 'flex', gap: '6px', borderBottom: '1px solid var(--borda-campo)' }}>
                 {(Array.isArray(v.abas) ? v.abas : []).map((ab, $index) => (
                   <Fragment key={$index}>
-                    <span
+                    <span role="button" tabIndex={0}
                       onClick={ab?.onClick}
                       data-tx-aba={ab?.k}
                       style={{
@@ -621,7 +621,7 @@ export default class Cadastros extends Tela {
                       />
                     </div>
                     <div data-tx-pop="" style={{ position: 'relative' }}>
-                      <div
+                      <div role="button" tabIndex={0}
                         onClick={v.abrirRegime}
                         data-tx-dd="regime"
                         style={{
@@ -672,7 +672,7 @@ export default class Cadastros extends Tela {
                           >
                             {(Array.isArray(v.pRegimes) ? v.pRegimes : []).map((pr, $index) => (
                               <Fragment key={$index}>
-                                <div
+                                <div role="button" tabIndex={0}
                                   onClick={pr?.onClick}
                                   data-tx-regime={pr?.k}
                                   style={{
@@ -824,7 +824,7 @@ export default class Cadastros extends Tela {
                         <div style={{ flex: '1', lineHeight: '1.5' }}>{v.pVazioTxt}</div>
                         {v.pVazioPede ? (
                           <>
-                            <span
+                            <span role="button" tabIndex={0}
                               onClick={v.pedirDaBusca}
                               data-tx-pedir-da-busca=""
                               style={{
@@ -867,7 +867,7 @@ export default class Cadastros extends Tela {
                         outline: 'none',
                       }}
                     />{' '}
-                    <span
+                    <span role="button" tabIndex={0}
                       onClick={v.pedirClass}
                       data-tx-pedir-classificacao=""
                       style={{
@@ -906,7 +906,7 @@ export default class Cadastros extends Tela {
                 <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 22px' }}>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <div style={{ fontSize: '16px', fontWeight: '800' }}>{v.manualTitulo}</div>
-                    <span
+                    <span role="button" tabIndex={0}
                       onClick={v.abrirPublicar}
                       data-tx-publicar=""
                       style={{
@@ -939,7 +939,7 @@ export default class Cadastros extends Tela {
                       </Fragment>
                     ))}
                   </div>
-                  <div
+                  <div role="button" tabIndex={0}
                     onClick={v.alternarCartoes}
                     data-tx-ver-cartoes=""
                     style={{
@@ -977,7 +977,7 @@ export default class Cadastros extends Tela {
                 <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 22px' }}>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <div style={{ fontSize: '16px', fontWeight: '800' }}>Treinamentos registrados</div>
-                    <span
+                    <span role="button" tabIndex={0}
                       onClick={v.abrirTreino}
                       data-tx-novo-treino=""
                       style={{
@@ -1076,7 +1076,7 @@ export default class Cadastros extends Tela {
                               <span style={{ color: fd?.c, fontWeight: '700' }}>{fd?.r}</span>
                               {fd?.atualiza ? (
                                 <>
-                                  <span
+                                  <span role="button" tabIndex={0}
                                     onClick={fd?.onAtualizar}
                                     data-tx-atualizar-doc={fd?.k}
                                     style={{ fontWeight: '800', color: 'var(--primario-2)', cursor: 'pointer', paddingLeft: '6px' }}
@@ -1148,7 +1148,7 @@ export default class Cadastros extends Tela {
                         </div>
                         {fl?.semOc ? (
                           <>
-                            <span
+                            <span role="button" tabIndex={0}
                               onClick={fl?.registrar}
                               data-tx-registrar-oc={fl?.id}
                               style={{
@@ -1189,7 +1189,7 @@ export default class Cadastros extends Tela {
                 padding: '32px',
               }}
             >
-              <div
+              <div role="dialog" aria-modal="true"
                 onClick={v.pararClique}
                 data-tx-modal={v.mK}
                 style={{
@@ -1204,7 +1204,7 @@ export default class Cadastros extends Tela {
               >
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <div style={{ fontSize: '16px', fontWeight: '800' }}>{v.mTitulo}</div>
-                  <span
+                  <span role="button" tabIndex={0}
                     onClick={v.fecharModal}
                     style={{
                       marginLeft: 'auto',
@@ -1256,7 +1256,7 @@ export default class Cadastros extends Tela {
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
                       {(Array.isArray(v.mChips) ? v.mChips : []).map((mh, $index) => (
                         <Fragment key={$index}>
-                          <span
+                          <span role="button" tabIndex={0}
                             onClick={mh?.onClick}
                             data-tx-chip={mh?.k}
                             style={{
@@ -1278,7 +1278,7 @@ export default class Cadastros extends Tela {
                   </>
                 ) : null}
                 <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
-                  <span
+                  <span role="button" tabIndex={0}
                     onClick={v.fecharModal}
                     style={{
                       background: 'var(--superficie-2)',
@@ -1291,7 +1291,7 @@ export default class Cadastros extends Tela {
                   >
                     Cancelar
                   </span>
-                  <span
+                  <span role="button" tabIndex={0}
                     onClick={v.confirmar}
                     data-tx-confirmar=""
                     style={{

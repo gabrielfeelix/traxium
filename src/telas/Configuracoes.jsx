@@ -107,7 +107,7 @@ export default class Configuracoes extends Tela {
         cargo: x.cargo,
         escopo: x.filiais.length === 4 ? 'todas as filiais' : 'filial ' + x.filiais.map((f) => TX.filial(f).nome).join(', '),
         er: x.id === u.id ? 'você está aqui' : 'Entrar como',
-        ec: x.id === u.id ? 'var(--texto-desab)' : 'var(--primario-2)',
+        ec: x.id === u.id ? 'var(--texto-apagado)' : 'var(--primario-2)',
         entrar: () => {
           if (x.id === u.id) return;
           TX.entrarComo(x.id);
@@ -292,7 +292,7 @@ export default class Configuracoes extends Tela {
             >
               {(Array.isArray(v.secoes) ? v.secoes : []).map((sc, $index) => (
                 <Fragment key={$index}>
-                  <span
+                  <span role="button" tabIndex={0}
                     onClick={sc?.onClick}
                     data-tx-secao={sc?.k}
                     style={{
@@ -324,7 +324,7 @@ export default class Configuracoes extends Tela {
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <div style={{ fontSize: '16px', fontWeight: '800' }}>Usuários e papéis</div>
-                  <span
+                  <span role="button" tabIndex={0}
                     onClick={v.abrirConvite}
                     data-tx-convidar=""
                     style={{
@@ -381,7 +381,7 @@ export default class Configuracoes extends Tela {
                         </div>
                         <span style={{ fontSize: '12.5px' }}>{us?.cargo}</span>
                         <span style={{ fontSize: '12.5px', color: 'var(--texto-sec)' }}>{us?.escopo}</span>
-                        <span
+                        <span role="button" tabIndex={0}
                           onClick={us?.entrar}
                           data-tx-entrar-como={us?.id}
                           style={{ fontSize: '12px', fontWeight: '800', color: us?.ec, cursor: 'pointer', textAlign: 'right' }}
@@ -429,7 +429,7 @@ export default class Configuracoes extends Tela {
                           <div style={{ fontSize: '11.5px', color: 'var(--aviso)', fontWeight: '700' }}>{cv?.estado}</div>
                         </div>
                         <span style={{ fontSize: '12.5px', color: 'var(--texto-sec)' }}>{cv?.escopo}</span>
-                        <span
+                        <span role="button" tabIndex={0}
                           onClick={cv?.cancelar}
                           data-tx-cancelar-convite={cv?.id}
                           style={{ fontSize: '12px', fontWeight: '800', color: 'var(--perigo)', cursor: 'pointer', textAlign: 'right' }}
@@ -508,7 +508,7 @@ export default class Configuracoes extends Tela {
                         <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
                           {(Array.isArray(rg?.classes) ? rg?.classes : []).map((cl, $index) => (
                             <Fragment key={$index}>
-                              <span
+                              <span role="button" tabIndex={0}
                                 onClick={cl?.onClick}
                                 data-tx-classe={cl?.k}
                                 style={{
@@ -552,7 +552,7 @@ export default class Configuracoes extends Tela {
                         <div style={{ display: 'flex', alignItems: 'center' }}>
                           <b style={{ fontSize: '13.5px' }}>{md?.n}</b>
                           <span style={{ marginLeft: '8px', fontSize: '11.5px', color: 'var(--texto-apagado)' }}>{md?.v}</span>
-                          <span
+                          <span role="button" tabIndex={0}
                             onClick={md?.copiar}
                             style={{ marginLeft: 'auto', fontSize: '12px', fontWeight: '800', color: 'var(--primario-2)', cursor: 'pointer' }}
                           >
@@ -638,7 +638,7 @@ export default class Configuracoes extends Tela {
               >
                 <div style={{ fontSize: '16px', fontWeight: '800' }}>Dados do protótipo</div>
                 <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '3px', lineHeight: '1.55' }}>{v.dadosTxt}</div>{' '}
-                <span
+                <span role="button" tabIndex={0}
                   onClick={v.abrirReset}
                   data-tx-reset=""
                   style={{
@@ -676,7 +676,7 @@ export default class Configuracoes extends Tela {
                 padding: '32px',
               }}
             >
-              <div
+              <div role="dialog" aria-modal="true"
                 onClick={v.pararClique}
                 data-tx-modal={v.mK}
                 style={{
@@ -691,7 +691,7 @@ export default class Configuracoes extends Tela {
               >
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <div style={{ fontSize: '16px', fontWeight: '800' }}>{v.mTitulo}</div>
-                  <span
+                  <span role="button" tabIndex={0}
                     onClick={v.fecharModal}
                     style={{
                       marginLeft: 'auto',
@@ -753,7 +753,7 @@ export default class Configuracoes extends Tela {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '6px' }}>
                       {(Array.isArray(v.cvPapeis) ? v.cvPapeis : []).map((pp, $index) => (
                         <Fragment key={$index}>
-                          <div
+                          <div role="button" tabIndex={0}
                             onClick={pp?.onClick}
                             data-tx-papel={pp?.k}
                             style={{
@@ -791,7 +791,7 @@ export default class Configuracoes extends Tela {
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
                           {(Array.isArray(v.cvFiliais) ? v.cvFiliais : []).map((cf, $index) => (
                             <Fragment key={$index}>
-                              <span
+                              <span role="button" tabIndex={0}
                                 onClick={cf?.onClick}
                                 data-tx-cv-filial={cf?.k}
                                 style={{
@@ -834,7 +834,7 @@ export default class Configuracoes extends Tela {
                   </>
                 ) : null}
                 <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
-                  <span
+                  <span role="button" tabIndex={0}
                     onClick={v.fecharModal}
                     style={{
                       background: 'var(--superficie-2)',
@@ -847,7 +847,7 @@ export default class Configuracoes extends Tela {
                   >
                     Cancelar
                   </span>
-                  <span
+                  <span role="button" tabIndex={0}
                     onClick={v.confirmar}
                     data-tx-confirmar=""
                     style={{

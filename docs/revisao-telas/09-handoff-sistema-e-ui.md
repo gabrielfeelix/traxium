@@ -143,3 +143,25 @@ Três opções mostradas ao Gabriel em captura de 1366x768 (Hoje e Viagens): A, 
 | Premissa | O que muda se a resposta vier diferente |
 | --- | --- |
 | Até a escolha, fica o fundo atual (A) | Trocar o padrão é mudar dois tokens e tirar as variantes |
+
+### Etapa 4. Contraste, teclado e foco em todas as telas (15/10/2026)
+
+Os três primeiros temas da tabela da seção 5 valem igual para as dez telas; resolvidos de uma vez, pelo mesmo padrão, antes da revisão tela a tela.
+
+**Problema.** Medido contra a superfície mais escura em que texto cai (`#f0f4f3`): o cinza `#7c8f8d`, usado 111 vezes, dava 3,07:1; o placeholder, 2,49:1; o verde de texto, 3,71:1; o âmbar de texto, 3,37:1; o cinza secundário `#5c706e`, 4,74:1 (passava no branco, não na superfície). O cinza claro de "desabilitado" (2,05:1) também aparecia como informação ("ainda não", "nenhuma", situação não assegurada). Quase toda ação era `div` ou `span` com `onClick`: sem foco e sem teclado. Os campos tinham `outline:none` inline e nenhum foco visível. Os modais das telas fechavam com Esc, mas o foco ficava atrás deles e não voltava.
+
+**O que mudou.**
+
+1. Tokens: `--texto-sec` `#526664` (5,50:1 na superfície), `--texto-apagado` `#5f7270` (4,59:1), `--placeholder` `#66797a` (4,58:1 no branco dos campos), `--ok` `#177d4c` (4,65:1), `--aviso` `#9a6210` (4,59:1). `--texto-desab` ficou só para controle desabilitado, que a WCAG isenta; os usos informativos passaram para `--texto-apagado`. Na sidebar, rótulos de grupo e nome da empresa subiram de 40% e 50% para 58% e 62% de branco.
+2. Os 167 clicáveis feitos de `div` ou `span` ganharam `role="button"` e `tabIndex`; `src/components/tela/teclado.tsx` faz Enter e espaço acionarem. Véus de modal ficaram de fora (o clique fora tem o Esc como par no teclado).
+3. Foco visível: anel de 2 px no primário em tudo que recebe foco por teclado. Campo com borda própria ganha o anel; campo sem borda dentro de uma caixa acende a borda da caixa.
+4. Os oito painéis de modal e drawer das telas viraram `role="dialog" aria-modal="true"`. Ao abrir, o foco vai para o primeiro campo (no celular, para o próprio diálogo, para não abrir o teclado por cima); Tab circula por dentro; ao fechar, o foco volta a quem abriu.
+
+**Teste.** `e2e-moldura.cjs` ganhou cinco conferências de teclado (Enter abre o modal de Frota, foco entra, Tab fica dentro, Esc fecha e devolve o foco, campo em foco acende a caixa). Bateria inteira passa.
+
+**Premissas.**
+
+| Premissa | O que muda se a resposta vier diferente |
+| --- | --- |
+| Os cinzas sobem de contraste mesmo ficando mais próximos entre si; a hierarquia passa a depender mais de peso e tamanho | Se o Gabriel achar a tela pesada, clarear só o que é texto grande (acima de 18 px, que pede 3:1) |
+| `role="button"` em `div` é o caminho mais curto e fiel ao visual; trocar por `<button>` vem com os componentes compartilhados, tela a tela | Nenhuma: é o mesmo destino, por partes |

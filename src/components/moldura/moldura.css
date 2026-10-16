@@ -16,8 +16,8 @@
 .mo-marca { display: flex; align-items: center; gap: 10px; padding: 2px 6px 4px; color: #fff; border-radius: 12px; }
 .mo-marca:hover { color: #fff; }
 .mo-marca-nome { font-weight: 800; font-size: 17px; letter-spacing: .2px; }
-.mo-marca-tenant { font-size: 10.5px; letter-spacing: 1.6px; color: rgba(255, 255, 255, .5); text-transform: uppercase; white-space: nowrap; }
-.mo-grupo { font-size: 10px; font-weight: 800; letter-spacing: 1.4px; color: rgba(255, 255, 255, .4); text-transform: uppercase; }
+.mo-marca-tenant { font-size: 10.5px; letter-spacing: 1.6px; color: rgba(255, 255, 255, .62); text-transform: uppercase; white-space: nowrap; }
+.mo-grupo { font-size: 10px; font-weight: 800; letter-spacing: 1.4px; color: rgba(255, 255, 255, .58); text-transform: uppercase; }
 .mo-sep { height: 1px; background: rgba(255, 255, 255, .1); margin: 12px 10px 8px; }
 .mo-lista { display: flex; flex-direction: column; gap: 3px; }
 

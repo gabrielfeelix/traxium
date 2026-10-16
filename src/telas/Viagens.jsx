@@ -274,7 +274,7 @@ export default class Viagens extends Tela {
             q,
             dot: t.dot,
             fw: s.sit === k ? '800' : '600',
-            cor: q || s.sit === k ? 'var(--texto)' : 'var(--texto-desab)',
+            cor: q || s.sit === k ? 'var(--texto)' : 'var(--texto-apagado)',
             ckOp: s.sit === k ? '1' : '0',
             onClick: () => set({ sit: k }),
           };
@@ -357,7 +357,7 @@ export default class Viagens extends Tela {
                 filial: TX.filial(v.filial).nome,
                 ordem: v.ordem,
                 ordemSub: v.cte ? 'CT-e ' + v.cte.numero + ', NF ' + v.cte.nf : v.id,
-                subC: v.cte ? 'var(--texto-2)' : 'var(--texto-desab)',
+                subC: v.cte ? 'var(--texto-2)' : 'var(--texto-apagado)',
                 produto: TX.produto(v.produto).nome,
                 assegTxt: v.assegurada ? '' : '(sem GMP+)',
                 rota:
@@ -532,7 +532,7 @@ export default class Viagens extends Tela {
               <div style={{ fontSize: '13.5px', color: 'var(--texto-sec)', marginTop: '2px' }}>{v.subtitulo}</div>
             </div>
             <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div
+              <div role="button" tabIndex={0}
                 onClick={v.exportar}
                 data-tx-exportar=""
                 title="Baixa a lista com os filtros da tela"
@@ -581,7 +581,7 @@ export default class Viagens extends Tela {
             >
               {(Array.isArray(v.abas) ? v.abas : []).map((ab, $index) => (
                 <Fragment key={$index}>
-                  <div
+                  <div role="button" tabIndex={0}
                     onClick={ab?.onClick}
                     data-tx-visao={ab?.k}
                     style={{
@@ -614,7 +614,7 @@ export default class Viagens extends Tela {
                     >
                       {ab?.q}
                     </span>
-                    <span
+                    <span role="button" tabIndex={0}
                       onClick={ab?.remover}
                       data-tx-apagar-visao={ab?.k}
                       title="Apagar esta visão"
@@ -626,7 +626,7 @@ export default class Viagens extends Tela {
                         alignItems: 'center',
                         justifyContent: 'center',
                         fontSize: '12px',
-                        color: 'var(--texto-desab)',
+                        color: 'var(--texto-apagado)',
                       }}
                       className="tx-ha5daa28"
                     >
@@ -674,7 +674,7 @@ export default class Viagens extends Tela {
                 />
               </div>
               <div data-tx-pop="" style={{ position: 'relative' }}>
-                <div
+                <div role="button" tabIndex={0}
                   onClick={v.abrirPeriodo}
                   data-tx-dd="periodo"
                   style={{
@@ -725,7 +725,7 @@ export default class Viagens extends Tela {
                     >
                       {(Array.isArray(v.periodos) ? v.periodos : []).map((pd, $index) => (
                         <Fragment key={$index}>
-                          <div
+                          <div role="button" tabIndex={0}
                             onClick={pd?.onClick}
                             data-tx-periodo={pd?.k}
                             style={{
@@ -764,7 +764,7 @@ export default class Viagens extends Tela {
               {v.temSituacao ? (
                 <>
                   <div data-tx-pop="" style={{ position: 'relative' }}>
-                    <div
+                    <div role="button" tabIndex={0}
                       onClick={v.abrirSituacao}
                       data-tx-dd="situacao"
                       style={{
@@ -816,7 +816,7 @@ export default class Viagens extends Tela {
                         >
                           {(Array.isArray(v.situacoes) ? v.situacoes : []).map((st, $index) => (
                             <Fragment key={$index}>
-                              <div
+                              <div role="button" tabIndex={0}
                                 onClick={st?.onClick}
                                 data-tx-situacao={st?.k}
                                 style={{
@@ -869,7 +869,7 @@ export default class Viagens extends Tela {
                 </>
               ) : null}
               <div data-tx-pop="" style={{ position: 'relative' }}>
-                <div
+                <div role="button" tabIndex={0}
                   onClick={v.abrirFiltros}
                   data-tx-dd="filtros"
                   style={{
@@ -934,7 +934,7 @@ export default class Viagens extends Tela {
                       </div>
                       {(Array.isArray(v.tipos) ? v.tipos : []).map((tp, $index) => (
                         <Fragment key={$index}>
-                          <div
+                          <div role="button" tabIndex={0}
                             onClick={tp?.onClick}
                             data-tx-tipo={tp?.k}
                             style={{
@@ -983,7 +983,7 @@ export default class Viagens extends Tela {
                           </div>
                           {(Array.isArray(v.filiais) ? v.filiais : []).map((fl, $index) => (
                             <Fragment key={$index}>
-                              <div
+                              <div role="button" tabIndex={0}
                                 onClick={fl?.onClick}
                                 data-tx-filial-chip={fl?.k}
                                 style={{
@@ -1023,7 +1023,7 @@ export default class Viagens extends Tela {
               </div>
               {(Array.isArray(v.ativos) ? v.ativos : []).map((at, $index) => (
                 <Fragment key={$index}>
-                  <span
+                  <span role="button" tabIndex={0}
                     onClick={at?.onClick}
                     title="Tirar este filtro"
                     style={{
@@ -1050,7 +1050,7 @@ export default class Viagens extends Tela {
                 {v.filtroAtivo ? (
                   <>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                      <span
+                      <span role="button" tabIndex={0}
                         onClick={v.limpar}
                         data-tx-limpar=""
                         style={{ fontSize: '12.5px', fontWeight: '700', color: 'var(--texto-sec)', cursor: 'pointer', whiteSpace: 'nowrap' }}
@@ -1060,7 +1060,7 @@ export default class Viagens extends Tela {
                       </span>
                       <div data-tx-pop="" style={{ position: 'relative' }}>
                         {' '}
-                        <span
+                        <span role="button" tabIndex={0}
                           onClick={v.abrirSalvar}
                           data-tx-salvar-visao=""
                           style={{ fontSize: '12.5px', fontWeight: '800', color: 'var(--primario-2)', cursor: 'pointer', whiteSpace: 'nowrap' }}
@@ -1105,7 +1105,7 @@ export default class Viagens extends Tela {
                                 }}
                               />
                               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-                                <span
+                                <span role="button" tabIndex={0}
                                   onClick={v.confirmarVisao}
                                   data-tx-confirmar-visao=""
                                   style={{
@@ -1151,7 +1151,7 @@ export default class Viagens extends Tela {
                   <div style={{ fontSize: '12.5px', color: 'var(--texto-2)', lineHeight: '1.5', flex: '1' }}>{v.dica}</div>
                   {v.temDicaAcao ? (
                     <>
-                      <span
+                      <span role="button" tabIndex={0}
                         onClick={v.dicaAcao}
                         data-tx-conciliar=""
                         style={{
@@ -1337,7 +1337,7 @@ export default class Viagens extends Tela {
               {v.temPaginacao ? (
                 <>
                   <div style={{ marginLeft: 'auto', display: 'flex', gap: '5px', alignItems: 'center' }}>
-                    <span
+                    <span role="button" tabIndex={0}
                       onClick={v.pagAnt}
                       style={{ fontSize: '13px', fontWeight: '700', color: v.pagAntC, cursor: v.pagAntCur, padding: '4px 8px' }}
                     >
@@ -1345,7 +1345,7 @@ export default class Viagens extends Tela {
                     </span>
                     {(Array.isArray(v.paginas) ? v.paginas : []).map((pg, $index) => (
                       <Fragment key={$index}>
-                        <span
+                        <span role="button" tabIndex={0}
                           onClick={pg?.onClick}
                           style={{
                             fontFamily: "'Spline Sans Mono',monospace",
@@ -1367,7 +1367,7 @@ export default class Viagens extends Tela {
                         </span>
                       </Fragment>
                     ))}
-                    <span
+                    <span role="button" tabIndex={0}
                       onClick={v.pagProx}
                       style={{ fontSize: '13px', fontWeight: '700', color: v.pagProxC, cursor: v.pagProxCur, padding: '4px 8px' }}
                     >
@@ -1395,7 +1395,7 @@ export default class Viagens extends Tela {
                 padding: '32px',
               }}
             >
-              <div
+              <div role="dialog" aria-modal="true"
                 onClick={v.pararClique}
                 data-tx-modal="conciliar"
                 style={{
@@ -1410,7 +1410,7 @@ export default class Viagens extends Tela {
               >
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <div style={{ fontSize: '16px', fontWeight: '800' }}>Conciliar CT-e e NF em lote</div>
-                  <span
+                  <span role="button" tabIndex={0}
                     onClick={v.fecharModal}
                     style={{
                       marginLeft: 'auto',
@@ -1450,7 +1450,7 @@ export default class Viagens extends Tela {
                     <div style={{ fontSize: '13.5px', fontWeight: '800' }}>{v.arqTitulo}</div>
                     <div style={{ fontSize: '12px', color: 'var(--texto-sec)' }}>planilha (.xlsx, .csv) ou XML de CT-e (.xml, .zip)</div>
                   </div>
-                  <span onClick={v.usarExemplo} data-tx-lote-exemplo="" style={{ fontSize: '12px', fontWeight: '800', color: 'var(--primario-2)' }}>
+                  <span role="button" tabIndex={0} onClick={v.usarExemplo} data-tx-lote-exemplo="" style={{ fontSize: '12px', fontWeight: '800', color: 'var(--primario-2)' }}>
                     usar o lote de exemplo
                   </span>
                 </label>
@@ -1505,7 +1505,7 @@ export default class Viagens extends Tela {
                   </>
                 ) : null}
                 <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
-                  <span
+                  <span role="button" tabIndex={0}
                     onClick={v.fecharModal}
                     style={{
                       background: 'var(--superficie-2)',
@@ -1518,7 +1518,7 @@ export default class Viagens extends Tela {
                   >
                     Cancelar
                   </span>
-                  <span
+                  <span role="button" tabIndex={0}
                     onClick={v.confirmarConciliar}
                     data-tx-confirmar=""
                     style={{

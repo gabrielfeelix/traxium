@@ -370,7 +370,7 @@ export default class Hoje extends Tela {
           pedido: x.pedido
             ? 'pedida por ' + TX.usuario(x.pedido.por).nome.split(' ')[0] + ' às ' + F.hora(x.pedido.em)
             : 'sem pedido da filial',
-          pedC: x.pedido ? '#b85a2e' : 'var(--texto-desab)',
+          pedC: x.pedido ? '#b85a2e' : 'var(--texto-apagado)',
           pedFw: x.pedido ? '700' : '500',
         };
       }),
@@ -546,7 +546,7 @@ export default class Hoje extends Tela {
         ['Ordem', 1],
         ['Quem carrega', 2],
         ['Link', 3],
-      ].map(([n, i]) => ({ n, bg: i <= p ? 'linear-gradient(90deg,var(--primario),var(--azul))' : 'var(--borda)', c: i <= p ? 'var(--primario-2)' : 'var(--texto-desab)' })),
+      ].map(([n, i]) => ({ n, bg: i <= p ? 'linear-gradient(90deg,var(--primario),var(--azul))' : 'var(--borda)', c: i <= p ? 'var(--primario-2)' : 'var(--texto-apagado)' })),
       nP1: p === 1,
       nP2: p === 2,
       nP3: p === 3,
@@ -753,7 +753,7 @@ export default class Hoje extends Tela {
               {v.temFiliais ? (
                 <>
                   <div data-tx-pop="" style={{ position: 'relative' }}>
-                    <div
+                    <div role="button" tabIndex={0}
                       onClick={v.onFilial}
                       data-tx-filial=""
                       style={{
@@ -790,7 +790,7 @@ export default class Hoje extends Tela {
                         >
                           {(Array.isArray(v.filiais) ? v.filiais : []).map((fl, $index) => (
                             <Fragment key={$index}>
-                              <div
+                              <div role="button" tabIndex={0}
                                 onClick={fl?.onClick}
                                 data-tx-filial-op={fl?.id}
                                 style={{
@@ -820,7 +820,7 @@ export default class Hoje extends Tela {
                   </div>
                 </>
               ) : null}
-              <span
+              <span role="button" tabIndex={0}
                 onClick={v.abrirNova}
                 data-tx-nova-viagem=""
                 style={{
@@ -898,7 +898,7 @@ export default class Hoje extends Tela {
                     </div>
                     {(Array.isArray(v.resItens) ? v.resItens : []).map((ri, $index) => (
                       <Fragment key={$index}>
-                        <span
+                        <span role="button" tabIndex={0}
                           onClick={ri?.onClick}
                           data-tx-ir-grupo={ri?.k}
                           style={{
@@ -1005,7 +1005,7 @@ export default class Hoje extends Tela {
               {(Array.isArray(v.grupos) ? v.grupos : []).map((gr, $index) => (
                 <Fragment key={$index}>
                   <div id={gr?.ancora} style={{ display: 'flex', flexDirection: 'column', gap: '10px', scrollMarginTop: '16px' }}>
-                    <div
+                    <div role="button" tabIndex={0}
                       onClick={gr?.toggle}
                       style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '4px 4px 0', cursor: 'pointer' }}
                     >
@@ -1175,7 +1175,7 @@ export default class Hoje extends Tela {
                               </A>
                               {ln?.temAcao ? (
                                 <>
-                                  <span
+                                  <span role="button" tabIndex={0}
                                     onClick={ln?.onAcao}
                                     data-tx-acao-linha={ln?.acaoK}
                                     style={{
@@ -1435,7 +1435,7 @@ export default class Hoje extends Tela {
                         {'afretador: '}
                         {cf?.afretador}
                       </div>
-                      <span
+                      <span role="button" tabIndex={0}
                         onClick={cf?.onClick}
                         data-tx-abrir-mesa={cf?.id}
                         style={{
@@ -1695,7 +1695,7 @@ export default class Hoje extends Tela {
                 padding: '28px',
               }}
             >
-              <div
+              <div role="dialog" aria-modal="true"
                 onClick={v.pararClique}
                 data-tx-modal="nova"
                 style={{
@@ -1714,7 +1714,7 @@ export default class Hoje extends Tela {
                     {'filial '}
                     {v.nFilialNome}
                   </span>
-                  <span
+                  <span role="button" tabIndex={0}
                     onClick={v.fecharModal}
                     style={{
                       marginLeft: 'auto',
@@ -1789,7 +1789,7 @@ export default class Hoje extends Tela {
                         <div style={{ fontSize: '14px', fontWeight: '800' }}>{v.pdfTitulo}</div>
                         <div style={{ fontSize: '12px', color: 'var(--texto-sec)' }}>{v.pdfSub}</div>
                       </div>
-                      <span
+                      <span role="button" tabIndex={0}
                         onClick={v.usarOrdemExemplo}
                         data-tx-ordem-exemplo=""
                         style={{ fontSize: '12px', fontWeight: '800', color: 'var(--primario-2)', whiteSpace: 'nowrap' }}
@@ -1834,7 +1834,7 @@ export default class Hoje extends Tela {
                             >
                               {(Array.isArray(v.nProdOps) ? v.nProdOps : []).map((po, $index) => (
                                 <Fragment key={$index}>
-                                  <div
+                                  <div role="button" tabIndex={0}
                                     onClick={po?.onClick}
                                     data-tx-produto-op={po?.id}
                                     style={{ padding: '7px 10px', borderRadius: '8px', cursor: 'pointer', fontSize: '13px' }}
@@ -1872,7 +1872,7 @@ export default class Hoje extends Tela {
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
                           {(Array.isArray(v.nEmbs) ? v.nEmbs : []).map((ne, $index) => (
                             <Fragment key={$index}>
-                              <span
+                              <span role="button" tabIndex={0}
                                 onClick={ne?.onClick}
                                 style={{
                                   fontSize: '12px',
@@ -1896,7 +1896,7 @@ export default class Hoje extends Tela {
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
                           {(Array.isArray(v.nDests) ? v.nDests : []).map((nd, $index) => (
                             <Fragment key={$index}>
-                              <span
+                              <span role="button" tabIndex={0}
                                 onClick={nd?.onClick}
                                 style={{
                                   fontSize: '12px',
@@ -1920,7 +1920,7 @@ export default class Hoje extends Tela {
                         <div style={{ display: 'flex', gap: '6px', marginTop: '6px', alignItems: 'center' }}>
                           {(Array.isArray(v.nDias) ? v.nDias : []).map((nx, $index) => (
                             <Fragment key={$index}>
-                              <span
+                              <span role="button" tabIndex={0}
                                 onClick={nx?.onClick}
                                 style={{
                                   fontSize: '12px',
@@ -1996,7 +1996,7 @@ export default class Hoje extends Tela {
                     <div style={{ display: 'flex', gap: '6px', marginTop: '16px' }}>
                       {(Array.isArray(v.nTipos) ? v.nTipos : []).map((nt, $index) => (
                         <Fragment key={$index}>
-                          <span
+                          <span role="button" tabIndex={0}
                             onClick={nt?.onClick}
                             data-tx-tipo={nt?.k}
                             style={{
@@ -2039,7 +2039,7 @@ export default class Hoje extends Tela {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '10px' }}>
                           {(Array.isArray(v.nAchados) ? v.nAchados : []).map((na, $index) => (
                             <Fragment key={$index}>
-                              <div
+                              <div role="button" tabIndex={0}
                                 onClick={na?.onClick}
                                 data-tx-achado={na?.id}
                                 style={{
@@ -2164,7 +2164,7 @@ export default class Hoje extends Tela {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '14px' }}>
                           {(Array.isArray(v.nConjs) ? v.nConjs : []).map((nc, $index) => (
                             <Fragment key={$index}>
-                              <div
+                              <div role="button" tabIndex={0}
                                 onClick={nc?.onClick}
                                 style={{
                                   display: 'flex',
@@ -2266,7 +2266,7 @@ export default class Hoje extends Tela {
                   <span style={{ fontSize: '12px', color: 'var(--texto-apagado)', marginRight: 'auto' }}>{v.nDica}</span>
                   {v.nVoltar ? (
                     <>
-                      <span
+                      <span role="button" tabIndex={0}
                         onClick={v.nVoltarFn}
                         style={{
                           background: 'var(--superficie-2)',
@@ -2298,7 +2298,7 @@ export default class Hoje extends Tela {
                       </A>
                     </>
                   ) : null}
-                  <span
+                  <span role="button" tabIndex={0}
                     onClick={v.nAvancar}
                     data-tx-confirmar=""
                     style={{

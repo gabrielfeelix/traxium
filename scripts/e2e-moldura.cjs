@@ -81,6 +81,19 @@ const ok = (c, m) => { console.log((c ? 'ok    ' : 'FALHOU ') + m); if (!c) falh
   await pg.click('[data-tx-avatar]'); await pg.click('text=Entrar como'); await pg.click('[data-tx-usuario="u-diego"]'); await pg.waitForTimeout(300);
   ok(/Diego Saldanha/.test(await pg.innerText('[data-tx-header]')) && /Diego Saldanha/.test(await pg.innerText('[data-tx-toast]')), 'Entrar como troca a pessoa no header e avisa no toast');
 
+  // 7b. teclado: clicável de tela abre com Enter, foco fica no diálogo, Esc fecha e devolve o foco
+  await pg.goto(base + '/frota'); await pg.waitForTimeout(1200);
+  const gatilho = pg.locator('[data-tx-escopo]').first();
+  await gatilho.focus(); await pg.keyboard.press('Enter'); await pg.waitForTimeout(300);
+  ok(await pg.locator('[data-tela="Frota"] [role="dialog"]').count() === 1, 'Enter num clicável da tela abre o modal');
+  ok(await pg.evaluate(() => !!document.activeElement.closest('[role="dialog"]')), 'o foco entra no modal');
+  for (let i = 0; i < 8; i++) await pg.keyboard.press('Tab');
+  ok(await pg.evaluate(() => !!document.activeElement.closest('[role="dialog"]')), 'Tab circula só dentro do modal');
+  await pg.keyboard.press('Escape'); await pg.waitForTimeout(250);
+  ok(await pg.locator('[data-tela="Frota"] [role="dialog"]').count() === 0 && await pg.evaluate(() => document.activeElement.hasAttribute('data-tx-escopo')), 'Esc fecha e o foco volta ao botão que abriu');
+  await pg.focus('[data-tx-gbusca]');
+  ok(await pg.evaluate(() => getComputedStyle(document.querySelector('.mo-busca-campo')).borderColor) === 'rgb(18, 118, 112)', 'campo em foco acende a caixa');
+
   // 8. tela baixa: a sidebar rola por dentro e o rodapé não some
   await pg.setViewportSize({ width: 1366, height: 560 }); await pg.waitForTimeout(300);
   const baixa = await pg.evaluate(() => {

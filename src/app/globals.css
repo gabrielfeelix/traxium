@@ -23,10 +23,12 @@
   /* texto */
   --texto: #0b2224;
   --texto-2: #3c4f4e;
-  --texto-sec: #5c706e;
-  --texto-apagado: #7c8f8d;
-  --placeholder: #8ba09e;
-  --texto-desab: #9db0ae;
+  /* Medidos contra a superfície mais escura em que texto cai (#f0f4f3), não só contra o branco.
+     Antes: #5c706e dava 4,74:1 ali, #7c8f8d dava 3,07:1 e o placeholder 2,49:1. */
+  --texto-sec: #526664;     /* 6,10:1 no branco, 5,50:1 na superfície */
+  --texto-apagado: #5f7270; /* 5,09:1 e 4,59:1 */
+  --placeholder: #66797a;   /* 4,58:1 no branco, que é o fundo dos campos */
+  --texto-desab: #9db0ae;   /* só controle desabilitado, que a WCAG isenta */
 
   /* marca */
   --primario: #127670;
@@ -37,8 +39,9 @@
   --degrade-primario: linear-gradient(135deg, #127670, #0e78b5);
 
   /* semânticas */
-  --ok: #1a8f57;
-  --aviso: #b97514;
+  /* Verde e âmbar de texto escurecidos para AA: #1a8f57 dava 4,11:1 e #b97514, 3,74:1. */
+  --ok: #177d4c;
+  --aviso: #9a6210;
   --aviso-2: #e8a33d;
   --perigo: #c43d3d;
   --tecnico: #93313f;
@@ -76,6 +79,15 @@ button { font: inherit; }
 
 /* Foco visível para quem usa teclado; o clique de mouse não acende o anel. */
 :focus-visible { outline: 2px solid var(--primario); outline-offset: 2px; }
+/* As telas tiram o contorno dos campos com outline:none inline. Campo com borda própria ganha
+   o anel nele; campo sem borda (dentro de uma caixa) acende a caixa. */
+input:not([style*="border: none"]):focus-visible, textarea:not([style*="border: none"]):focus-visible, select:focus-visible {
+  outline: 2px solid var(--primario) !important; outline-offset: 1px !important;
+}
+input[style*="border: none"]:focus-visible, textarea[style*="border: none"]:focus-visible { outline: none !important; }
+:has(> input[style*="border: none"]:focus-visible), :has(> textarea[style*="border: none"]:focus-visible) {
+  border-color: var(--primario) !important; box-shadow: 0 0 0 3px rgba(18, 118, 112, .14) !important;
+}
 
 @keyframes txsh { from { background-position: -600px 0 } to { background-position: 600px 0 } }
 @keyframes pulso { 0% { box-shadow: 0 0 0 0 rgba(14,120,181,.45) } 70% { box-shadow: 0 0 0 7px rgba(14,120,181,0) } 100% { box-shadow: 0 0 0 0 rgba(14,120,181,0) } }

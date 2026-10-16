@@ -14,7 +14,7 @@ import TX from './tx-dados';
     falta: { dot: 'linear-gradient(135deg,#f4c15d,var(--aviso-2))', ring: 'rgba(232,163,61,.2)', c: 'var(--aviso)', bd: 'var(--aviso-borda)' },
     bloqueio: { dot: 'linear-gradient(135deg,#e46969,var(--perigo))', ring: 'rgba(196,61,61,.16)', c: 'var(--perigo)', bd: 'var(--perigo-borda)' },
     tecnico: { dot: 'linear-gradient(135deg,var(--perigo),#7d2232)', ring: 'rgba(147,49,63,.2)', c: 'var(--tecnico)', bd: '#ebc3c8' },
-    na: { dot: '#dde5e3', ring: 'rgba(157,176,174,.14)', c: 'var(--texto-desab)', bd: 'var(--borda)' },
+    na: { dot: '#dde5e3', ring: 'rgba(157,176,174,.14)', c: 'var(--texto-apagado)', bd: 'var(--borda)' },
     info: { dot: 'linear-gradient(135deg,#5b8def,var(--azul))', ring: 'rgba(14,120,181,.16)', c: 'var(--azul)', bd: 'var(--info-borda)' },
     autoridade: { dot: 'linear-gradient(135deg,#f4c15d,#d97544)', ring: 'rgba(217,117,68,.18)', c: '#b85a2e', bd: '#f0d3bf' }
   };

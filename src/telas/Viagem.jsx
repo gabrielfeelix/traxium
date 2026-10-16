@@ -168,7 +168,7 @@ export default class Viagem extends Tela {
       st: 'feito',
     });
     const atual = (n) => ({ bg: '#fff', c: 'var(--primario-2)', sh: '0 0 0 2.5px var(--primario)', icon: n, subC: 'var(--aviso)', st: 'atual' });
-    const pend = (n) => ({ bg: 'var(--superficie-2)', c: 'var(--texto-desab)', sh: 'none', icon: n, subC: 'var(--texto-desab)', st: 'pend' });
+    const pend = (n) => ({ bg: 'var(--superficie-2)', c: 'var(--texto-apagado)', sh: 'none', icon: n, subC: 'var(--texto-apagado)', st: 'pend' });
     const bloq = (n) => ({
       bg: 'linear-gradient(135deg,#e46969,var(--perigo))',
       c: '#fff',
@@ -229,7 +229,7 @@ export default class Viagem extends Tela {
         dot: tm.dot,
         ring: tm.ring,
         c: tm.c,
-        tc: c.estado === 'na' ? 'var(--texto-desab)' : 'var(--texto)',
+        tc: c.estado === 'na' ? 'var(--texto-apagado)' : 'var(--texto)',
         rot: c.liberadaPor ? 'reprova' : c.tecnico && c.estado === 'bloqueio' ? 'técnico' : ROT[c.estado],
         aviso: !!c.aviso && c.estado === 'ok',
         lib: !!c.liberadaPor,
@@ -247,7 +247,7 @@ export default class Viagem extends Tela {
             rot: 'T-' + (i + 1),
             data: '',
             nome: 'não informada',
-            nc: 'var(--texto-desab)',
+            nc: 'var(--texto-apagado)',
             bg: 'repeating-linear-gradient(-45deg,var(--superficie) 0 6px,var(--superficie-2) 6px 12px)',
             bd: 'var(--borda-suave)',
             regD: 'none',
@@ -475,7 +475,7 @@ export default class Viagem extends Tela {
       em: p[1] ? F.quando(p[1]) : '',
       bg: p[1] ? 'linear-gradient(135deg,#48c78e,var(--ok))' : '#dde5e3',
       icon: p[1] ? '✓' : '',
-      c: p[1] ? 'var(--texto)' : 'var(--texto-desab)',
+      c: p[1] ? 'var(--texto)' : 'var(--texto-apagado)',
     }));
     const lt2 = {
       nao_enviado: U.tom('falta'),
@@ -1356,7 +1356,7 @@ export default class Viagem extends Tela {
               <span style={{ fontFamily: "'Spline Sans Mono',monospace", color: 'var(--texto)' }}>{v.vOrdem}</span>
             </div>
             <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div
+              <div role="button" tabIndex={0}
                 onClick={v.abrirExportar}
                 style={{
                   background: 'var(--painel)',
@@ -1387,7 +1387,7 @@ export default class Viagem extends Tela {
                 Exportar registro
               </div>
               <div data-tx-pop="" style={{ position: 'relative' }}>
-                <div
+                <div role="button" tabIndex={0}
                   onClick={v.abrirAcoes}
                   data-tx-acoes=""
                   style={{
@@ -1423,7 +1423,7 @@ export default class Viagem extends Tela {
                     >
                       {(Array.isArray(v.acoesLista) ? v.acoesLista : []).map((ac, $index) => (
                         <Fragment key={$index}>
-                          <div
+                          <div role="button" tabIndex={0}
                             onClick={ac?.onClick}
                             style={{ padding: '9px 12px', borderRadius: '10px', cursor: ac?.cur, opacity: ac?.op }}
                             className="tx-h894fca3"
@@ -1531,7 +1531,7 @@ export default class Viagem extends Tela {
                 <div style={{ fontSize: '14px', color: 'var(--texto-2)' }}>
                   <b style={{ fontWeight: '700' }}>{v.embNome}</b>
                   {', '}
-                  {v.embCidade} <span style={{ color: 'var(--texto-desab)' }}>→</span> <b style={{ fontWeight: '700' }}>{v.destNome}</b>
+                  {v.embCidade} <span style={{ color: 'var(--texto-apagado)' }}>→</span> <b style={{ fontWeight: '700' }}>{v.destNome}</b>
                   {', '}
                   {v.destCidade}
                   <span style={{ color: 'var(--texto-apagado)' }}>
@@ -1666,7 +1666,7 @@ export default class Viagem extends Tela {
                       </div>
                       {v.temAutoridade ? (
                         <>
-                          <div
+                          <div role="button" tabIndex={0}
                             onClick={v.verRegistro}
                             style={{
                               marginTop: '12px',
@@ -1722,7 +1722,7 @@ export default class Viagem extends Tela {
                         {v.declaracao}
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '12px' }}>
-                        <span
+                        <span role="button" tabIndex={0}
                           onClick={v.copiarDeclaracao}
                           data-tx-copiar-declaracao=""
                           style={{
@@ -1806,7 +1806,7 @@ export default class Viagem extends Tela {
                             </span>
                             {fl?.temAcao ? (
                               <>
-                                <span
+                                <span role="button" tabIndex={0}
                                   onClick={fl?.onClick}
                                   data-tx-falta-acao={fl?.k}
                                   style={{
@@ -1873,7 +1873,7 @@ export default class Viagem extends Tela {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '7px', alignItems: 'flex-end', flex: 'none' }}>
                       {v.podePedir ? (
                         <>
-                          <span
+                          <span role="button" tabIndex={0}
                             onClick={v.pedirLib}
                             data-tx-pedir-liberacao=""
                             style={{
@@ -1924,7 +1924,7 @@ export default class Viagem extends Tela {
                       ) : null}
                       {v.podeLiberar ? (
                         <>
-                          <span
+                          <span role="button" tabIndex={0}
                             onClick={v.abrirLiberar}
                             data-tx-liberar=""
                             style={{
@@ -1962,7 +1962,7 @@ export default class Viagem extends Tela {
                           </A>
                         </>
                       ) : null}
-                      <span
+                      <span role="button" tabIndex={0}
                         onClick={v.abrirManter}
                         style={{
                           background: 'var(--superficie-2)',
@@ -2021,7 +2021,7 @@ export default class Viagem extends Tela {
                         </div>
                       </div>
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                        <div
+                        <div role="button" tabIndex={0}
                           onClick={v.abrirTrocar}
                           data-tx-trocar=""
                           style={{
@@ -2038,7 +2038,7 @@ export default class Viagem extends Tela {
                             Outro TAC ou outra carreta. T-3 e checklist voltam a ser pedidos.
                           </div>
                         </div>
-                        <div
+                        <div role="button" tabIndex={0}
                           onClick={v.abrirRegularizar}
                           data-tx-regularizar=""
                           style={{
@@ -2163,7 +2163,7 @@ export default class Viagem extends Tela {
                         {' de '}
                         {v.totalN}
                       </div>
-                      <span
+                      <span role="button" tabIndex={0}
                         onClick={v.chToggle}
                         data-tx-ver-checagens=""
                         style={{
@@ -2245,7 +2245,7 @@ export default class Viagem extends Tela {
                                 ) : null}
                                 {ck?.lib ? (
                                   <>
-                                    <span
+                                    <span role="button" tabIndex={0}
                                       onClick={v.verRegistro}
                                       style={{
                                         fontSize: '11px',
@@ -2434,7 +2434,7 @@ export default class Viagem extends Tela {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: '10px', marginTop: '14px' }}>
                       {(Array.isArray(v.itensCk) ? v.itensCk : []).map((it, $index) => (
                         <Fragment key={$index}>
-                          <div
+                          <div role="button" tabIndex={0}
                             onClick={it?.onClick}
                             data-tx-foto={it?.k}
                             style={{
@@ -2550,7 +2550,7 @@ export default class Viagem extends Tela {
                           <div style={{ flex: '1', fontSize: '13px' }}>
                             <b>Sua vez de conferir.</b> Abra cada foto se precisar. Item crítico (interior) reprovado bloqueia a viagem.
                           </div>
-                          <span
+                          <span role="button" tabIndex={0}
                             onClick={v.abrirDevolver}
                             data-tx-devolver=""
                             style={{
@@ -2567,7 +2567,7 @@ export default class Viagem extends Tela {
                           >
                             Devolver ao motorista
                           </span>
-                          <span
+                          <span role="button" tabIndex={0}
                             onClick={v.aprovar}
                             data-tx-aprovar=""
                             style={{
@@ -2596,7 +2596,7 @@ export default class Viagem extends Tela {
                           <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)' }}>
                             regime acima de seco pede lavador credenciado e comprovante
                           </div>
-                          <span
+                          <span role="button" tabIndex={0}
                             onClick={v.abrirLimpeza}
                             style={{ marginLeft: 'auto', fontSize: '12.5px', fontWeight: '800', color: 'var(--primario-2)', cursor: 'pointer' }}
                             className="tx-h76d8d79"
@@ -2865,7 +2865,7 @@ export default class Viagem extends Tela {
                       ))}
                     </div>
                     <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
-                      <span
+                      <span role="button" tabIndex={0}
                         onClick={v.abrirMensagem}
                         data-tx-mensagem=""
                         style={{
@@ -2932,7 +2932,7 @@ export default class Viagem extends Tela {
                   <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px' }}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                       <div style={{ fontSize: '15px', fontWeight: '800' }}>Ocorrências</div>
-                      <span
+                      <span role="button" tabIndex={0}
                         onClick={v.abrirOcorrencia}
                         data-tx-nova-ocorrencia=""
                         style={{ marginLeft: 'auto', fontSize: '12.5px', fontWeight: '800', color: 'var(--primario-2)', cursor: 'pointer' }}
@@ -2994,7 +2994,7 @@ export default class Viagem extends Tela {
                 padding: '32px',
               }}
             >
-              <div
+              <div role="dialog" aria-modal="true"
                 onClick={v.pararClique}
                 data-tx-modal={v.mK}
                 style={{
@@ -3022,7 +3022,7 @@ export default class Viagem extends Tela {
                   >
                     {v.vOrdem}
                   </span>
-                  <span
+                  <span role="button" tabIndex={0}
                     onClick={v.fecharModal}
                     style={{
                       marginLeft: 'auto',
@@ -3079,7 +3079,7 @@ export default class Viagem extends Tela {
                       >
                         Abrir como motorista
                       </A>
-                      <span
+                      <span role="button" tabIndex={0}
                         onClick={v.copiarMensagem}
                         data-tx-copiar-mensagem=""
                         style={{
@@ -3158,7 +3158,7 @@ export default class Viagem extends Tela {
                     <div style={{ display: 'flex', gap: '7px', flexWrap: 'wrap', marginTop: '8px' }}>
                       {(Array.isArray(v.devItens) ? v.devItens : []).map((di, $index) => (
                         <Fragment key={$index}>
-                          <span
+                          <span role="button" tabIndex={0}
                             onClick={di?.onClick}
                             data-tx-dev-item={di?.k}
                             style={{
@@ -3198,7 +3198,7 @@ export default class Viagem extends Tela {
                       }}
                     ></textarea>
                     <div style={{ display: 'flex', gap: '8px', marginTop: '14px', justifyContent: 'flex-end' }}>
-                      <span
+                      <span role="button" tabIndex={0}
                         onClick={v.fecharModal}
                         style={{
                           background: 'var(--superficie-2)',
@@ -3211,7 +3211,7 @@ export default class Viagem extends Tela {
                       >
                         Cancelar
                       </span>
-                      <span
+                      <span role="button" tabIndex={0}
                         onClick={v.confirmarDevolver}
                         data-tx-confirmar=""
                         style={{
@@ -3267,7 +3267,7 @@ export default class Viagem extends Tela {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '6px' }}>
                           {(Array.isArray(v.libMotivos) ? v.libMotivos : []).map((lm, $index) => (
                             <Fragment key={$index}>
-                              <div
+                              <div role="button" tabIndex={0}
                                 onClick={lm?.onClick}
                                 data-tx-lib-motivo=""
                                 style={{
@@ -3359,7 +3359,7 @@ export default class Viagem extends Tela {
                           </div>
                           {v.libTrocar ? (
                             <>
-                              <span
+                              <span role="button" tabIndex={0}
                                 onClick={v.abrirEntrar}
                                 style={{ fontSize: '12px', fontWeight: '800', color: 'var(--primario-2)', cursor: 'pointer' }}
                               >
@@ -3374,7 +3374,7 @@ export default class Viagem extends Tela {
                         <div style={{ display: 'flex', gap: '7px', marginTop: '6px' }}>
                           {(Array.isArray(v.libRiscos) ? v.libRiscos : []).map((lr, $index) => (
                             <Fragment key={$index}>
-                              <span
+                              <span role="button" tabIndex={0}
                                 onClick={lr?.onClick}
                                 style={{
                                   fontSize: '12.5px',
@@ -3398,7 +3398,7 @@ export default class Viagem extends Tela {
                         <div style={{ display: 'flex', gap: '7px', marginTop: '6px' }}>
                           {(Array.isArray(v.libValidades) ? v.libValidades : []).map((lv, $index) => (
                             <Fragment key={$index}>
-                              <span
+                              <span role="button" tabIndex={0}
                                 onClick={lv?.onClick}
                                 style={{
                                   fontSize: '12.5px',
@@ -3438,14 +3438,14 @@ export default class Viagem extends Tela {
                             {v.fEvidTxt}
                           </span>
                         </label>
-                        <span
+                        <span role="button" tabIndex={0}
                           onClick={v.evidenciaExemplo}
                           style={{ fontSize: '11.5px', color: 'var(--texto-apagado)', cursor: 'pointer', textDecoration: 'underline' }}
                         >
                           usar documento de exemplo
                         </span>
                       </div>
-                      <div onClick={v.toggleEscopo} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', cursor: 'pointer' }}>
+                      <div role="button" tabIndex={0} onClick={v.toggleEscopo} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', cursor: 'pointer' }}>
                         <span
                           style={{
                             width: '19px',
@@ -3468,7 +3468,7 @@ export default class Viagem extends Tela {
                           <b>8. Escopo.</b> Vale só para esta viagem e não cria precedente para outras.
                         </div>
                       </div>
-                      <div onClick={v.toggleCiencia} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', cursor: 'pointer' }}>
+                      <div role="button" tabIndex={0} onClick={v.toggleCiencia} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', cursor: 'pointer' }}>
                         <span
                           style={{
                             width: '19px',
@@ -3493,7 +3493,7 @@ export default class Viagem extends Tela {
                       </div>
                     </div>
                     <div style={{ display: 'flex', gap: '8px', marginTop: '18px', justifyContent: 'flex-end' }}>
-                      <span
+                      <span role="button" tabIndex={0}
                         onClick={v.fecharModal}
                         style={{
                           background: 'var(--superficie-2)',
@@ -3506,7 +3506,7 @@ export default class Viagem extends Tela {
                       >
                         Cancelar
                       </span>
-                      <span
+                      <span role="button" tabIndex={0}
                         onClick={v.confirmarLiberar}
                         data-tx-confirmar=""
                         style={{
@@ -3554,7 +3554,7 @@ export default class Viagem extends Tela {
                     <div style={{ display: 'flex', gap: '7px', flexWrap: 'wrap', marginTop: '8px' }}>
                       {(Array.isArray(v.manterAcoes) ? v.manterAcoes : []).map((ma, $index) => (
                         <Fragment key={$index}>
-                          <span
+                          <span role="button" tabIndex={0}
                             onClick={ma?.onClick}
                             style={{
                               fontSize: '12.5px',
@@ -3592,7 +3592,7 @@ export default class Viagem extends Tela {
                       }}
                     ></textarea>
                     <div style={{ display: 'flex', gap: '8px', marginTop: '14px', justifyContent: 'flex-end' }}>
-                      <span
+                      <span role="button" tabIndex={0}
                         onClick={v.fecharModal}
                         style={{
                           background: 'var(--superficie-2)',
@@ -3605,7 +3605,7 @@ export default class Viagem extends Tela {
                       >
                         Cancelar
                       </span>
-                      <span
+                      <span role="button" tabIndex={0}
                         onClick={v.confirmarManter}
                         data-tx-confirmar=""
                         style={{
@@ -3629,7 +3629,7 @@ export default class Viagem extends Tela {
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '14px' }}>
                       {(Array.isArray(v.regOpcoes) ? v.regOpcoes : []).map((ro, $index) => (
                         <Fragment key={$index}>
-                          <div
+                          <div role="button" tabIndex={0}
                             onClick={ro?.onClick}
                             style={{
                               border: `1.5px solid ${ro?.bd ?? ''}`,
@@ -3692,7 +3692,7 @@ export default class Viagem extends Tela {
                       </>
                     ) : null}
                     <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
-                      <span
+                      <span role="button" tabIndex={0}
                         onClick={v.fecharModal}
                         style={{
                           background: 'var(--superficie-2)',
@@ -3705,7 +3705,7 @@ export default class Viagem extends Tela {
                       >
                         Fechar
                       </span>
-                      <span
+                      <span role="button" tabIndex={0}
                         onClick={v.confirmarRegularizar}
                         data-tx-confirmar=""
                         style={{
@@ -3753,7 +3753,7 @@ export default class Viagem extends Tela {
                     >
                       {(Array.isArray(v.trocaOpcoes) ? v.trocaOpcoes : []).map((to, $index) => (
                         <Fragment key={$index}>
-                          <div
+                          <div role="button" tabIndex={0}
                             onClick={to?.onClick}
                             data-tx-troca={to?.id}
                             style={{
@@ -3804,7 +3804,7 @@ export default class Viagem extends Tela {
                       }}
                     />
                     <div style={{ display: 'flex', gap: '8px', marginTop: '14px', justifyContent: 'flex-end' }}>
-                      <span
+                      <span role="button" tabIndex={0}
                         onClick={v.fecharModal}
                         style={{
                           background: 'var(--superficie-2)',
@@ -3817,7 +3817,7 @@ export default class Viagem extends Tela {
                       >
                         Cancelar
                       </span>
-                      <span
+                      <span role="button" tabIndex={0}
                         onClick={v.confirmarTrocar}
                         data-tx-confirmar=""
                         style={{
@@ -3842,7 +3842,7 @@ export default class Viagem extends Tela {
                     <div style={{ display: 'flex', gap: '7px', flexWrap: 'wrap', marginTop: '6px' }}>
                       {(Array.isArray(v.limpComps) ? v.limpComps : []).map((lc, $index) => (
                         <Fragment key={$index}>
-                          <span
+                          <span role="button" tabIndex={0}
                             onClick={lc?.onClick}
                             style={{
                               fontSize: '12.5px',
@@ -3864,7 +3864,7 @@ export default class Viagem extends Tela {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '6px' }}>
                       {(Array.isArray(v.limpLavadores) ? v.limpLavadores : []).map((ll, $index) => (
                         <Fragment key={$index}>
-                          <div
+                          <div role="button" tabIndex={0}
                             onClick={ll?.onClick}
                             style={{
                               display: 'flex',
@@ -3913,7 +3913,7 @@ export default class Viagem extends Tela {
                       }}
                     />
                     <div style={{ display: 'flex', gap: '8px', marginTop: '14px', justifyContent: 'flex-end' }}>
-                      <span
+                      <span role="button" tabIndex={0}
                         onClick={v.fecharModal}
                         style={{
                           background: 'var(--superficie-2)',
@@ -3926,7 +3926,7 @@ export default class Viagem extends Tela {
                       >
                         Cancelar
                       </span>
-                      <span
+                      <span role="button" tabIndex={0}
                         onClick={v.confirmarLimpeza}
                         data-tx-confirmar=""
                         style={{
@@ -3951,7 +3951,7 @@ export default class Viagem extends Tela {
                     <div style={{ display: 'flex', gap: '7px', flexWrap: 'wrap', marginTop: '6px' }}>
                       {(Array.isArray(v.ocTipos) ? v.ocTipos : []).map((ot, $index) => (
                         <Fragment key={$index}>
-                          <span
+                          <span role="button" tabIndex={0}
                             onClick={ot?.onClick}
                             style={{
                               fontSize: '12.5px',
@@ -3973,7 +3973,7 @@ export default class Viagem extends Tela {
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '6px' }}>
                       {(Array.isArray(v.ocGravs) ? v.ocGravs : []).map((og, $index) => (
                         <Fragment key={$index}>
-                          <div
+                          <div role="button" tabIndex={0}
                             onClick={og?.onClick}
                             style={{
                               border: `1.5px solid ${og?.bd ?? ''}`,
@@ -4009,7 +4009,7 @@ export default class Viagem extends Tela {
                       }}
                     ></textarea>
                     <div style={{ display: 'flex', gap: '8px', marginTop: '14px', justifyContent: 'flex-end' }}>
-                      <span
+                      <span role="button" tabIndex={0}
                         onClick={v.fecharModal}
                         style={{
                           background: 'var(--superficie-2)',
@@ -4022,7 +4022,7 @@ export default class Viagem extends Tela {
                       >
                         Cancelar
                       </span>
-                      <span
+                      <span role="button" tabIndex={0}
                         onClick={v.confirmarOcorrencia}
                         data-tx-confirmar=""
                         style={{
@@ -4047,7 +4047,7 @@ export default class Viagem extends Tela {
                     <div style={{ display: 'flex', gap: '7px', marginTop: '6px' }}>
                       {(Array.isArray(v.retCampos) ? v.retCampos : []).map((rt, $index) => (
                         <Fragment key={$index}>
-                          <span
+                          <span role="button" tabIndex={0}
                             onClick={rt?.onClick}
                             style={{
                               fontSize: '12.5px',
@@ -4116,7 +4116,7 @@ export default class Viagem extends Tela {
                       }}
                     />
                     <div style={{ display: 'flex', gap: '8px', marginTop: '14px', justifyContent: 'flex-end' }}>
-                      <span
+                      <span role="button" tabIndex={0}
                         onClick={v.fecharModal}
                         style={{
                           background: 'var(--superficie-2)',
@@ -4129,7 +4129,7 @@ export default class Viagem extends Tela {
                       >
                         Cancelar
                       </span>
-                      <span
+                      <span role="button" tabIndex={0}
                         onClick={v.confirmarRetificar}
                         data-tx-confirmar=""
                         style={{
@@ -4170,7 +4170,7 @@ export default class Viagem extends Tela {
                       }}
                     ></textarea>
                     <div style={{ display: 'flex', gap: '8px', marginTop: '14px', justifyContent: 'flex-end' }}>
-                      <span
+                      <span role="button" tabIndex={0}
                         onClick={v.fecharModal}
                         style={{
                           background: 'var(--superficie-2)',
@@ -4183,7 +4183,7 @@ export default class Viagem extends Tela {
                       >
                         Voltar
                       </span>
-                      <span
+                      <span role="button" tabIndex={0}
                         onClick={v.confirmarCancelar}
                         data-tx-confirmar=""
                         style={{
