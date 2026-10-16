@@ -179,7 +179,7 @@ export default class Frota extends Tela {
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <div>
               <div style={{ fontSize: '24px', fontWeight: '800' }}>Frota própria</div>
-              <div style={{ fontSize: '13.5px', color: 'var(--texto-sec)', marginTop: '2px' }}>{v.subtitulo}</div>
+              <div style={{ fontSize: '14px', color: 'var(--texto-sec)', marginTop: '2px' }}>{v.subtitulo}</div>
             </div>
             <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div role="button" tabIndex={0}
@@ -190,7 +190,7 @@ export default class Frota extends Tela {
                   color: '#fff',
                   borderRadius: '11px',
                   padding: '9px 16px',
-                  fontSize: '13.5px',
+                  fontSize: '14px',
                   fontWeight: '700',
                   cursor: 'pointer',
                 }}
@@ -243,11 +243,11 @@ export default class Frota extends Tela {
                       boxShadow: `0 0 0 3px ${cj?.escRing ?? ''}`,
                     }}
                   ></span>
-                  <span style={{ fontSize: '15px', fontWeight: '800' }}>{cj?.cab}</span>
+                  <span style={{ fontSize: '16px', fontWeight: '800' }}>{cj?.cab}</span>
                   <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '13px', fontWeight: '600', color: 'var(--texto-sec)' }}>
                     {cj?.cabQ}
                   </span>
-                  <span style={{ fontSize: '12.5px', color: 'var(--texto-apagado)' }}>{cj?.cabSub}</span>
+                  <span style={{ fontSize: '13px', color: 'var(--texto-apagado)' }}>{cj?.cabSub}</span>
                 </div>
                 <div
                   data-tx-conjunto={cj?.id}
@@ -308,9 +308,9 @@ export default class Frota extends Tela {
                       {cj?.ini}
                     </span>
                     <div style={{ minWidth: '0' }}>
-                      <div style={{ fontSize: '13.5px', fontWeight: '700' }}>{cj?.motorista}</div>
-                      <div style={{ fontSize: '11.5px', color: cj?.cnhC }}>{cj?.cnh}</div>
-                      <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)' }}>{cj?.treinos}</div>
+                      <div style={{ fontSize: '14px', fontWeight: '700' }}>{cj?.motorista}</div>
+                      <div style={{ fontSize: '12px', color: cj?.cnhC }}>{cj?.cnh}</div>
+                      <div style={{ fontSize: '12px', color: 'var(--texto-apagado)' }}>{cj?.treinos}</div>
                     </div>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -335,7 +335,7 @@ export default class Frota extends Tela {
                           <span
                             style={{
                               fontFamily: "'Spline Sans Mono',monospace",
-                              fontSize: '11.5px',
+                              fontSize: '12px',
                               fontWeight: '600',
                               whiteSpace: 'nowrap',
                               flex: 'none',
@@ -351,7 +351,7 @@ export default class Frota extends Tela {
                                   display: 'inline-flex',
                                   alignItems: 'center',
                                   gap: '5px',
-                                  fontSize: '11.5px',
+                                  fontSize: '12px',
                                   color: 'var(--texto-2)',
                                   whiteSpace: 'nowrap',
                                   minWidth: '0',
@@ -366,7 +366,7 @@ export default class Frota extends Tela {
                                     borderRadius: '5px',
                                     background: cg?.bg,
                                     color: cg?.c,
-                                    fontSize: '9.5px',
+                                    fontSize: '11px',
                                     fontWeight: '800',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -401,7 +401,7 @@ export default class Frota extends Tela {
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '7px',
-                        fontSize: '12.5px',
+                        fontSize: '13px',
                         fontWeight: '800',
                         color: cj?.escC,
                       }}
@@ -417,7 +417,7 @@ export default class Frota extends Tela {
                       ></span>
                       {cj?.esc}
                     </span>
-                    <span style={{ fontSize: '11.5px', color: 'var(--texto-apagado)', textAlign: 'right' }}>{cj?.escSub}</span>
+                    <span style={{ fontSize: '12px', color: 'var(--texto-apagado)', textAlign: 'right' }}>{cj?.escSub}</span>
                     <span role="button" tabIndex={0}
                       onClick={cj?.alternar}
                       data-tx-escopo={cj?.id}
@@ -430,7 +430,7 @@ export default class Frota extends Tela {
               </Fragment>
             ))}
           </div>
-          <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', lineHeight: '1.55', maxWidth: '900px' }}>
+          <div style={{ fontSize: '13px', color: 'var(--texto-sec)', lineHeight: '1.55', maxWidth: '900px' }}>
             Só os conjuntos no escopo GMP+ podem fazer viagem assegurada; o veículo diz se está ou não e desde quando. Conjuntos de TAC e
             ETC ficam em Transportadores. O histórico de cargas pertence ao compartimento (placa da carreta e posição) e continua quando o
             cavalo muda.
@@ -483,7 +483,7 @@ export default class Frota extends Tela {
                     ✕
                   </span>
                 </div>
-                <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '4px', lineHeight: '1.55' }}>{v.mSub}</div>
+                <div style={{ fontSize: '13px', color: 'var(--texto-sec)', marginTop: '4px', lineHeight: '1.55' }}>{v.mSub}</div>
                 <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '14px' }}>
                   MOTIVO (MÍNIMO 10 CARACTERES)
                 </div>
@@ -497,7 +497,7 @@ export default class Frota extends Tela {
                     border: '1px solid var(--borda-campo)',
                     borderRadius: '12px',
                     padding: '10px 12px',
-                    fontSize: '13.5px',
+                    fontSize: '14px',
                     outline: 'none',
                   }}
                 />
@@ -506,7 +506,7 @@ export default class Frota extends Tela {
                     onClick={v.fecharModal}
                     style={{
                       background: 'var(--superficie-2)',
-                      fontSize: '13.5px',
+                      fontSize: '14px',
                       fontWeight: '700',
                       borderRadius: '99px',
                       padding: '10px 20px',
@@ -523,7 +523,7 @@ export default class Frota extends Tela {
                       color: v.ctaC,
                       boxShadow: v.ctaSh,
                       cursor: v.ctaCur,
-                      fontSize: '13.5px',
+                      fontSize: '14px',
                       fontWeight: '800',
                       borderRadius: '99px',
                       padding: '10px 22px',

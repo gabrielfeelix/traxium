@@ -165,3 +165,11 @@ Os três primeiros temas da tabela da seção 5 valem igual para as dez telas; r
 | --- | --- |
 | Os cinzas sobem de contraste mesmo ficando mais próximos entre si; a hierarquia passa a depender mais de peso e tamanho | Se o Gabriel achar a tela pesada, clarear só o que é texto grande (acima de 18 px, que pede 3:1) |
 | `role="button"` em `div` é o caminho mais curto e fiel ao visual; trocar por `<button>` vem com os componentes compartilhados, tela a tela | Nenhuma: é o mesmo destino, por partes |
+
+### Etapa 5. Escala tipográfica (15/10/2026)
+
+**Problema.** 24 tamanhos de fonte nas telas, muitos a meio pixel um do outro (10,5; 11; 11,5; 12; 12,5; 13; 13,5; 14; 14,5; 15; 15,5; 16; 17...). Hoje sozinha usava 18; Viagem, 15. Tamanho próximo não comunica papel diferente, só parece descuido.
+
+**O que mudou.** Sete degraus no escritório, cada um com papel: 11 rótulo, 12 legenda, 13 corpo denso de tabela, 14 corpo e controles, 16 título de cartão, 20 número de destaque, 24 título de página; 32 e 40 ficam para o número grande do painel. Meio pixel arredonda para cima a partir de 12,5 (12,5 vira 13, 13,5 vira 14), o que deixa o corpo levemente maior; 9 a 10,5 viram 11, e 17 vira 16. A escala está anotada em `globals.css`. O Link do motorista fica de fora: a escala de celular entra na revisão dele.
+
+**Teste.** `scripts/conferir-largura.cjs` novo: em 1366x768, 15 estados das nove telas sem estouro lateral e sem rótulo de botão quebrado em duas linhas. Bateria inteira passa.

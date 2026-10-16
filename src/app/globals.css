@@ -59,6 +59,10 @@
   --sb-ativo: linear-gradient(90deg, rgba(26, 158, 147, 0.35), rgba(14, 120, 181, 0.28));
 
   --foco: 0 0 0 2px #fff, 0 0 0 4px #127670;
+
+  /* Escala tipográfica do escritório (px): 11 rótulo, 12 legenda, 13 corpo denso (tabela),
+     14 corpo e controles, 16 título de cartão, 20 número de destaque, 24 título de página;
+     32 e 40 só para o número grande de painel. O Link do motorista tem escala de celular. */
   --fonte: 'Hanken Grotesk', system-ui, sans-serif;
   --fonte-mono: 'Spline Sans Mono', ui-monospace, monospace;
 }

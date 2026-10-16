@@ -520,7 +520,7 @@ export default class Transportadores extends Tela {
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <div>
               <div style={{ fontSize: '24px', fontWeight: '800' }}>Transportadores</div>
-              <div style={{ fontSize: '13.5px', color: 'var(--texto-sec)', marginTop: '2px' }}>{v.subtitulo}</div>
+              <div style={{ fontSize: '14px', color: 'var(--texto-sec)', marginTop: '2px' }}>{v.subtitulo}</div>
             </div>
             <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div role="button" tabIndex={0}
@@ -531,7 +531,7 @@ export default class Transportadores extends Tela {
                   border: '1px solid var(--borda-campo)',
                   borderRadius: '11px',
                   padding: '9px 15px',
-                  fontSize: '13.5px',
+                  fontSize: '14px',
                   fontWeight: '700',
                   cursor: 'pointer',
                 }}
@@ -547,7 +547,7 @@ export default class Transportadores extends Tela {
                   color: '#fff',
                   borderRadius: '99px',
                   padding: '10px 20px',
-                  fontSize: '13.5px',
+                  fontSize: '14px',
                   fontWeight: '800',
                   cursor: 'pointer',
                   boxShadow: '0 6px 14px rgba(18,118,112,.3)',
@@ -579,7 +579,7 @@ export default class Transportadores extends Tela {
                       alignItems: 'center',
                       gap: '7px',
                       padding: '15px 12px 12px',
-                      fontSize: '13.5px',
+                      fontSize: '14px',
                       fontWeight: ab?.fw,
                       color: ab?.c,
                       borderBottom: `2.5px solid ${ab?.bd ?? ''}`,
@@ -643,7 +643,7 @@ export default class Transportadores extends Tela {
                   onChange={v.onBusca}
                   data-tx-busca=""
                   placeholder="Filtrar: nome, CPF, CNPJ, placa ou RNTRC"
-                  style={{ border: 'none', outline: 'none', background: 'transparent', fontSize: '13.5px', flex: '1', minWidth: '0' }}
+                  style={{ border: 'none', outline: 'none', background: 'transparent', fontSize: '14px', flex: '1', minWidth: '0' }}
                 />
               </div>
               <div style={{ display: 'flex', background: 'var(--superficie-2)', borderRadius: '11px', padding: '3px', gap: '2px' }}>
@@ -653,7 +653,7 @@ export default class Transportadores extends Tela {
                       onClick={tp?.onClick}
                       data-tx-tipo={tp?.k}
                       style={{
-                        fontSize: '12.5px',
+                        fontSize: '13px',
                         fontWeight: '700',
                         borderRadius: '9px',
                         padding: '7px 14px',
@@ -668,7 +668,7 @@ export default class Transportadores extends Tela {
                   </Fragment>
                 ))}
               </div>
-              <span style={{ marginLeft: 'auto', fontSize: '12.5px', color: 'var(--texto-apagado)', fontFamily: "'Spline Sans Mono',monospace" }}>
+              <span style={{ marginLeft: 'auto', fontSize: '13px', color: 'var(--texto-apagado)', fontFamily: "'Spline Sans Mono',monospace" }}>
                 {v.contagem}
               </span>
             </div>
@@ -681,7 +681,7 @@ export default class Transportadores extends Tela {
                     borderRadius: '13px',
                     border: '1px solid var(--borda)',
                     borderLeft: `3px solid ${v.dicaCor ?? ''}`,
-                    fontSize: '12.5px',
+                    fontSize: '13px',
                     color: 'var(--texto-2)',
                     lineHeight: '1.5',
                   }}
@@ -734,7 +734,7 @@ export default class Transportadores extends Tela {
                         flex: 'none',
                         background: `linear-gradient(135deg,${r?.g1 ?? ''},${r?.g2 ?? ''})`,
                         color: '#fff',
-                        fontSize: '12.5px',
+                        fontSize: '13px',
                         fontWeight: '700',
                         display: 'flex',
                         alignItems: 'center',
@@ -747,7 +747,7 @@ export default class Transportadores extends Tela {
                     <div style={{ minWidth: '0' }}>
                       <div
                         style={{
-                          fontSize: '13.5px',
+                          fontSize: '14px',
                           fontWeight: '800',
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
@@ -757,7 +757,7 @@ export default class Transportadores extends Tela {
                         {r?.nome}
                       </div>
                       <div
-                        style={{ fontSize: '11.5px', color: 'var(--texto-apagado)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                        style={{ fontSize: '12px', color: 'var(--texto-apagado)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
                       >
                         {r?.tipo}
                       </div>
@@ -786,7 +786,7 @@ export default class Transportadores extends Tela {
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '7px',
-                        fontSize: '12.5px',
+                        fontSize: '13px',
                         fontWeight: '700',
                         color: r?.qc,
                       }}
@@ -802,17 +802,17 @@ export default class Transportadores extends Tela {
                       ></span>
                       {r?.qn}
                     </div>
-                    <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)', marginTop: '1px' }}>{r?.qsub}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--texto-apagado)', marginTop: '1px' }}>{r?.qsub}</div>
                   </div>
-                  <div style={{ fontSize: '12.5px' }}>
+                  <div style={{ fontSize: '13px' }}>
                     <b style={{ fontFamily: "'Spline Sans Mono',monospace" }}>{r?.nv}</b>{' '}
                     <span style={{ color: 'var(--texto-apagado)' }}>{r?.ultima}</span>
                   </div>
-                  <div style={{ fontSize: '12.5px', color: r?.ocC, fontWeight: '700' }}>{r?.oc}</div>
+                  <div style={{ fontSize: '13px', color: r?.ocC, fontWeight: '700' }}>{r?.oc}</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span
                       style={{
-                        fontSize: '11.5px',
+                        fontSize: '12px',
                         fontWeight: '700',
                         color: r?.cvC,
                         border: `1px solid ${r?.cvBd ?? ''}`,
@@ -837,7 +837,7 @@ export default class Transportadores extends Tela {
             {v.vazio ? (
               <>
                 <div style={{ padding: '44px 20px', textAlign: 'center' }}>
-                  <div style={{ fontSize: '15px', fontWeight: '800' }}>Ninguém com esse filtro</div>
+                  <div style={{ fontSize: '16px', fontWeight: '800' }}>Ninguém com esse filtro</div>
                   <div style={{ fontSize: '13px', color: 'var(--texto-sec)', marginTop: '4px' }}>
                     Busque por CPF, placa ou nome. Se for novo, ele entra pela primeira viagem ou em Cadastrar.
                   </div>
@@ -845,7 +845,7 @@ export default class Transportadores extends Tela {
               </>
             ) : null}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 20px' }}>
-              <span style={{ fontSize: '12.5px', color: 'var(--texto-sec)' }}>{v.pagInfo}</span>
+              <span style={{ fontSize: '13px', color: 'var(--texto-sec)' }}>{v.pagInfo}</span>
               {v.temPaginacao ? (
                 <>
                   <div style={{ marginLeft: 'auto', display: 'flex', gap: '5px' }}>
@@ -855,7 +855,7 @@ export default class Transportadores extends Tela {
                           onClick={pg?.onClick}
                           style={{
                             fontFamily: "'Spline Sans Mono',monospace",
-                            fontSize: '12.5px',
+                            fontSize: '13px',
                             width: '30px',
                             height: '30px',
                             borderRadius: '9px',
@@ -914,7 +914,7 @@ export default class Transportadores extends Tela {
                         height: '48px',
                         borderRadius: '99px',
                         background: `linear-gradient(135deg,${v.dG1 ?? ''},${v.dG2 ?? ''})`,
-                        fontSize: '15px',
+                        fontSize: '16px',
                         fontWeight: '800',
                         display: 'flex',
                         alignItems: 'center',
@@ -925,8 +925,8 @@ export default class Transportadores extends Tela {
                       {v.dIni}
                     </span>
                     <div style={{ flex: '1', minWidth: '0' }}>
-                      <div style={{ fontSize: '18px', fontWeight: '800' }}>{v.dNome}</div>
-                      <div style={{ fontSize: '12.5px', color: 'rgba(255,255,255,.72)' }}>{v.dTipo}</div>
+                      <div style={{ fontSize: '20px', fontWeight: '800' }}>{v.dNome}</div>
+                      <div style={{ fontSize: '13px', color: 'rgba(255,255,255,.72)' }}>{v.dTipo}</div>
                     </div>
                     <span role="button" tabIndex={0}
                       onClick={v.fecharDrawer}
@@ -950,7 +950,7 @@ export default class Transportadores extends Tela {
                       <Fragment key={$index}>
                         <span
                           style={{
-                            fontSize: '11.5px',
+                            fontSize: '12px',
                             fontWeight: '700',
                             background: 'rgba(255,255,255,.1)',
                             border: '1px solid rgba(255,255,255,.18)',
@@ -969,7 +969,7 @@ export default class Transportadores extends Tela {
                     <>
                       <div style={{ background: 'var(--painel)', border: '1.5px solid var(--perigo-borda)', borderRadius: '16px', padding: '14px 16px' }}>
                         <div style={{ fontSize: '14px', fontWeight: '800', color: 'var(--tecnico)' }}>Em revisão após ocorrência grave</div>
-                        <div style={{ fontSize: '12.5px', color: 'var(--texto-2)', marginTop: '4px', lineHeight: '1.5' }}>{v.dOcTxt}</div>{' '}
+                        <div style={{ fontSize: '13px', color: 'var(--texto-2)', marginTop: '4px', lineHeight: '1.5' }}>{v.dOcTxt}</div>{' '}
                         <span role="button" tabIndex={0}
                           onClick={v.abrirRevisar}
                           data-tx-revisar=""
@@ -978,7 +978,7 @@ export default class Transportadores extends Tela {
                             marginTop: '10px',
                             background: 'linear-gradient(135deg,var(--primario),var(--azul))',
                             color: '#fff',
-                            fontSize: '12.5px',
+                            fontSize: '13px',
                             fontWeight: '800',
                             borderRadius: '99px',
                             padding: '8px 16px',
@@ -1008,7 +1008,7 @@ export default class Transportadores extends Tela {
                             <span style={{ width: '8px', height: '8px', borderRadius: '99px', background: dd?.dot, flex: 'none' }}></span>
                             <div style={{ flex: '1', minWidth: '0' }}>
                               <div style={{ fontSize: '13px', fontWeight: '700' }}>{dd?.n}</div>
-                              <div style={{ fontSize: '11.5px', color: dd?.c }}>{dd?.sub}</div>
+                              <div style={{ fontSize: '12px', color: dd?.c }}>{dd?.sub}</div>
                             </div>
                             <span role="button" tabIndex={0}
                               onClick={dd?.onClick}
@@ -1038,7 +1038,7 @@ export default class Transportadores extends Tela {
                                       alignItems: 'center',
                                       gap: '6px',
                                       fontFamily: "'Spline Sans Mono',monospace",
-                                      fontSize: '12.5px',
+                                      fontSize: '13px',
                                       fontWeight: '600',
                                       border: '1px solid var(--borda-campo)',
                                       borderRadius: '8px',
@@ -1052,13 +1052,13 @@ export default class Transportadores extends Tela {
                                 </Fragment>
                               ))}
                             </div>
-                            <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)', marginTop: '6px' }}>{cj?.sub}</div>
+                            <div style={{ fontSize: '12px', color: 'var(--texto-apagado)', marginTop: '6px' }}>{cj?.sub}</div>
                           </div>
                         </Fragment>
                       ))}
                       {v.dSemConj ? (
                         <>
-                          <div style={{ fontSize: '12.5px', color: 'var(--texto-apagado)' }}>
+                          <div style={{ fontSize: '13px', color: 'var(--texto-apagado)' }}>
                             Nenhum conjunto ainda. As placas entram na primeira viagem.
                           </div>
                         </>
@@ -1078,7 +1078,7 @@ export default class Transportadores extends Tela {
                                 <span style={{ color: 'var(--texto-apagado)', fontFamily: "'Spline Sans Mono',monospace", fontSize: '12px' }}>
                                   {dm?.cpf}
                                 </span>
-                                <span style={{ marginLeft: 'auto', fontSize: '11.5px', color: 'var(--texto-sec)' }}>{dm?.cnh}</span>
+                                <span style={{ marginLeft: 'auto', fontSize: '12px', color: 'var(--texto-sec)' }}>{dm?.cnh}</span>
                               </div>
                             </Fragment>
                           ))}
@@ -1103,7 +1103,7 @@ export default class Transportadores extends Tela {
                               padding: '8px 2px',
                               borderBottom: '1px solid var(--superficie-2)',
                               color: 'inherit',
-                              fontSize: '12.5px',
+                              fontSize: '13px',
                             }}
                             className="tx-hc05ca3a"
                           >
@@ -1126,7 +1126,7 @@ export default class Transportadores extends Tela {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '8px' }}>
                       {(Array.isArray(v.dOcs) ? v.dOcs : []).map((do_, $index) => (
                         <Fragment key={$index}>
-                          <div style={{ fontSize: '12.5px', background: 'var(--superficie)', borderRadius: '11px', padding: '8px 11px' }}>
+                          <div style={{ fontSize: '13px', background: 'var(--superficie)', borderRadius: '11px', padding: '8px 11px' }}>
                             <b>{do_?.tipo}</b>{' '}
                             <span style={{ color: 'var(--texto-apagado)' }}>
                               {do_?.data}
@@ -1139,14 +1139,14 @@ export default class Transportadores extends Tela {
                       ))}
                       {v.dSemOc ? (
                         <>
-                          <div style={{ fontSize: '12.5px', color: 'var(--texto-apagado)' }}>Nenhuma ocorrência registrada.</div>
+                          <div style={{ fontSize: '13px', color: 'var(--texto-apagado)' }}>Nenhuma ocorrência registrada.</div>
                         </>
                       ) : null}
                     </div>
                   </div>
                   <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '16px', padding: '14px 16px' }}>
                     <div style={{ fontSize: '14px', fontWeight: '800' }}>Convite para manter documentos</div>
-                    <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '4px', lineHeight: '1.5' }}>
+                    <div style={{ fontSize: '13px', color: 'var(--texto-sec)', marginTop: '4px', lineHeight: '1.5' }}>
                       Opcional. O transportador atualiza CNH, CRLV e RNTRC por um link próprio, sem esperar a próxima viagem. Estado:{' '}
                       <b>{v.dConvite}</b>.
                     </div>
@@ -1158,7 +1158,7 @@ export default class Transportadores extends Tela {
                             data-tx-d-convidar=""
                             style={{
                               background: 'var(--superficie-2)',
-                              fontSize: '12.5px',
+                              fontSize: '13px',
                               fontWeight: '800',
                               borderRadius: '99px',
                               padding: '7px 14px',
@@ -1174,7 +1174,7 @@ export default class Transportadores extends Tela {
                           <span role="button" tabIndex={0}
                             onClick={v.dRevogar}
                             style={{
-                              fontSize: '12.5px',
+                              fontSize: '13px',
                               fontWeight: '800',
                               color: 'var(--perigo)',
                               borderRadius: '99px',
@@ -1242,7 +1242,7 @@ export default class Transportadores extends Tela {
                     ✕
                   </span>
                 </div>
-                <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '4px', lineHeight: '1.55' }}>{v.mSub}</div>
+                <div style={{ fontSize: '13px', color: 'var(--texto-sec)', marginTop: '4px', lineHeight: '1.55' }}>{v.mSub}</div>
                 {v.mCad ? (
                   <>
                     <div style={{ display: 'flex', gap: '7px', marginTop: '14px' }}>
@@ -1251,7 +1251,7 @@ export default class Transportadores extends Tela {
                           <span role="button" tabIndex={0}
                             onClick={ct?.onClick}
                             style={{
-                              fontSize: '12.5px',
+                              fontSize: '13px',
                               fontWeight: '700',
                               borderRadius: '99px',
                               padding: '6px 14px',
@@ -1282,7 +1282,7 @@ export default class Transportadores extends Tela {
                                 border: '1px solid var(--borda-campo)',
                                 borderRadius: '11px',
                                 padding: '9px 12px',
-                                fontSize: '13.5px',
+                                fontSize: '14px',
                                 outline: 'none',
                               }}
                             />
@@ -1298,7 +1298,7 @@ export default class Transportadores extends Tela {
                             border: '1.5px solid var(--aviso-borda)',
                             borderRadius: '12px',
                             padding: '10px 12px',
-                            fontSize: '12.5px',
+                            fontSize: '13px',
                             color: '#8a5a0e',
                           }}
                         >
@@ -1323,7 +1323,7 @@ export default class Transportadores extends Tela {
                       }}
                     >
                       <input type="file" accept=".csv,.xlsx" onChange={v.onImpArq} style={{ display: 'none' }} />
-                      <div style={{ flex: '1', fontSize: '13.5px', fontWeight: '800' }}>{v.impTitulo}</div>
+                      <div style={{ flex: '1', fontSize: '14px', fontWeight: '800' }}>{v.impTitulo}</div>
                       <span role="button" tabIndex={0} onClick={v.impExemplo} data-tx-imp-exemplo="" style={{ fontSize: '12px', fontWeight: '800', color: 'var(--primario-2)' }}>
                         usar planilha de exemplo
                       </span>
@@ -1336,7 +1336,7 @@ export default class Transportadores extends Tela {
                               display: 'flex',
                               alignItems: 'center',
                               gap: '10px',
-                              fontSize: '12.5px',
+                              fontSize: '13px',
                               border: '1px solid var(--borda-suave)',
                               borderRadius: '11px',
                               padding: '8px 12px',
@@ -1354,7 +1354,7 @@ export default class Transportadores extends Tela {
                 ) : null}
                 {v.mDoc ? (
                   <>
-                    <div style={{ marginTop: '14px', fontSize: '13.5px' }}>
+                    <div style={{ marginTop: '14px', fontSize: '14px' }}>
                       <b>{v.docNome}</b> <span style={{ color: 'var(--texto-sec)' }}>{v.docAtual}</span>
                     </div>
                     <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '12px' }}>NOVA VALIDADE</div>
@@ -1370,7 +1370,7 @@ export default class Transportadores extends Tela {
                         border: '1px solid var(--borda-campo)',
                         borderRadius: '11px',
                         padding: '9px 12px',
-                        fontSize: '13.5px',
+                        fontSize: '14px',
                         outline: 'none',
                         fontFamily: "'Spline Sans Mono',monospace",
                       }}
@@ -1389,7 +1389,7 @@ export default class Transportadores extends Tela {
                         borderRadius: '12px',
                         padding: '10px 12px',
                         background: v.revBg,
-                        fontSize: '12.5px',
+                        fontSize: '13px',
                         color: v.revC,
                         fontWeight: '700',
                       }}
@@ -1410,7 +1410,7 @@ export default class Transportadores extends Tela {
                         border: '1px solid var(--borda-campo)',
                         borderRadius: '12px',
                         padding: '10px 12px',
-                        fontSize: '13.5px',
+                        fontSize: '14px',
                         outline: 'none',
                         resize: 'vertical',
                       }}
@@ -1422,7 +1422,7 @@ export default class Transportadores extends Tela {
                           style={{
                             display: 'inline-block',
                             marginTop: '8px',
-                            fontSize: '12.5px',
+                            fontSize: '13px',
                             fontWeight: '800',
                             color: 'var(--primario-2)',
                             cursor: 'pointer',
@@ -1439,7 +1439,7 @@ export default class Transportadores extends Tela {
                     onClick={v.fecharModal}
                     style={{
                       background: 'var(--superficie-2)',
-                      fontSize: '13.5px',
+                      fontSize: '14px',
                       fontWeight: '700',
                       borderRadius: '99px',
                       padding: '10px 20px',
@@ -1456,7 +1456,7 @@ export default class Transportadores extends Tela {
                       color: v.ctaC,
                       boxShadow: v.ctaSh,
                       cursor: v.ctaCur,
-                      fontSize: '13.5px',
+                      fontSize: '14px',
                       fontWeight: '800',
                       borderRadius: '99px',
                       padding: '10px 22px',

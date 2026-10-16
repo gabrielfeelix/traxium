@@ -716,7 +716,7 @@ export default class Hoje extends Tela {
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <div>
               <div style={{ fontSize: '24px', fontWeight: '800' }}>{v.titulo}</div>
-              <div style={{ fontSize: '13.5px', color: 'var(--texto-sec)', marginTop: '2px' }}>{v.subtitulo}</div>
+              <div style={{ fontSize: '14px', color: 'var(--texto-sec)', marginTop: '2px' }}>{v.subtitulo}</div>
             </div>
             <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div
@@ -744,7 +744,7 @@ export default class Hoje extends Tela {
                     border: 'none',
                     outline: 'none',
                     background: 'transparent',
-                    fontSize: '13.5px',
+                    fontSize: '14px',
                     padding: '10px 0',
                     width: '210px',
                   }}
@@ -761,7 +761,7 @@ export default class Hoje extends Tela {
                         border: '1px solid var(--borda-campo)',
                         borderRadius: '11px',
                         padding: '9px 14px',
-                        fontSize: '13.5px',
+                        fontSize: '14px',
                         fontWeight: '700',
                         cursor: 'pointer',
                       }}
@@ -808,7 +808,7 @@ export default class Hoje extends Tela {
                               >
                                 <span style={{ width: '7px', height: '7px', borderRadius: '99px', background: fl?.dot }}></span>
                                 <span style={{ flex: '1' }}>{fl?.n}</span>
-                                <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '11.5px', color: 'var(--texto-apagado)' }}>
+                                <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '12px', color: 'var(--texto-apagado)' }}>
                                   {fl?.q}
                                 </span>
                               </div>
@@ -828,7 +828,7 @@ export default class Hoje extends Tela {
                   color: '#fff',
                   borderRadius: '99px',
                   padding: '10px 20px',
-                  fontSize: '13.5px',
+                  fontSize: '14px',
                   fontWeight: '800',
                   cursor: 'pointer',
                   boxShadow: '0 6px 14px rgba(18,118,112,.3)',
@@ -875,7 +875,7 @@ export default class Hoje extends Tela {
                     }}
                   >
                     <div style={{ flex: 'none' }}>
-                      <span style={{ fontSize: '22px', fontWeight: '800', fontVariantNumeric: 'tabular-nums' }}>{v.resTotal}</span>
+                      <span style={{ fontSize: '20px', fontWeight: '800', fontVariantNumeric: 'tabular-nums' }}>{v.resTotal}</span>
                       <span style={{ fontSize: '13px', color: 'var(--texto-sec)', marginLeft: '6px' }}>{v.resTotalRot}</span>
                     </div>
                     <div
@@ -935,7 +935,7 @@ export default class Hoje extends Tela {
                             display: 'flex',
                             alignItems: 'center',
                             gap: '7px',
-                            fontSize: '12.5px',
+                            fontSize: '13px',
                             fontWeight: '700',
                             color: 'var(--azul)',
                             whiteSpace: 'nowrap',
@@ -998,7 +998,7 @@ export default class Hoje extends Tela {
                       </svg>
                     </span>
                     <div style={{ fontSize: '16px', fontWeight: '800' }}>{v.vazioTitulo}</div>
-                    <div style={{ fontSize: '13.5px', color: 'var(--texto-sec)' }}>{v.vazioSub}</div>
+                    <div style={{ fontSize: '14px', color: 'var(--texto-sec)' }}>{v.vazioSub}</div>
                   </div>
                 </>
               ) : null}
@@ -1022,8 +1022,8 @@ export default class Hoje extends Tela {
                       <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '13px', fontWeight: '600', color: 'var(--texto-sec)' }}>
                         {gr?.q}
                       </span>
-                      <div style={{ fontSize: '12.5px', color: 'var(--texto-apagado)' }}>{gr?.sub}</div>
-                      <span style={{ marginLeft: 'auto', fontSize: '12.5px', fontWeight: '700', color: 'var(--primario-2)' }}>{gr?.toggleRot}</span>
+                      <div style={{ fontSize: '13px', color: 'var(--texto-apagado)' }}>{gr?.sub}</div>
+                      <span style={{ marginLeft: 'auto', fontSize: '13px', fontWeight: '700', color: 'var(--primario-2)' }}>{gr?.toggleRot}</span>
                     </div>
                     {gr?.aberto ? (
                       <>
@@ -1049,10 +1049,10 @@ export default class Hoje extends Tela {
                                 style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: '1', minWidth: '0', color: 'inherit' }}
                               >
                                 <div style={{ width: '62px', flex: 'none', textAlign: 'center' }}>
-                                  <div style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '17px', fontWeight: '600' }}>
+                                  <div style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '16px', fontWeight: '600' }}>
                                     {ln?.janela}
                                   </div>
-                                  <div style={{ fontSize: '10.5px', color: ln?.prazoC, fontWeight: '700' }}>{ln?.prazo}</div>
+                                  <div style={{ fontSize: '11px', color: ln?.prazoC, fontWeight: '700' }}>{ln?.prazo}</div>
                                 </div>
                                 <span
                                   style={{
@@ -1062,7 +1062,7 @@ export default class Hoje extends Tela {
                                     flex: 'none',
                                     background: `linear-gradient(135deg,${ln?.g1 ?? ''},${ln?.g2 ?? ''})`,
                                     color: '#fff',
-                                    fontSize: '13.5px',
+                                    fontSize: '14px',
                                     fontWeight: '700',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -1076,7 +1076,7 @@ export default class Hoje extends Tela {
                                   <div style={{ display: 'flex', gap: '8px', alignItems: 'baseline' }}>
                                     <span
                                       style={{
-                                        fontSize: '14.5px',
+                                        fontSize: '14px',
                                         fontWeight: '800',
                                         whiteSpace: 'nowrap',
                                         overflow: 'hidden',
@@ -1085,11 +1085,11 @@ export default class Hoje extends Tela {
                                     >
                                       {ln?.motorista}
                                     </span>
-                                    <span style={{ fontSize: '11.5px', color: 'var(--texto-apagado)', whiteSpace: 'nowrap' }}>{ln?.tipo}</span>
+                                    <span style={{ fontSize: '12px', color: 'var(--texto-apagado)', whiteSpace: 'nowrap' }}>{ln?.tipo}</span>
                                   </div>
                                   <div
                                     style={{
-                                      fontSize: '12.5px',
+                                      fontSize: '13px',
                                       color: 'var(--texto-sec)',
                                       whiteSpace: 'nowrap',
                                       overflow: 'hidden',
@@ -1103,7 +1103,7 @@ export default class Hoje extends Tela {
                                   <div
                                     style={{
                                       fontFamily: "'Spline Sans Mono',monospace",
-                                      fontSize: '11.5px',
+                                      fontSize: '12px',
                                       color: 'var(--texto-2)',
                                       marginTop: '2px',
                                     }}
@@ -1162,7 +1162,7 @@ export default class Hoje extends Tela {
                                   </div>
                                   <div
                                     style={{
-                                      fontSize: '11.5px',
+                                      fontSize: '12px',
                                       color: 'var(--texto-apagado)',
                                       whiteSpace: 'nowrap',
                                       overflow: 'hidden',
@@ -1182,7 +1182,7 @@ export default class Hoje extends Tela {
                                       background: ln?.acaoBg,
                                       color: ln?.acaoC,
                                       boxShadow: ln?.acaoSh,
-                                      fontSize: '12.5px',
+                                      fontSize: '13px',
                                       fontWeight: '800',
                                       borderRadius: '99px',
                                       padding: '8px 16px',
@@ -1252,16 +1252,16 @@ export default class Hoje extends Tela {
                   >
                     <div style={{ height: '100%', width: v.prPct, background: 'linear-gradient(90deg,#48c78e,#9fe0c3)' }}></div>
                   </div>
-                  <div style={{ fontSize: '11.5px', color: 'rgba(255,255,255,.6)', marginTop: '7px' }}>
+                  <div style={{ fontSize: '12px', color: 'rgba(255,255,255,.6)', marginTop: '7px' }}>
                     viagem completa = T-3, verificação aprovada, termo quando gatekeeper e CT-e conciliado
                   </div>
                 </div>
                 {(Array.isArray(v.heroNums) ? v.heroNums : []).map((hn, $index) => (
                   <Fragment key={$index}>
                     <div style={{ position: 'relative', borderLeft: '1px solid rgba(255,255,255,.14)', paddingLeft: '22px' }}>
-                      <div style={{ fontSize: '12.5px', color: 'rgba(255,255,255,.7)' }}>{hn?.n}</div>
-                      <div style={{ fontSize: '30px', fontWeight: '800', marginTop: '4px' }}>{hn?.v}</div>
-                      <div style={{ fontSize: '11.5px', color: 'rgba(255,255,255,.55)' }}>{hn?.sub}</div>
+                      <div style={{ fontSize: '13px', color: 'rgba(255,255,255,.7)' }}>{hn?.n}</div>
+                      <div style={{ fontSize: '32px', fontWeight: '800', marginTop: '4px' }}>{hn?.v}</div>
+                      <div style={{ fontSize: '12px', color: 'rgba(255,255,255,.55)' }}>{hn?.sub}</div>
                     </div>
                   </Fragment>
                 ))}
@@ -1288,7 +1288,7 @@ export default class Hoje extends Tela {
                       >
                         {v.filaQ}
                       </span>
-                      <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)' }}>{v.filaSub}</div>
+                      <div style={{ fontSize: '13px', color: 'var(--texto-sec)' }}>{v.filaSub}</div>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', marginTop: '8px' }}>
                       {(Array.isArray(v.fila) ? v.fila : []).map((fq, $index) => (
@@ -1304,15 +1304,15 @@ export default class Hoje extends Tela {
                             }}
                           >
                             <div style={{ width: '58px', flex: 'none' }}>
-                              <div style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '15px', fontWeight: '600' }}>
+                              <div style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '16px', fontWeight: '600' }}>
                                 {fq?.janela}
                               </div>
-                              <div style={{ fontSize: '10.5px', fontWeight: '700', color: fq?.prazoC }}>{fq?.prazo}</div>
+                              <div style={{ fontSize: '11px', fontWeight: '700', color: fq?.prazoC }}>{fq?.prazo}</div>
                             </div>
                             <div style={{ width: '230px', flex: 'none', minWidth: '0' }}>
                               <div
                                 style={{
-                                  fontSize: '13.5px',
+                                  fontSize: '14px',
                                   fontWeight: '800',
                                   whiteSpace: 'nowrap',
                                   overflow: 'hidden',
@@ -1321,7 +1321,7 @@ export default class Hoje extends Tela {
                               >
                                 {fq?.motorista}
                               </div>
-                              <div style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '11.5px', color: 'var(--texto-sec)' }}>
+                              <div style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '12px', color: 'var(--texto-sec)' }}>
                                 {fq?.ordem}
                                 {', '}
                                 {fq?.filial}
@@ -1342,7 +1342,7 @@ export default class Hoje extends Tela {
                               </div>
                               <div
                                 style={{
-                                  fontSize: '11.5px',
+                                  fontSize: '12px',
                                   color: 'var(--texto-apagado)',
                                   whiteSpace: 'nowrap',
                                   overflow: 'hidden',
@@ -1362,7 +1362,7 @@ export default class Hoje extends Tela {
                                 flex: 'none',
                                 background: 'linear-gradient(135deg,var(--primario),var(--azul))',
                                 color: '#fff',
-                                fontSize: '12.5px',
+                                fontSize: '13px',
                                 fontWeight: '800',
                                 borderRadius: '99px',
                                 padding: '8px 16px',
@@ -1386,7 +1386,7 @@ export default class Hoje extends Tela {
                       ) : null}
                       {v.temAcima ? (
                         <>
-                          <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', paddingTop: '10px' }}>
+                          <div style={{ fontSize: '13px', color: 'var(--texto-sec)', paddingTop: '10px' }}>
                             {v.acimaTxt}{' '}
                             <A href={v.acimaHref} style={{ fontWeight: '800' }}>
                               {v.acimaLink}
@@ -1414,15 +1414,15 @@ export default class Hoje extends Tela {
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div style={{ fontSize: '15px', fontWeight: '800' }}>{cf?.n}</div>
+                        <div style={{ fontSize: '16px', fontWeight: '800' }}>{cf?.n}</div>
                         <span style={{ fontSize: '11px', color: 'var(--texto-apagado)', fontFamily: "'Spline Sans Mono',monospace" }}>{cf?.reg}</span>
                       </div>
-                      <div style={{ display: 'flex', gap: '14px', fontSize: '12.5px' }}>
+                      <div style={{ display: 'flex', gap: '14px', fontSize: '13px' }}>
                         <span>
-                          <b style={{ fontSize: '18px' }}>{cf?.hoje}</b> hoje
+                          <b style={{ fontSize: '20px' }}>{cf?.hoje}</b> hoje
                         </span>
                         <span style={{ color: cf?.pendC }}>
-                          <b style={{ fontSize: '18px' }}>{cf?.pend}</b> com pendência
+                          <b style={{ fontSize: '20px' }}>{cf?.pend}</b> com pendência
                         </span>
                       </div>
                       <div
@@ -1441,7 +1441,7 @@ export default class Hoje extends Tela {
                         style={{
                           marginTop: '2px',
                           alignSelf: 'flex-start',
-                          fontSize: '12.5px',
+                          fontSize: '13px',
                           fontWeight: '800',
                           color: 'var(--primario-2)',
                           cursor: 'pointer',
@@ -1460,12 +1460,12 @@ export default class Hoje extends Tela {
                     <div style={{ fontSize: '16px', fontWeight: '800' }}>Pendências de registro</div>
                     <A
                       href="/viagens?conciliar=1"
-                      style={{ marginLeft: 'auto', fontSize: '12.5px', fontWeight: '800', whiteSpace: 'nowrap' }}
+                      style={{ marginLeft: 'auto', fontSize: '13px', fontWeight: '800', whiteSpace: 'nowrap' }}
                     >
                       Conciliar CT-e em lote →
                     </A>
                   </div>
-                  <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '2px' }}>
+                  <div style={{ fontSize: '13px', color: 'var(--texto-sec)', marginTop: '2px' }}>
                     Viagens asseguradas já carregadas com item faltando. Quem trata é a qualidade.
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', marginTop: '10px' }}>
@@ -1486,7 +1486,7 @@ export default class Hoje extends Tela {
                           <span
                             style={{
                               fontFamily: "'Spline Sans Mono',monospace",
-                              fontSize: '12.5px',
+                              fontSize: '13px',
                               fontWeight: '600',
                               width: '84px',
                               flex: 'none',
@@ -1546,8 +1546,8 @@ export default class Hoje extends Tela {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px' }}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <div style={{ fontSize: '15.5px', fontWeight: '800' }}>Vencimentos</div>
-                      <A href="/transportadores?filtro=vencendo" style={{ marginLeft: 'auto', fontSize: '12.5px', fontWeight: '800' }}>
+                      <div style={{ fontSize: '16px', fontWeight: '800' }}>Vencimentos</div>
+                      <A href="/transportadores?filtro=vencendo" style={{ marginLeft: 'auto', fontSize: '13px', fontWeight: '800' }}>
                         Ver todos →
                       </A>
                     </div>
@@ -1638,7 +1638,7 @@ export default class Hoje extends Tela {
                               </div>
                               <div
                                 style={{
-                                  fontSize: '11.5px',
+                                  fontSize: '12px',
                                   color: 'var(--texto-sec)',
                                   whiteSpace: 'nowrap',
                                   overflow: 'hidden',
@@ -1668,9 +1668,9 @@ export default class Hoje extends Tela {
                     </div>
                   </div>
                   <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px' }}>
-                    <div style={{ fontSize: '15.5px', fontWeight: '800' }}>Auditoria</div>
-                    <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '4px', lineHeight: '1.5' }}>{v.simTxt}</div>{' '}
-                    <A href="/auditoria" style={{ display: 'inline-block', marginTop: '10px', fontSize: '12.5px', fontWeight: '800' }}>
+                    <div style={{ fontSize: '16px', fontWeight: '800' }}>Auditoria</div>
+                    <div style={{ fontSize: '13px', color: 'var(--texto-sec)', marginTop: '4px', lineHeight: '1.5' }}>{v.simTxt}</div>{' '}
+                    <A href="/auditoria" style={{ display: 'inline-block', marginTop: '10px', fontSize: '13px', fontWeight: '800' }}>
                       Rastrear placa ou montar amostra →
                     </A>{' '}
                   </div>
@@ -1709,7 +1709,7 @@ export default class Hoje extends Tela {
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{ fontSize: '17px', fontWeight: '800' }}>{v.nTitulo}</div>
+                  <div style={{ fontSize: '16px', fontWeight: '800' }}>{v.nTitulo}</div>
                   <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--texto-sec)' }}>
                     {'filial '}
                     {v.nFilialNome}
@@ -1737,7 +1737,7 @@ export default class Hoje extends Tela {
                     <Fragment key={$index}>
                       <div style={{ flex: '1' }}>
                         <div style={{ height: '4px', borderRadius: '99px', background: np?.bg }}></div>
-                        <div style={{ fontSize: '11.5px', fontWeight: '700', color: np?.c, marginTop: '5px' }}>{np?.n}</div>
+                        <div style={{ fontSize: '12px', fontWeight: '700', color: np?.c, marginTop: '5px' }}>{np?.n}</div>
                       </div>
                     </Fragment>
                   ))}
@@ -1797,7 +1797,7 @@ export default class Hoje extends Tela {
                         usar ordem de exemplo
                       </span>
                     </label>
-                    <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)', marginTop: '8px' }}>ou preencha o mínimo:</div>
+                    <div style={{ fontSize: '12px', color: 'var(--texto-apagado)', marginTop: '8px' }}>ou preencha o mínimo:</div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '8px' }}>
                       <div style={{ position: 'relative' }}>
                         <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)' }}>Produto</div>
@@ -1812,7 +1812,7 @@ export default class Hoje extends Tela {
                             border: '1px solid var(--borda-campo)',
                             borderRadius: '11px',
                             padding: '9px 12px',
-                            fontSize: '13.5px',
+                            fontSize: '14px',
                             outline: 'none',
                           }}
                         />
@@ -1840,7 +1840,7 @@ export default class Hoje extends Tela {
                                     style={{ padding: '7px 10px', borderRadius: '8px', cursor: 'pointer', fontSize: '13px' }}
                                     className="tx-h894fca3"
                                   >
-                                    <b>{po?.n}</b> <span style={{ color: 'var(--texto-apagado)', fontSize: '11.5px' }}>{po?.via}</span>
+                                    <b>{po?.n}</b> <span style={{ color: 'var(--texto-apagado)', fontSize: '12px' }}>{po?.via}</span>
                                   </div>
                                 </Fragment>
                               ))}
@@ -1861,7 +1861,7 @@ export default class Hoje extends Tela {
                             border: '1px solid var(--borda-campo)',
                             borderRadius: '11px',
                             padding: '9px 12px',
-                            fontSize: '13.5px',
+                            fontSize: '14px',
                             outline: 'none',
                             fontFamily: "'Spline Sans Mono',monospace",
                           }}
@@ -1965,7 +1965,7 @@ export default class Hoje extends Tela {
                             border: '1px solid var(--borda-campo)',
                             borderRadius: '11px',
                             padding: '9px 12px',
-                            fontSize: '13.5px',
+                            fontSize: '14px',
                             outline: 'none',
                             fontFamily: "'Spline Sans Mono',monospace",
                           }}
@@ -1981,7 +1981,7 @@ export default class Hoje extends Tela {
                         borderRadius: '12px',
                         padding: '10px 13px',
                         background: v.asBg,
-                        fontSize: '12.5px',
+                        fontSize: '13px',
                         color: v.asC,
                         fontWeight: '700',
                       }}
@@ -2000,7 +2000,7 @@ export default class Hoje extends Tela {
                             onClick={nt?.onClick}
                             data-tx-tipo={nt?.k}
                             style={{
-                              fontSize: '12.5px',
+                              fontSize: '13px',
                               fontWeight: '700',
                               borderRadius: '99px',
                               padding: '6px 14px',
@@ -2081,11 +2081,11 @@ export default class Hoje extends Tela {
                                   {na?.ini}
                                 </span>
                                 <div style={{ flex: '1', minWidth: '0' }}>
-                                  <div style={{ fontSize: '13.5px', fontWeight: '800' }}>{na?.nome}</div>
-                                  <div style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '11.5px', color: 'var(--texto-2)' }}>
+                                  <div style={{ fontSize: '14px', fontWeight: '800' }}>{na?.nome}</div>
+                                  <div style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '12px', color: 'var(--texto-2)' }}>
                                     {na?.placas}
                                   </div>
-                                  <div style={{ fontSize: '11.5px', color: na?.docC, marginTop: '1px' }}>{na?.docs}</div>
+                                  <div style={{ fontSize: '12px', color: na?.docC, marginTop: '1px' }}>{na?.docs}</div>
                                 </div>
                               </div>
                             </Fragment>
@@ -2107,7 +2107,7 @@ export default class Hoje extends Tela {
                                       border: '1px solid var(--borda-campo)',
                                       borderRadius: '11px',
                                       padding: '9px 12px',
-                                      fontSize: '13.5px',
+                                      fontSize: '14px',
                                       outline: 'none',
                                     }}
                                   />
@@ -2120,7 +2120,7 @@ export default class Hoje extends Tela {
                                       border: '1px solid var(--borda-campo)',
                                       borderRadius: '11px',
                                       padding: '9px 12px',
-                                      fontSize: '13.5px',
+                                      fontSize: '14px',
                                       outline: 'none',
                                     }}
                                   />
@@ -2133,7 +2133,7 @@ export default class Hoje extends Tela {
                                       border: '1px solid var(--borda-campo)',
                                       borderRadius: '11px',
                                       padding: '9px 12px',
-                                      fontSize: '13.5px',
+                                      fontSize: '14px',
                                       outline: 'none',
                                       fontFamily: "'Spline Sans Mono',monospace",
                                     }}
@@ -2147,7 +2147,7 @@ export default class Hoje extends Tela {
                                       border: '1px solid var(--borda-campo)',
                                       borderRadius: '11px',
                                       padding: '9px 12px',
-                                      fontSize: '13.5px',
+                                      fontSize: '14px',
                                       outline: 'none',
                                       fontFamily: "'Spline Sans Mono',monospace",
                                     }}
@@ -2192,7 +2192,7 @@ export default class Hoje extends Tela {
                                   <div style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '13px', fontWeight: '600' }}>
                                     {nc?.placas}
                                   </div>
-                                  <div style={{ fontSize: '11.5px', color: nc?.subC }}>{nc?.sub}</div>
+                                  <div style={{ fontSize: '12px', color: nc?.subC }}>{nc?.sub}</div>
                                 </div>
                               </div>
                             </Fragment>
@@ -2270,7 +2270,7 @@ export default class Hoje extends Tela {
                         onClick={v.nVoltarFn}
                         style={{
                           background: 'var(--superficie-2)',
-                          fontSize: '13.5px',
+                          fontSize: '14px',
                           fontWeight: '700',
                           borderRadius: '99px',
                           padding: '10px 20px',
@@ -2288,7 +2288,7 @@ export default class Hoje extends Tela {
                         style={{
                           background: 'var(--superficie-2)',
                           color: 'var(--texto)',
-                          fontSize: '13.5px',
+                          fontSize: '14px',
                           fontWeight: '700',
                           borderRadius: '99px',
                           padding: '10px 20px',
@@ -2306,7 +2306,7 @@ export default class Hoje extends Tela {
                       color: v.ctaC,
                       boxShadow: v.ctaSh,
                       cursor: v.ctaCur,
-                      fontSize: '13.5px',
+                      fontSize: '14px',
                       fontWeight: '800',
                       borderRadius: '99px',
                       padding: '10px 22px',

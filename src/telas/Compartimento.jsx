@@ -244,7 +244,7 @@ export default class Compartimento extends Tela {
                   color: '#fff',
                   borderRadius: '11px',
                   padding: '9px 16px',
-                  fontSize: '13.5px',
+                  fontSize: '14px',
                   fontWeight: '700',
                   cursor: 'pointer',
                 }}
@@ -276,7 +276,7 @@ export default class Compartimento extends Tela {
               <div
                 style={{
                   fontFamily: "'Spline Sans Mono',monospace",
-                  fontSize: '26px',
+                  fontSize: '24px',
                   fontWeight: '600',
                   marginTop: '4px',
                   whiteSpace: 'nowrap',
@@ -284,15 +284,15 @@ export default class Compartimento extends Tela {
               >
                 {v.titulo}
               </div>
-              <div style={{ fontSize: '12.5px', color: 'rgba(255,255,255,.75)' }}>{v.modelo}</div>
+              <div style={{ fontSize: '13px', color: 'rgba(255,255,255,.75)' }}>{v.modelo}</div>
             </div>
             <div style={{ borderLeft: '1px solid rgba(255,255,255,.15)', paddingLeft: '20px' }}>
-              <div style={{ fontSize: '12.5px', color: 'rgba(255,255,255,.7)' }}>Dono hoje</div>
+              <div style={{ fontSize: '13px', color: 'rgba(255,255,255,.7)' }}>Dono hoje</div>
               <div style={{ fontSize: '16px', fontWeight: '800', marginTop: '3px' }}>{v.dono}</div>
-              <div style={{ fontSize: '11.5px', color: 'rgba(255,255,255,.6)' }}>{v.conjuntoTxt}</div>
+              <div style={{ fontSize: '12px', color: 'rgba(255,255,255,.6)' }}>{v.conjuntoTxt}</div>
             </div>
             <div style={{ borderLeft: '1px solid rgba(255,255,255,.15)', paddingLeft: '20px' }}>
-              <div style={{ fontSize: '12.5px', color: 'rgba(255,255,255,.7)' }}>Pode carregar ração?</div>
+              <div style={{ fontSize: '13px', color: 'rgba(255,255,255,.7)' }}>Pode carregar ração?</div>
               <div
                 data-tx-pode=""
                 style={{ display: 'flex', alignItems: 'center', gap: '9px', fontSize: '16px', fontWeight: '800', marginTop: '3px' }}
@@ -309,10 +309,10 @@ export default class Compartimento extends Tela {
                 ></span>
                 {v.pode}
               </div>
-              <div style={{ fontSize: '11.5px', color: 'rgba(255,255,255,.7)', marginTop: '1px' }}>{v.podeSub}</div>
+              <div style={{ fontSize: '12px', color: 'rgba(255,255,255,.7)', marginTop: '1px' }}>{v.podeSub}</div>
             </div>
             <div style={{ borderLeft: '1px solid rgba(255,255,255,.15)', paddingLeft: '20px' }}>
-              <div style={{ fontSize: '12.5px', color: 'rgba(255,255,255,.7)' }}>Três últimas cargas (T-3)</div>
+              <div style={{ fontSize: '13px', color: 'rgba(255,255,255,.7)' }}>Três últimas cargas (T-3)</div>
               <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
                 {(Array.isArray(v.t3) ? v.t3 : []).map((t, $index) => (
                   <Fragment key={$index}>
@@ -348,7 +348,7 @@ export default class Compartimento extends Tela {
                         {t?.r}
                       </span>
                       <div style={{ minWidth: '0' }}>
-                        <div style={{ fontSize: '10.5px', fontWeight: '800', color: 'rgba(255,255,255,.6)' }}>{t?.k}</div>
+                        <div style={{ fontSize: '11px', fontWeight: '800', color: 'rgba(255,255,255,.6)' }}>{t?.k}</div>
                         <div style={{ fontSize: '11px', fontFamily: "'Spline Sans Mono',monospace", whiteSpace: 'nowrap' }}>{t?.data}</div>
                       </div>
                     </div>
@@ -398,7 +398,7 @@ export default class Compartimento extends Tela {
           <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 22px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
               <div style={{ fontSize: '16px', fontWeight: '800' }}>Histórico de cargas</div>
-              <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)' }}>
+              <div style={{ fontSize: '13px', color: 'var(--texto-sec)' }}>
                 a mais recente em cima; as três primeiras são o T-3 da próxima viagem
               </div>
               {v.temIrmaos ? (
@@ -438,7 +438,7 @@ export default class Compartimento extends Tela {
                 gridTemplateColumns: '46px 96px 1.4fr 70px 1.3fr 1fr',
                 gap: '12px',
                 padding: '14px 4px 8px',
-                fontSize: '10.5px',
+                fontSize: '11px',
                 fontWeight: '800',
                 letterSpacing: '.7px',
                 color: 'var(--texto-apagado)',
@@ -469,7 +469,7 @@ export default class Compartimento extends Tela {
                 >
                   <span
                     style={{
-                      fontSize: '10.5px',
+                      fontSize: '11px',
                       fontWeight: '800',
                       color: l?.tC,
                       border: `1px solid ${l?.tBd ?? ''}`,
@@ -481,10 +481,10 @@ export default class Compartimento extends Tela {
                   >
                     {l?.t}
                   </span>
-                  <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '12.5px' }}>{l?.data}</span>
+                  <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '13px' }}>{l?.data}</span>
                   <div>
-                    <div style={{ fontSize: '13.5px', fontWeight: '700', color: l?.nc }}>{l?.produto}</div>
-                    <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)' }}>{l?.cat}</div>
+                    <div style={{ fontSize: '14px', fontWeight: '700', color: l?.nc }}>{l?.produto}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--texto-apagado)' }}>{l?.cat}</div>
                   </div>
                   <span
                     style={{
@@ -493,7 +493,7 @@ export default class Compartimento extends Tela {
                       borderRadius: '8px',
                       background: l?.rBg,
                       color: l?.rC,
-                      fontSize: '11.5px',
+                      fontSize: '12px',
                       fontWeight: '800',
                       display: 'flex',
                       alignItems: 'center',
@@ -502,7 +502,7 @@ export default class Compartimento extends Tela {
                   >
                     {l?.r}
                   </span>
-                  <div style={{ fontSize: '12.5px' }}>
+                  <div style={{ fontSize: '13px' }}>
                     {l?.temHref ? (
                       <>
                         <A href={l?.href} style={{ fontWeight: '700' }}>

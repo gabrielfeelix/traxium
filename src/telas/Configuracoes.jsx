@@ -270,7 +270,7 @@ export default class Configuracoes extends Tela {
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <div>
               <div style={{ fontSize: '24px', fontWeight: '800' }}>Configurações</div>
-              <div style={{ fontSize: '13.5px', color: 'var(--texto-sec)', marginTop: '2px' }}>
+              <div style={{ fontSize: '14px', color: 'var(--texto-sec)', marginTop: '2px' }}>
                 Quem acessa, quem assina e o que trava a viagem. Mudar uma regra hoje não altera decisão já registrada.
               </div>
             </div>
@@ -296,7 +296,7 @@ export default class Configuracoes extends Tela {
                     onClick={sc?.onClick}
                     data-tx-secao={sc?.k}
                     style={{
-                      fontSize: '13.5px',
+                      fontSize: '14px',
                       fontWeight: '700',
                       padding: '9px 12px',
                       borderRadius: '10px',
@@ -333,7 +333,7 @@ export default class Configuracoes extends Tela {
                       color: '#fff',
                       borderRadius: '99px',
                       padding: '8px 16px',
-                      fontSize: '12.5px',
+                      fontSize: '13px',
                       fontWeight: '800',
                       cursor: 'pointer',
                       boxShadow: '0 6px 14px rgba(18,118,112,.25)',
@@ -343,7 +343,7 @@ export default class Configuracoes extends Tela {
                     Convidar usuário
                   </span>
                 </div>
-                <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '3px' }}>
+                <div style={{ fontSize: '13px', color: 'var(--texto-sec)', marginTop: '3px' }}>
                   O papel define o escopo de filiais e a alçada. Na demonstração, "Entrar como" troca o usuário da sessão.
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', marginTop: '10px' }}>
@@ -376,11 +376,11 @@ export default class Configuracoes extends Tela {
                           {us?.ini}
                         </span>
                         <div>
-                          <div style={{ fontSize: '13.5px', fontWeight: '700' }}>{us?.nome}</div>
-                          <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)' }}>{us?.email}</div>
+                          <div style={{ fontSize: '14px', fontWeight: '700' }}>{us?.nome}</div>
+                          <div style={{ fontSize: '12px', color: 'var(--texto-apagado)' }}>{us?.email}</div>
                         </div>
-                        <span style={{ fontSize: '12.5px' }}>{us?.cargo}</span>
-                        <span style={{ fontSize: '12.5px', color: 'var(--texto-sec)' }}>{us?.escopo}</span>
+                        <span style={{ fontSize: '13px' }}>{us?.cargo}</span>
+                        <span style={{ fontSize: '13px', color: 'var(--texto-sec)' }}>{us?.escopo}</span>
                         <span role="button" tabIndex={0}
                           onClick={us?.entrar}
                           data-tx-entrar-como={us?.id}
@@ -421,14 +421,14 @@ export default class Configuracoes extends Tela {
                           {cv?.ini}
                         </span>
                         <div>
-                          <div style={{ fontSize: '13.5px', fontWeight: '700' }}>{cv?.nome}</div>
-                          <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)' }}>{cv?.email}</div>
+                          <div style={{ fontSize: '14px', fontWeight: '700' }}>{cv?.nome}</div>
+                          <div style={{ fontSize: '12px', color: 'var(--texto-apagado)' }}>{cv?.email}</div>
                         </div>
                         <div>
-                          <div style={{ fontSize: '12.5px' }}>{cv?.cargo}</div>
-                          <div style={{ fontSize: '11.5px', color: 'var(--aviso)', fontWeight: '700' }}>{cv?.estado}</div>
+                          <div style={{ fontSize: '13px' }}>{cv?.cargo}</div>
+                          <div style={{ fontSize: '12px', color: 'var(--aviso)', fontWeight: '700' }}>{cv?.estado}</div>
                         </div>
-                        <span style={{ fontSize: '12.5px', color: 'var(--texto-sec)' }}>{cv?.escopo}</span>
+                        <span style={{ fontSize: '13px', color: 'var(--texto-sec)' }}>{cv?.escopo}</span>
                         <span role="button" tabIndex={0}
                           onClick={cv?.cancelar}
                           data-tx-cancelar-convite={cv?.id}
@@ -453,7 +453,7 @@ export default class Configuracoes extends Tela {
                 }}
               >
                 <div style={{ fontSize: '16px', fontWeight: '800' }}>Alçadas de liberação</div>
-                <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '3px' }}>
+                <div style={{ fontSize: '13px', color: 'var(--texto-sec)', marginTop: '3px' }}>
                   Três alçadas. Liberação por autoridade exige o registro de 9 campos e o motor continua reprovando.
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '10px', marginTop: '12px' }}>
@@ -464,8 +464,8 @@ export default class Configuracoes extends Tela {
                           <span style={{ width: '9px', height: '9px', borderRadius: '99px', background: al?.dot }}></span>
                           <b style={{ fontSize: '14px' }}>{al?.n}</b>
                         </div>
-                        <div style={{ fontSize: '12.5px', color: 'var(--texto-2)', marginTop: '6px', lineHeight: '1.5' }}>{al?.libera}</div>
-                        <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)', marginTop: '6px' }}>{al?.quem}</div>
+                        <div style={{ fontSize: '13px', color: 'var(--texto-2)', marginTop: '6px', lineHeight: '1.5' }}>{al?.libera}</div>
+                        <div style={{ fontSize: '12px', color: 'var(--texto-apagado)', marginTop: '6px' }}>{al?.quem}</div>
                       </div>
                     </Fragment>
                   ))}
@@ -483,7 +483,7 @@ export default class Configuracoes extends Tela {
                 }}
               >
                 <div style={{ fontSize: '16px', fontWeight: '800' }}>Regras</div>
-                <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '3px' }}>
+                <div style={{ fontSize: '13px', color: 'var(--texto-sec)', marginTop: '3px' }}>
                   As regras de norma ficam travadas em bloqueio. As internas podem passar a só alertar, com motivo registrado.
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', marginTop: '10px' }}>
@@ -501,8 +501,8 @@ export default class Configuracoes extends Tela {
                         }}
                       >
                         <div>
-                          <div style={{ fontSize: '13.5px', fontWeight: '700' }}>{rg?.n}</div>
-                          <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)' }}>{rg?.sub}</div>
+                          <div style={{ fontSize: '14px', fontWeight: '700' }}>{rg?.n}</div>
+                          <div style={{ fontSize: '12px', color: 'var(--texto-apagado)' }}>{rg?.sub}</div>
                         </div>
                         <span style={{ fontSize: '12px', color: 'var(--texto-sec)' }}>{rg?.base}</span>
                         <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
@@ -550,8 +550,8 @@ export default class Configuracoes extends Tela {
                     <Fragment key={$index}>
                       <div style={{ border: '1px solid var(--borda-suave)', borderRadius: '15px', padding: '13px 15px' }}>
                         <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <b style={{ fontSize: '13.5px' }}>{md?.n}</b>
-                          <span style={{ marginLeft: '8px', fontSize: '11.5px', color: 'var(--texto-apagado)' }}>{md?.v}</span>
+                          <b style={{ fontSize: '14px' }}>{md?.n}</b>
+                          <span style={{ marginLeft: '8px', fontSize: '12px', color: 'var(--texto-apagado)' }}>{md?.v}</span>
                           <span role="button" tabIndex={0}
                             onClick={md?.copiar}
                             style={{ marginLeft: 'auto', fontSize: '12px', fontWeight: '800', color: 'var(--primario-2)', cursor: 'pointer' }}
@@ -559,7 +559,7 @@ export default class Configuracoes extends Tela {
                             Copiar
                           </span>
                         </div>
-                        <div style={{ fontSize: '12.5px', color: 'var(--texto-2)', marginTop: '6px', lineHeight: '1.5', fontFamily: md?.font }}>
+                        <div style={{ fontSize: '13px', color: 'var(--texto-2)', marginTop: '6px', lineHeight: '1.5', fontFamily: md?.font }}>
                           {md?.txt}
                         </div>
                       </div>
@@ -583,7 +583,7 @@ export default class Configuracoes extends Tela {
                   {(Array.isArray(v.lgpd) ? v.lgpd : []).map((lg, $index) => (
                     <Fragment key={$index}>
                       <div style={{ background: 'var(--superficie)', borderRadius: '13px', padding: '11px 13px' }}>
-                        <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)' }}>{lg?.l}</div>
+                        <div style={{ fontSize: '12px', color: 'var(--texto-apagado)' }}>{lg?.l}</div>
                         <div style={{ fontSize: '13px', fontWeight: '700', marginTop: '3px', lineHeight: '1.45' }}>{lg?.v}</div>
                       </div>
                     </Fragment>
@@ -616,8 +616,8 @@ export default class Configuracoes extends Tela {
                       >
                         <span style={{ width: '8px', height: '8px', borderRadius: '99px', background: ig?.dot }}></span>
                         <div style={{ flex: '1' }}>
-                          <div style={{ fontSize: '13.5px', fontWeight: '700' }}>{ig?.n}</div>
-                          <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)' }}>{ig?.sub}</div>
+                          <div style={{ fontSize: '14px', fontWeight: '700' }}>{ig?.n}</div>
+                          <div style={{ fontSize: '12px', color: 'var(--texto-apagado)' }}>{ig?.sub}</div>
                         </div>
                         <span style={{ fontSize: '12px', fontWeight: '700', color: ig?.c }}>{ig?.e}</span>
                       </div>
@@ -637,7 +637,7 @@ export default class Configuracoes extends Tela {
                 }}
               >
                 <div style={{ fontSize: '16px', fontWeight: '800' }}>Dados do protótipo</div>
-                <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '3px', lineHeight: '1.55' }}>{v.dadosTxt}</div>{' '}
+                <div style={{ fontSize: '13px', color: 'var(--texto-sec)', marginTop: '3px', lineHeight: '1.55' }}>{v.dadosTxt}</div>{' '}
                 <span role="button" tabIndex={0}
                   onClick={v.abrirReset}
                   data-tx-reset=""
@@ -709,7 +709,7 @@ export default class Configuracoes extends Tela {
                     ✕
                   </span>
                 </div>
-                <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '4px', lineHeight: '1.55' }}>{v.mSub}</div>
+                <div style={{ fontSize: '13px', color: 'var(--texto-sec)', marginTop: '4px', lineHeight: '1.55' }}>{v.mSub}</div>
                 {v.mConvite ? (
                   <>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '14px' }}>
@@ -725,7 +725,7 @@ export default class Configuracoes extends Tela {
                             border: '1px solid var(--borda-campo)',
                             borderRadius: '11px',
                             padding: '9px 12px',
-                            fontSize: '13.5px',
+                            fontSize: '14px',
                             outline: 'none',
                           }}
                         />
@@ -743,7 +743,7 @@ export default class Configuracoes extends Tela {
                             border: '1px solid var(--borda-campo)',
                             borderRadius: '11px',
                             padding: '9px 12px',
-                            fontSize: '13.5px',
+                            fontSize: '14px',
                             outline: 'none',
                           }}
                         />
@@ -779,7 +779,7 @@ export default class Configuracoes extends Tela {
                             ></span>
                             <div>
                               <div style={{ fontSize: '13px', fontWeight: '700' }}>{pp?.n}</div>
-                              <div style={{ fontSize: '11.5px', color: 'var(--texto-sec)' }}>{pp?.sub}</div>
+                              <div style={{ fontSize: '12px', color: 'var(--texto-sec)' }}>{pp?.sub}</div>
                             </div>
                           </div>
                         </Fragment>
@@ -827,7 +827,7 @@ export default class Configuracoes extends Tela {
                         border: '1px solid var(--borda-campo)',
                         borderRadius: '12px',
                         padding: '10px 12px',
-                        fontSize: '13.5px',
+                        fontSize: '14px',
                         outline: 'none',
                       }}
                     />
@@ -838,7 +838,7 @@ export default class Configuracoes extends Tela {
                     onClick={v.fecharModal}
                     style={{
                       background: 'var(--superficie-2)',
-                      fontSize: '13.5px',
+                      fontSize: '14px',
                       fontWeight: '700',
                       borderRadius: '99px',
                       padding: '10px 20px',
@@ -855,7 +855,7 @@ export default class Configuracoes extends Tela {
                       color: v.ctaC,
                       boxShadow: v.ctaSh,
                       cursor: v.ctaCur,
-                      fontSize: '13.5px',
+                      fontSize: '14px',
                       fontWeight: '800',
                       borderRadius: '99px',
                       padding: '10px 22px',
