@@ -4,7 +4,7 @@ Atualizado em 15/10/2026, ao fim da segunda rodada (quatro telas restantes e pen
 
 > **Próxima etapa (15/10/2026):** virar um sistema com moldura única e revisar UI e UX página por página. O plano está em `09-handoff-sistema-e-ui.md`; leia este arquivo para o contexto e aquele para o que fazer.
 >
-> **Retomar por:** `09-handoff-sistema-e-ui.md`, seção 9 (o que falta, em ordem).
+> **Retomar por:** `10-handoff-revisao-ui.md` (situação, o que falta em ordem, como testar, arquitetura e armadilhas).
 >
 > **Atualização (15/10/2026, noite):** a moldura única foi feita (etapa 1 em `09-handoff-sistema-e-ui.md`, seção 8). O protótipo v2 agora é o app Next.js da raiz; o `.dc.html` ficou congelado como referência. A seção 2 abaixo já descreve como rodar o app novo; as seções 3 e 4 continuam valendo para entender as telas, que foram convertidas fiéis.
 
@@ -129,7 +129,8 @@ Repositórios em `/home/gabfelix/dev/4yu-apps/` (`autofluxos-ux` é o mais recen
 
 | Arquivo | Conteúdo |
 | --- | --- |
-| `09-handoff-sistema-e-ui.md` | **Próxima etapa**: moldura única (sistema, não páginas) e revisão de UI e UX com boas práticas, com o Autofluxos como referência |
+| `10-handoff-revisao-ui.md` | **Ponto de entrada (15/10/2026)**: continuar a revisão de UI e UX no app Next.js |
+| `09-handoff-sistema-e-ui.md` | Pedido da moldura única e da revisão de UI, com o registro das etapas 1 a 11: moldura única (sistema, não páginas) e revisão de UI e UX com boas práticas, com o Autofluxos como referência |
 | `08-resposta-pm-mvp.md` | Rascunho de resposta ao PM sobre estágio, MVP, prazos e riscos (15/10/2026) |
 | `07-revisao-v2.md` | **Revisão do v2 (14 e 15/10/2026)**: etapas 1 a 11, os doze itens do pente fino, premissas e a situação ao fim |
 | `00-plano.md` | Etapas da revisão do v1 e os seis critérios |

@@ -20,4 +20,4 @@ pnpm dev            # http://localhost:3000 (abre /hoje)
 | `scripts/` | Bateria de testes, captura de tela, conversor |
 | `SaaS moderno estilo Dribbble/` | Protótipo `.dc.html` (v1 e v2), congelado como referência; copiado para `public/prototipo/` no build |
 | `legado/v1-next/` | O primeiro protótipo em Next.js, guardado |
-| `docs/revisao-telas/` | Revisões, decisões e handoff. Comece por `HANDOFF.md` e `09-handoff-sistema-e-ui.md` |
+| `docs/revisao-telas/` | Revisões, decisões e handoff. Comece por `10-handoff-revisao-ui.md` |

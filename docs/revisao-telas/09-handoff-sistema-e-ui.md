@@ -248,6 +248,8 @@ Os três primeiros temas da tabela da seção 5 valem igual para as dez telas; r
 
 ## 9. Onde parar e retomar (15/10/2026, fim da sessão)
 
+O handoff completo para o próximo agente está em `10-handoff-revisao-ui.md`.
+
 Feito: Parte 1 inteira (moldura única, etapa 1), Parte 2 menos a escolha do fundo (tokens, etapa 2; opções, etapa 3) e, da Parte 3, os temas que valem para todas as telas (contraste, teclado, foco, escala tipográfica, espaçamento, campos, arquivos, alvos) mais a revisão de Hoje, Viagens, Viagem e Link da Viagem.
 
 Falta, nesta ordem:
