@@ -68,8 +68,8 @@ export default class Configuracoes extends Tela {
       secoes: SEC.map(([k, n]) => ({
         k,
         n,
-        c: s.secao === k ? '#0C5862' : '#3c4f4e',
-        bg: s.secao === k ? '#eef7f6' : 'transparent',
+        c: s.secao === k ? 'var(--primario-2)' : 'var(--texto-2)',
+        bg: s.secao === k ? 'var(--primario-fraco)' : 'transparent',
         onClick: () => {
           this._spyPausa = Date.now() + 900;
           this.setState({ secao: k });
@@ -107,7 +107,7 @@ export default class Configuracoes extends Tela {
         cargo: x.cargo,
         escopo: x.filiais.length === 4 ? 'todas as filiais' : 'filial ' + x.filiais.map((f) => TX.filial(f).nome).join(', '),
         er: x.id === u.id ? 'você está aqui' : 'Entrar como',
-        ec: x.id === u.id ? '#9db0ae' : '#0C5862',
+        ec: x.id === u.id ? 'var(--texto-desab)' : 'var(--primario-2)',
         entrar: () => {
           if (x.id === u.id) return;
           TX.entrarComo(x.id);
@@ -143,9 +143,9 @@ export default class Configuracoes extends Tela {
           return {
             k: cl,
             n: cl === 'bloqueio' ? 'Bloqueia' : 'Só alerta',
-            bd: on ? '#0b2224' : '#e0e7e5',
-            bg: on ? '#0b2224' : '#fff',
-            c: on ? '#fff' : '#3c4f4e',
+            bd: on ? 'var(--texto)' : 'var(--borda-campo)',
+            bg: on ? 'var(--texto)' : '#fff',
+            c: on ? '#fff' : 'var(--texto-2)',
             cur: pode ? 'pointer' : 'default',
             op: r.travada && !on ? '.4' : '1',
             onClick: () => {
@@ -185,7 +185,7 @@ export default class Configuracoes extends Tela {
         n: i.n,
         sub: i.sub,
         e: i.estado === 'ativo' ? 'ativa' : 'importação manual',
-        c: i.estado === 'ativo' ? '#1a8f57' : '#b97514',
+        c: i.estado === 'ativo' ? 'var(--ok)' : 'var(--aviso)',
         dot: i.estado === 'ativo' ? U.tom('ok').dot : U.tom('falta').dot,
       })),
       dadosTxt:
@@ -270,7 +270,7 @@ export default class Configuracoes extends Tela {
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <div>
               <div style={{ fontSize: '24px', fontWeight: '800' }}>Configurações</div>
-              <div style={{ fontSize: '13.5px', color: '#5c706e', marginTop: '2px' }}>
+              <div style={{ fontSize: '13.5px', color: 'var(--texto-sec)', marginTop: '2px' }}>
                 Quem acessa, quem assina e o que trava a viagem. Mudar uma regra hoje não altera decisão já registrada.
               </div>
             </div>
@@ -281,8 +281,8 @@ export default class Configuracoes extends Tela {
               style={{
                 position: 'sticky',
                 top: '24px',
-                background: '#fff',
-                border: '1px solid #e4eae8',
+                background: 'var(--painel)',
+                border: '1px solid var(--borda)',
                 borderRadius: '18px',
                 padding: '8px',
                 display: 'flex',
@@ -316,8 +316,8 @@ export default class Configuracoes extends Tela {
                 data-tx-sec="usuarios"
                 style={{
                   scrollMarginTop: '24px',
-                  background: '#fff',
-                  border: '1px solid #e4eae8',
+                  background: 'var(--painel)',
+                  border: '1px solid var(--borda)',
                   borderRadius: '20px',
                   padding: '20px 22px',
                 }}
@@ -329,7 +329,7 @@ export default class Configuracoes extends Tela {
                     data-tx-convidar=""
                     style={{
                       marginLeft: 'auto',
-                      background: 'linear-gradient(135deg,#127670,#0E78B5)',
+                      background: 'linear-gradient(135deg,var(--primario),var(--azul))',
                       color: '#fff',
                       borderRadius: '99px',
                       padding: '8px 16px',
@@ -343,7 +343,7 @@ export default class Configuracoes extends Tela {
                     Convidar usuário
                   </span>
                 </div>
-                <div style={{ fontSize: '12.5px', color: '#5c706e', marginTop: '3px' }}>
+                <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '3px' }}>
                   O papel define o escopo de filiais e a alçada. Na demonstração, "Entrar como" troca o usuário da sessão.
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', marginTop: '10px' }}>
@@ -356,7 +356,7 @@ export default class Configuracoes extends Tela {
                           gap: '12px',
                           alignItems: 'center',
                           padding: '10px 4px',
-                          borderBottom: '1px solid #f0f4f3',
+                          borderBottom: '1px solid var(--superficie-2)',
                         }}
                       >
                         <span
@@ -377,10 +377,10 @@ export default class Configuracoes extends Tela {
                         </span>
                         <div>
                           <div style={{ fontSize: '13.5px', fontWeight: '700' }}>{us?.nome}</div>
-                          <div style={{ fontSize: '11.5px', color: '#7c8f8d' }}>{us?.email}</div>
+                          <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)' }}>{us?.email}</div>
                         </div>
                         <span style={{ fontSize: '12.5px' }}>{us?.cargo}</span>
-                        <span style={{ fontSize: '12.5px', color: '#5c706e' }}>{us?.escopo}</span>
+                        <span style={{ fontSize: '12.5px', color: 'var(--texto-sec)' }}>{us?.escopo}</span>
                         <span
                           onClick={us?.entrar}
                           data-tx-entrar-como={us?.id}
@@ -401,7 +401,7 @@ export default class Configuracoes extends Tela {
                           gap: '12px',
                           alignItems: 'center',
                           padding: '10px 4px',
-                          borderBottom: '1px solid #f0f4f3',
+                          borderBottom: '1px solid var(--superficie-2)',
                         }}
                       >
                         <span
@@ -410,7 +410,7 @@ export default class Configuracoes extends Tela {
                             height: '34px',
                             borderRadius: '99px',
                             border: '1.5px dashed #b9c9c6',
-                            color: '#7c8f8d',
+                            color: 'var(--texto-apagado)',
                             fontSize: '12px',
                             fontWeight: '800',
                             display: 'flex',
@@ -422,17 +422,17 @@ export default class Configuracoes extends Tela {
                         </span>
                         <div>
                           <div style={{ fontSize: '13.5px', fontWeight: '700' }}>{cv?.nome}</div>
-                          <div style={{ fontSize: '11.5px', color: '#7c8f8d' }}>{cv?.email}</div>
+                          <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)' }}>{cv?.email}</div>
                         </div>
                         <div>
                           <div style={{ fontSize: '12.5px' }}>{cv?.cargo}</div>
-                          <div style={{ fontSize: '11.5px', color: '#b97514', fontWeight: '700' }}>{cv?.estado}</div>
+                          <div style={{ fontSize: '11.5px', color: 'var(--aviso)', fontWeight: '700' }}>{cv?.estado}</div>
                         </div>
-                        <span style={{ fontSize: '12.5px', color: '#5c706e' }}>{cv?.escopo}</span>
+                        <span style={{ fontSize: '12.5px', color: 'var(--texto-sec)' }}>{cv?.escopo}</span>
                         <span
                           onClick={cv?.cancelar}
                           data-tx-cancelar-convite={cv?.id}
-                          style={{ fontSize: '12px', fontWeight: '800', color: '#c43d3d', cursor: 'pointer', textAlign: 'right' }}
+                          style={{ fontSize: '12px', fontWeight: '800', color: 'var(--perigo)', cursor: 'pointer', textAlign: 'right' }}
                         >
                           Cancelar convite
                         </span>
@@ -446,26 +446,26 @@ export default class Configuracoes extends Tela {
                 data-tx-sec="alcadas"
                 style={{
                   scrollMarginTop: '24px',
-                  background: '#fff',
-                  border: '1px solid #e4eae8',
+                  background: 'var(--painel)',
+                  border: '1px solid var(--borda)',
                   borderRadius: '20px',
                   padding: '20px 22px',
                 }}
               >
                 <div style={{ fontSize: '16px', fontWeight: '800' }}>Alçadas de liberação</div>
-                <div style={{ fontSize: '12.5px', color: '#5c706e', marginTop: '3px' }}>
+                <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '3px' }}>
                   Três alçadas. Liberação por autoridade exige o registro de 9 campos e o motor continua reprovando.
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '10px', marginTop: '12px' }}>
                   {(Array.isArray(v.alcadas) ? v.alcadas : []).map((al, $index) => (
                     <Fragment key={$index}>
-                      <div style={{ border: '1px solid #eef2f1', borderRadius: '15px', padding: '13px 15px' }}>
+                      <div style={{ border: '1px solid var(--borda-suave)', borderRadius: '15px', padding: '13px 15px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <span style={{ width: '9px', height: '9px', borderRadius: '99px', background: al?.dot }}></span>
                           <b style={{ fontSize: '14px' }}>{al?.n}</b>
                         </div>
-                        <div style={{ fontSize: '12.5px', color: '#3c4f4e', marginTop: '6px', lineHeight: '1.5' }}>{al?.libera}</div>
-                        <div style={{ fontSize: '11.5px', color: '#7c8f8d', marginTop: '6px' }}>{al?.quem}</div>
+                        <div style={{ fontSize: '12.5px', color: 'var(--texto-2)', marginTop: '6px', lineHeight: '1.5' }}>{al?.libera}</div>
+                        <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)', marginTop: '6px' }}>{al?.quem}</div>
                       </div>
                     </Fragment>
                   ))}
@@ -476,14 +476,14 @@ export default class Configuracoes extends Tela {
                 data-tx-sec="regras"
                 style={{
                   scrollMarginTop: '24px',
-                  background: '#fff',
-                  border: '1px solid #e4eae8',
+                  background: 'var(--painel)',
+                  border: '1px solid var(--borda)',
                   borderRadius: '20px',
                   padding: '20px 22px',
                 }}
               >
                 <div style={{ fontSize: '16px', fontWeight: '800' }}>Regras</div>
-                <div style={{ fontSize: '12.5px', color: '#5c706e', marginTop: '3px' }}>
+                <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '3px' }}>
                   As regras de norma ficam travadas em bloqueio. As internas podem passar a só alertar, com motivo registrado.
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', marginTop: '10px' }}>
@@ -497,14 +497,14 @@ export default class Configuracoes extends Tela {
                           gap: '12px',
                           alignItems: 'center',
                           padding: '11px 4px',
-                          borderBottom: '1px solid #f0f4f3',
+                          borderBottom: '1px solid var(--superficie-2)',
                         }}
                       >
                         <div>
                           <div style={{ fontSize: '13.5px', fontWeight: '700' }}>{rg?.n}</div>
-                          <div style={{ fontSize: '11.5px', color: '#7c8f8d' }}>{rg?.sub}</div>
+                          <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)' }}>{rg?.sub}</div>
                         </div>
-                        <span style={{ fontSize: '12px', color: '#5c706e' }}>{rg?.base}</span>
+                        <span style={{ fontSize: '12px', color: 'var(--texto-sec)' }}>{rg?.base}</span>
                         <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
                           {(Array.isArray(rg?.classes) ? rg?.classes : []).map((cl, $index) => (
                             <Fragment key={$index}>
@@ -538,8 +538,8 @@ export default class Configuracoes extends Tela {
                 data-tx-sec="modelos"
                 style={{
                   scrollMarginTop: '24px',
-                  background: '#fff',
-                  border: '1px solid #e4eae8',
+                  background: 'var(--painel)',
+                  border: '1px solid var(--borda)',
                   borderRadius: '20px',
                   padding: '20px 22px',
                 }}
@@ -548,18 +548,18 @@ export default class Configuracoes extends Tela {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '12px' }}>
                   {(Array.isArray(v.modelos) ? v.modelos : []).map((md, $index) => (
                     <Fragment key={$index}>
-                      <div style={{ border: '1px solid #eef2f1', borderRadius: '15px', padding: '13px 15px' }}>
+                      <div style={{ border: '1px solid var(--borda-suave)', borderRadius: '15px', padding: '13px 15px' }}>
                         <div style={{ display: 'flex', alignItems: 'center' }}>
                           <b style={{ fontSize: '13.5px' }}>{md?.n}</b>
-                          <span style={{ marginLeft: '8px', fontSize: '11.5px', color: '#7c8f8d' }}>{md?.v}</span>
+                          <span style={{ marginLeft: '8px', fontSize: '11.5px', color: 'var(--texto-apagado)' }}>{md?.v}</span>
                           <span
                             onClick={md?.copiar}
-                            style={{ marginLeft: 'auto', fontSize: '12px', fontWeight: '800', color: '#0C5862', cursor: 'pointer' }}
+                            style={{ marginLeft: 'auto', fontSize: '12px', fontWeight: '800', color: 'var(--primario-2)', cursor: 'pointer' }}
                           >
                             Copiar
                           </span>
                         </div>
-                        <div style={{ fontSize: '12.5px', color: '#3c4f4e', marginTop: '6px', lineHeight: '1.5', fontFamily: md?.font }}>
+                        <div style={{ fontSize: '12.5px', color: 'var(--texto-2)', marginTop: '6px', lineHeight: '1.5', fontFamily: md?.font }}>
                           {md?.txt}
                         </div>
                       </div>
@@ -572,8 +572,8 @@ export default class Configuracoes extends Tela {
                 data-tx-sec="lgpd"
                 style={{
                   scrollMarginTop: '24px',
-                  background: '#fff',
-                  border: '1px solid #e4eae8',
+                  background: 'var(--painel)',
+                  border: '1px solid var(--borda)',
                   borderRadius: '20px',
                   padding: '20px 22px',
                 }}
@@ -582,8 +582,8 @@ export default class Configuracoes extends Tela {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '10px', marginTop: '12px' }}>
                   {(Array.isArray(v.lgpd) ? v.lgpd : []).map((lg, $index) => (
                     <Fragment key={$index}>
-                      <div style={{ background: '#f7faf9', borderRadius: '13px', padding: '11px 13px' }}>
-                        <div style={{ fontSize: '11.5px', color: '#7c8f8d' }}>{lg?.l}</div>
+                      <div style={{ background: 'var(--superficie)', borderRadius: '13px', padding: '11px 13px' }}>
+                        <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)' }}>{lg?.l}</div>
                         <div style={{ fontSize: '13px', fontWeight: '700', marginTop: '3px', lineHeight: '1.45' }}>{lg?.v}</div>
                       </div>
                     </Fragment>
@@ -595,8 +595,8 @@ export default class Configuracoes extends Tela {
                 data-tx-sec="integracoes"
                 style={{
                   scrollMarginTop: '24px',
-                  background: '#fff',
-                  border: '1px solid #e4eae8',
+                  background: 'var(--painel)',
+                  border: '1px solid var(--borda)',
                   borderRadius: '20px',
                   padding: '20px 22px',
                 }}
@@ -611,13 +611,13 @@ export default class Configuracoes extends Tela {
                           alignItems: 'center',
                           gap: '12px',
                           padding: '10px 4px',
-                          borderBottom: '1px solid #f0f4f3',
+                          borderBottom: '1px solid var(--superficie-2)',
                         }}
                       >
                         <span style={{ width: '8px', height: '8px', borderRadius: '99px', background: ig?.dot }}></span>
                         <div style={{ flex: '1' }}>
                           <div style={{ fontSize: '13.5px', fontWeight: '700' }}>{ig?.n}</div>
-                          <div style={{ fontSize: '11.5px', color: '#7c8f8d' }}>{ig?.sub}</div>
+                          <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)' }}>{ig?.sub}</div>
                         </div>
                         <span style={{ fontSize: '12px', fontWeight: '700', color: ig?.c }}>{ig?.e}</span>
                       </div>
@@ -630,23 +630,23 @@ export default class Configuracoes extends Tela {
                 data-tx-sec="dados"
                 style={{
                   scrollMarginTop: '24px',
-                  background: '#fff',
-                  border: '1px solid #e4eae8',
+                  background: 'var(--painel)',
+                  border: '1px solid var(--borda)',
                   borderRadius: '20px',
                   padding: '20px 22px',
                 }}
               >
                 <div style={{ fontSize: '16px', fontWeight: '800' }}>Dados do protótipo</div>
-                <div style={{ fontSize: '12.5px', color: '#5c706e', marginTop: '3px', lineHeight: '1.55' }}>{v.dadosTxt}</div>{' '}
+                <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '3px', lineHeight: '1.55' }}>{v.dadosTxt}</div>{' '}
                 <span
                   onClick={v.abrirReset}
                   data-tx-reset=""
                   style={{
                     display: 'inline-block',
                     marginTop: '12px',
-                    background: '#fff',
-                    border: '1.5px solid #f1caca',
-                    color: '#c43d3d',
+                    background: 'var(--painel)',
+                    border: '1.5px solid var(--perigo-borda)',
+                    color: 'var(--perigo)',
                     fontSize: '13px',
                     fontWeight: '800',
                     borderRadius: '99px',
@@ -680,7 +680,7 @@ export default class Configuracoes extends Tela {
                 onClick={v.pararClique}
                 data-tx-modal={v.mK}
                 style={{
-                  background: '#fff',
+                  background: 'var(--painel)',
                   borderRadius: '24px',
                   width: '540px',
                   maxHeight: '90vh',
@@ -698,7 +698,7 @@ export default class Configuracoes extends Tela {
                       width: '32px',
                       height: '32px',
                       borderRadius: '99px',
-                      background: '#f0f4f3',
+                      background: 'var(--superficie-2)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -709,12 +709,12 @@ export default class Configuracoes extends Tela {
                     ✕
                   </span>
                 </div>
-                <div style={{ fontSize: '12.5px', color: '#5c706e', marginTop: '4px', lineHeight: '1.55' }}>{v.mSub}</div>
+                <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '4px', lineHeight: '1.55' }}>{v.mSub}</div>
                 {v.mConvite ? (
                   <>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '14px' }}>
                       <div>
-                        <div style={{ fontSize: '12px', fontWeight: '800', color: '#3c4f4e' }}>Nome</div>
+                        <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)' }}>Nome</div>
                         <input
                           value={v.cvNome ?? ''}
                           onChange={v.onCvNome}
@@ -722,7 +722,7 @@ export default class Configuracoes extends Tela {
                           style={{
                             width: '100%',
                             marginTop: '5px',
-                            border: '1px solid #dfe7e5',
+                            border: '1px solid var(--borda-campo)',
                             borderRadius: '11px',
                             padding: '9px 12px',
                             fontSize: '13.5px',
@@ -731,7 +731,7 @@ export default class Configuracoes extends Tela {
                         />
                       </div>
                       <div>
-                        <div style={{ fontSize: '12px', fontWeight: '800', color: '#3c4f4e' }}>E-mail</div>
+                        <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)' }}>E-mail</div>
                         <input
                           value={v.cvEmail ?? ''}
                           onChange={v.onCvEmail}
@@ -740,7 +740,7 @@ export default class Configuracoes extends Tela {
                           style={{
                             width: '100%',
                             marginTop: '5px',
-                            border: '1px solid #dfe7e5',
+                            border: '1px solid var(--borda-campo)',
                             borderRadius: '11px',
                             padding: '9px 12px',
                             fontSize: '13.5px',
@@ -749,7 +749,7 @@ export default class Configuracoes extends Tela {
                         />
                       </div>
                     </div>
-                    <div style={{ fontSize: '12px', fontWeight: '800', color: '#3c4f4e', marginTop: '12px' }}>PAPEL</div>
+                    <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '12px' }}>PAPEL</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '6px' }}>
                       {(Array.isArray(v.cvPapeis) ? v.cvPapeis : []).map((pp, $index) => (
                         <Fragment key={$index}>
@@ -779,7 +779,7 @@ export default class Configuracoes extends Tela {
                             ></span>
                             <div>
                               <div style={{ fontSize: '13px', fontWeight: '700' }}>{pp?.n}</div>
-                              <div style={{ fontSize: '11.5px', color: '#5c706e' }}>{pp?.sub}</div>
+                              <div style={{ fontSize: '11.5px', color: 'var(--texto-sec)' }}>{pp?.sub}</div>
                             </div>
                           </div>
                         </Fragment>
@@ -787,7 +787,7 @@ export default class Configuracoes extends Tela {
                     </div>
                     {v.cvTemFilial ? (
                       <>
-                        <div style={{ fontSize: '12px', fontWeight: '800', color: '#3c4f4e', marginTop: '12px' }}>FILIAL</div>
+                        <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '12px' }}>FILIAL</div>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
                           {(Array.isArray(v.cvFiliais) ? v.cvFiliais : []).map((cf, $index) => (
                             <Fragment key={$index}>
@@ -824,7 +824,7 @@ export default class Configuracoes extends Tela {
                       style={{
                         width: '100%',
                         marginTop: '12px',
-                        border: '1px solid #dfe7e5',
+                        border: '1px solid var(--borda-campo)',
                         borderRadius: '12px',
                         padding: '10px 12px',
                         fontSize: '13.5px',
@@ -837,7 +837,7 @@ export default class Configuracoes extends Tela {
                   <span
                     onClick={v.fecharModal}
                     style={{
-                      background: '#f0f4f3',
+                      background: 'var(--superficie-2)',
                       fontSize: '13.5px',
                       fontWeight: '700',
                       borderRadius: '99px',

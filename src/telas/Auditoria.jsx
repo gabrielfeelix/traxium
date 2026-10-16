@@ -182,8 +182,8 @@ export default class Auditoria extends Tela {
         })),
         deTxt,
         ateTxt,
-        deBd: deOk ? '#e0e7e5' : '#e8a33d',
-        ateBd: ateOk ? '#e0e7e5' : '#e8a33d',
+        deBd: deOk ? 'var(--borda-campo)' : 'var(--aviso-2)',
+        ateBd: ateOk ? 'var(--borda-campo)' : 'var(--aviso-2)',
         onDeTxt: (ev) => {
           const t = mascara(ev.target.value);
           const d = iso(t);
@@ -200,7 +200,7 @@ export default class Auditoria extends Tela {
               ? 'A data inicial é depois da final.'
               : 'A lista atualiza enquanto você digita.'
             : 'Digite dia, mês e ano: 01/09/2026.',
-        dataMsgC: deOk && ateOk && s.de <= s.ate ? '#7c8f8d' : '#b97514',
+        dataMsgC: deOk && ateOk && s.de <= s.ate ? 'var(--texto-apagado)' : 'var(--aviso)',
         tipos: [
           ['todos', 'Todas'],
           ['afretamento', 'Afretamento'],
@@ -209,7 +209,7 @@ export default class Auditoria extends Tela {
           n,
           onClick: () => this.setState({ tipo: k, pag: 1 }),
           bg: s.tipo === k ? '#fff' : 'transparent',
-          c: s.tipo === k ? '#093D44' : '#fff',
+          c: s.tipo === k ? 'var(--primario-3)' : '#fff',
         })),
         resumoBusca:
           res.length +
@@ -245,17 +245,17 @@ export default class Auditoria extends Tela {
                 data: F.data(v.data),
                 cte: v.cte ? v.cte.numero : 'pendente',
                 nf: v.cte ? v.cte.nf : '',
-                cteC: v.cte ? '#0b2224' : '#b97514',
+                cteC: v.cte ? 'var(--texto)' : 'var(--aviso)',
                 rota: TX.embarcador(v.embarcador).nome + ' para ' + TX.destinatario(v.destinatario).nome,
                 produto: TX.produto(v.produto).nome,
                 placas: TX.placasDoConjunto(v.conjunto).join(' '),
                 termo: v.termo ? F.curta(v.termo.em.slice(0, 10)) : TX.coberturaDe(v) === 'gatekeeper' ? 'falta' : 'n/a',
-                termoC: v.termo || TX.coberturaDe(v) !== 'gatekeeper' ? '#3c4f4e' : '#c43d3d',
+                termoC: v.termo || TX.coberturaDe(v) !== 'gatekeeper' ? 'var(--texto-2)' : 'var(--perigo)',
                 ver: v.verificacao && v.verificacao.estado === 'aprovada' ? F.curta(v.verificacao.em.slice(0, 10)) : 'falta',
-                verC: v.verificacao && v.verificacao.estado === 'aprovada' ? '#3c4f4e' : '#c43d3d',
+                verC: v.verificacao && v.verificacao.estado === 'aprovada' ? 'var(--texto-2)' : 'var(--perigo)',
                 bg: on ? '#f3faf8' : '#fff',
-                ck: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#fff',
-                ckBd: on ? '#127670' : '#c9d5d3',
+                ck: on ? 'linear-gradient(135deg,var(--primario),var(--azul))' : '#fff',
+                ckBd: on ? 'var(--primario)' : 'var(--borda-forte)',
                 ckI: on ? '✓' : '',
                 toggle: () => this.setState({ sel: on ? s.sel.filter((x) => x !== v.id) : s.sel.concat(v.id) }),
               };
@@ -452,7 +452,7 @@ export default class Auditoria extends Tela {
           },
         ].map((ap) =>
           Object.assign({ ancora: 'apoio-' + ap.k, rot: 'Exportar', csvD: 'none', onCsv: () => {} }, ap, {
-            bd: ap.ancora && location.hash === '#' + ap.ancora ? '#127670' : '#eef2f1',
+            bd: ap.ancora && location.hash === '#' + ap.ancora ? 'var(--primario)' : 'var(--borda-suave)',
           }),
         ),
         sims: TX.db.simulacoes
@@ -478,7 +478,7 @@ export default class Auditoria extends Tela {
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <div>
               <div style={{ fontSize: '24px', fontWeight: '800' }}>Auditoria</div>
-              <div style={{ fontSize: '13.5px', color: '#5c706e', marginTop: '2px' }}>
+              <div style={{ fontSize: '13.5px', color: 'var(--texto-sec)', marginTop: '2px' }}>
                 Rastrear por placa, CT-e, NF ou período e montar a amostra. O auditor não opera: a qualidade opera ao lado dele.
               </div>
             </div>
@@ -489,7 +489,7 @@ export default class Auditoria extends Tela {
               position: 'relative',
               zIndex: '5',
               borderRadius: '22px',
-              background: 'linear-gradient(115deg,#093D44,#0C5862 60%,#0E78B5 140%)',
+              background: 'linear-gradient(115deg,var(--primario-3),var(--primario-2) 60%,var(--azul) 140%)',
               color: '#fff',
               padding: '20px 24px',
             }}
@@ -579,9 +579,9 @@ export default class Auditoria extends Tela {
                         position: 'absolute',
                         left: '0',
                         top: '50px',
-                        background: '#fff',
-                        color: '#0b2224',
-                        border: '1px solid #e4eae8',
+                        background: 'var(--painel)',
+                        color: 'var(--texto)',
+                        border: '1px solid var(--borda)',
                         borderRadius: '14px',
                         boxShadow: '0 16px 40px rgba(9,61,68,.22)',
                         padding: '6px',
@@ -608,15 +608,15 @@ export default class Auditoria extends Tela {
                           >
                             {at?.n}
                             <span
-                              style={{ marginLeft: 'auto', fontFamily: "'Spline Sans Mono',monospace", fontSize: '11px', color: '#7c8f8d' }}
+                              style={{ marginLeft: 'auto', fontFamily: "'Spline Sans Mono',monospace", fontSize: '11px', color: 'var(--texto-apagado)' }}
                             >
                               {at?.sub}
                             </span>
                           </div>
                         </Fragment>
                       ))}
-                      <div style={{ borderTop: '1px solid #f0f4f3', marginTop: '4px', padding: '10px 11px 6px' }}>
-                        <div style={{ fontSize: '10.5px', fontWeight: '800', letterSpacing: '.8px', color: '#7c8f8d' }}>DATAS EXATAS</div>
+                      <div style={{ borderTop: '1px solid var(--superficie-2)', marginTop: '4px', padding: '10px 11px 6px' }}>
+                        <div style={{ fontSize: '10.5px', fontWeight: '800', letterSpacing: '.8px', color: 'var(--texto-apagado)' }}>DATAS EXATAS</div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '7px' }}>
                           <input
                             value={v.deTxt ?? ''}
@@ -634,7 +634,7 @@ export default class Auditoria extends Tela {
                               outline: 'none',
                             }}
                           />
-                          <span style={{ fontSize: '12px', color: '#7c8f8d' }}>a</span>
+                          <span style={{ fontSize: '12px', color: 'var(--texto-apagado)' }}>a</span>
                           <input
                             value={v.ateTxt ?? ''}
                             onChange={v.onAteTxt}
@@ -699,8 +699,8 @@ export default class Auditoria extends Tela {
                   onClick={v.onSim}
                   data-tx-simulacao=""
                   style={{
-                    background: '#fff',
-                    color: '#093D44',
+                    background: 'var(--painel)',
+                    color: 'var(--primario-3)',
                     fontSize: '13px',
                     fontWeight: '800',
                     borderRadius: '99px',
@@ -715,13 +715,13 @@ export default class Auditoria extends Tela {
             <div style={{ fontSize: '12px', color: 'rgba(255,255,255,.65)', marginTop: '10px' }}>{v.resumoBusca}</div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(280px,340px)', gap: '20px', alignItems: 'start' }}>
-            <div style={{ background: '#fff', border: '1px solid #e4eae8', borderRadius: '20px', overflow: 'hidden' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '14px 18px', borderBottom: '1px solid #eef2f1' }}>
+            <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', overflow: 'hidden' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '14px 18px', borderBottom: '1px solid var(--borda-suave)' }}>
                 <div style={{ fontSize: '15px', fontWeight: '800' }}>Viagens encontradas</div>
-                <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '13px', color: '#5c706e' }}>{v.nRes}</span>
+                <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '13px', color: 'var(--texto-sec)' }}>{v.nRes}</span>
                 <span
                   onClick={v.selTodas}
-                  style={{ marginLeft: 'auto', fontSize: '12.5px', fontWeight: '800', color: '#0C5862', cursor: 'pointer' }}
+                  style={{ marginLeft: 'auto', fontSize: '12.5px', fontWeight: '800', color: 'var(--primario-2)', cursor: 'pointer' }}
                 >
                   {v.selTodasRot}
                 </span>
@@ -732,11 +732,11 @@ export default class Auditoria extends Tela {
                   gridTemplateColumns: v.cols,
                   gap: '10px',
                   padding: '10px 18px',
-                  background: '#f7faf9',
+                  background: 'var(--superficie)',
                   fontSize: '10.5px',
                   fontWeight: '800',
                   letterSpacing: '.7px',
-                  color: '#7c8f8d',
+                  color: 'var(--texto-apagado)',
                 }}
               >
                 <span></span>
@@ -757,7 +757,7 @@ export default class Auditoria extends Tela {
                       gridTemplateColumns: v.cols,
                       gap: '10px',
                       padding: '10px 18px',
-                      borderTop: '1px solid #f0f4f3',
+                      borderTop: '1px solid var(--superficie-2)',
                       alignItems: 'center',
                       fontSize: '12.5px',
                       background: r?.bg,
@@ -783,7 +783,7 @@ export default class Auditoria extends Tela {
                     >
                       {r?.ckI}
                     </span>
-                    <A href={r?.href} style={{ fontFamily: "'Spline Sans Mono',monospace", fontWeight: '600', color: '#0b2224' }}>
+                    <A href={r?.href} style={{ fontFamily: "'Spline Sans Mono',monospace", fontWeight: '600', color: 'var(--texto)' }}>
                       {r?.data}
                     </A>
                     <span style={{ fontFamily: "'Spline Sans Mono',monospace", color: r?.cteC, lineHeight: '1.45' }}>
@@ -801,13 +801,13 @@ export default class Auditoria extends Tela {
               ))}
               {v.vazio ? (
                 <>
-                  <div style={{ padding: '40px 18px', textAlign: 'center', fontSize: '13px', color: '#5c706e' }}>
+                  <div style={{ padding: '40px 18px', textAlign: 'center', fontSize: '13px', color: 'var(--texto-sec)' }}>
                     Nenhuma viagem assegurada com esta placa, documento ou período.
                   </div>
                 </>
               ) : null}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 18px', borderTop: '1px solid #eef2f1' }}>
-                <span style={{ fontSize: '12.5px', color: '#5c706e' }}>{v.pagInfo}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 18px', borderTop: '1px solid var(--borda-suave)' }}>
+                <span style={{ fontSize: '12.5px', color: 'var(--texto-sec)' }}>{v.pagInfo}</span>
                 {v.temPaginacao ? (
                   <>
                     <div style={{ marginLeft: 'auto', display: 'flex', gap: '5px' }}>
@@ -840,9 +840,9 @@ export default class Auditoria extends Tela {
               </div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ background: '#fff', border: '1px solid #e4eae8', borderRadius: '20px', padding: '18px 20px' }}>
+              <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '18px 20px' }}>
                 <div style={{ fontSize: '15px', fontWeight: '800' }}>Amostra</div>
-                <div style={{ fontSize: '12.5px', color: '#5c706e', marginTop: '3px' }}>{v.amostraTxt}</div>{' '}
+                <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '3px' }}>{v.amostraTxt}</div>{' '}
                 <span
                   onClick={v.exportarAmostra}
                   data-tx-exportar-amostra=""
@@ -863,9 +863,9 @@ export default class Auditoria extends Tela {
                   Exportar amostra em documento único
                 </span>{' '}
               </div>
-              <div style={{ background: '#fff', border: '1px solid #e4eae8', borderRadius: '20px', padding: '18px 20px' }}>
+              <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '18px 20px' }}>
                 <div style={{ fontSize: '15px', fontWeight: '800' }}>Listas de apoio</div>
-                <div style={{ fontSize: '12.5px', color: '#5c706e', marginTop: '3px' }}>o que o auditor pede na mesma visita</div>
+                <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '3px' }}>o que o auditor pede na mesma visita</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '10px' }}>
                   {(Array.isArray(v.apoio) ? v.apoio : []).map((ap, $index) => (
                     <Fragment key={$index}>
@@ -884,13 +884,13 @@ export default class Auditoria extends Tela {
                       >
                         <div style={{ flex: '1', minWidth: '0' }}>
                           <div style={{ fontSize: '13px', fontWeight: '700' }}>{ap?.n}</div>
-                          <div style={{ fontSize: '11.5px', color: '#7c8f8d' }}>{ap?.sub}</div>
+                          <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)' }}>{ap?.sub}</div>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '3px' }}>
                           <span
                             onClick={ap?.onClick}
                             data-tx-apoio-doc={ap?.k}
-                            style={{ fontSize: '12px', fontWeight: '800', color: '#0C5862', cursor: 'pointer', whiteSpace: 'nowrap' }}
+                            style={{ fontSize: '12px', fontWeight: '800', color: 'var(--primario-2)', cursor: 'pointer', whiteSpace: 'nowrap' }}
                             className="tx-h76d8d79"
                           >
                             {ap?.rot}
@@ -902,7 +902,7 @@ export default class Auditoria extends Tela {
                               display: ap?.csvD,
                               fontSize: '12px',
                               fontWeight: '700',
-                              color: '#5c706e',
+                              color: 'var(--texto-sec)',
                               cursor: 'pointer',
                               whiteSpace: 'nowrap',
                             }}
@@ -916,9 +916,9 @@ export default class Auditoria extends Tela {
                   ))}
                 </div>
               </div>
-              <div style={{ background: '#fff', border: '1px solid #e4eae8', borderRadius: '20px', padding: '18px 20px' }}>
+              <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '18px 20px' }}>
                 <div style={{ fontSize: '15px', fontWeight: '800' }}>Simulações de rastreabilidade</div>
-                <div style={{ fontSize: '12.5px', color: '#5c706e', marginTop: '3px' }}>
+                <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '3px' }}>
                   limite da auditoria: 4 horas do carregamento à descarga
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '10px' }}>
@@ -926,18 +926,18 @@ export default class Auditoria extends Tela {
                     <Fragment key={$index}>
                       <div
                         data-tx-sim-item=""
-                        style={{ background: '#f7faf9', borderRadius: '12px', padding: '9px 12px', fontSize: '12.5px' }}
+                        style={{ background: 'var(--superficie)', borderRadius: '12px', padding: '9px 12px', fontSize: '12.5px' }}
                       >
                         <div style={{ display: 'flex', gap: '8px' }}>
                           <b>{sm?.data}</b>
                           <span
-                            style={{ marginLeft: 'auto', fontFamily: "'Spline Sans Mono',monospace", color: '#1a8f57', fontWeight: '600' }}
+                            style={{ marginLeft: 'auto', fontFamily: "'Spline Sans Mono',monospace", color: 'var(--ok)', fontWeight: '600' }}
                           >
                             {sm?.dur}
                           </span>
                         </div>
-                        <div style={{ color: '#3c4f4e', marginTop: '2px' }}>{sm?.pedido}</div>
-                        <div style={{ color: '#7c8f8d', fontSize: '11.5px' }}>
+                        <div style={{ color: 'var(--texto-2)', marginTop: '2px' }}>{sm?.pedido}</div>
+                        <div style={{ color: 'var(--texto-apagado)', fontSize: '11.5px' }}>
                           {sm?.quem}
                           {', '}
                           {sm?.n}

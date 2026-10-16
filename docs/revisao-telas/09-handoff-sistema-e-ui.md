@@ -123,3 +123,15 @@ Cada achado entra numa lista por tela; resolva, teste e registre.
 | As telas ficam em `.jsx` sem tipos, convertidas fiéis; tipar e extrair componentes vem na revisão tela a tela | Tipar tudo agora custaria a revisão inteira antes de qualquer melhoria visível |
 | A tela monta de novo a cada navegação, com o esqueleto de carregamento de 650 ms do protótipo | Se piscar demais, encurtar ou mostrar o esqueleto só na primeira visita |
 | Publicação: o projeto Vercel `traxium-prototipo` publica a pasta estática; o app Next precisa de um projeto com raiz no repositório (o `traxium` da outra conta já aponta para a raiz) | Quando o Gabriel quiser publicar, escolher o projeto e ligar o build Next |
+
+### Etapa 2. Tokens de cor nas telas (15/10/2026)
+
+**Problema.** As cores estavam escritas à mão em estilo inline nas dez telas (cerca de 1.200 ocorrências de 30 tons). Testar outro fundo, ou corrigir um cinza que reprova em contraste, exigia editar todas.
+
+**O que mudou.**
+
+1. Tokens em `src/app/globals.css`: fundo (`--fundo`, `--fundo-fundo`), painel, superfícies, quatro níveis de borda, cinco de texto (`--texto`, `--texto-2`, `--texto-sec`, `--texto-apagado`, `--texto-desab`), marca (`--primario`, `--primario-2`, `--primario-3`, `--azul`) e semânticas com bordas e fundos (`--ok`, `--aviso`, `--perigo`, `--tecnico`).
+2. As telas e `TX.ui` (tons, seleção, botão primário) passaram a usar `var(--token)`. Ficaram de fora, de propósito: as pontas de degradê dos regimes e dos avatares (arte, não tema), o HTML das exportações (abre em outra aba, sem os tokens) e as cores fixas em atributo de SVG. Três ícones que recebiam cor por atributo passaram a receber por `style`, porque `var()` não vale em atributo de SVG.
+3. Dois tons quase iguais viraram um só: `#dfe7e5` e `#e0e7e5` (borda de campo), `#f5f8f7` e `#f7faf9` (superfície).
+
+**Teste.** Captura das dez telas antes e depois comparada pixel a pixel: só ruído de antialiasing de fonte. Bateria inteira passa.

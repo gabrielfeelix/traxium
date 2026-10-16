@@ -19,12 +19,12 @@ export default class Frota extends Tela {
     const no = cs.filter((c) => c.escopo && c.escopo.no);
     const regT = (r) =>
       ({
-        A: ['linear-gradient(135deg,#48c78e,#1a8f57)', '#fff'],
+        A: ['linear-gradient(135deg,#48c78e,var(--ok))', '#fff'],
         B: ['linear-gradient(135deg,#f1d55a,#e3c235)', '#5b4b05'],
-        C: ['linear-gradient(135deg,#f4c15d,#e8a33d)', '#fff'],
+        C: ['linear-gradient(135deg,#f4c15d,var(--aviso-2))', '#fff'],
         D: ['linear-gradient(135deg,#e88a5f,#d06a3c)', '#fff'],
-        X: ['linear-gradient(135deg,#e46969,#c43d3d)', '#fff'],
-      })[r] || ['#e4eae8', '#7c8f8d'];
+        X: ['linear-gradient(135deg,#e46969,var(--perigo))', '#fff'],
+      })[r] || ['var(--borda)', 'var(--texto-apagado)'];
     const venc = TX.vencimentos(30).filter((x) => x.dono.startsWith('Frota própria'));
     // No escopo primeiro; cada grupo ganha um título no primeiro conjunto.
     const lista = cs.filter((c) => c.escopo && c.escopo.no).concat(cs.filter((c) => !(c.escopo && c.escopo.no)));
@@ -72,13 +72,13 @@ export default class Frota extends Tela {
           cabSub: dentro ? 'podem fazer viagem assegurada' : 'só carga não assegurada; incluir exige a data de entrada',
           modelo: TX.placa(cj.carretas[0]).modelo,
           filial: TX.filial(cj.filial).nome,
-          placas: TX.placasDoConjunto(cj).map((p, i) => ({ p, bg: i === 0 ? '#0b2224' : '#f0f4f3', c: i === 0 ? '#fff' : '#0b2224' })),
+          placas: TX.placasDoConjunto(cj).map((p, i) => ({ p, bg: i === 0 ? 'var(--texto)' : 'var(--superficie-2)', c: i === 0 ? '#fff' : 'var(--texto)' })),
           motorista: mot.nome,
           ini: F.iniciais(mot.nome),
           g1: mot.g1,
           g2: mot.g2,
           cnh: 'CNH ' + de.rotulo,
-          cnhC: de.estado === 'ok' ? '#5c706e' : '#b97514',
+          cnhC: de.estado === 'ok' ? 'var(--texto-sec)' : 'var(--aviso)',
           treinos:
             treinos.length + ' treinamentos registrados, último ' + (treinos.length ? F.curta(treinos[treinos.length - 1].data) : 'nenhum'),
           comps: TX.compsDoConjunto(cj).map((k) => ({
@@ -99,12 +99,12 @@ export default class Frota extends Tela {
               }),
           })),
           esc: esc.no ? 'No escopo GMP+' : 'Fora do escopo',
-          escC: esc.no ? '#1a8f57' : '#7c8f8d',
+          escC: esc.no ? 'var(--ok)' : 'var(--texto-apagado)',
           escDot: esc.no ? U.tom('ok').dot : U.tom('na').dot,
           escRing: esc.no ? U.tom('ok').ring : U.tom('na').ring,
           escSub: esc.no ? 'desde ' + F.data(esc.desde) : esc.motivo || 'nunca entrou',
           altRot: esc.no ? 'Tirar do escopo' : 'Incluir no escopo',
-          altC: esc.no ? '#c43d3d' : '#0C5862',
+          altC: esc.no ? 'var(--perigo)' : 'var(--primario-2)',
           alternar: () => this.setState({ modal: cj.id, fMotivo: '' }),
         };
       }),
@@ -179,14 +179,14 @@ export default class Frota extends Tela {
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <div>
               <div style={{ fontSize: '24px', fontWeight: '800' }}>Frota própria</div>
-              <div style={{ fontSize: '13.5px', color: '#5c706e', marginTop: '2px' }}>{v.subtitulo}</div>
+              <div style={{ fontSize: '13.5px', color: 'var(--texto-sec)', marginTop: '2px' }}>{v.subtitulo}</div>
             </div>
             <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div
                 onClick={v.exportarEscopo}
                 data-tx-exportar=""
                 style={{
-                  background: '#093D44',
+                  background: 'var(--primario-3)',
                   color: '#fff',
                   borderRadius: '11px',
                   padding: '9px 16px',
@@ -208,13 +208,13 @@ export default class Frota extends Tela {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '12px',
-                  background: '#fff',
-                  border: '1px solid #e4eae8',
-                  borderLeft: '3px solid #e8a33d',
+                  background: 'var(--painel)',
+                  border: '1px solid var(--borda)',
+                  borderLeft: '3px solid var(--aviso-2)',
                   borderRadius: '14px',
                   padding: '11px 16px',
                   fontSize: '13px',
-                  color: '#3c4f4e',
+                  color: 'var(--texto-2)',
                 }}
               >
                 <span
@@ -222,7 +222,7 @@ export default class Frota extends Tela {
                     width: '8px',
                     height: '8px',
                     borderRadius: '99px',
-                    background: 'linear-gradient(135deg,#f4c15d,#e8a33d)',
+                    background: 'linear-gradient(135deg,#f4c15d,var(--aviso-2))',
                     flex: 'none',
                   }}
                 ></span>
@@ -244,16 +244,16 @@ export default class Frota extends Tela {
                     }}
                   ></span>
                   <span style={{ fontSize: '15px', fontWeight: '800' }}>{cj?.cab}</span>
-                  <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '13px', fontWeight: '600', color: '#5c706e' }}>
+                  <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '13px', fontWeight: '600', color: 'var(--texto-sec)' }}>
                     {cj?.cabQ}
                   </span>
-                  <span style={{ fontSize: '12.5px', color: '#7c8f8d' }}>{cj?.cabSub}</span>
+                  <span style={{ fontSize: '12.5px', color: 'var(--texto-apagado)' }}>{cj?.cabSub}</span>
                 </div>
                 <div
                   data-tx-conjunto={cj?.id}
                   style={{
-                    background: '#fff',
-                    border: '1px solid #e4eae8',
+                    background: 'var(--painel)',
+                    border: '1px solid var(--borda)',
                     borderRadius: '20px',
                     padding: '16px 20px',
                     display: 'grid',
@@ -283,7 +283,7 @@ export default class Frota extends Tela {
                         </Fragment>
                       ))}
                     </div>
-                    <div style={{ fontSize: '12px', color: '#5c706e', marginTop: '6px' }}>
+                    <div style={{ fontSize: '12px', color: 'var(--texto-sec)', marginTop: '6px' }}>
                       {cj?.modelo}
                       {', base '}
                       {cj?.filial}
@@ -310,7 +310,7 @@ export default class Frota extends Tela {
                     <div style={{ minWidth: '0' }}>
                       <div style={{ fontSize: '13.5px', fontWeight: '700' }}>{cj?.motorista}</div>
                       <div style={{ fontSize: '11.5px', color: cj?.cnhC }}>{cj?.cnh}</div>
-                      <div style={{ fontSize: '11.5px', color: '#7c8f8d' }}>{cj?.treinos}</div>
+                      <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)' }}>{cj?.treinos}</div>
                     </div>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -324,7 +324,7 @@ export default class Frota extends Tela {
                             alignItems: 'center',
                             gap: '8px',
                             color: 'inherit',
-                            border: '1px solid #eef2f1',
+                            border: '1px solid var(--borda-suave)',
                             borderRadius: '11px',
                             padding: '6px 10px',
                             minWidth: '0',
@@ -352,7 +352,7 @@ export default class Frota extends Tela {
                                   alignItems: 'center',
                                   gap: '5px',
                                   fontSize: '11.5px',
-                                  color: '#3c4f4e',
+                                  color: 'var(--texto-2)',
                                   whiteSpace: 'nowrap',
                                   minWidth: '0',
                                   overflow: 'hidden',
@@ -384,7 +384,7 @@ export default class Frota extends Tela {
                               marginLeft: 'auto',
                               fontSize: '13px',
                               fontWeight: '800',
-                              color: '#0C5862',
+                              color: 'var(--primario-2)',
                               flex: 'none',
                               paddingLeft: '2px',
                             }}
@@ -417,7 +417,7 @@ export default class Frota extends Tela {
                       ></span>
                       {cj?.esc}
                     </span>
-                    <span style={{ fontSize: '11.5px', color: '#7c8f8d', textAlign: 'right' }}>{cj?.escSub}</span>
+                    <span style={{ fontSize: '11.5px', color: 'var(--texto-apagado)', textAlign: 'right' }}>{cj?.escSub}</span>
                     <span
                       onClick={cj?.alternar}
                       data-tx-escopo={cj?.id}
@@ -430,7 +430,7 @@ export default class Frota extends Tela {
               </Fragment>
             ))}
           </div>
-          <div style={{ fontSize: '12.5px', color: '#5c706e', lineHeight: '1.55', maxWidth: '900px' }}>
+          <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', lineHeight: '1.55', maxWidth: '900px' }}>
             Só os conjuntos no escopo GMP+ podem fazer viagem assegurada; o veículo diz se está ou não e desde quando. Conjuntos de TAC e
             ETC ficam em Transportadores. O histórico de cargas pertence ao compartimento (placa da carreta e posição) e continua quando o
             cavalo muda.
@@ -456,7 +456,7 @@ export default class Frota extends Tela {
                 onClick={v.pararClique}
                 data-tx-modal="escopo"
                 style={{
-                  background: '#fff',
+                  background: 'var(--painel)',
                   borderRadius: '24px',
                   width: '520px',
                   boxShadow: '0 40px 100px rgba(9,34,36,.4)',
@@ -472,7 +472,7 @@ export default class Frota extends Tela {
                       width: '32px',
                       height: '32px',
                       borderRadius: '99px',
-                      background: '#f0f4f3',
+                      background: 'var(--superficie-2)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -483,8 +483,8 @@ export default class Frota extends Tela {
                     ✕
                   </span>
                 </div>
-                <div style={{ fontSize: '12.5px', color: '#5c706e', marginTop: '4px', lineHeight: '1.55' }}>{v.mSub}</div>
-                <div style={{ fontSize: '12px', fontWeight: '800', color: '#3c4f4e', marginTop: '14px' }}>
+                <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '4px', lineHeight: '1.55' }}>{v.mSub}</div>
+                <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '14px' }}>
                   MOTIVO (MÍNIMO 10 CARACTERES)
                 </div>
                 <input
@@ -494,7 +494,7 @@ export default class Frota extends Tela {
                   style={{
                     width: '100%',
                     marginTop: '6px',
-                    border: '1px solid #dfe7e5',
+                    border: '1px solid var(--borda-campo)',
                     borderRadius: '12px',
                     padding: '10px 12px',
                     fontSize: '13.5px',
@@ -505,7 +505,7 @@ export default class Frota extends Tela {
                   <span
                     onClick={v.fecharModal}
                     style={{
-                      background: '#f0f4f3',
+                      background: 'var(--superficie-2)',
                       fontSize: '13.5px',
                       fontWeight: '700',
                       borderRadius: '99px',

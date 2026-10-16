@@ -26,6 +26,7 @@
   --texto-sec: #5c706e;
   --texto-apagado: #7c8f8d;
   --placeholder: #8ba09e;
+  --texto-desab: #9db0ae;
 
   /* marca */
   --primario: #127670;
@@ -40,6 +41,12 @@
   --aviso: #b97514;
   --aviso-2: #e8a33d;
   --perigo: #c43d3d;
+  --tecnico: #93313f;
+  --ok-borda: #cfe9dc;
+  --aviso-borda: #f3dfb8;
+  --perigo-borda: #f1caca;
+  --perigo-fundo: #fdf6f6;
+  --info-borda: #cfe1ef;
 
   /* sidebar */
   --sb-fundo: radial-gradient(120% 55% at 0% 0%, rgba(26, 158, 147, 0.42), transparent 62%),

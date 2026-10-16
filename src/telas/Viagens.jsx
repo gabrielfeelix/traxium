@@ -46,7 +46,7 @@ export default class Viagens extends Tela {
         k: 'limpeza',
         n: 'Limpeza exigida',
         periodo: '90',
-        cor: '#e8a33d',
+        cor: 'var(--aviso-2)',
         f: (x) => !x.v.cancelada && (['B', 'C', 'D'].includes(x.dec.regime) || (x.v.limpezas || []).length > 0),
         conta: (x) => !x.v.cancelada && x.dec.falta.some((c) => c.k === 'regime' && c.estado === 'falta'),
         dica: 'Viagens em que a carga anterior pediu lavagem. As que estão em Falta algo esperam o comprovante do lavador: abra a viagem para anexar.',
@@ -77,7 +77,7 @@ export default class Viagens extends Tela {
         k: 'ocorrencia',
         n: 'Com ocorrência',
         periodo: '90',
-        cor: '#c43d3d',
+        cor: 'var(--perigo)',
         f: (x) => comOc.has(x.v.id),
         dica: 'Viagens com ocorrência registrada na conferência ou no destino. A lista para o SGQ, com descrição e revisão, sai em Auditoria.',
         link: ['Ocorrências do período', '/auditoria#ocorrencias'],
@@ -214,7 +214,7 @@ export default class Viagens extends Tela {
       this.setState({ visao: k, popAberto: null, nomeVisao: '', txv: Date.now() });
       this.avisar('Visão "' + s.nomeVisao.trim() + '" salva. Ela abre como aba acima da lista.');
     };
-    const tm = vi.cor || '#127670';
+    const tm = vi.cor || 'var(--primario)';
     const escopoTxt = s.filial
       ? 'filial ' + TX.filial(s.filial).nome
       : u.filiais.length > 1
@@ -230,12 +230,12 @@ export default class Viagens extends Tela {
             k: x.k,
             n: x.n,
             fw: on ? '800' : '600',
-            c: on ? '#0b2224' : '#5c706e',
-            bd: on ? '#127670' : 'transparent',
+            c: on ? 'var(--texto)' : 'var(--texto-sec)',
+            bd: on ? 'var(--primario)' : 'transparent',
             q,
             qD: x.conta && q ? 'inline-block' : 'none',
-            qC: '#b97514',
-            qBd: '#f3dfb8',
+            qC: 'var(--aviso)',
+            qBd: 'var(--aviso-borda)',
             xD: x.usuario ? 'inline-flex' : 'none',
             onClick: () => this.setState(this.entrarVisao(x.k)),
             remover: (e) => {
@@ -249,7 +249,7 @@ export default class Viagens extends Tela {
         busca: s.busca,
         onBusca: (e) => this.setState({ busca: e.target.value, pag: 1 }),
         perRot: (PER.find((x) => x[0] === s.periodo) || PER[2])[1].replace('Últimos ', ''),
-        perBd: s.periodo !== perDef ? '#127670' : '#e0e7e5',
+        perBd: s.periodo !== perDef ? 'var(--primario)' : 'var(--borda-campo)',
         popPeriodo: s.popAberto === 'periodo',
         abrirPeriodo: pop('periodo'),
         periodos: PER.map(([k, n]) => ({
@@ -263,7 +263,7 @@ export default class Viagens extends Tela {
         sitRot: sitAtual[1],
         sitDot: sitAtual[2].dot,
         sitDotD: s.sit === 'todas' ? 'none' : 'inline-block',
-        sitBd: s.sit !== 'todas' ? '#127670' : '#e0e7e5',
+        sitBd: s.sit !== 'todas' ? 'var(--primario)' : 'var(--borda-campo)',
         popSituacao: s.popAberto === 'situacao',
         abrirSituacao: pop('situacao'),
         situacoes: SIT.map(([k, n, t]) => {
@@ -274,7 +274,7 @@ export default class Viagens extends Tela {
             q,
             dot: t.dot,
             fw: s.sit === k ? '800' : '600',
-            cor: q || s.sit === k ? '#0b2224' : '#9db0ae',
+            cor: q || s.sit === k ? 'var(--texto)' : 'var(--texto-desab)',
             ckOp: s.sit === k ? '1' : '0',
             onClick: () => set({ sit: k }),
           };
@@ -283,7 +283,7 @@ export default class Viagens extends Tela {
         abrirFiltros: pop('filtros'),
         filQ: ativos.length,
         filQD: ativos.length ? 'inline-flex' : 'none',
-        filBd: ativos.length ? '#127670' : '#e0e7e5',
+        filBd: ativos.length ? 'var(--primario)' : 'var(--borda-campo)',
         tipos: TIPOS.map(([k, n]) => ({
           k,
           n,
@@ -357,7 +357,7 @@ export default class Viagens extends Tela {
                 filial: TX.filial(v.filial).nome,
                 ordem: v.ordem,
                 ordemSub: v.cte ? 'CT-e ' + v.cte.numero + ', NF ' + v.cte.nf : v.id,
-                subC: v.cte ? '#3c4f4e' : '#9db0ae',
+                subC: v.cte ? 'var(--texto-2)' : 'var(--texto-desab)',
                 produto: TX.produto(v.produto).nome,
                 assegTxt: v.assegurada ? '' : '(sem GMP+)',
                 rota:
@@ -472,8 +472,8 @@ export default class Viagens extends Tela {
       fecharModal: () => this.setState({ modal: null, lote: null }),
       pararClique: (e) => e.stopPropagation(),
       abrirConciliar: () => this.setState({ modal: 'conciliar', lote: null }),
-      arqBd: lote ? '#127670' : '#c9d5d3',
-      arqBg: lote ? '#eef7f6' : '#fff',
+      arqBd: lote ? 'var(--primario)' : 'var(--borda-forte)',
+      arqBg: lote ? 'var(--primario-fraco)' : '#fff',
       arqTitulo: lote ? 'Arquivo: ' + lote.arquivo : 'Escolher arquivo do TMS',
       onArquivo: (e) => {
         const f = e.target.files && e.target.files[0];
@@ -498,7 +498,7 @@ export default class Viagens extends Tela {
             viagem: l.casou
               ? TX.viagem(l.viagem).ordem + ', ' + TX.pessoa(TX.viagem(l.viagem).motorista).nome
               : 'sem correspondência: ' + l.motivo.toLowerCase(),
-            c: l.casou ? '#1a8f57' : '#b97514',
+            c: l.casou ? 'var(--ok)' : 'var(--aviso)',
           }))
         : [],
       loteResumo: lote
@@ -529,7 +529,7 @@ export default class Viagens extends Tela {
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <div>
               <div style={{ fontSize: '24px', fontWeight: '800' }}>Viagens</div>
-              <div style={{ fontSize: '13.5px', color: '#5c706e', marginTop: '2px' }}>{v.subtitulo}</div>
+              <div style={{ fontSize: '13.5px', color: 'var(--texto-sec)', marginTop: '2px' }}>{v.subtitulo}</div>
             </div>
             <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div
@@ -537,8 +537,8 @@ export default class Viagens extends Tela {
                 data-tx-exportar=""
                 title="Baixa a lista com os filtros da tela"
                 style={{
-                  background: '#fff',
-                  border: '1px solid #e0e7e5',
+                  background: 'var(--painel)',
+                  border: '1px solid var(--borda-campo)',
                   borderRadius: '11px',
                   padding: '9px 15px',
                   fontSize: '13.5px',
@@ -568,14 +568,14 @@ export default class Viagens extends Tela {
               </div>
             </div>
           </div>
-          <div style={{ background: '#fff', border: '1px solid #e4eae8', borderRadius: '20px' }}>
+          <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px' }}>
             <div
               style={{
                 display: 'flex',
                 alignItems: 'flex-end',
                 gap: '4px',
                 padding: '0 20px',
-                borderBottom: '1px solid #eef2f1',
+                borderBottom: '1px solid var(--borda-suave)',
                 overflowX: 'auto',
               }}
             >
@@ -626,7 +626,7 @@ export default class Viagens extends Tela {
                         alignItems: 'center',
                         justifyContent: 'center',
                         fontSize: '12px',
-                        color: '#9db0ae',
+                        color: 'var(--texto-desab)',
                       }}
                       className="tx-ha5daa28"
                     >
@@ -639,8 +639,8 @@ export default class Viagens extends Tela {
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '14px 20px', flexWrap: 'wrap' }}>
               <div
                 style={{
-                  background: '#f7faf9',
-                  border: '1px solid #e0e7e5',
+                  background: 'var(--superficie)',
+                  border: '1px solid var(--borda-campo)',
                   borderRadius: '11px',
                   padding: '0 13px',
                   display: 'flex',
@@ -685,14 +685,14 @@ export default class Viagens extends Tela {
                     padding: '0 12px 0 13px',
                     borderRadius: '11px',
                     border: `1px solid ${v.perBd ?? ''}`,
-                    background: '#fff',
+                    background: 'var(--painel)',
                     fontSize: '13px',
                     cursor: 'pointer',
                     whiteSpace: 'nowrap',
                   }}
                   className="tx-h30bbaa9"
                 >
-                  <span style={{ color: '#7c8f8d', fontWeight: '600' }}>Período</span>
+                  <span style={{ color: 'var(--texto-apagado)', fontWeight: '600' }}>Período</span>
                   <span style={{ fontWeight: '700' }}>{v.perRot}</span>
                   <svg
                     width="11"
@@ -714,8 +714,8 @@ export default class Viagens extends Tela {
                         position: 'absolute',
                         left: '0',
                         top: '44px',
-                        background: '#fff',
-                        border: '1px solid #e4eae8',
+                        background: 'var(--painel)',
+                        border: '1px solid var(--borda)',
                         borderRadius: '14px',
                         boxShadow: '0 16px 40px rgba(9,61,68,.16)',
                         padding: '6px',
@@ -775,14 +775,14 @@ export default class Viagens extends Tela {
                         padding: '0 12px 0 13px',
                         borderRadius: '11px',
                         border: `1px solid ${v.sitBd ?? ''}`,
-                        background: '#fff',
+                        background: 'var(--painel)',
                         fontSize: '13px',
                         cursor: 'pointer',
                         whiteSpace: 'nowrap',
                       }}
                       className="tx-h30bbaa9"
                     >
-                      <span style={{ color: '#7c8f8d', fontWeight: '600' }}>Situação</span>
+                      <span style={{ color: 'var(--texto-apagado)', fontWeight: '600' }}>Situação</span>
                       <span style={{ display: v.sitDotD, width: '7px', height: '7px', borderRadius: '99px', background: v.sitDot }}></span>
                       <span style={{ fontWeight: '700' }}>{v.sitRot}</span>
                       <svg
@@ -805,8 +805,8 @@ export default class Viagens extends Tela {
                             position: 'absolute',
                             left: '0',
                             top: '44px',
-                            background: '#fff',
-                            border: '1px solid #e4eae8',
+                            background: 'var(--painel)',
+                            border: '1px solid var(--borda)',
                             borderRadius: '14px',
                             boxShadow: '0 16px 40px rgba(9,61,68,.16)',
                             padding: '6px',
@@ -841,7 +841,7 @@ export default class Viagens extends Tela {
                                     marginLeft: 'auto',
                                     fontFamily: "'Spline Sans Mono',monospace",
                                     fontSize: '11.5px',
-                                    color: '#7c8f8d',
+                                    color: 'var(--texto-apagado)',
                                   }}
                                 >
                                   {st?.q}
@@ -880,7 +880,7 @@ export default class Viagens extends Tela {
                     padding: '0 13px',
                     borderRadius: '11px',
                     border: `1px solid ${v.filBd ?? ''}`,
-                    background: '#fff',
+                    background: 'var(--painel)',
                     fontSize: '13px',
                     fontWeight: '700',
                     cursor: 'pointer',
@@ -900,7 +900,7 @@ export default class Viagens extends Tela {
                       minWidth: '18px',
                       height: '18px',
                       borderRadius: '6px',
-                      background: '#127670',
+                      background: 'var(--primario)',
                       color: '#fff',
                       fontSize: '10.5px',
                       alignItems: 'center',
@@ -918,8 +918,8 @@ export default class Viagens extends Tela {
                         position: 'absolute',
                         left: '0',
                         top: '44px',
-                        background: '#fff',
-                        border: '1px solid #e4eae8',
+                        background: 'var(--painel)',
+                        border: '1px solid var(--borda)',
                         borderRadius: '14px',
                         boxShadow: '0 16px 40px rgba(9,61,68,.16)',
                         padding: '6px',
@@ -928,7 +928,7 @@ export default class Viagens extends Tela {
                       }}
                     >
                       <div
-                        style={{ fontSize: '10.5px', fontWeight: '800', letterSpacing: '.8px', color: '#7c8f8d', padding: '8px 11px 4px' }}
+                        style={{ fontSize: '10.5px', fontWeight: '800', letterSpacing: '.8px', color: 'var(--texto-apagado)', padding: '8px 11px 4px' }}
                       >
                         TIPO
                       </div>
@@ -973,10 +973,10 @@ export default class Viagens extends Tela {
                               fontSize: '10.5px',
                               fontWeight: '800',
                               letterSpacing: '.8px',
-                              color: '#7c8f8d',
+                              color: 'var(--texto-apagado)',
                               padding: '10px 11px 4px',
                               marginTop: '4px',
-                              borderTop: '1px solid #f0f4f3',
+                              borderTop: '1px solid var(--superficie-2)',
                             }}
                           >
                             FILIAL
@@ -1032,7 +1032,7 @@ export default class Viagens extends Tela {
                       gap: '6px',
                       fontSize: '12px',
                       fontWeight: '700',
-                      color: '#0C5862',
+                      color: 'var(--primario-2)',
                       border: '1px solid #cfe3e1',
                       borderRadius: '8px',
                       padding: '5px 9px',
@@ -1042,7 +1042,7 @@ export default class Viagens extends Tela {
                     className="tx-h30bbaa9"
                   >
                     {at?.n}
-                    <span style={{ color: '#7c8f8d' }}>×</span>
+                    <span style={{ color: 'var(--texto-apagado)' }}>×</span>
                   </span>
                 </Fragment>
               ))}
@@ -1053,7 +1053,7 @@ export default class Viagens extends Tela {
                       <span
                         onClick={v.limpar}
                         data-tx-limpar=""
-                        style={{ fontSize: '12.5px', fontWeight: '700', color: '#5c706e', cursor: 'pointer', whiteSpace: 'nowrap' }}
+                        style={{ fontSize: '12.5px', fontWeight: '700', color: 'var(--texto-sec)', cursor: 'pointer', whiteSpace: 'nowrap' }}
                         className="tx-h39963fb"
                       >
                         Limpar
@@ -1063,7 +1063,7 @@ export default class Viagens extends Tela {
                         <span
                           onClick={v.abrirSalvar}
                           data-tx-salvar-visao=""
-                          style={{ fontSize: '12.5px', fontWeight: '800', color: '#0C5862', cursor: 'pointer', whiteSpace: 'nowrap' }}
+                          style={{ fontSize: '12.5px', fontWeight: '800', color: 'var(--primario-2)', cursor: 'pointer', whiteSpace: 'nowrap' }}
                           className="tx-h76d8d79"
                         >
                           Salvar como visão
@@ -1075,8 +1075,8 @@ export default class Viagens extends Tela {
                                 position: 'absolute',
                                 right: '0',
                                 top: '30px',
-                                background: '#fff',
-                                border: '1px solid #e4eae8',
+                                background: 'var(--painel)',
+                                border: '1px solid var(--borda)',
                                 borderRadius: '14px',
                                 boxShadow: '0 16px 40px rgba(9,61,68,.16)',
                                 padding: '14px',
@@ -1085,7 +1085,7 @@ export default class Viagens extends Tela {
                               }}
                             >
                               <div style={{ fontSize: '13.5px', fontWeight: '800' }}>Salvar como visão</div>
-                              <div style={{ fontSize: '12px', color: '#5c706e', marginTop: '2px', lineHeight: '1.5' }}>
+                              <div style={{ fontSize: '12px', color: 'var(--texto-sec)', marginTop: '2px', lineHeight: '1.5' }}>
                                 Vira uma aba acima da lista, com estes filtros. Fica salva neste navegador.
                               </div>
                               <input
@@ -1097,7 +1097,7 @@ export default class Viagens extends Tela {
                                 style={{
                                   marginTop: '10px',
                                   width: '100%',
-                                  border: '1px solid #e0e7e5',
+                                  border: '1px solid var(--borda-campo)',
                                   borderRadius: '10px',
                                   padding: '9px 11px',
                                   fontSize: '13px',
@@ -1129,7 +1129,7 @@ export default class Viagens extends Tela {
                     </div>
                   </>
                 ) : null}
-                <span style={{ fontSize: '12.5px', color: '#7c8f8d', whiteSpace: 'nowrap', fontFamily: "'Spline Sans Mono',monospace" }}>
+                <span style={{ fontSize: '12.5px', color: 'var(--texto-apagado)', whiteSpace: 'nowrap', fontFamily: "'Spline Sans Mono',monospace" }}>
                   {v.contagem}
                 </span>
               </div>
@@ -1144,18 +1144,18 @@ export default class Viagens extends Tela {
                     margin: '0 20px 14px',
                     padding: '11px 14px',
                     borderRadius: '13px',
-                    border: '1px solid #e4eae8',
+                    border: '1px solid var(--borda)',
                     borderLeft: `3px solid ${v.dicaCor ?? ''}`,
                   }}
                 >
-                  <div style={{ fontSize: '12.5px', color: '#3c4f4e', lineHeight: '1.5', flex: '1' }}>{v.dica}</div>
+                  <div style={{ fontSize: '12.5px', color: 'var(--texto-2)', lineHeight: '1.5', flex: '1' }}>{v.dica}</div>
                   {v.temDicaAcao ? (
                     <>
                       <span
                         onClick={v.dicaAcao}
                         data-tx-conciliar=""
                         style={{
-                          background: 'linear-gradient(135deg,#127670,#0E78B5)',
+                          background: 'linear-gradient(135deg,var(--primario),var(--azul))',
                           color: '#fff',
                           borderRadius: '99px',
                           padding: '8px 16px',
@@ -1188,13 +1188,13 @@ export default class Viagens extends Tela {
                 gridTemplateColumns: v.cols,
                 gap: '14px',
                 padding: '11px 20px',
-                background: '#f7faf9',
-                borderTop: '1px solid #eef2f1',
-                borderBottom: '1px solid #eef2f1',
+                background: 'var(--superficie)',
+                borderTop: '1px solid var(--borda-suave)',
+                borderBottom: '1px solid var(--borda-suave)',
                 fontSize: '11px',
                 fontWeight: '800',
                 letterSpacing: '.7px',
-                color: '#7c8f8d',
+                color: 'var(--texto-apagado)',
               }}
             >
               <span>CARREGAMENTO</span>
@@ -1208,12 +1208,12 @@ export default class Viagens extends Tela {
               <>
                 {(Array.isArray(v.skel) ? v.skel : []).map((sk, $index) => (
                   <Fragment key={$index}>
-                    <div style={{ padding: '14px 20px', borderBottom: '1px solid #f0f4f3' }}>
+                    <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--superficie-2)' }}>
                       <div
                         style={{
                           height: '16px',
                           borderRadius: '99px',
-                          background: 'linear-gradient(90deg,#eef2f1 25%,#f7faf9 40%,#eef2f1 55%)',
+                          background: 'linear-gradient(90deg,var(--borda-suave) 25%,var(--superficie) 40%,var(--borda-suave) 55%)',
                           backgroundSize: '600px 100%',
                           animation: 'txsh 1.3s linear infinite',
                         }}
@@ -1234,7 +1234,7 @@ export default class Viagens extends Tela {
                     gridTemplateColumns: v.cols,
                     gap: '14px',
                     padding: '12px 20px',
-                    borderBottom: '1px solid #f0f4f3',
+                    borderBottom: '1px solid var(--superficie-2)',
                     alignItems: 'center',
                     color: 'inherit',
                   }}
@@ -1242,7 +1242,7 @@ export default class Viagens extends Tela {
                 >
                   <div>
                     <div style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '13px', fontWeight: '600' }}>{r?.data}</div>
-                    <div style={{ fontSize: '11.5px', color: '#7c8f8d' }}>{r?.filial}</div>
+                    <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)' }}>{r?.filial}</div>
                   </div>
                   <div style={{ minWidth: '0' }}>
                     <div style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '13px', fontWeight: '600' }}>{r?.ordem}</div>
@@ -1264,9 +1264,9 @@ export default class Viagens extends Tela {
                       style={{ fontSize: '13.5px', fontWeight: '700', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
                     >
                       {r?.produto}
-                      <span style={{ fontWeight: '600', color: '#7c8f8d', fontSize: '12px' }}> {r?.assegTxt}</span>
+                      <span style={{ fontWeight: '600', color: 'var(--texto-apagado)', fontSize: '12px' }}> {r?.assegTxt}</span>
                     </div>
-                    <div style={{ fontSize: '12px', color: '#5c706e', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <div style={{ fontSize: '12px', color: 'var(--texto-sec)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {r?.rota}
                     </div>
                   </div>
@@ -1277,12 +1277,12 @@ export default class Viagens extends Tela {
                       {r?.transp}
                     </div>
                     <div
-                      style={{ fontSize: '11.5px', color: '#7c8f8d', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                      style={{ fontSize: '11.5px', color: 'var(--texto-apagado)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
                     >
                       {r?.transpSub}
                     </div>
                   </div>
-                  <div style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '12px', color: '#3c4f4e', lineHeight: '1.5' }}>
+                  <div style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '12px', color: 'var(--texto-2)', lineHeight: '1.5' }}>
                     {r?.placas}
                   </div>
                   <div style={{ minWidth: '0' }}>
@@ -1311,7 +1311,7 @@ export default class Viagens extends Tela {
                     <div
                       style={{
                         fontSize: '11.5px',
-                        color: '#7c8f8d',
+                        color: 'var(--texto-apagado)',
                         marginTop: '2px',
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
@@ -1328,12 +1328,12 @@ export default class Viagens extends Tela {
               <>
                 <div style={{ padding: '48px 20px', textAlign: 'center' }}>
                   <div style={{ fontSize: '15px', fontWeight: '800' }}>{v.vazioT}</div>
-                  <div style={{ fontSize: '13px', color: '#5c706e', marginTop: '4px' }}>{v.vazioSub}</div>
+                  <div style={{ fontSize: '13px', color: 'var(--texto-sec)', marginTop: '4px' }}>{v.vazioSub}</div>
                 </div>
               </>
             ) : null}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 20px' }}>
-              <span style={{ fontSize: '12.5px', color: '#5c706e' }}>{v.pagInfo}</span>
+              <span style={{ fontSize: '12.5px', color: 'var(--texto-sec)' }}>{v.pagInfo}</span>
               {v.temPaginacao ? (
                 <>
                   <div style={{ marginLeft: 'auto', display: 'flex', gap: '5px', alignItems: 'center' }}>
@@ -1399,7 +1399,7 @@ export default class Viagens extends Tela {
                 onClick={v.pararClique}
                 data-tx-modal="conciliar"
                 style={{
-                  background: '#fff',
+                  background: 'var(--painel)',
                   borderRadius: '24px',
                   width: '760px',
                   maxHeight: '90vh',
@@ -1417,7 +1417,7 @@ export default class Viagens extends Tela {
                       width: '32px',
                       height: '32px',
                       borderRadius: '99px',
-                      background: '#f0f4f3',
+                      background: 'var(--superficie-2)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -1428,7 +1428,7 @@ export default class Viagens extends Tela {
                     ✕
                   </span>
                 </div>
-                <div style={{ fontSize: '12.5px', color: '#5c706e', marginTop: '4px', lineHeight: '1.55' }}>
+                <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '4px', lineHeight: '1.55' }}>
                   Importe a planilha ou os XML de CT-e do período exportados do TMS. O Traxium casa cada CT-e com a viagem pela placa do
                   cavalo e pela data. Viagem conciliada com descarga passada se conclui sozinha.
                 </div>
@@ -1448,26 +1448,26 @@ export default class Viagens extends Tela {
                   <input type="file" accept=".xml,.csv,.xlsx,.zip" onChange={v.onArquivo} style={{ display: 'none' }} />
                   <div style={{ flex: '1' }}>
                     <div style={{ fontSize: '13.5px', fontWeight: '800' }}>{v.arqTitulo}</div>
-                    <div style={{ fontSize: '12px', color: '#5c706e' }}>planilha (.xlsx, .csv) ou XML de CT-e (.xml, .zip)</div>
+                    <div style={{ fontSize: '12px', color: 'var(--texto-sec)' }}>planilha (.xlsx, .csv) ou XML de CT-e (.xml, .zip)</div>
                   </div>
-                  <span onClick={v.usarExemplo} data-tx-lote-exemplo="" style={{ fontSize: '12px', fontWeight: '800', color: '#0C5862' }}>
+                  <span onClick={v.usarExemplo} data-tx-lote-exemplo="" style={{ fontSize: '12px', fontWeight: '800', color: 'var(--primario-2)' }}>
                     usar o lote de exemplo
                   </span>
                 </label>
                 {v.temLote ? (
                   <>
-                    <div style={{ marginTop: '14px', border: '1px solid #eef2f1', borderRadius: '14px', overflow: 'hidden' }}>
+                    <div style={{ marginTop: '14px', border: '1px solid var(--borda-suave)', borderRadius: '14px', overflow: 'hidden' }}>
                       <div
                         style={{
                           display: 'grid',
                           gridTemplateColumns: '80px 80px 100px 70px 1fr',
                           gap: '10px',
                           padding: '9px 14px',
-                          background: '#f7faf9',
+                          background: 'var(--superficie)',
                           fontSize: '10.5px',
                           fontWeight: '800',
                           letterSpacing: '.7px',
-                          color: '#7c8f8d',
+                          color: 'var(--texto-apagado)',
                         }}
                       >
                         <span>CT-E</span>
@@ -1484,7 +1484,7 @@ export default class Viagens extends Tela {
                               gridTemplateColumns: '80px 80px 100px 70px 1fr',
                               gap: '10px',
                               padding: '9px 14px',
-                              borderTop: '1px solid #f0f4f3',
+                              borderTop: '1px solid var(--superficie-2)',
                               fontSize: '12.5px',
                               alignItems: 'center',
                             }}
@@ -1501,14 +1501,14 @@ export default class Viagens extends Tela {
                         </Fragment>
                       ))}
                     </div>
-                    <div style={{ fontSize: '12.5px', color: '#3c4f4e', marginTop: '10px' }}>{v.loteResumo}</div>
+                    <div style={{ fontSize: '12.5px', color: 'var(--texto-2)', marginTop: '10px' }}>{v.loteResumo}</div>
                   </>
                 ) : null}
                 <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
                   <span
                     onClick={v.fecharModal}
                     style={{
-                      background: '#f0f4f3',
+                      background: 'var(--superficie-2)',
                       fontSize: '13.5px',
                       fontWeight: '700',
                       borderRadius: '99px',

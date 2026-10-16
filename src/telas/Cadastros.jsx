@@ -38,11 +38,11 @@ export default class Cadastros extends Tela {
       aba = this.cadAtiva();
     const regT = (r) =>
       ({
-        A: ['linear-gradient(135deg,#48c78e,#1a8f57)', '#fff'],
+        A: ['linear-gradient(135deg,#48c78e,var(--ok))', '#fff'],
         B: ['linear-gradient(135deg,#f1d55a,#e3c235)', '#5b4b05'],
-        C: ['linear-gradient(135deg,#f4c15d,#e8a33d)', '#fff'],
+        C: ['linear-gradient(135deg,#f4c15d,var(--aviso-2))', '#fff'],
         D: ['linear-gradient(135deg,#e88a5f,#d06a3c)', '#fff'],
-        X: ['linear-gradient(135deg,#e46969,#c43d3d)', '#fff'],
+        X: ['linear-gradient(135deg,#e46969,var(--perigo))', '#fff'],
       })[r];
     const ABAS = [
       ['produtos', 'Produtos e regimes'],
@@ -89,8 +89,8 @@ export default class Cadastros extends Tela {
         k,
         n,
         onClick: () => this.irAba(k),
-        c: aba === k ? '#0b2224' : '#7c8f8d',
-        bd: aba === k ? '#127670' : 'transparent',
+        c: aba === k ? 'var(--texto)' : 'var(--texto-apagado)',
+        bd: aba === k ? 'var(--primario)' : 'transparent',
       })),
       temAcao: aba === 'fornecedores',
       acaoRot: 'Cadastrar fornecedor',
@@ -135,12 +135,12 @@ export default class Cadastros extends Tela {
       pedirDaBusca: () => pedir(termo),
       pContagem: lista.length === TX.db.produtos.length ? lista.length + ' produtos' : lista.length + ' de ' + TX.db.produtos.length,
       regRot: s.pReg === 'todos' ? 'Todos' : REGS.find((x) => x[0] === s.pReg)[1],
-      regBd: s.pReg !== 'todos' ? '#127670' : '#e0e7e5',
+      regBd: s.pReg !== 'todos' ? 'var(--primario)' : 'var(--borda-campo)',
       popRegime: s.popAberto === 'regime',
       abrirRegime: () => this.setState((st) => ({ popAberto: st.popAberto === 'regime' ? null : 'regime' })),
       pRegimes: REGS.map(([k, n]) => {
         const q = k === 'todos' ? achados.length : achados.filter((p) => p.regime === k).length;
-        const t = k === 'todos' ? ['transparent', '#7c8f8d'] : regT(k);
+        const t = k === 'todos' ? ['transparent', 'var(--texto-apagado)'] : regT(k);
         const pode = q > 0 || k === s.pReg;
         return {
           k,
@@ -150,7 +150,7 @@ export default class Cadastros extends Tela {
           rBg: t[0],
           rT: t[1],
           fw: s.pReg === k ? '800' : '600',
-          cor: pode ? '#0b2224' : '#9db0ae',
+          cor: pode ? 'var(--texto)' : 'var(--texto-desab)',
           cur: pode ? 'pointer' : 'default',
           ckOp: s.pReg === k ? '1' : '0',
           onClick: () => {
@@ -169,7 +169,7 @@ export default class Cadastros extends Tela {
           rBg: t[0],
           rT: t[1],
           rn: TX.REGIMES[p.regime].n.toLowerCase(),
-          rc: p.regime === 'X' ? '#c43d3d' : '#3c4f4e',
+          rc: p.regime === 'X' ? 'var(--perigo)' : 'var(--texto-2)',
           racao: p.racao ? 'sim' : 'não',
         };
       }),
@@ -203,8 +203,8 @@ export default class Cadastros extends Tela {
           return {
             v: x.v,
             st: on ? 'vigente desde ' + F.data(x.desde) : 'de ' + F.data(x.desde) + ' a ' + F.data(x.ate),
-            c: on ? '#1a8f57' : '#7c8f8d',
-            bd: on ? '#cfe9dc' : '#eef2f1',
+            c: on ? 'var(--ok)' : 'var(--texto-apagado)',
+            bd: on ? 'var(--ok-borda)' : 'var(--borda-suave)',
             mud: x.mudancas,
             ciencias: n + ' ciências em viagens',
           };
@@ -231,7 +231,7 @@ export default class Cadastros extends Tela {
         servico: f.servico,
         cidade: f.cidade,
         cnpj: f.cnpj,
-        bd: s.hl === f.id ? '#127670' : '#e4eae8',
+        bd: s.hl === f.id ? 'var(--primario)' : 'var(--borda)',
         sh: s.hl === f.id ? '0 0 0 4px rgba(18,118,112,.12)' : 'none',
         regime: f.regimeMax
           ? 'Credenciado para limpeza até regime ' + f.regimeMax + ' (' + TX.REGIMES[f.regimeMax].n.toLowerCase() + ')'
@@ -271,7 +271,7 @@ export default class Cadastros extends Tela {
           afretador: TX.usuario(f.afretador).nome,
           gk,
           hrefMesa: '/hoje?filial=' + f.id,
-          bd: oc ? '#e4eae8' : '#f1caca',
+          bd: oc ? 'var(--borda)' : 'var(--perigo-borda)',
           oc: oc ? 'Gatekeeper comunicado ao organismo certificador' : 'Gatekeeper ainda não comunicado',
           ocSub: oc
             ? F.data(oc.data) + ', protocolo ' + oc.protocolo
@@ -279,7 +279,7 @@ export default class Cadastros extends Tela {
           ocC: tm.c,
           ocDot: tm.dot,
           ocRing: tm.ring,
-          ocBd: oc ? '#eef2f1' : '#f1caca',
+          ocBd: oc ? 'var(--borda-suave)' : 'var(--perigo-borda)',
           semOc: !oc,
           registrar: () => this.setState({ modal: 'oc', fFil: f.id, f: { data: TX.HOJE, protocolo: '' } }),
         };
@@ -516,13 +516,13 @@ export default class Cadastros extends Tela {
         <div style={{ flex: '1', display: 'flex', flexDirection: 'column', padding: '24px 32px 48px', gap: '16px', minWidth: '0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <div>
-              <div style={{ fontSize: '11px', fontWeight: '800', letterSpacing: '1.2px', color: '#7c8f8d', textTransform: 'uppercase' }}>
+              <div style={{ fontSize: '11px', fontWeight: '800', letterSpacing: '1.2px', color: 'var(--texto-apagado)', textTransform: 'uppercase' }}>
                 Cadastros
               </div>
               <div data-tx-titulo="" style={{ fontSize: '24px', fontWeight: '800', marginTop: '1px' }}>
                 {v.abaNome}
               </div>
-              <div style={{ fontSize: '13.5px', color: '#5c706e', marginTop: '2px' }}>{v.abaSub}</div>
+              <div style={{ fontSize: '13.5px', color: 'var(--texto-sec)', marginTop: '2px' }}>{v.abaSub}</div>
             </div>
             <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
               {v.temAcao ? (
@@ -531,7 +531,7 @@ export default class Cadastros extends Tela {
                     onClick={v.acao}
                     data-tx-acao-aba=""
                     style={{
-                      background: 'linear-gradient(135deg,#127670,#0E78B5)',
+                      background: 'linear-gradient(135deg,var(--primario),var(--azul))',
                       color: '#fff',
                       borderRadius: '99px',
                       padding: '10px 20px',
@@ -549,7 +549,7 @@ export default class Cadastros extends Tela {
           </div>
           {v.mostrarAbas ? (
             <>
-              <div style={{ display: 'flex', gap: '6px', borderBottom: '1px solid #e0e7e5' }}>
+              <div style={{ display: 'flex', gap: '6px', borderBottom: '1px solid var(--borda-campo)' }}>
                 {(Array.isArray(v.abas) ? v.abas : []).map((ab, $index) => (
                   <Fragment key={$index}>
                     <span
@@ -575,12 +575,12 @@ export default class Cadastros extends Tela {
           {v.aProdutos ? (
             <>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: '20px', alignItems: 'start' }}>
-                <div style={{ background: '#fff', border: '1px solid #e4eae8', borderRadius: '20px', overflow: 'hidden' }}>
+                <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', overflow: 'hidden' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '14px 18px' }}>
                     <div
                       style={{
-                        background: '#f7faf9',
-                        border: '1px solid #e0e7e5',
+                        background: 'var(--superficie)',
+                        border: '1px solid var(--borda-campo)',
                         borderRadius: '11px',
                         padding: '0 13px',
                         display: 'flex',
@@ -632,14 +632,14 @@ export default class Cadastros extends Tela {
                           padding: '0 12px 0 13px',
                           borderRadius: '11px',
                           border: `1px solid ${v.regBd ?? ''}`,
-                          background: '#fff',
+                          background: 'var(--painel)',
                           fontSize: '13px',
                           cursor: 'pointer',
                           whiteSpace: 'nowrap',
                         }}
                         className="tx-h30bbaa9"
                       >
-                        <span style={{ color: '#7c8f8d', fontWeight: '600' }}>Depois dele</span>
+                        <span style={{ color: 'var(--texto-apagado)', fontWeight: '600' }}>Depois dele</span>
                         <span style={{ fontWeight: '700' }}>{v.regRot}</span>
                         <svg
                           width="11"
@@ -661,8 +661,8 @@ export default class Cadastros extends Tela {
                               position: 'absolute',
                               left: '0',
                               top: '44px',
-                              background: '#fff',
-                              border: '1px solid #e4eae8',
+                              background: 'var(--painel)',
+                              border: '1px solid var(--borda)',
                               borderRadius: '14px',
                               boxShadow: '0 16px 40px rgba(9,61,68,.16)',
                               padding: '6px',
@@ -711,7 +711,7 @@ export default class Cadastros extends Tela {
                                       marginLeft: 'auto',
                                       fontFamily: "'Spline Sans Mono',monospace",
                                       fontSize: '11.5px',
-                                      color: '#7c8f8d',
+                                      color: 'var(--texto-apagado)',
                                     }}
                                   >
                                     {pr?.q}
@@ -736,7 +736,7 @@ export default class Cadastros extends Tela {
                         </>
                       ) : null}
                     </div>
-                    <span style={{ marginLeft: 'auto', fontSize: '12.5px', color: '#7c8f8d', whiteSpace: 'nowrap' }}>{v.pContagem}</span>
+                    <span style={{ marginLeft: 'auto', fontSize: '12.5px', color: 'var(--texto-apagado)', whiteSpace: 'nowrap' }}>{v.pContagem}</span>
                   </div>
                   <div
                     style={{
@@ -744,11 +744,11 @@ export default class Cadastros extends Tela {
                       gridTemplateColumns: '1.3fr 1.4fr 1fr 110px 80px',
                       gap: '12px',
                       padding: '10px 18px',
-                      background: '#f7faf9',
+                      background: 'var(--superficie)',
                       fontSize: '10.5px',
                       fontWeight: '800',
                       letterSpacing: '.7px',
-                      color: '#7c8f8d',
+                      color: 'var(--texto-apagado)',
                     }}
                   >
                     <span>PRODUTO</span>
@@ -765,17 +765,17 @@ export default class Cadastros extends Tela {
                           gridTemplateColumns: '1.3fr 1.4fr 1fr 110px 80px',
                           gap: '12px',
                           padding: '10px 18px',
-                          borderTop: '1px solid #f0f4f3',
+                          borderTop: '1px solid var(--superficie-2)',
                           alignItems: 'center',
                           fontSize: '13px',
                         }}
                       >
                         <div>
                           <b>{p?.nome}</b>
-                          <div style={{ fontSize: '11.5px', color: '#7c8f8d' }}>{p?.en}</div>
+                          <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)' }}>{p?.en}</div>
                         </div>
-                        <span style={{ color: '#5c706e', fontSize: '12.5px' }}>{p?.sin}</span>
-                        <span style={{ color: '#5c706e' }}>{p?.cat}</span>
+                        <span style={{ color: 'var(--texto-sec)', fontSize: '12.5px' }}>{p?.sin}</span>
+                        <span style={{ color: 'var(--texto-sec)' }}>{p?.cat}</span>
                         <span
                           style={{
                             display: 'inline-flex',
@@ -804,7 +804,7 @@ export default class Cadastros extends Tela {
                           </span>
                           {p?.rn}
                         </span>
-                        <span style={{ fontSize: '12px', color: '#5c706e' }}>{p?.racao}</span>
+                        <span style={{ fontSize: '12px', color: 'var(--texto-sec)' }}>{p?.racao}</span>
                       </div>
                     </Fragment>
                   ))}
@@ -815,7 +815,7 @@ export default class Cadastros extends Tela {
                         style={{
                           padding: '22px 18px',
                           fontSize: '13px',
-                          color: '#5c706e',
+                          color: 'var(--texto-sec)',
                           display: 'flex',
                           alignItems: 'center',
                           gap: '14px',
@@ -828,7 +828,7 @@ export default class Cadastros extends Tela {
                               onClick={v.pedirDaBusca}
                               data-tx-pedir-da-busca=""
                               style={{
-                                background: 'linear-gradient(135deg,#127670,#0E78B5)',
+                                background: 'linear-gradient(135deg,var(--primario),var(--azul))',
                                 color: '#fff',
                                 fontSize: '12.5px',
                                 fontWeight: '800',
@@ -847,9 +847,9 @@ export default class Cadastros extends Tela {
                   ) : null}
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  <div style={{ background: '#fff', border: '1px solid #e4eae8', borderRadius: '20px', padding: '18px 20px' }}>
+                  <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '18px 20px' }}>
                     <div style={{ fontSize: '15px', fontWeight: '800' }}>Pedir classificação à Traxium</div>
-                    <div style={{ fontSize: '12.5px', color: '#5c706e', marginTop: '3px', lineHeight: '1.5' }}>
+                    <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '3px', lineHeight: '1.5' }}>
                       Para carga que não está na base. Até a classificação, viagem com ela como carga anterior fica travada.
                     </div>
                     <input
@@ -860,7 +860,7 @@ export default class Cadastros extends Tela {
                       style={{
                         width: '100%',
                         marginTop: '10px',
-                        border: '1px solid #dfe7e5',
+                        border: '1px solid var(--borda-campo)',
                         borderRadius: '11px',
                         padding: '9px 12px',
                         fontSize: '13.5px',
@@ -888,9 +888,9 @@ export default class Cadastros extends Tela {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '12px' }}>
                       {(Array.isArray(v.pedidos) ? v.pedidos : []).map((pd, $index) => (
                         <Fragment key={$index}>
-                          <div style={{ fontSize: '12.5px', background: '#f7faf9', borderRadius: '11px', padding: '8px 11px' }}>
+                          <div style={{ fontSize: '12.5px', background: 'var(--superficie)', borderRadius: '11px', padding: '8px 11px' }}>
                             <b>"{pd?.t}"</b>
-                            <div style={{ color: '#7c8f8d' }}>{pd?.sub}</div>
+                            <div style={{ color: 'var(--texto-apagado)' }}>{pd?.sub}</div>
                           </div>
                         </Fragment>
                       ))}
@@ -903,7 +903,7 @@ export default class Cadastros extends Tela {
           {v.aManual ? (
             <>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', alignItems: 'start' }}>
-                <div style={{ background: '#fff', border: '1px solid #e4eae8', borderRadius: '20px', padding: '20px 22px' }}>
+                <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 22px' }}>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <div style={{ fontSize: '16px', fontWeight: '800' }}>{v.manualTitulo}</div>
                     <span
@@ -914,7 +914,7 @@ export default class Cadastros extends Tela {
                         paddingLeft: '12px',
                         fontSize: '12.5px',
                         fontWeight: '800',
-                        color: '#0C5862',
+                        color: 'var(--primario-2)',
                         cursor: 'pointer',
                         whiteSpace: 'nowrap',
                       }}
@@ -922,7 +922,7 @@ export default class Cadastros extends Tela {
                       Publicar nova versão
                     </span>
                   </div>
-                  <div style={{ fontSize: '12.5px', color: '#5c706e', marginTop: '3px' }}>
+                  <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '3px' }}>
                     O motorista lê no link, em cartões, e a ciência grava a versão na viagem.
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '7px', marginTop: '12px' }}>
@@ -932,9 +932,9 @@ export default class Cadastros extends Tela {
                           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                             <b style={{ fontFamily: "'Spline Sans Mono',monospace" }}>v{vs?.v}</b>
                             <span style={{ fontSize: '11.5px', fontWeight: '700', color: vs?.c }}>{vs?.st}</span>
-                            <span style={{ marginLeft: 'auto', fontSize: '12px', color: '#5c706e' }}>{vs?.ciencias}</span>
+                            <span style={{ marginLeft: 'auto', fontSize: '12px', color: 'var(--texto-sec)' }}>{vs?.ciencias}</span>
                           </div>
-                          <div style={{ fontSize: '12.5px', color: '#5c706e', marginTop: '3px' }}>{vs?.mud}</div>
+                          <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '3px' }}>{vs?.mud}</div>
                         </div>
                       </Fragment>
                     ))}
@@ -949,24 +949,24 @@ export default class Cadastros extends Tela {
                       marginTop: '14px',
                       padding: '10px 13px',
                       borderRadius: '12px',
-                      background: '#f7faf9',
+                      background: 'var(--superficie)',
                       cursor: 'pointer',
                       fontSize: '13px',
                     }}
                     className="tx-h6eff871"
                   >
                     <b>{v.cartoesRot}</b>
-                    <span style={{ color: '#5c706e' }}>{v.cartoesSub}</span>
-                    <span style={{ marginLeft: 'auto', fontSize: '12.5px', fontWeight: '800', color: '#0C5862' }}>{v.cartoesAcao}</span>
+                    <span style={{ color: 'var(--texto-sec)' }}>{v.cartoesSub}</span>
+                    <span style={{ marginLeft: 'auto', fontSize: '12.5px', fontWeight: '800', color: 'var(--primario-2)' }}>{v.cartoesAcao}</span>
                   </div>
                   {v.verCartoes ? (
                     <>
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '8px' }}>
                         {(Array.isArray(v.cartoes) ? v.cartoes : []).map((ct, $index) => (
                           <Fragment key={$index}>
-                            <div style={{ background: '#f7faf9', borderRadius: '13px', padding: '11px 13px' }}>
+                            <div style={{ background: 'var(--superficie)', borderRadius: '13px', padding: '11px 13px' }}>
                               <div style={{ fontSize: '13px', fontWeight: '800' }}>{ct?.t}</div>
-                              <div style={{ fontSize: '12px', color: '#5c706e', marginTop: '3px', lineHeight: '1.45' }}>{ct?.txt}</div>
+                              <div style={{ fontSize: '12px', color: 'var(--texto-sec)', marginTop: '3px', lineHeight: '1.45' }}>{ct?.txt}</div>
                             </div>
                           </Fragment>
                         ))}
@@ -974,7 +974,7 @@ export default class Cadastros extends Tela {
                     </>
                   ) : null}
                 </div>
-                <div style={{ background: '#fff', border: '1px solid #e4eae8', borderRadius: '20px', padding: '20px 22px' }}>
+                <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 22px' }}>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <div style={{ fontSize: '16px', fontWeight: '800' }}>Treinamentos registrados</div>
                     <span
@@ -985,7 +985,7 @@ export default class Cadastros extends Tela {
                         paddingLeft: '12px',
                         fontSize: '12.5px',
                         fontWeight: '800',
-                        color: '#0C5862',
+                        color: 'var(--primario-2)',
                         cursor: 'pointer',
                         whiteSpace: 'nowrap',
                       }}
@@ -993,18 +993,18 @@ export default class Cadastros extends Tela {
                       Registrar treinamento
                     </span>
                   </div>
-                  <div style={{ fontSize: '12.5px', color: '#5c706e', marginTop: '3px' }}>
+                  <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '3px' }}>
                     Lista datada com tema, instrutor e participantes: o registro que o auditor confere.
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
                     {(Array.isArray(v.treinos) ? v.treinos : []).map((tr, $index) => (
                       <Fragment key={$index}>
-                        <div style={{ border: '1px solid #eef2f1', borderRadius: '13px', padding: '11px 13px' }}>
+                        <div style={{ border: '1px solid var(--borda-suave)', borderRadius: '13px', padding: '11px 13px' }}>
                           <div style={{ display: 'flex', gap: '10px' }}>
                             <b style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '12.5px' }}>{tr?.data}</b>
                             <b style={{ fontSize: '13px' }}>{tr?.tema}</b>
                           </div>
-                          <div style={{ fontSize: '12px', color: '#5c706e', marginTop: '3px' }}>
+                          <div style={{ fontSize: '12px', color: 'var(--texto-sec)', marginTop: '3px' }}>
                             {tr?.instrutor}
                             {', '}
                             {tr?.carga}
@@ -1012,7 +1012,7 @@ export default class Cadastros extends Tela {
                             {tr?.n}
                             {' participantes'}
                           </div>
-                          <div style={{ fontSize: '11.5px', color: '#7c8f8d', marginTop: '2px' }}>{tr?.quem}</div>
+                          <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)', marginTop: '2px' }}>{tr?.quem}</div>
                         </div>
                       </Fragment>
                     ))}
@@ -1029,7 +1029,7 @@ export default class Cadastros extends Tela {
                     <div
                       data-tx-forn={fo?.id}
                       style={{
-                        background: '#fff',
+                        background: 'var(--painel)',
                         border: `1.5px solid ${fo?.bd ?? ''}`,
                         boxShadow: fo?.sh,
                         borderRadius: '18px',
@@ -1043,7 +1043,7 @@ export default class Cadastros extends Tela {
                           style={{
                             fontSize: '11.5px',
                             fontWeight: '700',
-                            color: '#0C5862',
+                            color: 'var(--primario-2)',
                             border: '1px solid #cfe3e1',
                             borderRadius: '99px',
                             padding: '2px 9px',
@@ -1051,12 +1051,12 @@ export default class Cadastros extends Tela {
                         >
                           {fo?.servico}
                         </span>
-                        <span style={{ marginLeft: 'auto', fontSize: '12px', color: '#5c706e' }}>{fo?.cidade}</span>
+                        <span style={{ marginLeft: 'auto', fontSize: '12px', color: 'var(--texto-sec)' }}>{fo?.cidade}</span>
                       </div>
-                      <div style={{ fontSize: '12px', color: '#7c8f8d', marginTop: '3px', fontFamily: "'Spline Sans Mono',monospace" }}>
+                      <div style={{ fontSize: '12px', color: 'var(--texto-apagado)', marginTop: '3px', fontFamily: "'Spline Sans Mono',monospace" }}>
                         {fo?.cnpj}
                       </div>
-                      <div style={{ fontSize: '12.5px', color: '#3c4f4e', marginTop: '6px' }}>{fo?.regime}</div>
+                      <div style={{ fontSize: '12.5px', color: 'var(--texto-2)', marginTop: '6px' }}>{fo?.regime}</div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginTop: '10px' }}>
                         {(Array.isArray(fo?.docs) ? fo?.docs : []).map((fd, $index) => (
                           <Fragment key={$index}>
@@ -1066,7 +1066,7 @@ export default class Cadastros extends Tela {
                                 alignItems: 'center',
                                 gap: '9px',
                                 fontSize: '12.5px',
-                                background: '#f7faf9',
+                                background: 'var(--superficie)',
                                 borderRadius: '10px',
                                 padding: '7px 11px',
                               }}
@@ -1079,7 +1079,7 @@ export default class Cadastros extends Tela {
                                   <span
                                     onClick={fd?.onAtualizar}
                                     data-tx-atualizar-doc={fd?.k}
-                                    style={{ fontWeight: '800', color: '#0C5862', cursor: 'pointer', paddingLeft: '6px' }}
+                                    style={{ fontWeight: '800', color: 'var(--primario-2)', cursor: 'pointer', paddingLeft: '6px' }}
                                     className="tx-h76d8d79"
                                   >
                                     Atualizar
@@ -1103,22 +1103,22 @@ export default class Cadastros extends Tela {
                   <Fragment key={$index}>
                     <div
                       data-tx-filial-card={fl?.id}
-                      style={{ background: '#fff', border: `1.5px solid ${fl?.bd ?? ''}`, borderRadius: '18px', padding: '16px 18px' }}
+                      style={{ background: 'var(--painel)', border: `1.5px solid ${fl?.bd ?? ''}`, borderRadius: '18px', padding: '16px 18px' }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <div style={{ fontSize: '16px', fontWeight: '800' }}>{fl?.nome}</div>
-                        <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '12px', color: '#5c706e' }}>{fl?.reg}</span>
+                        <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '12px', color: 'var(--texto-sec)' }}>{fl?.reg}</span>
                         <A href={fl?.hrefMesa} style={{ marginLeft: 'auto', fontSize: '12.5px', fontWeight: '800' }}>
                           Abrir a mesa →
                         </A>
                       </div>
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '12px' }}>
-                        <div style={{ background: '#f7faf9', borderRadius: '12px', padding: '9px 12px' }}>
-                          <div style={{ fontSize: '11.5px', color: '#7c8f8d' }}>Afretador</div>
+                        <div style={{ background: 'var(--superficie)', borderRadius: '12px', padding: '9px 12px' }}>
+                          <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)' }}>Afretador</div>
                           <div style={{ fontSize: '13px', fontWeight: '700' }}>{fl?.afretador}</div>
                         </div>
-                        <div style={{ background: '#f7faf9', borderRadius: '12px', padding: '9px 12px' }}>
-                          <div style={{ fontSize: '11.5px', color: '#7c8f8d' }}>Protocolos gatekeeper, 45 dias</div>
+                        <div style={{ background: 'var(--superficie)', borderRadius: '12px', padding: '9px 12px' }}>
+                          <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)' }}>Protocolos gatekeeper, 45 dias</div>
                           <div style={{ fontSize: '13px', fontWeight: '700', fontFamily: "'Spline Sans Mono',monospace" }}>{fl?.gk}</div>
                         </div>
                       </div>
@@ -1144,7 +1144,7 @@ export default class Cadastros extends Tela {
                         ></span>
                         <div style={{ flex: '1' }}>
                           <div style={{ fontSize: '13px', fontWeight: '700', color: fl?.ocC }}>{fl?.oc}</div>
-                          <div style={{ fontSize: '11.5px', color: '#7c8f8d' }}>{fl?.ocSub}</div>
+                          <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)' }}>{fl?.ocSub}</div>
                         </div>
                         {fl?.semOc ? (
                           <>
@@ -1152,7 +1152,7 @@ export default class Cadastros extends Tela {
                               onClick={fl?.registrar}
                               data-tx-registrar-oc={fl?.id}
                               style={{
-                                background: 'linear-gradient(135deg,#127670,#0E78B5)',
+                                background: 'linear-gradient(135deg,var(--primario),var(--azul))',
                                 color: '#fff',
                                 fontSize: '12.5px',
                                 fontWeight: '800',
@@ -1193,7 +1193,7 @@ export default class Cadastros extends Tela {
                 onClick={v.pararClique}
                 data-tx-modal={v.mK}
                 style={{
-                  background: '#fff',
+                  background: 'var(--painel)',
                   borderRadius: '24px',
                   width: '580px',
                   maxHeight: '90vh',
@@ -1211,7 +1211,7 @@ export default class Cadastros extends Tela {
                       width: '32px',
                       height: '32px',
                       borderRadius: '99px',
-                      background: '#f0f4f3',
+                      background: 'var(--superficie-2)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -1222,12 +1222,12 @@ export default class Cadastros extends Tela {
                     ✕
                   </span>
                 </div>
-                <div style={{ fontSize: '12.5px', color: '#5c706e', marginTop: '4px', lineHeight: '1.55' }}>{v.mSub}</div>
+                <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '4px', lineHeight: '1.55' }}>{v.mSub}</div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '14px' }}>
                   {(Array.isArray(v.mCampos) ? v.mCampos : []).map((mc, $index) => (
                     <Fragment key={$index}>
                       <div style={{ gridColumn: mc?.col }}>
-                        <div style={{ fontSize: '12px', fontWeight: '800', color: '#3c4f4e' }}>{mc?.l}</div>
+                        <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)' }}>{mc?.l}</div>
                         <input
                           value={mc?.v ?? ''}
                           onChange={mc?.on}
@@ -1237,7 +1237,7 @@ export default class Cadastros extends Tela {
                           style={{
                             width: '100%',
                             marginTop: '5px',
-                            border: '1px solid #dfe7e5',
+                            border: '1px solid var(--borda-campo)',
                             borderRadius: '11px',
                             padding: '9px 12px',
                             fontSize: '13.5px',
@@ -1245,14 +1245,14 @@ export default class Cadastros extends Tela {
                             fontFamily: mc?.ff,
                           }}
                         />
-                        <div style={{ fontSize: '11.5px', fontWeight: '700', color: '#c43d3d', marginTop: '3px' }}>{mc?.msg}</div>
+                        <div style={{ fontSize: '11.5px', fontWeight: '700', color: 'var(--perigo)', marginTop: '3px' }}>{mc?.msg}</div>
                       </div>
                     </Fragment>
                   ))}
                 </div>
                 {v.mTemChips ? (
                   <>
-                    <div style={{ fontSize: '12px', fontWeight: '800', color: '#3c4f4e', marginTop: '12px' }}>{v.mChipsRot}</div>
+                    <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '12px' }}>{v.mChipsRot}</div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
                       {(Array.isArray(v.mChips) ? v.mChips : []).map((mh, $index) => (
                         <Fragment key={$index}>
@@ -1281,7 +1281,7 @@ export default class Cadastros extends Tela {
                   <span
                     onClick={v.fecharModal}
                     style={{
-                      background: '#f0f4f3',
+                      background: 'var(--superficie-2)',
                       fontSize: '13.5px',
                       fontWeight: '700',
                       borderRadius: '99px',

@@ -10,12 +10,12 @@ import TX from './tx-dados';
   'use strict';
 
   const TOM = {
-    ok: { dot: 'linear-gradient(135deg,#48c78e,#1a8f57)', ring: 'rgba(26,143,87,.16)', c: '#1a8f57', bd: '#cfe9dc' },
-    falta: { dot: 'linear-gradient(135deg,#f4c15d,#e8a33d)', ring: 'rgba(232,163,61,.2)', c: '#b97514', bd: '#f3dfb8' },
-    bloqueio: { dot: 'linear-gradient(135deg,#e46969,#c43d3d)', ring: 'rgba(196,61,61,.16)', c: '#c43d3d', bd: '#f1caca' },
-    tecnico: { dot: 'linear-gradient(135deg,#c43d3d,#7d2232)', ring: 'rgba(147,49,63,.2)', c: '#93313f', bd: '#ebc3c8' },
-    na: { dot: '#dde5e3', ring: 'rgba(157,176,174,.14)', c: '#9db0ae', bd: '#e4eae8' },
-    info: { dot: 'linear-gradient(135deg,#5b8def,#0E78B5)', ring: 'rgba(14,120,181,.16)', c: '#0E78B5', bd: '#cfe1ef' },
+    ok: { dot: 'linear-gradient(135deg,#48c78e,var(--ok))', ring: 'rgba(26,143,87,.16)', c: 'var(--ok)', bd: 'var(--ok-borda)' },
+    falta: { dot: 'linear-gradient(135deg,#f4c15d,var(--aviso-2))', ring: 'rgba(232,163,61,.2)', c: 'var(--aviso)', bd: 'var(--aviso-borda)' },
+    bloqueio: { dot: 'linear-gradient(135deg,#e46969,var(--perigo))', ring: 'rgba(196,61,61,.16)', c: 'var(--perigo)', bd: 'var(--perigo-borda)' },
+    tecnico: { dot: 'linear-gradient(135deg,var(--perigo),#7d2232)', ring: 'rgba(147,49,63,.2)', c: 'var(--tecnico)', bd: '#ebc3c8' },
+    na: { dot: '#dde5e3', ring: 'rgba(157,176,174,.14)', c: 'var(--texto-desab)', bd: 'var(--borda)' },
+    info: { dot: 'linear-gradient(135deg,#5b8def,var(--azul))', ring: 'rgba(14,120,181,.16)', c: 'var(--azul)', bd: 'var(--info-borda)' },
     autoridade: { dot: 'linear-gradient(135deg,#f4c15d,#d97544)', ring: 'rgba(217,117,68,.18)', c: '#b85a2e', bd: '#f0d3bf' }
   };
   const RES = {
@@ -105,24 +105,24 @@ import TX from './tx-dados';
   function sel(on, habilitado) {
     const ok = habilitado !== false;
     return {
-      bd: on ? '#127670' : ok ? '#e0e7e5' : '#eef2f1', bg: on ? '#eef7f6' : ok ? '#fff' : '#fafcfb',
-      dot: on ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#fff', dotBd: on ? '#127670' : '#c9d5d3',
-      c: on ? '#0C5862' : ok ? '#3c4f4e' : '#9db0ae', cur: ok ? 'pointer' : 'not-allowed', op: ok ? '1' : '.5'
+      bd: on ? 'var(--primario)' : ok ? 'var(--borda-campo)' : 'var(--borda-suave)', bg: on ? 'var(--primario-fraco)' : ok ? '#fff' : '#fafcfb',
+      dot: on ? 'linear-gradient(135deg,var(--primario),var(--azul))' : '#fff', dotBd: on ? 'var(--primario)' : 'var(--borda-forte)',
+      c: on ? 'var(--primario-2)' : ok ? 'var(--texto-2)' : 'var(--texto-desab)', cur: ok ? 'pointer' : 'not-allowed', op: ok ? '1' : '.5'
     };
   }
   function chip(on) {
-    return { bg: on ? '#0b2224' : '#fff', c: on ? '#fff' : '#3c4f4e', bd: on ? '#0b2224' : '#e0e7e5' };
+    return { bg: on ? 'var(--texto)' : '#fff', c: on ? '#fff' : 'var(--texto-2)', bd: on ? 'var(--texto)' : 'var(--borda-campo)' };
   }
   // Botão primário: habilitado só quando o obrigatório está preenchido.
   function cta(pronto) {
     return pronto
-      ? { bg: 'linear-gradient(135deg,#127670,#0E78B5)', c: '#fff', sh: '0 8px 18px rgba(18,118,112,.35)', cur: 'pointer' }
-      : { bg: '#eef2f1', c: '#9db0ae', sh: 'none', cur: 'not-allowed' };
+      ? { bg: 'linear-gradient(135deg,var(--primario),var(--azul))', c: '#fff', sh: '0 8px 18px rgba(18,118,112,.35)', cur: 'pointer' }
+      : { bg: 'var(--borda-suave)', c: 'var(--texto-desab)', sh: 'none', cur: 'not-allowed' };
   }
   function ctaPerigo(pronto) {
     return pronto
-      ? { bg: 'linear-gradient(135deg,#e46969,#c43d3d)', c: '#fff', sh: '0 8px 18px rgba(196,61,61,.3)', cur: 'pointer' }
-      : { bg: '#eef2f1', c: '#9db0ae', sh: 'none', cur: 'not-allowed' };
+      ? { bg: 'linear-gradient(135deg,#e46969,var(--perigo))', c: '#fff', sh: '0 8px 18px rgba(196,61,61,.3)', cur: 'pointer' }
+      : { bg: 'var(--borda-suave)', c: 'var(--texto-desab)', sh: 'none', cur: 'not-allowed' };
   }
 
   const ROTULO_PAPEL = { qualidade: 'Qualidade', direcao: 'Direção', afretador: 'Afretador', frota: 'Frota', consultoria: 'Consultoria' };
@@ -170,12 +170,12 @@ import TX from './tx-dados';
     }).sort((a, b) => (b.data + b.janela).localeCompare(a.data + a.janela));
     if (vs.length) grupos.push({ n: 'VIAGENS', total: vs.length, itens: vs.slice(0, 4).map(v => { const d = TX.decidir(v), tm = tomResultado(d); return { t: v.ordem + ', ' + TX.pessoa(v.motorista).nome, sub: TX.produto(v.produto).nome + ', ' + TX.filial(v.filial).nome + ', ' + F.curta(v.data) + ' ' + v.janela + (v.cte ? ', CT-e ' + v.cte.numero : ''), href: '/viagem?id=' + v.id, dot: tm.dot, tag: v.cancelada ? 'cancelada' : d.rotulo, tagC: tm.c }; }) });
     const ts = TX.db.transportadores.filter(t => { const p = t.pessoa ? TX.pessoa(t.pessoa) : null; return tem(TX.nomeTransportador(t)) || tem([p && p.cpf, t.cnpj, t.rntrc && t.rntrc.numero].join(' '), true); });
-    if (ts.length) grupos.push({ n: 'TRANSPORTADORES', total: ts.length, itens: ts.slice(0, 3).map(t => ({ t: TX.nomeTransportador(t), sub: (t.tipo === 'TAC' ? 'TAC' : 'ETC') + (t.rntrc ? ', RNTRC ' + t.rntrc.numero : ''), href: '/transportadores?id=' + t.id, dot: TOM.info.dot, tag: '', tagC: '#5c706e' })) });
+    if (ts.length) grupos.push({ n: 'TRANSPORTADORES', total: ts.length, itens: ts.slice(0, 3).map(t => ({ t: TX.nomeTransportador(t), sub: (t.tipo === 'TAC' ? 'TAC' : 'ETC') + (t.rntrc ? ', RNTRC ' + t.rntrc.numero : ''), href: '/transportadores?id=' + t.id, dot: TOM.info.dot, tag: '', tagC: 'var(--texto-sec)' })) });
     const comps = [];
     TX.db.placas.filter(p => p.tipo === 'carreta' && tem(p.placa)).forEach(p => (p.comps || ['C1']).forEach(pos => comps.push({ placa: p.placa, pos, dono: p.dono })));
-    if (comps.length) grupos.push({ n: 'COMPARTIMENTOS', total: comps.length, itens: comps.slice(0, 3).map(c => { const h = TX.historico(c.placa, c.pos)[0]; const pr = h && h.produto ? TX.produto(h.produto) : null; return { t: c.placa + ' ' + c.pos, sub: 'última carga: ' + (pr ? pr.nome + ' em ' + F.data(h.data) : 'sem registro'), href: '/compartimento?placa=' + encodeURIComponent(c.placa) + '&pos=' + c.pos, dot: TOM.na.dot, tag: c.dono === 'propria' ? 'frota própria' : '', tagC: '#5c706e' }; }) });
+    if (comps.length) grupos.push({ n: 'COMPARTIMENTOS', total: comps.length, itens: comps.slice(0, 3).map(c => { const h = TX.historico(c.placa, c.pos)[0]; const pr = h && h.produto ? TX.produto(h.produto) : null; return { t: c.placa + ' ' + c.pos, sub: 'última carga: ' + (pr ? pr.nome + ' em ' + F.data(h.data) : 'sem registro'), href: '/compartimento?placa=' + encodeURIComponent(c.placa) + '&pos=' + c.pos, dot: TOM.na.dot, tag: c.dono === 'propria' ? 'frota própria' : '', tagC: 'var(--texto-sec)' }; }) });
     const ps = TX.buscarProdutos(texto, 3);
-    if (ps.length) grupos.push({ n: 'PRODUTOS', total: ps.length, itens: ps.map(x => { const p = x.produto || x; return { t: p.nome, sub: 'regime ' + p.regime + (p.racao ? ', pode ser ração' : ', não é ração'), href: '/cadastros?aba=produtos&q=' + encodeURIComponent(p.nome), dot: p.regime === 'X' ? TOM.bloqueio.dot : TOM.ok.dot, tag: '', tagC: '#5c706e' }; }) });
+    if (ps.length) grupos.push({ n: 'PRODUTOS', total: ps.length, itens: ps.map(x => { const p = x.produto || x; return { t: p.nome, sub: 'regime ' + p.regime + (p.racao ? ', pode ser ração' : ', não é ração'), href: '/cadastros?aba=produtos&q=' + encodeURIComponent(p.nome), dot: p.regime === 'X' ? TOM.bloqueio.dot : TOM.ok.dot, tag: '', tagC: 'var(--texto-sec)' }; }) });
     return grupos;
   }
 
@@ -193,7 +193,7 @@ import TX from './tx-dados';
         pagInfo: lista.length === 0 ? 'nenhum registro' : 'mostrando ' + (ini + 1) + ' a ' + fim + ' de ' + lista.length + ' ' + rotulo,
         paginas: Array.from({ length: n }, (_, i) => i + 1).map(x => Object.assign({ n: x, onClick: () => c.setState({ [k]: x }) }, chip(x === p))),
         pagAnt: () => { if (p > 1) c.setState({ [k]: p - 1 }); }, pagProx: () => { if (p < n) c.setState({ [k]: p + 1 }); },
-        pagAntC: p > 1 ? '#3c4f4e' : '#c9d5d3', pagProxC: p < n ? '#3c4f4e' : '#c9d5d3', pagAntCur: p > 1 ? 'pointer' : 'not-allowed', pagProxCur: p < n ? 'pointer' : 'not-allowed'
+        pagAntC: p > 1 ? 'var(--texto-2)' : 'var(--borda-forte)', pagProxC: p < n ? 'var(--texto-2)' : 'var(--borda-forte)', pagAntCur: p > 1 ? 'pointer' : 'not-allowed', pagProxCur: p < n ? 'pointer' : 'not-allowed'
       }
     };
   }
@@ -204,7 +204,7 @@ import TX from './tx-dados';
     if (!w) return false;
     w.document.write('<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>' + titulo + '</title><style>' +
       'body{font-family:Arial,Helvetica,sans-serif;color:#1d2b2c;margin:36px 44px;font-size:12.5px;line-height:1.5}h1{font-size:19px;margin:0 0 4px}h2{font-size:14px;margin:22px 0 8px;border-bottom:1px solid #ccd6d4;padding-bottom:4px}' +
-      'table{border-collapse:collapse;width:100%;margin:6px 0 10px}th,td{border:1px solid #d5dedc;padding:5px 8px;text-align:left;vertical-align:top}th{background:#f1f5f4;font-weight:bold}.sub{color:#5c706e}.mono{font-family:Consolas,monospace}.aus{color:#a33}@media print{body{margin:14mm}}' +
+      'table{border-collapse:collapse;width:100%;margin:6px 0 10px}th,td{border:1px solid #d5dedc;padding:5px 8px;text-align:left;vertical-align:top}th{background:#f1f5f4;font-weight:bold}.sub{color:var(--texto-sec)}.mono{font-family:Consolas,monospace}.aus{color:#a33}@media print{body{margin:14mm}}' +
       '</style></head><body>' + html + '<p class="sub" style="margin-top:28px">Gerado pelo Traxium em ' + TX.fmt.data(TX.HOJE) + '. Protótipo: dados fictícios.</p></body></html>');
     w.document.close();
     return true;

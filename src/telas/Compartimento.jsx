@@ -33,12 +33,12 @@ export default class Compartimento extends Tela {
     const hist = TX.historico(a.placa, a.pos);
     const regT = (r) =>
       ({
-        A: ['linear-gradient(135deg,#48c78e,#1a8f57)', '#fff'],
+        A: ['linear-gradient(135deg,#48c78e,var(--ok))', '#fff'],
         B: ['linear-gradient(135deg,#f1d55a,#e3c235)', '#5b4b05'],
-        C: ['linear-gradient(135deg,#f4c15d,#e8a33d)', '#fff'],
+        C: ['linear-gradient(135deg,#f4c15d,var(--aviso-2))', '#fff'],
         D: ['linear-gradient(135deg,#e88a5f,#d06a3c)', '#fff'],
-        X: ['linear-gradient(135deg,#e46969,#c43d3d)', '#fff'],
-      })[r] || ['#e4eae8', '#7c8f8d'];
+        X: ['linear-gradient(135deg,#e46969,var(--perigo))', '#fff'],
+      })[r] || ['var(--borda)', 'var(--texto-apagado)'];
     const key = a.placa + '#' + a.pos;
     const limpezas = TX.db.viagens.flatMap((v) =>
       (v.limpezas || []).filter((l) => l.comp === key).map((l) => Object.assign({ viagem: v.id }, l)),
@@ -76,11 +76,11 @@ export default class Compartimento extends Tela {
     } else if (!t3.length) {
       pode = 'Ainda não se sabe';
       podeSub = 'T-3 vazio: a primeira viagem pede as três últimas cargas';
-      podeDot = '#e8a33d';
+      podeDot = 'var(--aviso-2)';
     } else if (foraBase) {
       pode = 'Ainda não';
       podeSub = 'carga fora da base IDTF no T-3, esperando classificação';
-      podeDot = '#e8a33d';
+      podeDot = 'var(--aviso-2)';
     } else if (regs.length) {
       pode = LIMP.A;
       podeSub = 'regularizado pela TS1.9, laudo ' + regs[0].laudo;
@@ -104,14 +104,14 @@ export default class Compartimento extends Tela {
       return {
         t: i < 3 ? 'T-' + (i + 1) : '',
         tVis: i < 3 ? 'visible' : 'hidden',
-        tC: r === 'X' ? '#c43d3d' : '#0C5862',
-        tBd: r === 'X' ? '#f1caca' : '#cfe3e1',
+        tC: r === 'X' ? 'var(--perigo)' : 'var(--primario-2)',
+        tBd: r === 'X' ? 'var(--perigo-borda)' : '#cfe3e1',
         op: i < 3 ? '1' : '.62',
-        lC: r === 'X' ? '#c43d3d' : '#5c706e',
+        lC: r === 'X' ? 'var(--perigo)' : 'var(--texto-sec)',
         data: F.data(h.data),
         produto: pr ? pr.nome : '"' + h.texto + '"',
         cat: pr ? pr.cat + (pr.racao ? ', ração' : '') : 'fora da base IDTF',
-        nc: r === 'X' ? '#c43d3d' : '#0b2224',
+        nc: r === 'X' ? 'var(--perigo)' : 'var(--texto)',
         bg: r === 'X' ? '#fdf8f8' : '#fff',
         r: r === 'X' ? '✕' : r || '?',
         rBg: t[0],
@@ -167,8 +167,8 @@ export default class Compartimento extends Tela {
             : ' Faça na próxima viagem que usar esta carreta.')
         : '',
       heroBg: quarentena
-        ? 'linear-gradient(115deg,#3a1219,#6e1f2b 60%,#93313f 130%)'
-        : 'linear-gradient(115deg,#093D44,#0C5862 60%,#0E78B5 140%)',
+        ? 'linear-gradient(115deg,#3a1219,#6e1f2b 60%,var(--tecnico) 130%)'
+        : 'linear-gradient(115deg,var(--primario-3),var(--primario-2) 60%,var(--azul) 140%)',
       linhas,
       vazio: !hist.length,
       temIrmaos: !!conj && TX.compsDoConjunto(conj).length > 1,
@@ -176,7 +176,7 @@ export default class Compartimento extends Tela {
         ? TX.compsDoConjunto(conj).map((k) => ({
             n: k.placa + ' ' + k.pos,
             href: '/compartimento?placa=' + encodeURIComponent(k.placa) + '&pos=' + k.pos,
-            c: k.key === key ? '#0b2224' : '#5c706e',
+            c: k.key === key ? 'var(--texto)' : 'var(--texto-sec)',
             bg: k.key === key ? '#fff' : 'transparent',
             sh: k.key === key ? '0 1px 4px rgba(9,61,68,.12)' : 'none',
           }))
@@ -220,27 +220,27 @@ export default class Compartimento extends Tela {
       <div style={{ minHeight: '100%' }} data-screen-label="Compartimento" data-tela="Compartimento">
         <div style={{ flex: '1', display: 'flex', flexDirection: 'column', padding: '24px 32px 48px', gap: '18px', minWidth: '0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: '600', color: '#5c706e' }}>
-              <A href={v.voltarHref} style={{ color: '#5c706e' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--texto-sec)' }}>
+              <A href={v.voltarHref} style={{ color: 'var(--texto-sec)' }}>
                 {v.voltarRot}
               </A>
               {v.temDono ? (
                 <>
                   <span style={{ color: '#b8c6c4' }}>›</span>
-                  <A href={v.donoHref} style={{ color: '#5c706e' }}>
+                  <A href={v.donoHref} style={{ color: 'var(--texto-sec)' }}>
                     {v.dono}
                   </A>
                 </>
               ) : null}
               <span style={{ color: '#b8c6c4' }}>›</span>
-              <span style={{ fontFamily: "'Spline Sans Mono',monospace", color: '#0b2224' }}>{v.titulo}</span>
+              <span style={{ fontFamily: "'Spline Sans Mono',monospace", color: 'var(--texto)' }}>{v.titulo}</span>
             </div>
             <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div
                 onClick={v.exportar}
                 data-tx-exportar=""
                 style={{
-                  background: '#093D44',
+                  background: 'var(--primario-3)',
                   color: '#fff',
                   borderRadius: '11px',
                   padding: '9px 16px',
@@ -376,7 +376,7 @@ export default class Compartimento extends Tela {
                         href={v.qHref}
                         data-tx-regularizar-viagem=""
                         style={{
-                          background: '#fff',
+                          background: 'var(--painel)',
                           color: '#6e1f2b',
                           borderRadius: '99px',
                           padding: '10px 18px',
@@ -395,17 +395,17 @@ export default class Compartimento extends Tela {
               </>
             ) : null}
           </div>
-          <div style={{ background: '#fff', border: '1px solid #e4eae8', borderRadius: '20px', padding: '20px 22px' }}>
+          <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 22px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
               <div style={{ fontSize: '16px', fontWeight: '800' }}>Histórico de cargas</div>
-              <div style={{ fontSize: '12.5px', color: '#5c706e' }}>
+              <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)' }}>
                 a mais recente em cima; as três primeiras são o T-3 da próxima viagem
               </div>
               {v.temIrmaos ? (
                 <>
                   <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '12px', color: '#7c8f8d', fontWeight: '600' }}>No mesmo conjunto</span>
-                    <div style={{ display: 'flex', background: '#f0f4f3', borderRadius: '11px', padding: '3px', gap: '2px' }}>
+                    <span style={{ fontSize: '12px', color: 'var(--texto-apagado)', fontWeight: '600' }}>No mesmo conjunto</span>
+                    <div style={{ display: 'flex', background: 'var(--superficie-2)', borderRadius: '11px', padding: '3px', gap: '2px' }}>
                       {(Array.isArray(v.irmaos) ? v.irmaos : []).map((ir, $index) => (
                         <Fragment key={$index}>
                           <A
@@ -441,8 +441,8 @@ export default class Compartimento extends Tela {
                 fontSize: '10.5px',
                 fontWeight: '800',
                 letterSpacing: '.7px',
-                color: '#7c8f8d',
-                borderBottom: '1px solid #eef2f1',
+                color: 'var(--texto-apagado)',
+                borderBottom: '1px solid var(--borda-suave)',
               }}
             >
               <span></span>
@@ -461,7 +461,7 @@ export default class Compartimento extends Tela {
                     gridTemplateColumns: '46px 96px 1.4fr 70px 1.3fr 1fr',
                     gap: '12px',
                     padding: '11px 4px',
-                    borderBottom: '1px solid #f0f4f3',
+                    borderBottom: '1px solid var(--superficie-2)',
                     alignItems: 'center',
                     background: l?.bg,
                     opacity: l?.op,
@@ -484,7 +484,7 @@ export default class Compartimento extends Tela {
                   <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '12.5px' }}>{l?.data}</span>
                   <div>
                     <div style={{ fontSize: '13.5px', fontWeight: '700', color: l?.nc }}>{l?.produto}</div>
-                    <div style={{ fontSize: '11.5px', color: '#7c8f8d' }}>{l?.cat}</div>
+                    <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)' }}>{l?.cat}</div>
                   </div>
                   <span
                     style={{
@@ -512,7 +512,7 @@ export default class Compartimento extends Tela {
                     ) : null}
                     {l?.semHref ? (
                       <>
-                        <span style={{ color: '#5c706e' }}>{l?.fonte}</span>
+                        <span style={{ color: 'var(--texto-sec)' }}>{l?.fonte}</span>
                       </>
                     ) : null}
                   </div>
@@ -522,12 +522,12 @@ export default class Compartimento extends Tela {
             ))}
             {v.vazio ? (
               <>
-                <div style={{ padding: '28px 4px', fontSize: '13px', color: '#5c706e' }}>
+                <div style={{ padding: '28px 4px', fontSize: '13px', color: 'var(--texto-sec)' }}>
                   Nenhuma carga registrada neste compartimento. O T-3 nasce vazio e a primeira viagem pede as três últimas cargas.
                 </div>
               </>
             ) : null}
-            <div style={{ fontSize: '12px', color: '#7c8f8d', marginTop: '12px', lineHeight: '1.55' }}>
+            <div style={{ fontSize: '12px', color: 'var(--texto-apagado)', marginTop: '12px', lineHeight: '1.55' }}>
               A limpeza exigida antes de ração sai da carga anterior, pela base IDTF. Carga proibida no T-3 põe o compartimento em
               quarentena: limpeza não resolve, só a regularização da TS1.9 registrada na viagem.
             </div>

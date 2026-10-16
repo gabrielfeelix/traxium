@@ -49,7 +49,7 @@ export default class Hoje extends Tela {
     const conferir = dec.falta.some((f) => f.k === 'verificacao' && /esperando conferência/.test(f.detalhe));
     const gk = dec.cobertura === 'gatekeeper';
     const fz = (on, atual) =>
-      on ? 'linear-gradient(90deg,#48c78e,#1a8f57)' : atual ? 'linear-gradient(90deg,#f4c15d,#e8a33d)' : '#e4eae8';
+      on ? 'linear-gradient(90deg,#48c78e,var(--ok))' : atual ? 'linear-gradient(90deg,#f4c15d,var(--aviso-2))' : 'var(--borda)';
     const etapas = [
       { tip: 'link enviado', bg: fz(!!l.enviadoEm, !l.enviadoEm) },
       { tip: 'três últimas cargas', bg: fz(dec.t3.every((c) => c.completo) && dec.t3.length, !!l.abertoEm) },
@@ -73,7 +73,7 @@ export default class Hoje extends Tela {
     let falta, faltaC, quem;
     if (dec.resultado === 'pronta') {
       falta = dec.porAutoridade ? 'Liberada por autoridade' : 'Pronta para assegurar';
-      faltaC = '#1a8f57';
+      faltaC = 'var(--ok)';
       quem = 'declaração do CT-e liberada';
     } else {
       falta =
@@ -139,7 +139,7 @@ export default class Hoje extends Tela {
       janela: v.janela,
       prazo:
         v.data !== TX.HOJE ? F.curta(v.data) : dif < 0 ? 'passou' : dif < 120 ? 'em ' + dif + ' min' : 'em ' + Math.round(dif / 60) + ' h',
-      prazoC: dif < 120 && dec.resultado !== 'pronta' ? '#c43d3d' : '#7c8f8d',
+      prazoC: dif < 120 && dec.resultado !== 'pronta' ? 'var(--perigo)' : 'var(--texto-apagado)',
       ini: F.iniciais(mot.nome),
       g1: mot.g1,
       g2: mot.g2,
@@ -163,8 +163,8 @@ export default class Hoje extends Tela {
       acao: acao ? acao.n : '',
       acaoK: acao ? acao.k : '',
       onAcao: acao ? acao.fn : null,
-      acaoBg: acao && acao.prim ? 'linear-gradient(135deg,#127670,#0E78B5)' : '#f0f4f3',
-      acaoC: acao && acao.prim ? '#fff' : '#0b2224',
+      acaoBg: acao && acao.prim ? 'linear-gradient(135deg,var(--primario),var(--azul))' : 'var(--superficie-2)',
+      acaoC: acao && acao.prim ? '#fff' : 'var(--texto)',
       acaoSh: acao && acao.prim ? '0 6px 14px rgba(18,118,112,.28)' : 'none',
       _r: dec.resultado,
       _busca: TX.norm(
@@ -213,8 +213,8 @@ export default class Hoje extends Tela {
           id,
           n: id === 'todas' ? 'Todas as filiais' : TX.filial(id).nome + ' ' + TX.filial(id).uf,
           q: q + ' hoje',
-          bg: on ? '#eef7f6' : '#fff',
-          dot: on ? '#127670' : '#c9d5d3',
+          bg: on ? 'var(--primario-fraco)' : '#fff',
+          dot: on ? 'var(--primario)' : 'var(--borda-forte)',
           onClick: () => this.setFilial(id),
         };
       }),
@@ -289,9 +289,9 @@ export default class Hoje extends Tela {
       }, 60);
     };
     const RES = [
-      ['falta', 'falta algo', U.tom('falta'), 'linear-gradient(90deg,#f4c15d,#e8a33d)'],
-      ['bloq', 'bloqueadas', U.tom('bloqueio'), 'linear-gradient(90deg,#e46969,#c43d3d)'],
-      ['pronta', 'prontas', U.tom('ok'), 'linear-gradient(90deg,#48c78e,#1a8f57)'],
+      ['falta', 'falta algo', U.tom('falta'), 'linear-gradient(90deg,#f4c15d,var(--aviso-2))'],
+      ['bloq', 'bloqueadas', U.tom('bloqueio'), 'linear-gradient(90deg,#e46969,var(--perigo))'],
+      ['pronta', 'prontas', U.tom('ok'), 'linear-gradient(90deg,#48c78e,var(--ok))'],
     ];
     const noLink = linhas.filter((l) => /preenchimento|aberto/.test(l.linkRot)).length;
     const tot = Math.max(1, linhas.length);
@@ -339,12 +339,12 @@ export default class Hoje extends Tela {
     const alcN = this.nomeAlcada(u.alcada);
     const acima = fila.acima;
     const prazoDe = (v) => {
-      if (v.data !== TX.HOJE) return { t: F.curta(v.data), c: '#7c8f8d' };
+      if (v.data !== TX.HOJE) return { t: F.curta(v.data), c: 'var(--texto-apagado)' };
       const hm = TX.agoraHM();
       const dif = +v.janela.slice(0, 2) * 60 + +v.janela.slice(3, 5) - (+hm.slice(0, 2) * 60 + +hm.slice(3, 5));
       return {
         t: dif < 0 ? 'passou' : dif < 120 ? 'em ' + dif + ' min' : 'em ' + Math.round(dif / 60) + ' h',
-        c: dif < 120 ? '#c43d3d' : '#7c8f8d',
+        c: dif < 120 ? 'var(--perigo)' : 'var(--texto-apagado)',
       };
     };
     return {
@@ -370,7 +370,7 @@ export default class Hoje extends Tela {
           pedido: x.pedido
             ? 'pedida por ' + TX.usuario(x.pedido.por).nome.split(' ')[0] + ' às ' + F.hora(x.pedido.em)
             : 'sem pedido da filial',
-          pedC: x.pedido ? '#b85a2e' : '#9db0ae',
+          pedC: x.pedido ? '#b85a2e' : 'var(--texto-desab)',
           pedFw: x.pedido ? '700' : '500',
         };
       }),
@@ -412,10 +412,10 @@ export default class Hoje extends Tela {
             reg: f.registro,
             hoje: hj.length,
             pend: pd,
-            pendC: pd ? '#b97514' : '#5c706e',
+            pendC: pd ? 'var(--aviso)' : 'var(--texto-sec)',
             oc: oc ? 'Gatekeeper comunicado ao OC em ' + F.curta(oc.data) : 'Gatekeeper não comunicado ao OC',
-            ocC: oc ? '#1a8f57' : '#c43d3d',
-            ocDot: oc ? '#1a8f57' : '#c43d3d',
+            ocC: oc ? 'var(--ok)' : 'var(--perigo)',
+            ocDot: oc ? 'var(--ok)' : 'var(--perigo)',
             afretador: TX.usuario(f.afretador).nome,
             onClick: () => this.setFilial(f.id),
           };
@@ -428,7 +428,7 @@ export default class Hoje extends Tela {
           filial: TX.filial(v.filial).nome,
           data: F.curta(v.data),
           quem: TX.pessoa(v.motorista).nome + ', ' + TX.produto(v.produto).nome.toLowerCase(),
-          itens: p.itens.map((i) => ({ n: i.n, c: i.leve ? '#b85a2e' : '#b97514', bd: i.leve ? '#f0d3bf' : '#f3dfb8' })),
+          itens: p.itens.map((i) => ({ n: i.n, c: i.leve ? '#b85a2e' : 'var(--aviso)', bd: i.leve ? '#f0d3bf' : 'var(--aviso-borda)' })),
         };
       }),
       semPend: pend.length === 0,
@@ -445,7 +445,7 @@ export default class Hoje extends Tela {
           dono: x.dono,
           href: x.href,
           d: x.estado === 'vencido' ? 'vencido' : x.dias + ' dias',
-          c: x.dias <= 15 ? '#c43d3d' : x.dias <= 30 ? '#b97514' : '#5c706e',
+          c: x.dias <= 15 ? 'var(--perigo)' : x.dias <= 30 ? 'var(--aviso)' : 'var(--texto-sec)',
         })),
       simTxt: sim
         ? 'Última simulação de rastreabilidade: ' +
@@ -546,12 +546,12 @@ export default class Hoje extends Tela {
         ['Ordem', 1],
         ['Quem carrega', 2],
         ['Link', 3],
-      ].map(([n, i]) => ({ n, bg: i <= p ? 'linear-gradient(90deg,#127670,#0E78B5)' : '#e4eae8', c: i <= p ? '#0C5862' : '#9db0ae' })),
+      ].map(([n, i]) => ({ n, bg: i <= p ? 'linear-gradient(90deg,var(--primario),var(--azul))' : 'var(--borda)', c: i <= p ? 'var(--primario-2)' : 'var(--texto-desab)' })),
       nP1: p === 1,
       nP2: p === 2,
       nP3: p === 3,
-      pdfBd: s.nPdf ? '#127670' : '#c9d5d3',
-      pdfBg: s.nPdf ? '#eef7f6' : '#fff',
+      pdfBd: s.nPdf ? 'var(--primario)' : 'var(--borda-forte)',
+      pdfBg: s.nPdf ? 'var(--primario-fraco)' : '#fff',
       pdfTitulo: s.nPdf ? 'Ordem importada: ' + s.nPdf : 'Importar o PDF da ordem de carregamento',
       pdfSub: s.nPdf
         ? 'Produto, embarcador, destinatário, data e peso preenchidos. Confira abaixo.'
@@ -596,9 +596,9 @@ export default class Hoje extends Tela {
           : assegura
             ? 'Viagem assegurada GMP+: produto é ração e o destinatário é certificado.'
             : 'Sem declaração GMP+: ' + (prod.racao ? 'destinatário não certificado.' : prod.nome + ' não é ração.'),
-      asBg: assegura === null ? '#f7faf9' : assegura ? '#eef7f6' : '#fdf6ec',
-      asC: assegura === null ? '#5c706e' : assegura ? '#0C5862' : '#b97514',
-      asDot: assegura === null ? '#c9d5d3' : assegura ? '#1a8f57' : '#e8a33d',
+      asBg: assegura === null ? 'var(--superficie)' : assegura ? 'var(--primario-fraco)' : '#fdf6ec',
+      asC: assegura === null ? 'var(--texto-sec)' : assegura ? 'var(--primario-2)' : 'var(--aviso)',
+      asDot: assegura === null ? 'var(--borda-forte)' : assegura ? 'var(--ok)' : 'var(--aviso-2)',
       nTipos: [
         ['terceiro', 'TAC ou ETC'],
         ['propria', 'Frota própria'],
@@ -618,15 +618,15 @@ export default class Hoje extends Tela {
             id: t.id,
             nome: nome + (t.tipo === 'ETC' ? ' (ETC)' : ''),
             ini: F.iniciais(nome),
-            g1: p0 ? p0.g1 : '#0C5862',
-            g2: p0 ? p0.g2 : '#0E78B5',
+            g1: p0 ? p0.g1 : 'var(--primario-2)',
+            g2: p0 ? p0.g2 : 'var(--azul)',
             placas: (t.conjuntos || []).map((c) => TX.placasDoConjunto(c).join(' ')).join('  /  '),
             docs: qual.ocorrencia
               ? 'em revisão após ocorrência grave: a Direção decide'
               : ruins
                 ? qual.n + ': o motorista atualiza pelo link'
                 : 'documentos em dia, dados voltam preenchidos',
-            docC: qual.ocorrencia ? '#c43d3d' : ruins ? '#b97514' : '#1a8f57',
+            docC: qual.ocorrencia ? 'var(--perigo)' : ruins ? 'var(--aviso)' : 'var(--ok)',
             onClick: () => this.setState({ nSel: t.id }),
           },
           sx,
@@ -650,7 +650,7 @@ export default class Hoje extends Tela {
             {
               placas: TX.placasDoConjunto(c).join('  '),
               sub: (no ? 'no escopo GMP+, ' : 'fora do escopo: ' + (c.escopo.motivo || '') + ', ') + TX.pessoa(c.motorista).nome,
-              subC: no ? '#5c706e' : '#c43d3d',
+              subC: no ? 'var(--texto-sec)' : 'var(--perigo)',
               onClick: () => {
                 if (no || !assegura) this.setState({ nSel: c.id });
                 else this.avisar('Conjunto fora do escopo GMP+ não é selecionável para viagem assegurada.');
@@ -716,13 +716,13 @@ export default class Hoje extends Tela {
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
             <div>
               <div style={{ fontSize: '24px', fontWeight: '800' }}>{v.titulo}</div>
-              <div style={{ fontSize: '13.5px', color: '#5c706e', marginTop: '2px' }}>{v.subtitulo}</div>
+              <div style={{ fontSize: '13.5px', color: 'var(--texto-sec)', marginTop: '2px' }}>{v.subtitulo}</div>
             </div>
             <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div
                 style={{
-                  background: '#fff',
-                  border: '1px solid #e0e7e5',
+                  background: 'var(--painel)',
+                  border: '1px solid var(--borda-campo)',
                   borderRadius: '11px',
                   padding: '0 14px',
                   display: 'flex',
@@ -757,8 +757,8 @@ export default class Hoje extends Tela {
                       onClick={v.onFilial}
                       data-tx-filial=""
                       style={{
-                        background: '#fff',
-                        border: '1px solid #e0e7e5',
+                        background: 'var(--painel)',
+                        border: '1px solid var(--borda-campo)',
                         borderRadius: '11px',
                         padding: '9px 14px',
                         fontSize: '13.5px',
@@ -777,8 +777,8 @@ export default class Hoje extends Tela {
                             position: 'absolute',
                             right: '0',
                             top: '46px',
-                            background: '#fff',
-                            border: '1px solid #e4eae8',
+                            background: 'var(--painel)',
+                            border: '1px solid var(--borda)',
                             borderRadius: '14px',
                             boxShadow: '0 16px 40px rgba(9,61,68,.16)',
                             padding: '6px',
@@ -808,7 +808,7 @@ export default class Hoje extends Tela {
                               >
                                 <span style={{ width: '7px', height: '7px', borderRadius: '99px', background: fl?.dot }}></span>
                                 <span style={{ flex: '1' }}>{fl?.n}</span>
-                                <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '11.5px', color: '#7c8f8d' }}>
+                                <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '11.5px', color: 'var(--texto-apagado)' }}>
                                   {fl?.q}
                                 </span>
                               </div>
@@ -824,7 +824,7 @@ export default class Hoje extends Tela {
                 onClick={v.abrirNova}
                 data-tx-nova-viagem=""
                 style={{
-                  background: 'linear-gradient(135deg,#127670,#0E78B5)',
+                  background: 'linear-gradient(135deg,var(--primario),var(--azul))',
                   color: '#fff',
                   borderRadius: '99px',
                   padding: '10px 20px',
@@ -848,7 +848,7 @@ export default class Hoje extends Tela {
                       style={{
                         height: '74px',
                         borderRadius: '20px',
-                        background: 'linear-gradient(90deg,#eef2f1 25%,#f7faf9 40%,#eef2f1 55%)',
+                        background: 'linear-gradient(90deg,var(--borda-suave) 25%,var(--superficie) 40%,var(--borda-suave) 55%)',
                         backgroundSize: '600px 100%',
                         animation: 'txsh 1.3s linear infinite',
                       }}
@@ -865,8 +865,8 @@ export default class Hoje extends Tela {
                   <div
                     data-tx-resumo=""
                     style={{
-                      background: '#fff',
-                      border: '1px solid #e4eae8',
+                      background: 'var(--painel)',
+                      border: '1px solid var(--borda)',
                       borderRadius: '18px',
                       padding: '14px 20px',
                       display: 'flex',
@@ -876,7 +876,7 @@ export default class Hoje extends Tela {
                   >
                     <div style={{ flex: 'none' }}>
                       <span style={{ fontSize: '22px', fontWeight: '800', fontVariantNumeric: 'tabular-nums' }}>{v.resTotal}</span>
-                      <span style={{ fontSize: '13px', color: '#5c706e', marginLeft: '6px' }}>{v.resTotalRot}</span>
+                      <span style={{ fontSize: '13px', color: 'var(--texto-sec)', marginLeft: '6px' }}>{v.resTotalRot}</span>
                     </div>
                     <div
                       style={{
@@ -887,7 +887,7 @@ export default class Hoje extends Tela {
                         overflow: 'hidden',
                         display: 'flex',
                         gap: '3px',
-                        background: 'repeating-linear-gradient(-45deg,#f0f4f3 0 5px,#e4ebe9 5px 10px)',
+                        background: 'repeating-linear-gradient(-45deg,var(--superficie-2) 0 5px,#e4ebe9 5px 10px)',
                       }}
                     >
                       {(Array.isArray(v.resSeg) ? v.resSeg : []).map((sg, $index) => (
@@ -907,7 +907,7 @@ export default class Hoje extends Tela {
                             gap: '7px',
                             fontSize: '13px',
                             fontWeight: '700',
-                            color: '#3c4f4e',
+                            color: 'var(--texto-2)',
                             cursor: 'pointer',
                             whiteSpace: 'nowrap',
                           }}
@@ -937,10 +937,10 @@ export default class Hoje extends Tela {
                             gap: '7px',
                             fontSize: '12.5px',
                             fontWeight: '700',
-                            color: '#0E78B5',
+                            color: 'var(--azul)',
                             whiteSpace: 'nowrap',
                             paddingLeft: '18px',
-                            borderLeft: '1px solid #eef2f1',
+                            borderLeft: '1px solid var(--borda-suave)',
                           }}
                         >
                           <span
@@ -948,7 +948,7 @@ export default class Hoje extends Tela {
                               width: '8px',
                               height: '8px',
                               borderRadius: '99px',
-                              background: '#0E78B5',
+                              background: 'var(--azul)',
                               animation: 'pulso 1.6s infinite',
                             }}
                           ></span>
@@ -963,8 +963,8 @@ export default class Hoje extends Tela {
                 <>
                   <div
                     style={{
-                      background: '#fff',
-                      border: '1px solid #e4eae8',
+                      background: 'var(--painel)',
+                      border: '1px solid var(--borda)',
                       borderRadius: '20px',
                       padding: '50px 20px',
                       display: 'flex',
@@ -978,7 +978,7 @@ export default class Hoje extends Tela {
                         width: '50px',
                         height: '50px',
                         borderRadius: '99px',
-                        background: 'linear-gradient(135deg,#48c78e,#127670)',
+                        background: 'linear-gradient(135deg,#48c78e,var(--primario))',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -998,7 +998,7 @@ export default class Hoje extends Tela {
                       </svg>
                     </span>
                     <div style={{ fontSize: '16px', fontWeight: '800' }}>{v.vazioTitulo}</div>
-                    <div style={{ fontSize: '13.5px', color: '#5c706e' }}>{v.vazioSub}</div>
+                    <div style={{ fontSize: '13.5px', color: 'var(--texto-sec)' }}>{v.vazioSub}</div>
                   </div>
                 </>
               ) : null}
@@ -1019,11 +1019,11 @@ export default class Hoje extends Tela {
                         }}
                       ></span>
                       <div style={{ fontSize: '16px', fontWeight: '800' }}>{gr?.n}</div>
-                      <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '13px', fontWeight: '600', color: '#5c706e' }}>
+                      <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '13px', fontWeight: '600', color: 'var(--texto-sec)' }}>
                         {gr?.q}
                       </span>
-                      <div style={{ fontSize: '12.5px', color: '#7c8f8d' }}>{gr?.sub}</div>
-                      <span style={{ marginLeft: 'auto', fontSize: '12.5px', fontWeight: '700', color: '#0C5862' }}>{gr?.toggleRot}</span>
+                      <div style={{ fontSize: '12.5px', color: 'var(--texto-apagado)' }}>{gr?.sub}</div>
+                      <span style={{ marginLeft: 'auto', fontSize: '12.5px', fontWeight: '700', color: 'var(--primario-2)' }}>{gr?.toggleRot}</span>
                     </div>
                     {gr?.aberto ? (
                       <>
@@ -1032,8 +1032,8 @@ export default class Hoje extends Tela {
                             <div
                               data-tx-linha={ln?.id}
                               style={{
-                                background: '#fff',
-                                border: '1px solid #eef2f1',
+                                background: 'var(--painel)',
+                                border: '1px solid var(--borda-suave)',
                                 borderRadius: '18px',
                                 boxShadow: '0 2px 10px rgba(9,61,68,.04)',
                                 display: 'flex',
@@ -1085,12 +1085,12 @@ export default class Hoje extends Tela {
                                     >
                                       {ln?.motorista}
                                     </span>
-                                    <span style={{ fontSize: '11.5px', color: '#7c8f8d', whiteSpace: 'nowrap' }}>{ln?.tipo}</span>
+                                    <span style={{ fontSize: '11.5px', color: 'var(--texto-apagado)', whiteSpace: 'nowrap' }}>{ln?.tipo}</span>
                                   </div>
                                   <div
                                     style={{
                                       fontSize: '12.5px',
-                                      color: '#5c706e',
+                                      color: 'var(--texto-sec)',
                                       whiteSpace: 'nowrap',
                                       overflow: 'hidden',
                                       textOverflow: 'ellipsis',
@@ -1104,7 +1104,7 @@ export default class Hoje extends Tela {
                                     style={{
                                       fontFamily: "'Spline Sans Mono',monospace",
                                       fontSize: '11.5px',
-                                      color: '#3c4f4e',
+                                      color: 'var(--texto-2)',
                                       marginTop: '2px',
                                     }}
                                   >
@@ -1142,7 +1142,7 @@ export default class Hoje extends Tela {
                                       }}
                                     ></span>
                                     {ln?.linkRot}
-                                    <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontWeight: '500', color: '#7c8f8d' }}>
+                                    <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontWeight: '500', color: 'var(--texto-apagado)' }}>
                                       {ln?.linkHora}
                                     </span>
                                   </div>
@@ -1163,7 +1163,7 @@ export default class Hoje extends Tela {
                                   <div
                                     style={{
                                       fontSize: '11.5px',
-                                      color: '#7c8f8d',
+                                      color: 'var(--texto-apagado)',
                                       whiteSpace: 'nowrap',
                                       overflow: 'hidden',
                                       textOverflow: 'ellipsis',
@@ -1213,7 +1213,7 @@ export default class Hoje extends Tela {
                   position: 'relative',
                   overflow: 'hidden',
                   borderRadius: '22px',
-                  background: 'linear-gradient(115deg,#093D44,#0C5862 60%,#0E78B5 140%)',
+                  background: 'linear-gradient(115deg,var(--primario-3),var(--primario-2) 60%,var(--azul) 140%)',
                   color: '#fff',
                   padding: '24px 28px',
                   display: 'grid',
@@ -1270,7 +1270,7 @@ export default class Hoje extends Tela {
                 <>
                   <div
                     data-tx-fila=""
-                    style={{ background: '#fff', border: '1px solid #e4eae8', borderRadius: '20px', padding: '18px 22px' }}
+                    style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '18px 22px' }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
                       <div style={{ fontSize: '16px', fontWeight: '800' }}>Esperando sua assinatura</div>
@@ -1288,7 +1288,7 @@ export default class Hoje extends Tela {
                       >
                         {v.filaQ}
                       </span>
-                      <div style={{ fontSize: '12.5px', color: '#5c706e' }}>{v.filaSub}</div>
+                      <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)' }}>{v.filaSub}</div>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', marginTop: '8px' }}>
                       {(Array.isArray(v.fila) ? v.fila : []).map((fq, $index) => (
@@ -1300,7 +1300,7 @@ export default class Hoje extends Tela {
                               alignItems: 'center',
                               gap: '16px',
                               padding: '11px 0',
-                              borderBottom: '1px solid #f0f4f3',
+                              borderBottom: '1px solid var(--superficie-2)',
                             }}
                           >
                             <div style={{ width: '58px', flex: 'none' }}>
@@ -1321,7 +1321,7 @@ export default class Hoje extends Tela {
                               >
                                 {fq?.motorista}
                               </div>
-                              <div style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '11.5px', color: '#5c706e' }}>
+                              <div style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '11.5px', color: 'var(--texto-sec)' }}>
                                 {fq?.ordem}
                                 {', '}
                                 {fq?.filial}
@@ -1332,7 +1332,7 @@ export default class Hoje extends Tela {
                                 style={{
                                   fontSize: '13px',
                                   fontWeight: '700',
-                                  color: '#c43d3d',
+                                  color: 'var(--perigo)',
                                   whiteSpace: 'nowrap',
                                   overflow: 'hidden',
                                   textOverflow: 'ellipsis',
@@ -1343,7 +1343,7 @@ export default class Hoje extends Tela {
                               <div
                                 style={{
                                   fontSize: '11.5px',
-                                  color: '#7c8f8d',
+                                  color: 'var(--texto-apagado)',
                                   whiteSpace: 'nowrap',
                                   overflow: 'hidden',
                                   textOverflow: 'ellipsis',
@@ -1360,7 +1360,7 @@ export default class Hoje extends Tela {
                               data-tx-assinar={fq?.id}
                               style={{
                                 flex: 'none',
-                                background: 'linear-gradient(135deg,#127670,#0E78B5)',
+                                background: 'linear-gradient(135deg,var(--primario),var(--azul))',
                                 color: '#fff',
                                 fontSize: '12.5px',
                                 fontWeight: '800',
@@ -1378,7 +1378,7 @@ export default class Hoje extends Tela {
                       ))}
                       {v.filaVazia ? (
                         <>
-                          <div style={{ fontSize: '13px', color: '#5c706e', padding: '12px 0 4px' }}>
+                          <div style={{ fontSize: '13px', color: 'var(--texto-sec)', padding: '12px 0 4px' }}>
                             Nada esperando a sua assinatura. Viagem bloqueada por regra que a sua alçada libera aparece aqui, com o prazo de
                             carregamento.
                           </div>
@@ -1386,7 +1386,7 @@ export default class Hoje extends Tela {
                       ) : null}
                       {v.temAcima ? (
                         <>
-                          <div style={{ fontSize: '12.5px', color: '#5c706e', paddingTop: '10px' }}>
+                          <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', paddingTop: '10px' }}>
                             {v.acimaTxt}{' '}
                             <A href={v.acimaHref} style={{ fontWeight: '800' }}>
                               {v.acimaLink}
@@ -1404,8 +1404,8 @@ export default class Hoje extends Tela {
                   <Fragment key={$index}>
                     <div
                       style={{
-                        background: '#fff',
-                        border: '1px solid #e4eae8',
+                        background: 'var(--painel)',
+                        border: '1px solid var(--borda)',
                         borderRadius: '18px',
                         padding: '16px 18px',
                         display: 'flex',
@@ -1415,7 +1415,7 @@ export default class Hoje extends Tela {
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <div style={{ fontSize: '15px', fontWeight: '800' }}>{cf?.n}</div>
-                        <span style={{ fontSize: '11px', color: '#7c8f8d', fontFamily: "'Spline Sans Mono',monospace" }}>{cf?.reg}</span>
+                        <span style={{ fontSize: '11px', color: 'var(--texto-apagado)', fontFamily: "'Spline Sans Mono',monospace" }}>{cf?.reg}</span>
                       </div>
                       <div style={{ display: 'flex', gap: '14px', fontSize: '12.5px' }}>
                         <span>
@@ -1431,7 +1431,7 @@ export default class Hoje extends Tela {
                         <span style={{ width: '7px', height: '7px', borderRadius: '99px', background: cf?.ocDot }}></span>
                         {cf?.oc}
                       </div>
-                      <div style={{ fontSize: '12px', color: '#5c706e' }}>
+                      <div style={{ fontSize: '12px', color: 'var(--texto-sec)' }}>
                         {'afretador: '}
                         {cf?.afretador}
                       </div>
@@ -1443,7 +1443,7 @@ export default class Hoje extends Tela {
                           alignSelf: 'flex-start',
                           fontSize: '12.5px',
                           fontWeight: '800',
-                          color: '#0C5862',
+                          color: 'var(--primario-2)',
                           cursor: 'pointer',
                         }}
                         className="tx-h76d8d79"
@@ -1455,7 +1455,7 @@ export default class Hoje extends Tela {
                 ))}
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(320px,400px)', gap: '20px', alignItems: 'start' }}>
-                <div style={{ background: '#fff', border: '1px solid #e4eae8', borderRadius: '20px', padding: '20px 22px' }}>
+                <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 22px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <div style={{ fontSize: '16px', fontWeight: '800' }}>Pendências de registro</div>
                     <A
@@ -1465,7 +1465,7 @@ export default class Hoje extends Tela {
                       Conciliar CT-e em lote →
                     </A>
                   </div>
-                  <div style={{ fontSize: '12.5px', color: '#5c706e', marginTop: '2px' }}>
+                  <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '2px' }}>
                     Viagens asseguradas já carregadas com item faltando. Quem trata é a qualidade.
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', marginTop: '10px' }}>
@@ -1478,7 +1478,7 @@ export default class Hoje extends Tela {
                             alignItems: 'center',
                             gap: '12px',
                             padding: '11px 4px',
-                            borderBottom: '1px solid #f0f4f3',
+                            borderBottom: '1px solid var(--superficie-2)',
                             color: 'inherit',
                           }}
                           className="tx-hc05ca3a"
@@ -1494,7 +1494,7 @@ export default class Hoje extends Tela {
                           >
                             {pr?.ordem}
                           </span>
-                          <span style={{ fontSize: '12px', color: '#5c706e', width: '90px', flex: 'none' }}>
+                          <span style={{ fontSize: '12px', color: 'var(--texto-sec)', width: '90px', flex: 'none' }}>
                             {pr?.filial}
                             {', '}
                             {pr?.data}
@@ -1536,7 +1536,7 @@ export default class Hoje extends Tela {
                     ))}
                     {v.semPend ? (
                       <>
-                        <div style={{ fontSize: '13px', color: '#5c706e', padding: '16px 4px' }}>
+                        <div style={{ fontSize: '13px', color: 'var(--texto-sec)', padding: '16px 4px' }}>
                           Nenhuma pendência de registro no período. Tudo pronto para a amostra.
                         </div>
                       </>
@@ -1544,7 +1544,7 @@ export default class Hoje extends Tela {
                   </div>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  <div style={{ background: '#fff', border: '1px solid #e4eae8', borderRadius: '20px', padding: '20px' }}>
+                  <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px' }}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                       <div style={{ fontSize: '15.5px', fontWeight: '800' }}>Vencimentos</div>
                       <A href="/transportadores?filtro=vencendo" style={{ marginLeft: 'auto', fontSize: '12.5px', fontWeight: '800' }}>
@@ -1558,14 +1558,14 @@ export default class Hoje extends Tela {
                         borderRadius: '99px',
                         overflow: 'hidden',
                         display: 'flex',
-                        background: 'repeating-linear-gradient(-45deg,#f0f4f3 0 5px,#e4ebe9 5px 10px)',
+                        background: 'repeating-linear-gradient(-45deg,var(--superficie-2) 0 5px,#e4ebe9 5px 10px)',
                       }}
                     >
-                      <div style={{ width: v.vW1, background: 'linear-gradient(90deg,#e46969,#c43d3d)' }}></div>
-                      <div style={{ width: v.vW2, background: 'linear-gradient(90deg,#f4c15d,#e8a33d)' }}></div>
+                      <div style={{ width: v.vW1, background: 'linear-gradient(90deg,#e46969,var(--perigo))' }}></div>
+                      <div style={{ width: v.vW2, background: 'linear-gradient(90deg,#f4c15d,var(--aviso-2))' }}></div>
                       <div style={{ width: v.vW3, background: 'linear-gradient(90deg,#9fc9c6,#6ba8a4)' }}></div>
                     </div>
-                    <div style={{ display: 'flex', gap: '14px', marginTop: '9px', fontSize: '12px', color: '#5c706e', fontWeight: '600' }}>
+                    <div style={{ display: 'flex', gap: '14px', marginTop: '9px', fontSize: '12px', color: 'var(--texto-sec)', fontWeight: '600' }}>
                       <span>
                         <span
                           style={{
@@ -1573,7 +1573,7 @@ export default class Hoje extends Tela {
                             width: '8px',
                             height: '8px',
                             borderRadius: '3px',
-                            background: '#c43d3d',
+                            background: 'var(--perigo)',
                             marginRight: '5px',
                           }}
                         ></span>
@@ -1587,7 +1587,7 @@ export default class Hoje extends Tela {
                             width: '8px',
                             height: '8px',
                             borderRadius: '3px',
-                            background: '#e8a33d',
+                            background: 'var(--aviso-2)',
                             marginRight: '5px',
                           }}
                         ></span>
@@ -1619,7 +1619,7 @@ export default class Hoje extends Tela {
                               alignItems: 'center',
                               gap: '10px',
                               padding: '9px 2px',
-                              borderBottom: '1px solid #f0f4f3',
+                              borderBottom: '1px solid var(--superficie-2)',
                               color: 'inherit',
                             }}
                             className="tx-hc05ca3a"
@@ -1639,7 +1639,7 @@ export default class Hoje extends Tela {
                               <div
                                 style={{
                                   fontSize: '11.5px',
-                                  color: '#5c706e',
+                                  color: 'var(--texto-sec)',
                                   whiteSpace: 'nowrap',
                                   overflow: 'hidden',
                                   textOverflow: 'ellipsis',
@@ -1667,9 +1667,9 @@ export default class Hoje extends Tela {
                       ))}
                     </div>
                   </div>
-                  <div style={{ background: '#fff', border: '1px solid #e4eae8', borderRadius: '20px', padding: '20px' }}>
+                  <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px' }}>
                     <div style={{ fontSize: '15.5px', fontWeight: '800' }}>Auditoria</div>
-                    <div style={{ fontSize: '12.5px', color: '#5c706e', marginTop: '4px', lineHeight: '1.5' }}>{v.simTxt}</div>{' '}
+                    <div style={{ fontSize: '12.5px', color: 'var(--texto-sec)', marginTop: '4px', lineHeight: '1.5' }}>{v.simTxt}</div>{' '}
                     <A href="/auditoria" style={{ display: 'inline-block', marginTop: '10px', fontSize: '12.5px', fontWeight: '800' }}>
                       Rastrear placa ou montar amostra →
                     </A>{' '}
@@ -1699,7 +1699,7 @@ export default class Hoje extends Tela {
                 onClick={v.pararClique}
                 data-tx-modal="nova"
                 style={{
-                  background: '#fff',
+                  background: 'var(--painel)',
                   borderRadius: '24px',
                   width: '700px',
                   maxHeight: '92vh',
@@ -1710,7 +1710,7 @@ export default class Hoje extends Tela {
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <div style={{ fontSize: '17px', fontWeight: '800' }}>{v.nTitulo}</div>
-                  <span style={{ fontSize: '12px', fontWeight: '700', color: '#5c706e' }}>
+                  <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--texto-sec)' }}>
                     {'filial '}
                     {v.nFilialNome}
                   </span>
@@ -1721,7 +1721,7 @@ export default class Hoje extends Tela {
                       width: '32px',
                       height: '32px',
                       borderRadius: '99px',
-                      background: '#f0f4f3',
+                      background: 'var(--superficie-2)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -1764,7 +1764,7 @@ export default class Hoje extends Tela {
                           width: '40px',
                           height: '40px',
                           borderRadius: '12px',
-                          background: 'linear-gradient(135deg,#127670,#0E78B5)',
+                          background: 'linear-gradient(135deg,var(--primario),var(--azul))',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -1787,20 +1787,20 @@ export default class Hoje extends Tela {
                       </span>
                       <div style={{ flex: '1' }}>
                         <div style={{ fontSize: '14px', fontWeight: '800' }}>{v.pdfTitulo}</div>
-                        <div style={{ fontSize: '12px', color: '#5c706e' }}>{v.pdfSub}</div>
+                        <div style={{ fontSize: '12px', color: 'var(--texto-sec)' }}>{v.pdfSub}</div>
                       </div>
                       <span
                         onClick={v.usarOrdemExemplo}
                         data-tx-ordem-exemplo=""
-                        style={{ fontSize: '12px', fontWeight: '800', color: '#0C5862', whiteSpace: 'nowrap' }}
+                        style={{ fontSize: '12px', fontWeight: '800', color: 'var(--primario-2)', whiteSpace: 'nowrap' }}
                       >
                         usar ordem de exemplo
                       </span>
                     </label>
-                    <div style={{ fontSize: '11.5px', color: '#7c8f8d', marginTop: '8px' }}>ou preencha o mínimo:</div>
+                    <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)', marginTop: '8px' }}>ou preencha o mínimo:</div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '8px' }}>
                       <div style={{ position: 'relative' }}>
-                        <div style={{ fontSize: '12px', fontWeight: '800', color: '#3c4f4e' }}>Produto</div>
+                        <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)' }}>Produto</div>
                         <input
                           value={v.nProdBusca ?? ''}
                           onChange={v.onProdBusca}
@@ -1809,7 +1809,7 @@ export default class Hoje extends Tela {
                           style={{
                             width: '100%',
                             marginTop: '6px',
-                            border: '1px solid #dfe7e5',
+                            border: '1px solid var(--borda-campo)',
                             borderRadius: '11px',
                             padding: '9px 12px',
                             fontSize: '13.5px',
@@ -1824,8 +1824,8 @@ export default class Hoje extends Tela {
                                 left: '0',
                                 right: '0',
                                 top: '66px',
-                                background: '#fff',
-                                border: '1px solid #e4eae8',
+                                background: 'var(--painel)',
+                                border: '1px solid var(--borda)',
                                 borderRadius: '12px',
                                 boxShadow: '0 14px 30px rgba(9,61,68,.14)',
                                 padding: '5px',
@@ -1840,7 +1840,7 @@ export default class Hoje extends Tela {
                                     style={{ padding: '7px 10px', borderRadius: '8px', cursor: 'pointer', fontSize: '13px' }}
                                     className="tx-h894fca3"
                                   >
-                                    <b>{po?.n}</b> <span style={{ color: '#7c8f8d', fontSize: '11.5px' }}>{po?.via}</span>
+                                    <b>{po?.n}</b> <span style={{ color: 'var(--texto-apagado)', fontSize: '11.5px' }}>{po?.via}</span>
                                   </div>
                                 </Fragment>
                               ))}
@@ -1849,7 +1849,7 @@ export default class Hoje extends Tela {
                         ) : null}
                       </div>
                       <div>
-                        <div style={{ fontSize: '12px', fontWeight: '800', color: '#3c4f4e' }}>Ordem de carregamento</div>
+                        <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)' }}>Ordem de carregamento</div>
                         <input
                           value={v.nOrdem ?? ''}
                           onChange={v.onOrdem}
@@ -1858,7 +1858,7 @@ export default class Hoje extends Tela {
                           style={{
                             width: '100%',
                             marginTop: '6px',
-                            border: '1px solid #dfe7e5',
+                            border: '1px solid var(--borda-campo)',
                             borderRadius: '11px',
                             padding: '9px 12px',
                             fontSize: '13.5px',
@@ -1868,7 +1868,7 @@ export default class Hoje extends Tela {
                         />
                       </div>
                       <div>
-                        <div style={{ fontSize: '12px', fontWeight: '800', color: '#3c4f4e' }}>Embarcador</div>
+                        <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)' }}>Embarcador</div>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
                           {(Array.isArray(v.nEmbs) ? v.nEmbs : []).map((ne, $index) => (
                             <Fragment key={$index}>
@@ -1892,7 +1892,7 @@ export default class Hoje extends Tela {
                         </div>
                       </div>
                       <div>
-                        <div style={{ fontSize: '12px', fontWeight: '800', color: '#3c4f4e' }}>Destinatário</div>
+                        <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)' }}>Destinatário</div>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
                           {(Array.isArray(v.nDests) ? v.nDests : []).map((nd, $index) => (
                             <Fragment key={$index}>
@@ -1916,7 +1916,7 @@ export default class Hoje extends Tela {
                         </div>
                       </div>
                       <div>
-                        <div style={{ fontSize: '12px', fontWeight: '800', color: '#3c4f4e' }}>Carregamento</div>
+                        <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)' }}>Carregamento</div>
                         <div style={{ display: 'flex', gap: '6px', marginTop: '6px', alignItems: 'center' }}>
                           {(Array.isArray(v.nDias) ? v.nDias : []).map((nx, $index) => (
                             <Fragment key={$index}>
@@ -1943,7 +1943,7 @@ export default class Hoje extends Tela {
                             data-tx-campo="janela"
                             style={{
                               width: '76px',
-                              border: '1px solid #dfe7e5',
+                              border: '1px solid var(--borda-campo)',
                               borderRadius: '11px',
                               padding: '6px 10px',
                               fontSize: '13px',
@@ -1954,7 +1954,7 @@ export default class Hoje extends Tela {
                         </div>
                       </div>
                       <div>
-                        <div style={{ fontSize: '12px', fontWeight: '800', color: '#3c4f4e' }}>Peso (t)</div>
+                        <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)' }}>Peso (t)</div>
                         <input
                           value={v.nPeso ?? ''}
                           onChange={v.onPeso}
@@ -1962,7 +1962,7 @@ export default class Hoje extends Tela {
                           style={{
                             width: '100%',
                             marginTop: '6px',
-                            border: '1px solid #dfe7e5',
+                            border: '1px solid var(--borda-campo)',
                             borderRadius: '11px',
                             padding: '9px 12px',
                             fontSize: '13.5px',
@@ -2017,7 +2017,7 @@ export default class Hoje extends Tela {
                     </div>
                     {v.nTerceiro ? (
                       <>
-                        <div style={{ fontSize: '12px', fontWeight: '800', color: '#3c4f4e', marginTop: '14px' }}>
+                        <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '14px' }}>
                           PLACA DO CAVALO OU CPF DO MOTORISTA
                         </div>
                         <input
@@ -2028,7 +2028,7 @@ export default class Hoje extends Tela {
                           style={{
                             width: '100%',
                             marginTop: '6px',
-                            border: '1px solid #dfe7e5',
+                            border: '1px solid var(--borda-campo)',
                             borderRadius: '12px',
                             padding: '10px 12px',
                             fontSize: '14px',
@@ -2082,7 +2082,7 @@ export default class Hoje extends Tela {
                                 </span>
                                 <div style={{ flex: '1', minWidth: '0' }}>
                                   <div style={{ fontSize: '13.5px', fontWeight: '800' }}>{na?.nome}</div>
-                                  <div style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '11.5px', color: '#3c4f4e' }}>
+                                  <div style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '11.5px', color: 'var(--texto-2)' }}>
                                     {na?.placas}
                                   </div>
                                   <div style={{ fontSize: '11.5px', color: na?.docC, marginTop: '1px' }}>{na?.docs}</div>
@@ -2092,9 +2092,9 @@ export default class Hoje extends Tela {
                           ))}
                           {v.nNaoAchou ? (
                             <>
-                              <div style={{ border: '1.5px dashed #c9d5d3', borderRadius: '14px', padding: '12px 14px' }}>
+                              <div style={{ border: '1.5px dashed var(--borda-forte)', borderRadius: '14px', padding: '12px 14px' }}>
                                 <div style={{ fontSize: '13px', fontWeight: '800' }}>Não encontrado na base. Cadastro mínimo:</div>
-                                <div style={{ fontSize: '12px', color: '#5c706e', marginTop: '2px' }}>
+                                <div style={{ fontSize: '12px', color: 'var(--texto-sec)', marginTop: '2px' }}>
                                   O resto (CNH, RNTRC, CRLV) o motorista manda pelo link.
                                 </div>
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '10px' }}>
@@ -2104,7 +2104,7 @@ export default class Hoje extends Tela {
                                     data-tx-campo="cm-nome"
                                     placeholder="Nome do motorista"
                                     style={{
-                                      border: '1px solid #dfe7e5',
+                                      border: '1px solid var(--borda-campo)',
                                       borderRadius: '11px',
                                       padding: '9px 12px',
                                       fontSize: '13.5px',
@@ -2117,7 +2117,7 @@ export default class Hoje extends Tela {
                                     data-tx-campo="cm-tel"
                                     placeholder="(66) 99999-0000"
                                     style={{
-                                      border: '1px solid #dfe7e5',
+                                      border: '1px solid var(--borda-campo)',
                                       borderRadius: '11px',
                                       padding: '9px 12px',
                                       fontSize: '13.5px',
@@ -2130,7 +2130,7 @@ export default class Hoje extends Tela {
                                     data-tx-campo="cm-cpf"
                                     placeholder="CPF"
                                     style={{
-                                      border: '1px solid #dfe7e5',
+                                      border: '1px solid var(--borda-campo)',
                                       borderRadius: '11px',
                                       padding: '9px 12px',
                                       fontSize: '13.5px',
@@ -2144,7 +2144,7 @@ export default class Hoje extends Tela {
                                     data-tx-campo="cm-placas"
                                     placeholder="Placas: cavalo, carreta 1, carreta 2"
                                     style={{
-                                      border: '1px solid #dfe7e5',
+                                      border: '1px solid var(--borda-campo)',
                                       borderRadius: '11px',
                                       padding: '9px 12px',
                                       fontSize: '13.5px',
@@ -2210,7 +2210,7 @@ export default class Hoje extends Tela {
                         display: 'flex',
                         alignItems: 'center',
                         gap: '12px',
-                        background: '#eef7f6',
+                        background: 'var(--primario-fraco)',
                         borderRadius: '16px',
                         padding: '14px 16px',
                       }}
@@ -2220,7 +2220,7 @@ export default class Hoje extends Tela {
                           width: '36px',
                           height: '36px',
                           borderRadius: '99px',
-                          background: 'linear-gradient(135deg,#48c78e,#1a8f57)',
+                          background: 'linear-gradient(135deg,#48c78e,var(--ok))',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -2242,7 +2242,7 @@ export default class Hoje extends Tela {
                       </span>
                       <div>
                         <div style={{ fontSize: '14px', fontWeight: '800' }}>{v.nCriadaTxt}</div>
-                        <div style={{ fontSize: '12px', color: '#3c4f4e' }}>
+                        <div style={{ fontSize: '12px', color: 'var(--texto-2)' }}>
                           Agora mande o link: o motorista informa as cargas, as fotos e assina pelo celular.
                         </div>
                       </div>
@@ -2250,7 +2250,7 @@ export default class Hoje extends Tela {
                     <div style={{ marginTop: '12px', background: '#e7f1ec', borderRadius: '16px', padding: '14px' }}>
                       <div
                         style={{
-                          background: '#fff',
+                          background: 'var(--painel)',
                           borderRadius: '4px 14px 14px 14px',
                           padding: '11px 13px',
                           fontSize: '13px',
@@ -2263,13 +2263,13 @@ export default class Hoje extends Tela {
                   </>
                 ) : null}
                 <div style={{ display: 'flex', gap: '8px', marginTop: '18px', justifyContent: 'flex-end', alignItems: 'center' }}>
-                  <span style={{ fontSize: '12px', color: '#7c8f8d', marginRight: 'auto' }}>{v.nDica}</span>
+                  <span style={{ fontSize: '12px', color: 'var(--texto-apagado)', marginRight: 'auto' }}>{v.nDica}</span>
                   {v.nVoltar ? (
                     <>
                       <span
                         onClick={v.nVoltarFn}
                         style={{
-                          background: '#f0f4f3',
+                          background: 'var(--superficie-2)',
                           fontSize: '13.5px',
                           fontWeight: '700',
                           borderRadius: '99px',
@@ -2286,8 +2286,8 @@ export default class Hoje extends Tela {
                       <A
                         href={v.nHref}
                         style={{
-                          background: '#f0f4f3',
-                          color: '#0b2224',
+                          background: 'var(--superficie-2)',
+                          color: 'var(--texto)',
                           fontSize: '13.5px',
                           fontWeight: '700',
                           borderRadius: '99px',
