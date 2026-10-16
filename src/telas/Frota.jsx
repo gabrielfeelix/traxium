@@ -72,7 +72,11 @@ export default class Frota extends Tela {
           cabSub: dentro ? 'podem fazer viagem assegurada' : 'só carga não assegurada; incluir exige a data de entrada',
           modelo: TX.placa(cj.carretas[0]).modelo,
           filial: TX.filial(cj.filial).nome,
-          placas: TX.placasDoConjunto(cj).map((p, i) => ({ p, bg: i === 0 ? 'var(--texto)' : 'var(--superficie-2)', c: i === 0 ? '#fff' : 'var(--texto)' })),
+          placas: TX.placasDoConjunto(cj).map((p, i) => ({
+            p,
+            bg: i === 0 ? 'var(--texto)' : 'var(--superficie-2)',
+            c: i === 0 ? '#fff' : 'var(--texto)',
+          })),
           motorista: mot.nome,
           ini: F.iniciais(mot.nome),
           g1: mot.g1,
@@ -182,7 +186,9 @@ export default class Frota extends Tela {
               <div style={{ fontSize: '14px', color: 'var(--texto-sec)', marginTop: '2px' }}>{v.subtitulo}</div>
             </div>
             <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div role="button" tabIndex={0}
+              <div
+                role="button"
+                tabIndex={0}
                 onClick={v.exportarEscopo}
                 data-tx-exportar=""
                 style={{
@@ -244,7 +250,9 @@ export default class Frota extends Tela {
                     }}
                   ></span>
                   <span style={{ fontSize: '16px', fontWeight: '800' }}>{cj?.cab}</span>
-                  <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '13px', fontWeight: '600', color: 'var(--texto-sec)' }}>
+                  <span
+                    style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '13px', fontWeight: '600', color: 'var(--texto-sec)' }}
+                  >
                     {cj?.cabQ}
                   </span>
                   <span style={{ fontSize: '13px', color: 'var(--texto-apagado)' }}>{cj?.cabSub}</span>
@@ -418,7 +426,9 @@ export default class Frota extends Tela {
                       {cj?.esc}
                     </span>
                     <span style={{ fontSize: '12px', color: 'var(--texto-apagado)', textAlign: 'right' }}>{cj?.escSub}</span>
-                    <span role="button" tabIndex={0}
+                    <span
+                      role="button"
+                      tabIndex={0}
                       onClick={cj?.alternar}
                       data-tx-escopo={cj?.id}
                       style={{ fontSize: '12px', fontWeight: '800', color: cj?.altC, cursor: 'pointer' }}
@@ -452,7 +462,9 @@ export default class Frota extends Tela {
                 padding: '32px',
               }}
             >
-              <div role="dialog" aria-modal="true"
+              <div
+                role="dialog"
+                aria-modal="true"
                 onClick={v.pararClique}
                 data-tx-modal="escopo"
                 style={{
@@ -465,7 +477,11 @@ export default class Frota extends Tela {
               >
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <div style={{ fontSize: '16px', fontWeight: '800' }}>{v.mTitulo}</div>
-                  <span role="button" aria-label="Fechar" title="Fechar" tabIndex={0}
+                  <span
+                    role="button"
+                    aria-label="Fechar"
+                    title="Fechar"
+                    tabIndex={0}
                     onClick={v.fecharModal}
                     style={{
                       marginLeft: 'auto',
@@ -484,10 +500,15 @@ export default class Frota extends Tela {
                   </span>
                 </div>
                 <div style={{ fontSize: '13px', color: 'var(--texto-sec)', marginTop: '4px', lineHeight: '1.55' }}>{v.mSub}</div>
-                <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '16px' }}>
-                  MOTIVO (MÍNIMO 10 CARACTERES)
-                </div>
+                <label
+                  htmlFor="frota-motivo"
+                  className="tx-rotulo"
+                  style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '16px' }}
+                >
+                  Motivo (mínimo 10 caracteres)
+                </label>
                 <input
+                  id="frota-motivo"
                   value={v.fMotivo ?? ''}
                   onChange={v.onMotivo}
                   data-tx-campo="motivo"
@@ -502,7 +523,9 @@ export default class Frota extends Tela {
                   }}
                 />
                 <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
-                  <span role="button" tabIndex={0}
+                  <span
+                    role="button"
+                    tabIndex={0}
                     onClick={v.fecharModal}
                     style={{
                       background: 'var(--superficie-2)',
@@ -515,7 +538,9 @@ export default class Frota extends Tela {
                   >
                     Cancelar
                   </span>
-                  <span role="button" tabIndex={0}
+                  <span
+                    role="button"
+                    tabIndex={0}
                     onClick={v.confirmar}
                     data-tx-confirmar=""
                     style={{

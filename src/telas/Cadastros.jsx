@@ -516,7 +516,15 @@ export default class Cadastros extends Tela {
         <div style={{ flex: '1', display: 'flex', flexDirection: 'column', padding: '24px 32px 48px', gap: '16px', minWidth: '0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <div>
-              <div style={{ fontSize: '11px', fontWeight: '800', letterSpacing: '1.2px', color: 'var(--texto-apagado)', textTransform: 'uppercase' }}>
+              <div
+                style={{
+                  fontSize: '11px',
+                  fontWeight: '800',
+                  letterSpacing: '1.2px',
+                  color: 'var(--texto-apagado)',
+                  textTransform: 'uppercase',
+                }}
+              >
                 Cadastros
               </div>
               <div data-tx-titulo="" style={{ fontSize: '24px', fontWeight: '800', marginTop: '1px' }}>
@@ -527,7 +535,9 @@ export default class Cadastros extends Tela {
             <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
               {v.temAcao ? (
                 <>
-                  <span role="button" tabIndex={0}
+                  <span
+                    role="button"
+                    tabIndex={0}
                     onClick={v.acao}
                     data-tx-acao-aba=""
                     style={{
@@ -552,7 +562,9 @@ export default class Cadastros extends Tela {
               <div style={{ display: 'flex', gap: '6px', borderBottom: '1px solid var(--borda-campo)' }}>
                 {(Array.isArray(v.abas) ? v.abas : []).map((ab, $index) => (
                   <Fragment key={$index}>
-                    <span role="button" tabIndex={0}
+                    <span
+                      role="button"
+                      tabIndex={0}
                       onClick={ab?.onClick}
                       data-tx-aba={ab?.k}
                       style={{
@@ -604,7 +616,8 @@ export default class Cadastros extends Tela {
                         <circle cx="7" cy="7" r="4.6"></circle>
                         <line x1="10.5" y1="10.5" x2="13.5" y2="13.5"></line>
                       </svg>
-                      <input aria-label="Nome popular, comercial ou em inglês"
+                      <input
+                        aria-label="Nome popular, comercial ou em inglês"
                         value={v.pq ?? ''}
                         onChange={v.onPq}
                         data-tx-busca=""
@@ -621,7 +634,9 @@ export default class Cadastros extends Tela {
                       />
                     </div>
                     <div data-tx-pop="" style={{ position: 'relative' }}>
-                      <div role="button" tabIndex={0}
+                      <div
+                        role="button"
+                        tabIndex={0}
                         onClick={v.abrirRegime}
                         data-tx-dd="regime"
                         style={{
@@ -672,7 +687,9 @@ export default class Cadastros extends Tela {
                           >
                             {(Array.isArray(v.pRegimes) ? v.pRegimes : []).map((pr, $index) => (
                               <Fragment key={$index}>
-                                <div role="button" tabIndex={0}
+                                <div
+                                  role="button"
+                                  tabIndex={0}
                                   onClick={pr?.onClick}
                                   data-tx-regime={pr?.k}
                                   style={{
@@ -736,7 +753,9 @@ export default class Cadastros extends Tela {
                         </>
                       ) : null}
                     </div>
-                    <span style={{ marginLeft: 'auto', fontSize: '13px', color: 'var(--texto-apagado)', whiteSpace: 'nowrap' }}>{v.pContagem}</span>
+                    <span style={{ marginLeft: 'auto', fontSize: '13px', color: 'var(--texto-apagado)', whiteSpace: 'nowrap' }}>
+                      {v.pContagem}
+                    </span>
                   </div>
                   <div
                     style={{
@@ -824,7 +843,9 @@ export default class Cadastros extends Tela {
                         <div style={{ flex: '1', lineHeight: '1.5' }}>{v.pVazioTxt}</div>
                         {v.pVazioPede ? (
                           <>
-                            <span role="button" tabIndex={0}
+                            <span
+                              role="button"
+                              tabIndex={0}
                               onClick={v.pedirDaBusca}
                               data-tx-pedir-da-busca=""
                               style={{
@@ -847,12 +868,15 @@ export default class Cadastros extends Tela {
                   ) : null}
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 20px' }}>
+                  <div
+                    style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 20px' }}
+                  >
                     <div style={{ fontSize: '16px', fontWeight: '800' }}>Pedir classificação à Traxium</div>
                     <div style={{ fontSize: '13px', color: 'var(--texto-sec)', marginTop: '3px', lineHeight: '1.5' }}>
                       Para carga que não está na base. Até a classificação, viagem com ela como carga anterior fica travada.
                     </div>
-                    <input aria-label="escória de alto-forno"
+                    <input
+                      aria-label="escória de alto-forno"
                       value={v.pcTexto ?? ''}
                       onChange={v.onPcTexto}
                       data-tx-campo="classificar"
@@ -867,7 +891,9 @@ export default class Cadastros extends Tela {
                         outline: 'none',
                       }}
                     />{' '}
-                    <span role="button" tabIndex={0}
+                    <span
+                      role="button"
+                      tabIndex={0}
                       onClick={v.pedirClass}
                       data-tx-pedir-classificacao=""
                       style={{
@@ -906,7 +932,9 @@ export default class Cadastros extends Tela {
                 <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 24px' }}>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <div style={{ fontSize: '16px', fontWeight: '800' }}>{v.manualTitulo}</div>
-                    <span role="button" tabIndex={0}
+                    <span
+                      role="button"
+                      tabIndex={0}
                       onClick={v.abrirPublicar}
                       data-tx-publicar=""
                       style={{
@@ -939,7 +967,9 @@ export default class Cadastros extends Tela {
                       </Fragment>
                     ))}
                   </div>
-                  <div role="button" tabIndex={0}
+                  <div
+                    role="button"
+                    tabIndex={0}
                     onClick={v.alternarCartoes}
                     data-tx-ver-cartoes=""
                     style={{
@@ -957,7 +987,9 @@ export default class Cadastros extends Tela {
                   >
                     <b>{v.cartoesRot}</b>
                     <span style={{ color: 'var(--texto-sec)' }}>{v.cartoesSub}</span>
-                    <span style={{ marginLeft: 'auto', fontSize: '13px', fontWeight: '800', color: 'var(--primario-2)' }}>{v.cartoesAcao}</span>
+                    <span style={{ marginLeft: 'auto', fontSize: '13px', fontWeight: '800', color: 'var(--primario-2)' }}>
+                      {v.cartoesAcao}
+                    </span>
                   </div>
                   {v.verCartoes ? (
                     <>
@@ -966,7 +998,9 @@ export default class Cadastros extends Tela {
                           <Fragment key={$index}>
                             <div style={{ background: 'var(--superficie)', borderRadius: '13px', padding: '11px 13px' }}>
                               <div style={{ fontSize: '13px', fontWeight: '800' }}>{ct?.t}</div>
-                              <div style={{ fontSize: '12px', color: 'var(--texto-sec)', marginTop: '3px', lineHeight: '1.45' }}>{ct?.txt}</div>
+                              <div style={{ fontSize: '12px', color: 'var(--texto-sec)', marginTop: '3px', lineHeight: '1.45' }}>
+                                {ct?.txt}
+                              </div>
                             </div>
                           </Fragment>
                         ))}
@@ -977,7 +1011,9 @@ export default class Cadastros extends Tela {
                 <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 24px' }}>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <div style={{ fontSize: '16px', fontWeight: '800' }}>Treinamentos registrados</div>
-                    <span role="button" tabIndex={0}
+                    <span
+                      role="button"
+                      tabIndex={0}
                       onClick={v.abrirTreino}
                       data-tx-novo-treino=""
                       style={{
@@ -1053,7 +1089,14 @@ export default class Cadastros extends Tela {
                         </span>
                         <span style={{ marginLeft: 'auto', fontSize: '12px', color: 'var(--texto-sec)' }}>{fo?.cidade}</span>
                       </div>
-                      <div style={{ fontSize: '12px', color: 'var(--texto-apagado)', marginTop: '3px', fontFamily: "'Spline Sans Mono',monospace" }}>
+                      <div
+                        style={{
+                          fontSize: '12px',
+                          color: 'var(--texto-apagado)',
+                          marginTop: '3px',
+                          fontFamily: "'Spline Sans Mono',monospace",
+                        }}
+                      >
                         {fo?.cnpj}
                       </div>
                       <div style={{ fontSize: '13px', color: 'var(--texto-2)', marginTop: '6px' }}>{fo?.regime}</div>
@@ -1076,7 +1119,9 @@ export default class Cadastros extends Tela {
                               <span style={{ color: fd?.c, fontWeight: '700' }}>{fd?.r}</span>
                               {fd?.atualiza ? (
                                 <>
-                                  <span role="button" tabIndex={0}
+                                  <span
+                                    role="button"
+                                    tabIndex={0}
                                     onClick={fd?.onAtualizar}
                                     data-tx-atualizar-doc={fd?.k}
                                     style={{ fontWeight: '800', color: 'var(--primario-2)', cursor: 'pointer', paddingLeft: '6px' }}
@@ -1103,11 +1148,18 @@ export default class Cadastros extends Tela {
                   <Fragment key={$index}>
                     <div
                       data-tx-filial-card={fl?.id}
-                      style={{ background: 'var(--painel)', border: `1.5px solid ${fl?.bd ?? ''}`, borderRadius: '18px', padding: '16px 20px' }}
+                      style={{
+                        background: 'var(--painel)',
+                        border: `1.5px solid ${fl?.bd ?? ''}`,
+                        borderRadius: '18px',
+                        padding: '16px 20px',
+                      }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <div style={{ fontSize: '16px', fontWeight: '800' }}>{fl?.nome}</div>
-                        <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '12px', color: 'var(--texto-sec)' }}>{fl?.reg}</span>
+                        <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '12px', color: 'var(--texto-sec)' }}>
+                          {fl?.reg}
+                        </span>
                         <A href={fl?.hrefMesa} style={{ marginLeft: 'auto', fontSize: '13px', fontWeight: '800' }}>
                           Abrir a mesa →
                         </A>
@@ -1148,7 +1200,9 @@ export default class Cadastros extends Tela {
                         </div>
                         {fl?.semOc ? (
                           <>
-                            <span role="button" tabIndex={0}
+                            <span
+                              role="button"
+                              tabIndex={0}
                               onClick={fl?.registrar}
                               data-tx-registrar-oc={fl?.id}
                               style={{
@@ -1189,7 +1243,9 @@ export default class Cadastros extends Tela {
                 padding: '32px',
               }}
             >
-              <div role="dialog" aria-modal="true"
+              <div
+                role="dialog"
+                aria-modal="true"
                 onClick={v.pararClique}
                 data-tx-modal={v.mK}
                 style={{
@@ -1204,7 +1260,11 @@ export default class Cadastros extends Tela {
               >
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <div style={{ fontSize: '16px', fontWeight: '800' }}>{v.mTitulo}</div>
-                  <span role="button" aria-label="Fechar" title="Fechar" tabIndex={0}
+                  <span
+                    role="button"
+                    aria-label="Fechar"
+                    title="Fechar"
+                    tabIndex={0}
                     onClick={v.fecharModal}
                     style={{
                       marginLeft: 'auto',
@@ -1256,7 +1316,9 @@ export default class Cadastros extends Tela {
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
                       {(Array.isArray(v.mChips) ? v.mChips : []).map((mh, $index) => (
                         <Fragment key={$index}>
-                          <span role="button" tabIndex={0}
+                          <span
+                            role="button"
+                            tabIndex={0}
                             onClick={mh?.onClick}
                             data-tx-chip={mh?.k}
                             style={{
@@ -1278,7 +1340,9 @@ export default class Cadastros extends Tela {
                   </>
                 ) : null}
                 <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
-                  <span role="button" tabIndex={0}
+                  <span
+                    role="button"
+                    tabIndex={0}
                     onClick={v.fecharModal}
                     style={{
                       background: 'var(--superficie-2)',
@@ -1291,7 +1355,9 @@ export default class Cadastros extends Tela {
                   >
                     Cancelar
                   </span>
-                  <span role="button" tabIndex={0}
+                  <span
+                    role="button"
+                    tabIndex={0}
                     onClick={v.confirmar}
                     data-tx-confirmar=""
                     style={{

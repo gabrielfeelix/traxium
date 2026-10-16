@@ -359,7 +359,11 @@ export default class LinkDaViagem extends Tela {
         ckItens: lista.map((it, i) => {
           const r = itens[it.k],
             f = fotos[it.k];
-          const bt = (on) => ({ bd: on ? 'var(--primario)' : 'var(--borda-campo)', bg: on ? 'var(--primario-fraco)' : '#fff', c: on ? 'var(--primario-2)' : 'var(--texto-2)' });
+          const bt = (on) => ({
+            bd: on ? 'var(--primario)' : 'var(--borda-campo)',
+            bg: on ? 'var(--primario-fraco)' : '#fff',
+            c: on ? 'var(--primario-2)' : 'var(--texto-2)',
+          });
           const bn = r === 'nao' ? { bd: 'var(--perigo)', bg: 'var(--perigo-fundo)', c: 'var(--perigo)' } : bt(false);
           const bs = bt(r === 'ok');
           return {
@@ -422,7 +426,10 @@ export default class LinkDaViagem extends Tela {
         cartaoN: s.cartao + 1,
         cartaoT: c.t,
         cartaoTxt: c.txt,
-        cartaoDots: TX.db.manual.cartoes.map((_, i) => ({ w: i === s.cartao ? '22px' : '7px', bg: i <= s.cartao ? 'var(--primario)' : 'var(--borda-campo)' })),
+        cartaoDots: TX.db.manual.cartoes.map((_, i) => ({
+          w: i === s.cartao ? '22px' : '7px',
+          bg: i <= s.cartao ? 'var(--primario)' : 'var(--borda-campo)',
+        })),
       });
       rot = ultimo ? 'Li e entendi' : 'Próximo cartão';
       acao = () => {
@@ -548,7 +555,13 @@ export default class LinkDaViagem extends Tela {
             position: 'relative',
           }}
         >
-          <div style={{ background: 'linear-gradient(130deg,var(--primario-3),var(--primario-2) 60%,var(--azul) 140%)', color: '#fff', padding: '18px 18px 16px' }}>
+          <div
+            style={{
+              background: 'linear-gradient(130deg,var(--primario-3),var(--primario-2) 60%,var(--azul) 140%)',
+              color: '#fff',
+              padding: '18px 18px 16px',
+            }}
+          >
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <span
                 style={{
@@ -574,7 +587,9 @@ export default class LinkDaViagem extends Tela {
                   {v.afretador}
                 </div>
               </div>
-              <span role="button" tabIndex={0}
+              <span
+                role="button"
+                tabIndex={0}
                 data-tx-sinal={v.sinalK}
                 onClick={v.alternarSinal}
                 title="Demonstração: simular falta de sinal"
@@ -658,7 +673,9 @@ export default class LinkDaViagem extends Tela {
                   <div style={{ fontSize: '13.5px', color: 'var(--texto-sec)', marginTop: '6px', lineHeight: '1.5' }}>
                     Na operação real, o motorista só recebe o link depois que o afretador manda a mensagem pelo WhatsApp.
                   </div>{' '}
-                  <span role="button" tabIndex={0}
+                  <span
+                    role="button"
+                    tabIndex={0}
                     onClick={v.simularEnvio}
                     data-tx-simular-envio=""
                     style={{
@@ -724,7 +741,14 @@ export default class LinkDaViagem extends Tela {
             ) : null}
             {v.eDevolvido ? (
               <>
-                <div style={{ background: 'var(--painel)', border: '1.5px solid var(--perigo-borda)', borderRadius: '20px', padding: '16px 18px' }}>
+                <div
+                  style={{
+                    background: 'var(--painel)',
+                    border: '1.5px solid var(--perigo-borda)',
+                    borderRadius: '20px',
+                    padding: '16px 18px',
+                  }}
+                >
                   <div style={{ fontSize: '15px', fontWeight: '800', color: 'var(--tecnico)' }}>A filial pediu foto nova</div>
                   <div style={{ fontSize: '13.5px', color: 'var(--texto-2)', marginTop: '5px', lineHeight: '1.5' }}>"{v.devMotivo}"</div>
                   <div style={{ fontSize: '12px', color: 'var(--texto-apagado)', marginTop: '6px' }}>{v.devQuem}</div>
@@ -735,8 +759,11 @@ export default class LinkDaViagem extends Tela {
               <>
                 <div style={{ background: 'var(--painel)', borderRadius: '20px', padding: '20px' }}>
                   <div style={{ fontSize: '17px', fontWeight: '800' }}>É você mesmo?</div>
-                  <div style={{ fontSize: '13.5px', color: 'var(--texto-sec)', marginTop: '4px' }}>Digite os 3 primeiros números do seu CPF.</div>
-                  <input aria-label="000"
+                  <div style={{ fontSize: '13.5px', color: 'var(--texto-sec)', marginTop: '4px' }}>
+                    Digite os 3 primeiros números do seu CPF.
+                  </div>
+                  <input
+                    aria-label="000"
                     value={v.cpfIn ?? ''}
                     onChange={v.onCpf}
                     data-tx-campo="cpf"
@@ -757,7 +784,9 @@ export default class LinkDaViagem extends Tela {
                     }}
                   />
                   <div style={{ fontSize: '12.5px', color: v.cpfMsgC, marginTop: '6px', minHeight: '16px' }}>{v.cpfMsg}</div>
-                  <div style={{ fontSize: '12.5px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '10px' }}>As placas estão certas?</div>
+                  <div style={{ fontSize: '12.5px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '10px' }}>
+                    As placas estão certas?
+                  </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '6px' }}>
                     {(Array.isArray(v.placasConf) ? v.placasConf : []).map((pc, $index) => (
                       <Fragment key={$index}>
@@ -771,7 +800,9 @@ export default class LinkDaViagem extends Tela {
                             padding: '9px 12px',
                           }}
                         >
-                          <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--texto-apagado)', width: '66px' }}>{pc?.papel}</span>
+                          <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--texto-apagado)', width: '66px' }}>
+                            {pc?.papel}
+                          </span>
                           <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '15px', fontWeight: '600' }}>
                             {pc?.placa}
                           </span>
@@ -809,7 +840,9 @@ export default class LinkDaViagem extends Tela {
                             <div style={{ fontSize: '14.5px', fontWeight: '800' }}>{dp?.n}</div>
                             <div style={{ fontSize: '12px', color: dp?.subC }}>{dp?.sub}</div>
                           </div>
-                          <span role="button" tabIndex={0}
+                          <span
+                            role="button"
+                            tabIndex={0}
                             onClick={dp?.onClick}
                             data-tx-doc={dp?.k}
                             style={{
@@ -854,7 +887,9 @@ export default class LinkDaViagem extends Tela {
                       </div>
                       {tc?.temAtalho ? (
                         <>
-                          <span role="button" tabIndex={0}
+                          <span
+                            role="button"
+                            tabIndex={0}
                             onClick={tc?.atalho}
                             data-tx-atalho=""
                             style={{
@@ -889,7 +924,9 @@ export default class LinkDaViagem extends Tela {
                               }}
                             >
                               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--texto-apagado)', width: '76px' }}>{tl?.rot}</span>
+                                <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--texto-apagado)', width: '76px' }}>
+                                  {tl?.rot}
+                                </span>
                                 <input
                                   type="date"
                                   value={tl?.data ?? ''}
@@ -906,7 +943,8 @@ export default class LinkDaViagem extends Tela {
                                   }}
                                 />
                               </div>
-                              <input aria-label="soja, adubo, casquinha"
+                              <input
+                                aria-label="soja, adubo, casquinha"
                                 value={tl?.texto ?? ''}
                                 onChange={tl?.onTexto}
                                 data-tx-t3-produto={tl?.key}
@@ -929,7 +967,9 @@ export default class LinkDaViagem extends Tela {
                                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '4px' }}>
                                     {(Array.isArray(tl?.sugs) ? tl?.sugs : []).map((sg, $index) => (
                                       <Fragment key={$index}>
-                                        <span role="button" tabIndex={0}
+                                        <span
+                                          role="button"
+                                          tabIndex={0}
                                           onClick={sg?.onClick}
                                           data-tx-sug={sg?.id}
                                           style={{
@@ -997,7 +1037,9 @@ export default class LinkDaViagem extends Tela {
                       </div>
                       <div style={{ fontSize: '14px', color: 'var(--texto-2)', marginTop: '6px', lineHeight: '1.45' }}>{ci?.pergunta}</div>
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '10px' }}>
-                        <span role="button" tabIndex={0}
+                        <span
+                          role="button"
+                          tabIndex={0}
                           onClick={ci?.sim}
                           data-tx-sim={ci?.k}
                           style={{
@@ -1014,7 +1056,9 @@ export default class LinkDaViagem extends Tela {
                         >
                           Sim
                         </span>
-                        <span role="button" tabIndex={0}
+                        <span
+                          role="button"
+                          tabIndex={0}
                           onClick={ci?.nao}
                           data-tx-nao={ci?.k}
                           style={{
@@ -1032,7 +1076,9 @@ export default class LinkDaViagem extends Tela {
                           Não
                         </span>
                       </div>
-                      <div role="button" tabIndex={0}
+                      <div
+                        role="button"
+                        tabIndex={0}
                         onClick={ci?.foto}
                         data-tx-foto-ck={ci?.k}
                         style={{
@@ -1068,7 +1114,9 @@ export default class LinkDaViagem extends Tela {
                       <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)', marginTop: '6px' }}>{ci?.dica}</div>
                       {ci?.alerta ? (
                         <>
-                          <div style={{ marginTop: '8px', fontSize: '12.5px', color: 'var(--tecnico)', fontWeight: '700', lineHeight: '1.45' }}>
+                          <div
+                            style={{ marginTop: '8px', fontSize: '12.5px', color: 'var(--tecnico)', fontWeight: '700', lineHeight: '1.45' }}
+                          >
                             Com resto de carga a carreta não carrega ração. Limpe e responda de novo, ou avise o afretador.
                           </div>
                         </>
@@ -1099,7 +1147,9 @@ export default class LinkDaViagem extends Tela {
                     </span>
                   </div>
                   <div style={{ fontSize: '21px', fontWeight: '800', marginTop: '12px' }}>{v.cartaoT}</div>
-                  <div style={{ fontSize: '16px', color: 'var(--texto-2)', marginTop: '10px', lineHeight: '1.6', flex: '1' }}>{v.cartaoTxt}</div>
+                  <div style={{ fontSize: '16px', color: 'var(--texto-2)', marginTop: '10px', lineHeight: '1.6', flex: '1' }}>
+                    {v.cartaoTxt}
+                  </div>
                   <div style={{ display: 'flex', gap: '5px', justifyContent: 'center', marginTop: '14px' }}>
                     {(Array.isArray(v.cartaoDots) ? v.cartaoDots : []).map((cd, $index) => (
                       <Fragment key={$index}>
@@ -1165,7 +1215,9 @@ export default class LinkDaViagem extends Tela {
                       {', '}
                       {v.hojeTxt}
                     </span>{' '}
-                    <span role="button" tabIndex={0}
+                    <span
+                      role="button"
+                      tabIndex={0}
                       onClick={v.limparAss}
                       style={{
                         position: 'absolute',
@@ -1260,7 +1312,9 @@ export default class LinkDaViagem extends Tela {
               >
                 {v.temVoltar ? (
                   <>
-                    <span role="button" tabIndex={0}
+                    <span
+                      role="button"
+                      tabIndex={0}
                       onClick={v.voltar}
                       style={{
                         background: 'var(--painel)',
@@ -1277,7 +1331,9 @@ export default class LinkDaViagem extends Tela {
                     </span>
                   </>
                 ) : null}
-                <span role="button" tabIndex={0}
+                <span
+                  role="button"
+                  tabIndex={0}
                   onClick={v.avancar}
                   data-tx-avancar=""
                   style={{

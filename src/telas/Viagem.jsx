@@ -2,6 +2,7 @@
 'use client';
 import { Fragment } from 'react';
 import { TX, Tela, A, css } from '@/lib/tx/tela';
+import { listaFalta } from '@/components/ui/formulario';
 
 export default class Viagem extends Tela {
   state = { loading: true, modal: null, acoesOpen: false };
@@ -823,6 +824,12 @@ export default class Viagem extends Tela {
     else this.avisar('O navegador bloqueou a aba nova. Libere pop-ups para este endereço e tente de novo.');
   }
 
+  // Botão apagado clicado: o foco vai para o primeiro campo que falta, se for campo de texto.
+  levarAoQueFalta() {
+    const f = (this.modalVals().mFaltaLista || []).find((x) => x[1]);
+    const el = f && document.querySelector('[role="dialog"] [data-tx-campo="' + f[1] + '"]');
+    if (el) el.focus();
+  }
   modalVals() {
     const s = this.state,
       U = TX.ui,
@@ -854,11 +861,25 @@ export default class Viagem extends Tela {
       fMotivo: s.fMotivo || '',
       onMotivo: (e) => this.setState({ fMotivo: e.target.value }),
     };
-    const ctaOf = (ok) => {
+    // O botão apagado diz o que falta. falta: lista de [texto, campo para focar].
+    const ctaOf = (ok, falta) => {
       const c = U.cta(ok);
-      return { ctaBg: c.bg, ctaC: c.c, ctaSh: c.sh, ctaCur: c.cur };
+      const f = (falta || []).filter(Boolean);
+      return {
+        ctaBg: c.bg,
+        ctaC: c.c,
+        ctaSh: c.sh,
+        ctaCur: c.cur,
+        mFalta: ok || !f.length ? '' : 'Falta: ' + listaFalta(f.map((x) => x[0])) + '.',
+        mFaltaLista: f,
+      };
     };
     const motivo = (s.fMotivo || '').trim();
+    // "motivo" quando vazio; "motivo (faltam 7 caracteres)" quando começou a escrever.
+    const minimo = (txt, min, nome, campo) => {
+      const n = (txt || '').trim().length;
+      return n >= min ? null : [n === 0 ? nome : nome + ' (faltam ' + (min - n) + (min - n === 1 ? ' caractere)' : ' caracteres)'), campo];
+    };
     if (!m) return Object.assign(base, ctaOf(false));
 
     if (m === 'mensagem') {
@@ -934,13 +955,13 @@ export default class Viagem extends Tela {
             );
           }),
           confirmarDevolver: () => {
-            if (!ok) return;
+            if (!ok) return this.levarAoQueFalta();
             TX.fazer('conferir', { id: v.id, decisao: 'devolver', motivo, itens });
             this.setState({ modal: null });
             this.avisar('Devolvido ao motorista. Ele vê o motivo no link e reenvia as fotos.');
           },
         },
-        ctaOf(ok),
+        ctaOf(ok, [!itens.length && ['marcar o que reenviar'], minimo(motivo, 10, 'motivo', 'motivo')]),
       );
     }
     if (m === 'liberar' || m === 'registro') {
@@ -1007,6 +1028,20 @@ export default class Viagem extends Tela {
       ];
       const n = campos.filter(Boolean).length;
       const ok = n === 9;
+      const nomesLib = [
+        'regra',
+        'motivo',
+        'justificativa',
+        'alçada que assina',
+        'risco residual',
+        'validade',
+        'evidência',
+        'escopo',
+        'ciência',
+      ];
+      const faltaLib = campos.map((c, i) =>
+        c ? null : i === 2 ? minimo(just, 20, 'justificativa', 'justificativa') : [nomesLib[i], null],
+      );
       const ck = (on) => ({
         bd: on ? 'var(--primario)' : 'var(--borda-forte)',
         bg: on ? 'linear-gradient(135deg,var(--primario),var(--azul))' : '#fff',
@@ -1060,7 +1095,7 @@ export default class Viagem extends Tela {
           cieBg: cie.bg,
           cieIcon: cie.icon,
           confirmarLiberar: () => {
-            if (!ok) return;
+            if (!ok) return this.levarAoQueFalta();
             TX.fazer('liberar', {
               id: v.id,
               registro: {
@@ -1085,11 +1120,12 @@ export default class Viagem extends Tela {
             );
           },
         },
-        ctaOf(ok),
+        ctaOf(ok, faltaLib),
       );
     }
     if (m === 'manter') {
       const ok = motivo.length >= 15 && !!s.fAcao;
+      const falta = [minimo(motivo, 15, 'motivo', 'motivo'), !s.fAcao && ['ação indicada']];
       return Object.assign(
         base,
         {
@@ -1099,14 +1135,14 @@ export default class Viagem extends Tela {
             Object.assign({ n: x, onClick: () => this.setState({ fAcao: x }) }, U.chip(s.fAcao === x)),
           ),
           confirmarManter: () => {
-            if (!ok) return;
+            if (!ok) return this.levarAoQueFalta();
             const bl = dec.falta.find((f) => f.estado === 'bloqueio') || {};
             TX.fazer('manterBloqueio', { id: v.id, checagem: bl.k, motivo, acao: s.fAcao });
             this.setState({ modal: null });
             this.avisar('Bloqueio mantido e registrado na linha do tempo.');
           },
         },
-        ctaOf(ok),
+        ctaOf(ok, falta),
       );
     }
     if (m === 'regularizar') {
@@ -1116,6 +1152,9 @@ export default class Viagem extends Tela {
       const opB = naoRacao >= 5;
       const opA = s.fOpcao === 'A';
       const ok = opA && (s.fInspetor || '').trim().length >= 5 && (s.fLaudo || '').trim().length >= 4;
+      const falta = opA
+        ? [minimo(s.fInspetor, 5, 'inspetor', 'inspetor'), minimo(s.fLaudo, 4, 'número do laudo', 'laudo')]
+        : [['escolher a inspeção oficial (opção A)']];
       return Object.assign(
         base,
         {
@@ -1154,7 +1193,7 @@ export default class Viagem extends Tela {
           fLaudo: s.fLaudo || '',
           onLaudo: (e) => this.setState({ fLaudo: e.target.value }),
           confirmarRegularizar: () => {
-            if (!ok) return;
+            if (!ok) return this.levarAoQueFalta();
             TX.fazer('regularizar', {
               id: v.id,
               comp: comp.key,
@@ -1171,7 +1210,7 @@ export default class Viagem extends Tela {
             );
           },
         },
-        ctaOf(ok),
+        ctaOf(ok, falta),
       );
     }
     if (m === 'trocar') {
@@ -1182,6 +1221,7 @@ export default class Viagem extends Tela {
         .filter((c) => !q || TX.norm(TX.placasDoConjunto(c).join(' ') + ' ' + TX.nomeTransportador(c.dono)).includes(q))
         .slice(0, 8);
       const ok = !!s.fConj && motivo.length >= 5;
+      const falta = [!s.fConj && ['novo conjunto'], minimo(motivo, 5, 'motivo', 'motivo')];
       return Object.assign(
         base,
         {
@@ -1205,13 +1245,13 @@ export default class Viagem extends Tela {
             );
           }),
           confirmarTrocar: () => {
-            if (!ok) return;
+            if (!ok) return this.levarAoQueFalta();
             TX.fazer('trocarConjunto', { id: v.id, conjunto: s.fConj, motivo });
             this.setState({ modal: null });
             this.avisar('Conjunto trocado. Mande o link de novo para o motorista informar as cargas e as fotos.');
           },
         },
-        ctaOf(ok),
+        ctaOf(ok, falta),
       );
     }
     if (m === 'limpeza') {
@@ -1220,6 +1260,11 @@ export default class Viagem extends Tela {
       const alvo = lista.find((c) => c.key === s.fComp) || lista[0];
       const exig = alvo ? (['A', 'B', 'C', 'D'].includes(alvo.regimeExigido) ? alvo.regimeExigido : 'A') : 'A';
       const ok = !!alvo && !!s.fLavador && (s.fComprovante || '').trim().length >= 4;
+      const falta = [
+        !alvo && ['compartimento'],
+        !s.fLavador && ['lavador'],
+        minimo(s.fComprovante, 4, 'número do comprovante', 'comprovante'),
+      ];
       return Object.assign(
         base,
         {
@@ -1254,7 +1299,7 @@ export default class Viagem extends Tela {
           fComprovante: s.fComprovante || '',
           onComprovante: (e) => this.setState({ fComprovante: e.target.value }),
           confirmarLimpeza: () => {
-            if (!ok) return;
+            if (!ok) return this.levarAoQueFalta();
             TX.fazer('registrarLimpeza', {
               id: v.id,
               comp: alvo.key,
@@ -1266,11 +1311,12 @@ export default class Viagem extends Tela {
             this.avisar('Limpeza registrada no compartimento e na viagem.');
           },
         },
-        ctaOf(ok),
+        ctaOf(ok, falta),
       );
     }
     if (m === 'ocorrencia') {
       const ok = !!s.fTipo && !!s.fGrav && motivo.length >= 15;
+      const falta = [!s.fTipo && ['tipo'], !s.fGrav && ['gravidade'], minimo(motivo, 15, 'o que aconteceu', 'motivo')];
       return Object.assign(
         base,
         {
@@ -1284,7 +1330,7 @@ export default class Viagem extends Tela {
             ['grave', 'Grave', 'Suspende o transportador para viagens asseguradas até a revisão da Direção.'],
           ].map((x) => Object.assign({ n: x[1], sub: x[2], onClick: () => this.setState({ fGrav: x[0] }) }, U.sel(s.fGrav === x[0]))),
           confirmarOcorrencia: () => {
-            if (!ok) return;
+            if (!ok) return this.levarAoQueFalta();
             const id = TX.fazer('registrarOcorrencia', { viagem: v.id, tipo: s.fTipo, gravidade: s.fGrav, descricao: motivo, fotos: 0 });
             this.setState({ modal: null });
             this.avisar(
@@ -1295,7 +1341,7 @@ export default class Viagem extends Tela {
             );
           },
         },
-        ctaOf(ok),
+        ctaOf(ok, falta),
       );
     }
     if (m === 'retificar') {
@@ -1303,6 +1349,14 @@ export default class Viagem extends Tela {
       const atual = { peso: F.peso(v.peso), janela: v.janela, ordem: v.ordem }[campo];
       const novo = (s.fNovo || '').trim();
       const ok = novo.length > 0 && motivo.length >= 10 && (campo !== 'peso' || /^\d+([.,]\d+)?$/.test(novo));
+      const falta = [
+        !novo
+          ? ['valor novo', 'novo']
+          : campo === 'peso' && !/^\d+([.,]\d+)?$/.test(novo)
+            ? ['peso só com números, como 37,5', 'novo']
+            : null,
+        minimo(motivo, 10, 'motivo', 'motivo'),
+      ];
       return Object.assign(
         base,
         {
@@ -1317,7 +1371,7 @@ export default class Viagem extends Tela {
           fNovo: s.fNovo || '',
           onNovo: (e) => this.setState({ fNovo: e.target.value }),
           confirmarRetificar: () => {
-            if (!ok) return;
+            if (!ok) return this.levarAoQueFalta();
             const para = campo === 'peso' ? novo.replace(',', '.') : novo;
             TX.fazer('retificar', {
               id: v.id,
@@ -1332,11 +1386,12 @@ export default class Viagem extends Tela {
             this.avisar('Retificação registrada. O valor anterior continua na linha do tempo.');
           },
         },
-        ctaOf(ok),
+        ctaOf(ok, falta),
       );
     }
     if (m === 'cancelar') {
       const ok = motivo.length >= 15;
+      const falta = [minimo(motivo, 15, 'motivo', 'motivo')];
       const c = U.ctaPerigo(ok);
       return Object.assign(
         base,
@@ -1348,13 +1403,13 @@ export default class Viagem extends Tela {
           ctaPSh: c.sh,
           ctaPCur: c.cur,
           confirmarCancelar: () => {
-            if (!ok) return;
+            if (!ok) return this.levarAoQueFalta();
             TX.fazer('cancelarViagem', { id: v.id, motivo });
             this.setState({ modal: null });
             this.avisar('Viagem cancelada. O registro continua em Viagens, com o motivo.');
           },
         },
-        ctaOf(ok),
+        ctaOf(ok, falta),
       );
     }
     return Object.assign(base, ctaOf(false));
@@ -3162,7 +3217,12 @@ export default class Viagem extends Tela {
                         {v.motTel}
                       </div>
                     </div>
-                    <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end', alignItems: 'center' }}>
+                      {v.mFalta ? (
+                        <span className="tx-falta" aria-live="polite">
+                          {v.mFalta}
+                        </span>
+                      ) : null}
                       <A
                         href={v.linkHref}
                         target="_blank"
@@ -3281,11 +3341,16 @@ export default class Viagem extends Tela {
                         </Fragment>
                       ))}
                     </div>
-                    <div style={{ fontSize: '12px', fontWeight: '800', letterSpacing: '.6px', color: 'var(--texto-2)', marginTop: '16px' }}>
-                      MOTIVO (O MOTORISTA LÊ ISTO NO LINK)
-                    </div>
+                    <label
+                      htmlFor="viagem-motivo"
+                      className="tx-rotulo"
+                      style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '16px' }}
+                    >
+                      Motivo (o motorista lê isto no link)
+                    </label>
                     <textarea
-                      aria-label="foto da lona sem foco, tire de novo de lado com a carreta inteira"
+                      id="viagem-motivo"
+
                       value={v.fMotivo ?? ''}
                       onChange={v.onMotivo}
                       data-tx-campo="motivo"
@@ -3302,7 +3367,12 @@ export default class Viagem extends Tela {
                         outline: 'none',
                       }}
                     ></textarea>
-                    <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end', alignItems: 'center' }}>
+                      {v.mFalta ? (
+                        <span className="tx-falta" aria-live="polite">
+                          {v.mFalta}
+                        </span>
+                      ) : null}
                       <span
                         role="button"
                         tabIndex={0}
@@ -3413,10 +3483,15 @@ export default class Viagem extends Tela {
                         </div>
                       </div>
                       <div>
-                        <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)' }}>
+                        <label
+                          htmlFor="viagem-justificativa"
+                          className="tx-rotulo"
+                          style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)' }}
+                        >
                           3. Justificativa (complemento, mínimo 20 caracteres)
-                        </div>
+                        </label>
                         <textarea
+                          id="viagem-justificativa"
                           value={v.fJust ?? ''}
                           onChange={v.onJust}
                           data-tx-campo="justificativa"
@@ -3628,7 +3703,12 @@ export default class Viagem extends Tela {
                         </div>
                       </div>
                     </div>
-                    <div style={{ display: 'flex', gap: '8px', marginTop: '20px', justifyContent: 'flex-end' }}>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '20px', justifyContent: 'flex-end', alignItems: 'center' }}>
+                      {v.mFalta ? (
+                        <span className="tx-falta" aria-live="polite">
+                          {v.mFalta}
+                        </span>
+                      ) : null}
                       <span
                         role="button"
                         tabIndex={0}
@@ -3714,10 +3794,15 @@ export default class Viagem extends Tela {
                         </Fragment>
                       ))}
                     </div>
-                    <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '16px' }}>
-                      MOTIVO (MÍNIMO 15 CARACTERES)
-                    </div>
+                    <label
+                      htmlFor="viagem-motivo"
+                      className="tx-rotulo"
+                      style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '16px' }}
+                    >
+                      Motivo (mínimo 15 caracteres)
+                    </label>
                     <textarea
+                      id="viagem-motivo"
                       value={v.fMotivo ?? ''}
                       onChange={v.onMotivo}
                       data-tx-campo="motivo"
@@ -3733,7 +3818,12 @@ export default class Viagem extends Tela {
                         resize: 'vertical',
                       }}
                     ></textarea>
-                    <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end', alignItems: 'center' }}>
+                      {v.mFalta ? (
+                        <span className="tx-falta" aria-live="polite">
+                          {v.mFalta}
+                        </span>
+                      ) : null}
                       <span
                         role="button"
                         tabIndex={0}
@@ -3801,8 +3891,15 @@ export default class Viagem extends Tela {
                       <>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '16px' }}>
                           <div>
-                            <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)' }}>Inspetor independente</div>
+                            <label
+                              htmlFor="viagem-inspetor"
+                              className="tx-rotulo"
+                              style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)' }}
+                            >
+                              Inspetor independente
+                            </label>
                             <input
+                              id="viagem-inspetor"
                               value={v.fInspetor ?? ''}
                               onChange={v.onInspetor}
                               data-tx-campo="inspetor"
@@ -3818,8 +3915,15 @@ export default class Viagem extends Tela {
                             />
                           </div>
                           <div>
-                            <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)' }}>Número do laudo</div>
+                            <label
+                              htmlFor="viagem-laudo"
+                              className="tx-rotulo"
+                              style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)' }}
+                            >
+                              Número do laudo
+                            </label>
                             <input
+                              id="viagem-laudo"
                               value={v.fLaudo ?? ''}
                               onChange={v.onLaudo}
                               data-tx-campo="laudo"
@@ -3841,7 +3945,12 @@ export default class Viagem extends Tela {
                         </div>
                       </>
                     ) : null}
-                    <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end', alignItems: 'center' }}>
+                      {v.mFalta ? (
+                        <span className="tx-falta" aria-live="polite">
+                          {v.mFalta}
+                        </span>
+                      ) : null}
                       <span
                         role="button"
                         tabIndex={0}
@@ -3945,8 +4054,15 @@ export default class Viagem extends Tela {
                         </Fragment>
                       ))}
                     </div>
-                    <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '12px' }}>MOTIVO DA TROCA</div>
+                    <label
+                      htmlFor="viagem-motivo"
+                      className="tx-rotulo"
+                      style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '12px' }}
+                    >
+                      Motivo da troca
+                    </label>
                     <input
+                      id="viagem-motivo"
                       value={v.fMotivo ?? ''}
                       onChange={v.onMotivo}
                       data-tx-campo="motivo"
@@ -3960,7 +4076,12 @@ export default class Viagem extends Tela {
                         outline: 'none',
                       }}
                     />
-                    <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end', alignItems: 'center' }}>
+                      {v.mFalta ? (
+                        <span className="tx-falta" aria-live="polite">
+                          {v.mFalta}
+                        </span>
+                      ) : null}
                       <span
                         role="button"
                         tabIndex={0}
@@ -4063,10 +4184,15 @@ export default class Viagem extends Tela {
                         </Fragment>
                       ))}
                     </div>
-                    <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '12px' }}>
-                      NÚMERO DO COMPROVANTE
-                    </div>
+                    <label
+                      htmlFor="viagem-comprovante"
+                      className="tx-rotulo"
+                      style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '12px' }}
+                    >
+                      Número do comprovante
+                    </label>
                     <input
+                      id="viagem-comprovante"
                       value={v.fComprovante ?? ''}
                       onChange={v.onComprovante}
                       data-tx-campo="comprovante"
@@ -4081,7 +4207,12 @@ export default class Viagem extends Tela {
                         fontFamily: "'Spline Sans Mono',monospace",
                       }}
                     />
-                    <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end', alignItems: 'center' }}>
+                      {v.mFalta ? (
+                        <span className="tx-falta" aria-live="polite">
+                          {v.mFalta}
+                        </span>
+                      ) : null}
                       <span
                         role="button"
                         tabIndex={0}
@@ -4168,10 +4299,15 @@ export default class Viagem extends Tela {
                         </Fragment>
                       ))}
                     </div>
-                    <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '12px' }}>
-                      O QUE ACONTECEU (MÍNIMO 15 CARACTERES)
-                    </div>
+                    <label
+                      htmlFor="viagem-motivo"
+                      className="tx-rotulo"
+                      style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '12px' }}
+                    >
+                      O que aconteceu (mínimo 15 caracteres)
+                    </label>
                     <textarea
+                      id="viagem-motivo"
                       value={v.fMotivo ?? ''}
                       onChange={v.onMotivo}
                       data-tx-campo="motivo"
@@ -4187,7 +4323,12 @@ export default class Viagem extends Tela {
                         resize: 'vertical',
                       }}
                     ></textarea>
-                    <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end', alignItems: 'center' }}>
+                      {v.mFalta ? (
+                        <span className="tx-falta" aria-live="polite">
+                          {v.mFalta}
+                        </span>
+                      ) : null}
                       <span
                         role="button"
                         tabIndex={0}
@@ -4267,8 +4408,15 @@ export default class Viagem extends Tela {
                         </div>
                       </div>
                       <div>
-                        <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)' }}>Valor correto</div>
+                        <label
+                          htmlFor="viagem-novo"
+                          className="tx-rotulo"
+                          style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)' }}
+                        >
+                          Valor correto
+                        </label>
                         <input
+                          id="viagem-novo"
                           value={v.fNovo ?? ''}
                           onChange={v.onNovo}
                           data-tx-campo="novo"
@@ -4285,8 +4433,15 @@ export default class Viagem extends Tela {
                         />
                       </div>
                     </div>
-                    <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '12px' }}>MOTIVO</div>
+                    <label
+                      htmlFor="viagem-motivo"
+                      className="tx-rotulo"
+                      style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '12px' }}
+                    >
+                      Motivo
+                    </label>
                     <input
+                      id="viagem-motivo"
                       value={v.fMotivo ?? ''}
                       onChange={v.onMotivo}
                       data-tx-campo="motivo"
@@ -4300,7 +4455,12 @@ export default class Viagem extends Tela {
                         outline: 'none',
                       }}
                     />
-                    <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end', alignItems: 'center' }}>
+                      {v.mFalta ? (
+                        <span className="tx-falta" aria-live="polite">
+                          {v.mFalta}
+                        </span>
+                      ) : null}
                       <span
                         role="button"
                         tabIndex={0}
@@ -4339,10 +4499,15 @@ export default class Viagem extends Tela {
                 ) : null}
                 {v.mCancelar ? (
                   <>
-                    <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '16px' }}>
-                      MOTIVO (MÍNIMO 15 CARACTERES)
-                    </div>
+                    <label
+                      htmlFor="viagem-motivo"
+                      className="tx-rotulo"
+                      style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '16px' }}
+                    >
+                      Motivo (mínimo 15 caracteres)
+                    </label>
                     <textarea
+                      id="viagem-motivo"
                       value={v.fMotivo ?? ''}
                       onChange={v.onMotivo}
                       data-tx-campo="motivo"
@@ -4358,7 +4523,12 @@ export default class Viagem extends Tela {
                         resize: 'vertical',
                       }}
                     ></textarea>
-                    <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end', alignItems: 'center' }}>
+                      {v.mFalta ? (
+                        <span className="tx-falta" aria-live="polite">
+                          {v.mFalta}
+                        </span>
+                      ) : null}
                       <span
                         role="button"
                         tabIndex={0}

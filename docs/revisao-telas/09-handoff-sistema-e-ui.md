@@ -218,3 +218,14 @@ Os três primeiros temas da tabela da seção 5 valem igual para as dez telas; r
 | Premissa | O que muda se a resposta vier diferente |
 | --- | --- |
 | Limite de 20 MB por arquivo | Ajustar em `conferirArquivo` quando houver backend com limite real |
+
+### Etapa 9. Viagem, e rótulos ligados em todas as telas (15/10/2026)
+
+**Problema.** A Viagem tem nove modais com formulário (devolver ao motorista, liberar por autoridade, manter o bloqueio, regularizar quarentena, trocar o conjunto, registrar limpeza, registrar ocorrência, retificar e cancelar). Todos deixavam o botão apagado sem dizer o que faltava; o mínimo de caracteres vinha escrito dentro do rótulo e não havia contagem. Os rótulos eram `div` soltos, em caixa alta em uns modais e em frase em outros ("MOTIVO (MÍNIMO 15 CARACTERES)" ao lado de "3. Justificativa (...)").
+
+**O que mudou.**
+
+1. Cada modal calcula a lista do que falta; o rodapé mostra ao lado dos botões ("Falta: motivo, justificativa (faltam 11 caracteres), risco residual..."), atualizada a cada tecla. Clicar no botão apagado leva o foco ao primeiro campo de texto pendente. Os botões do rodapé não quebram linha.
+2. Rótulo visível logo antes de um campo virou `<label>` ligado a ele, em frase, nas telas que tinham esse padrão (Viagem 11, Configurações 2, Transportadores 2, Frota 1).
+
+**Teste.** `e2e-ui.cjs`: no modal de liberação, rodapé lista os sete itens que faltam, conta os caracteres da justificativa, botão apagado leva à justificativa, rótulo ligado. Bateria inteira passa.

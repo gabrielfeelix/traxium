@@ -220,7 +220,9 @@ export default class Compartimento extends Tela {
       <div style={{ minHeight: '100%' }} data-screen-label="Compartimento" data-tela="Compartimento">
         <div style={{ flex: '1', display: 'flex', flexDirection: 'column', padding: '24px 32px 48px', gap: '20px', minWidth: '0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--texto-sec)' }}>
+            <div
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--texto-sec)' }}
+            >
               <A href={v.voltarHref} style={{ color: 'var(--texto-sec)' }}>
                 {v.voltarRot}
               </A>
@@ -236,7 +238,9 @@ export default class Compartimento extends Tela {
               <span style={{ fontFamily: "'Spline Sans Mono',monospace", color: 'var(--texto)' }}>{v.titulo}</span>
             </div>
             <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div role="button" tabIndex={0}
+              <div
+                role="button"
+                tabIndex={0}
                 onClick={v.exportar}
                 data-tx-exportar=""
                 style={{

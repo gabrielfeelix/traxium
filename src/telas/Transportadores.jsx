@@ -1452,9 +1452,16 @@ export default class Transportadores extends Tela {
                     <div style={{ marginTop: '16px', fontSize: '14px' }}>
                       <b>{v.docNome}</b> <span style={{ color: 'var(--texto-sec)' }}>{v.docAtual}</span>
                     </div>
-                    <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '12px' }}>NOVA VALIDADE</div>
+                    <label
+                      htmlFor="transportadores-validade"
+                      className="tx-rotulo"
+                      style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '12px' }}
+                    >
+                      Nova validade
+                    </label>
                     <input
-                      aria-label="DD/MM/AAAA"
+                      id="transportadores-validade"
+
                       value={v.docVal ?? ''}
                       onChange={v.onDocVal}
                       data-tx-campo="validade"
@@ -1492,10 +1499,15 @@ export default class Transportadores extends Tela {
                     >
                       {v.revTxt}
                     </div>
-                    <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '12px' }}>
-                      O QUE FOI FEITO (MÍNIMO 20 CARACTERES)
-                    </div>
+                    <label
+                      htmlFor="transportadores-motivo"
+                      className="tx-rotulo"
+                      style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '12px' }}
+                    >
+                      O que foi feito (mínimo 20 caracteres)
+                    </label>
                     <textarea
+                      id="transportadores-motivo"
                       value={v.fMotivo ?? ''}
                       onChange={v.onMotivo}
                       data-tx-campo="motivo"

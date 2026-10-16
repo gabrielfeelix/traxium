@@ -63,6 +63,18 @@ const ok = (c, m) => { console.log((c ? 'ok    ' : 'FALHOU ') + m); if (!c) falh
   ok(await pg.evaluate(() => document.activeElement.type === 'file'), 'Conciliar: o seletor de arquivo é alcançável pelo teclado');
   await pg.screenshot({ path: out + '/ui-viagens-conciliar.png' });
 
+  // ---------------------------------------------------------------- Viagem
+  await ir('viagem?id=VG-3121&liberar=1', 1400);
+  const falta = () => texto('[data-tx-modal="liberar"] .tx-falta');
+  ok(/^Falta: motivo, justificativa, risco residual, validade, evidência, escopo e ciência\.$/.test(await falta()), 'Liberar: rodapé lista o que falta (' + await falta() + ')');
+  await pg.fill('[data-tx-campo="justificativa"]', 'Protocolo');
+  ok(/justificativa \(faltam 11 caracteres\)/.test(await falta()), 'Liberar: conta os caracteres que faltam na justificativa');
+  await pg.click('[data-tx-modal="liberar"] [data-tx-confirmar]'); await pg.waitForTimeout(150);
+  ok(await pg.evaluate(() => document.activeElement.getAttribute('data-tx-campo') === 'justificativa'), 'Liberar: botão apagado leva ao campo de texto que falta');
+  ok(await pg.evaluate(() => { const l = document.querySelector('label[for="' + document.activeElement.id + '"]'); return !!l && /Justificativa/.test(l.innerText); }), 'Liberar: rótulo visível ligado ao campo');
+  await pg.screenshot({ path: out + '/ui-viagem-liberar.png' });
+  await pg.keyboard.press('Escape');
+
   ok(erros.length === 0, 'sem erro de JavaScript (' + erros.join(' | ') + ')');
   await browser.close();
   console.log(falhas ? falhas + ' falha(s)' : 'Revisão de UI: tudo certo');
