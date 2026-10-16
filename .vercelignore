@@ -1,0 +1,15 @@
+# Só o app Next e o protótipo .dc.html (copiado para public/prototipo no build) vão para a Vercel.
+legado
+docs
+reports
+research_notes
+UX-COWORK
+*.pdf
+*.pdf:Zone.Identifier
+ola.txt
+public/prototipo
+SaaS moderno estilo Dribbble/.vercel
+SaaS moderno estilo Dribbble/.vercel.4yu-antigo
+SaaS moderno estilo Dribbble/.env.local
+SaaS moderno estilo Dribbble/uploads
+.env*.local
