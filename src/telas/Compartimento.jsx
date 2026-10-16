@@ -218,7 +218,7 @@ export default class Compartimento extends Tela {
     const v = this.renderVals();
     return (
       <div style={{ minHeight: '100%' }} data-screen-label="Compartimento" data-tela="Compartimento">
-        <div style={{ flex: '1', display: 'flex', flexDirection: 'column', padding: '24px 32px 48px', gap: '18px', minWidth: '0' }}>
+        <div style={{ flex: '1', display: 'flex', flexDirection: 'column', padding: '24px 32px 48px', gap: '20px', minWidth: '0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--texto-sec)' }}>
               <A href={v.voltarHref} style={{ color: 'var(--texto-sec)' }}>
@@ -262,10 +262,10 @@ export default class Compartimento extends Tela {
               borderRadius: '22px',
               background: v.heroBg,
               color: '#fff',
-              padding: '22px 26px',
+              padding: '24px 28px',
               display: 'grid',
               gridTemplateColumns: '1.1fr 1fr 1.25fr 1.15fr',
-              gap: '22px',
+              gap: '24px',
               alignItems: 'center',
             }}
           >
@@ -395,7 +395,7 @@ export default class Compartimento extends Tela {
               </>
             ) : null}
           </div>
-          <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 22px' }}>
+          <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
               <div style={{ fontSize: '16px', fontWeight: '800' }}>Histórico de cargas</div>
               <div style={{ fontSize: '13px', color: 'var(--texto-sec)' }}>

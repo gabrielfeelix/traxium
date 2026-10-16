@@ -176,7 +176,7 @@ export default class Frota extends Tela {
     return (
       <div style={{ minHeight: '100%' }} data-screen-label="Frota própria" data-tela="Frota">
         <div style={{ flex: '1', display: 'flex', flexDirection: 'column', padding: '24px 32px 48px', gap: '16px', minWidth: '0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <div>
               <div style={{ fontSize: '24px', fontWeight: '800' }}>Frota própria</div>
               <div style={{ fontSize: '14px', color: 'var(--texto-sec)', marginTop: '2px' }}>{v.subtitulo}</div>
@@ -460,7 +460,7 @@ export default class Frota extends Tela {
                   borderRadius: '24px',
                   width: '520px',
                   boxShadow: '0 40px 100px rgba(9,34,36,.4)',
-                  padding: '26px 28px',
+                  padding: '28px 28px',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -484,7 +484,7 @@ export default class Frota extends Tela {
                   </span>
                 </div>
                 <div style={{ fontSize: '13px', color: 'var(--texto-sec)', marginTop: '4px', lineHeight: '1.55' }}>{v.mSub}</div>
-                <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '14px' }}>
+                <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '16px' }}>
                   MOTIVO (MÍNIMO 10 CARACTERES)
                 </div>
                 <input

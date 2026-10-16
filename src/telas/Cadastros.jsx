@@ -514,7 +514,7 @@ export default class Cadastros extends Tela {
     return (
       <div style={{ minHeight: '100%' }} data-screen-label="Cadastros" data-tela="Cadastros">
         <div style={{ flex: '1', display: 'flex', flexDirection: 'column', padding: '24px 32px 48px', gap: '16px', minWidth: '0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <div>
               <div style={{ fontSize: '11px', fontWeight: '800', letterSpacing: '1.2px', color: 'var(--texto-apagado)', textTransform: 'uppercase' }}>
                 Cadastros
@@ -576,13 +576,13 @@ export default class Cadastros extends Tela {
             <>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: '20px', alignItems: 'start' }}>
                 <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', overflow: 'hidden' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '14px 18px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '16px 20px' }}>
                     <div
                       style={{
                         background: 'var(--superficie)',
                         border: '1px solid var(--borda-campo)',
                         borderRadius: '11px',
-                        padding: '0 13px',
+                        padding: '0 12px',
                         display: 'flex',
                         gap: '8px',
                         alignItems: 'center',
@@ -629,7 +629,7 @@ export default class Cadastros extends Tela {
                           alignItems: 'center',
                           gap: '7px',
                           height: '38px',
-                          padding: '0 12px 0 13px',
+                          padding: '0 12px 0 12px',
                           borderRadius: '11px',
                           border: `1px solid ${v.regBd ?? ''}`,
                           background: 'var(--painel)',
@@ -813,12 +813,12 @@ export default class Cadastros extends Tela {
                       <div
                         data-tx-vazio=""
                         style={{
-                          padding: '22px 18px',
+                          padding: '24px 20px',
                           fontSize: '13px',
                           color: 'var(--texto-sec)',
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '14px',
+                          gap: '16px',
                         }}
                       >
                         <div style={{ flex: '1', lineHeight: '1.5' }}>{v.pVazioTxt}</div>
@@ -847,7 +847,7 @@ export default class Cadastros extends Tela {
                   ) : null}
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '18px 20px' }}>
+                  <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 20px' }}>
                     <div style={{ fontSize: '16px', fontWeight: '800' }}>Pedir classificação à Traxium</div>
                     <div style={{ fontSize: '13px', color: 'var(--texto-sec)', marginTop: '3px', lineHeight: '1.5' }}>
                       Para carga que não está na base. Até a classificação, viagem com ela como carga anterior fica travada.
@@ -903,7 +903,7 @@ export default class Cadastros extends Tela {
           {v.aManual ? (
             <>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', alignItems: 'start' }}>
-                <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 22px' }}>
+                <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 24px' }}>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <div style={{ fontSize: '16px', fontWeight: '800' }}>{v.manualTitulo}</div>
                     <span role="button" tabIndex={0}
@@ -946,7 +946,7 @@ export default class Cadastros extends Tela {
                       display: 'flex',
                       alignItems: 'center',
                       gap: '8px',
-                      marginTop: '14px',
+                      marginTop: '16px',
                       padding: '10px 13px',
                       borderRadius: '12px',
                       background: 'var(--superficie)',
@@ -974,7 +974,7 @@ export default class Cadastros extends Tela {
                     </>
                   ) : null}
                 </div>
-                <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 22px' }}>
+                <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 24px' }}>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <div style={{ fontSize: '16px', fontWeight: '800' }}>Treinamentos registrados</div>
                     <span role="button" tabIndex={0}
@@ -1023,7 +1023,7 @@ export default class Cadastros extends Tela {
           ) : null}
           {v.aFornecedores ? (
             <>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '14px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '16px' }}>
                 {(Array.isArray(v.fornecedores) ? v.fornecedores : []).map((fo, $index) => (
                   <Fragment key={$index}>
                     <div
@@ -1033,7 +1033,7 @@ export default class Cadastros extends Tela {
                         border: `1.5px solid ${fo?.bd ?? ''}`,
                         boxShadow: fo?.sh,
                         borderRadius: '18px',
-                        padding: '16px 18px',
+                        padding: '16px 20px',
                         scrollMarginTop: '96px',
                       }}
                     >
@@ -1098,12 +1098,12 @@ export default class Cadastros extends Tela {
           ) : null}
           {v.aFiliais ? (
             <>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '14px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '16px' }}>
                 {(Array.isArray(v.filiais) ? v.filiais : []).map((fl, $index) => (
                   <Fragment key={$index}>
                     <div
                       data-tx-filial-card={fl?.id}
-                      style={{ background: 'var(--painel)', border: `1.5px solid ${fl?.bd ?? ''}`, borderRadius: '18px', padding: '16px 18px' }}
+                      style={{ background: 'var(--painel)', border: `1.5px solid ${fl?.bd ?? ''}`, borderRadius: '18px', padding: '16px 20px' }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <div style={{ fontSize: '16px', fontWeight: '800' }}>{fl?.nome}</div>
@@ -1199,7 +1199,7 @@ export default class Cadastros extends Tela {
                   maxHeight: '90vh',
                   overflow: 'auto',
                   boxShadow: '0 40px 100px rgba(9,34,36,.4)',
-                  padding: '26px 28px',
+                  padding: '28px 28px',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -1223,7 +1223,7 @@ export default class Cadastros extends Tela {
                   </span>
                 </div>
                 <div style={{ fontSize: '13px', color: 'var(--texto-sec)', marginTop: '4px', lineHeight: '1.55' }}>{v.mSub}</div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '14px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '16px' }}>
                   {(Array.isArray(v.mCampos) ? v.mCampos : []).map((mc, $index) => (
                     <Fragment key={$index}>
                       <div style={{ gridColumn: mc?.col }}>

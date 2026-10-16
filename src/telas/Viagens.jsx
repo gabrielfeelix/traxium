@@ -526,7 +526,7 @@ export default class Viagens extends Tela {
     return (
       <div style={{ minHeight: '100%' }} data-screen-label="Viagens" data-tela="Viagens">
         <div style={{ flex: '1', display: 'flex', flexDirection: 'column', padding: '24px 32px 48px', gap: '16px', minWidth: '0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <div>
               <div style={{ fontSize: '24px', fontWeight: '800' }}>Viagens</div>
               <div style={{ fontSize: '14px', color: 'var(--texto-sec)', marginTop: '2px' }}>{v.subtitulo}</div>
@@ -588,7 +588,7 @@ export default class Viagens extends Tela {
                       display: 'flex',
                       alignItems: 'center',
                       gap: '7px',
-                      padding: '15px 12px 12px',
+                      padding: '16px 12px 12px',
                       fontSize: '14px',
                       fontWeight: ab?.fw,
                       color: ab?.c,
@@ -636,13 +636,13 @@ export default class Viagens extends Tela {
                 </Fragment>
               ))}
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '14px 20px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '16px 20px', flexWrap: 'wrap' }}>
               <div
                 style={{
                   background: 'var(--superficie)',
                   border: '1px solid var(--borda-campo)',
                   borderRadius: '11px',
-                  padding: '0 13px',
+                  padding: '0 12px',
                   display: 'flex',
                   gap: '8px',
                   alignItems: 'center',
@@ -682,7 +682,7 @@ export default class Viagens extends Tela {
                     alignItems: 'center',
                     gap: '7px',
                     height: '38px',
-                    padding: '0 12px 0 13px',
+                    padding: '0 12px 0 12px',
                     borderRadius: '11px',
                     border: `1px solid ${v.perBd ?? ''}`,
                     background: 'var(--painel)',
@@ -772,7 +772,7 @@ export default class Viagens extends Tela {
                         alignItems: 'center',
                         gap: '7px',
                         height: '38px',
-                        padding: '0 12px 0 13px',
+                        padding: '0 12px 0 12px',
                         borderRadius: '11px',
                         border: `1px solid ${v.sitBd ?? ''}`,
                         background: 'var(--painel)',
@@ -877,7 +877,7 @@ export default class Viagens extends Tela {
                     alignItems: 'center',
                     gap: '7px',
                     height: '38px',
-                    padding: '0 13px',
+                    padding: '0 12px',
                     borderRadius: '11px',
                     border: `1px solid ${v.filBd ?? ''}`,
                     background: 'var(--painel)',
@@ -1046,10 +1046,10 @@ export default class Viagens extends Tela {
                   </span>
                 </Fragment>
               ))}
-              <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '14px' }}>
+              <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '16px' }}>
                 {v.filtroAtivo ? (
                   <>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                       <span role="button" tabIndex={0}
                         onClick={v.limpar}
                         data-tx-limpar=""
@@ -1079,7 +1079,7 @@ export default class Viagens extends Tela {
                                 border: '1px solid var(--borda)',
                                 borderRadius: '14px',
                                 boxShadow: '0 16px 40px rgba(9,61,68,.16)',
-                                padding: '14px',
+                                padding: '16px',
                                 width: '300px',
                                 zIndex: '60',
                               }}
@@ -1186,7 +1186,7 @@ export default class Viagens extends Tela {
               style={{
                 display: 'grid',
                 gridTemplateColumns: v.cols,
-                gap: '14px',
+                gap: '16px',
                 padding: '11px 20px',
                 background: 'var(--superficie)',
                 borderTop: '1px solid var(--borda-suave)',
@@ -1208,7 +1208,7 @@ export default class Viagens extends Tela {
               <>
                 {(Array.isArray(v.skel) ? v.skel : []).map((sk, $index) => (
                   <Fragment key={$index}>
-                    <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--superficie-2)' }}>
+                    <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--superficie-2)' }}>
                       <div
                         style={{
                           height: '16px',
@@ -1232,7 +1232,7 @@ export default class Viagens extends Tela {
                   style={{
                     display: 'grid',
                     gridTemplateColumns: v.cols,
-                    gap: '14px',
+                    gap: '16px',
                     padding: '12px 20px',
                     borderBottom: '1px solid var(--superficie-2)',
                     alignItems: 'center',
@@ -1405,7 +1405,7 @@ export default class Viagens extends Tela {
                   maxHeight: '90vh',
                   overflow: 'auto',
                   boxShadow: '0 40px 100px rgba(9,34,36,.4)',
-                  padding: '26px 28px',
+                  padding: '28px 28px',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -1434,14 +1434,14 @@ export default class Viagens extends Tela {
                 </div>
                 <label
                   style={{
-                    marginTop: '14px',
+                    marginTop: '16px',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '12px',
                     border: `1.5px dashed ${v.arqBd ?? ''}`,
                     background: v.arqBg,
                     borderRadius: '15px',
-                    padding: '13px 15px',
+                    padding: '12px 16px',
                     cursor: 'pointer',
                   }}
                 >
@@ -1456,7 +1456,7 @@ export default class Viagens extends Tela {
                 </label>
                 {v.temLote ? (
                   <>
-                    <div style={{ marginTop: '14px', border: '1px solid var(--borda-suave)', borderRadius: '14px', overflow: 'hidden' }}>
+                    <div style={{ marginTop: '16px', border: '1px solid var(--borda-suave)', borderRadius: '14px', overflow: 'hidden' }}>
                       <div
                         style={{
                           display: 'grid',

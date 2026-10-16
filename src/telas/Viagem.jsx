@@ -1346,7 +1346,7 @@ export default class Viagem extends Tela {
     const v = this.renderVals();
     return (
       <div style={{ minHeight: '100%' }} data-screen-label="Viagem" data-tela="Viagem">
-        <div style={{ flex: '1', display: 'flex', flexDirection: 'column', padding: '24px 32px 48px', gap: '18px', minWidth: '0' }}>
+        <div style={{ flex: '1', display: 'flex', flexDirection: 'column', padding: '24px 32px 48px', gap: '20px', minWidth: '0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--texto-sec)' }}>
               <A href="/viagens" style={{ color: 'var(--texto-sec)' }} className="tx-h76d8d79">
@@ -1441,7 +1441,7 @@ export default class Viagem extends Tela {
           </div>
           {v.loading ? (
             <>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <span
                   style={{
                     height: '30px',
@@ -1609,7 +1609,7 @@ export default class Viagem extends Tela {
                       padding: '24px 28px',
                       display: 'grid',
                       gridTemplateColumns: '1fr 470px',
-                      gap: '26px',
+                      gap: '28px',
                       alignItems: 'center',
                     }}
                   >
@@ -1703,7 +1703,7 @@ export default class Viagem extends Tela {
                         background: 'rgba(255,255,255,.08)',
                         border: '1px solid rgba(255,255,255,.18)',
                         borderRadius: '16px',
-                        padding: '16px 18px',
+                        padding: '16px 20px',
                       }}
                     >
                       <div style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '1.4px', color: 'rgba(255,255,255,.6)' }}>
@@ -1773,14 +1773,14 @@ export default class Viagem extends Tela {
                       <div style={{ fontSize: '20px', fontWeight: '800' }}>{v.heroTitulo}</div>
                       <div style={{ fontSize: '13px', color: 'var(--texto-sec)' }}>{v.heroSub}</div>
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '7px', marginTop: '14px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '7px', marginTop: '16px' }}>
                       {(Array.isArray(v.faltaLista) ? v.faltaLista : []).map((fl, $index) => (
                         <Fragment key={$index}>
                           <div
                             style={{
                               display: 'flex',
                               alignItems: 'center',
-                              gap: '14px',
+                              gap: '16px',
                               background: 'var(--superficie)',
                               borderRadius: '14px',
                               padding: '10px 14px',
@@ -1844,7 +1844,7 @@ export default class Viagem extends Tela {
                       padding: '20px 24px',
                       boxShadow: 'inset 4px 0 0 var(--perigo)',
                       display: 'flex',
-                      gap: '18px',
+                      gap: '20px',
                       alignItems: 'center',
                     }}
                   >
@@ -1998,7 +1998,7 @@ export default class Viagem extends Tela {
                       borderRadius: '22px',
                       background: 'linear-gradient(115deg,#3a1219,#6e1f2b 60%,var(--tecnico) 130%)',
                       color: '#fff',
-                      padding: '22px 26px',
+                      padding: '24px 28px',
                     }}
                   >
                     <div
@@ -2028,7 +2028,7 @@ export default class Viagem extends Tela {
                             background: 'rgba(255,255,255,.08)',
                             border: '1px solid rgba(255,255,255,.2)',
                             borderRadius: '16px',
-                            padding: '14px 16px',
+                            padding: '16px 16px',
                             cursor: 'pointer',
                           }}
                           className="tx-h681b28c"
@@ -2045,7 +2045,7 @@ export default class Viagem extends Tela {
                             background: 'rgba(255,255,255,.08)',
                             border: '1px solid rgba(255,255,255,.2)',
                             borderRadius: '16px',
-                            padding: '14px 16px',
+                            padding: '16px 16px',
                             cursor: 'pointer',
                           }}
                           className="tx-h681b28c"
@@ -2081,7 +2081,7 @@ export default class Viagem extends Tela {
                   background: 'var(--painel)',
                   border: '1px solid var(--borda)',
                   borderRadius: '20px',
-                  padding: '18px 24px',
+                  padding: '20px 24px',
                   display: 'flex',
                   alignItems: 'flex-start',
                 }}
@@ -2145,8 +2145,8 @@ export default class Viagem extends Tela {
                 ))}
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 392px', gap: '20px', alignItems: 'start' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', minWidth: '0' }}>
-                  <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 22px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', minWidth: '0' }}>
+                  <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 24px' }}>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>
                       <div style={{ fontSize: '16px', fontWeight: '800' }}>Checagens</div>
                       <div style={{ fontSize: '13px', color: 'var(--texto-sec)' }}>derivadas dos fatos; ninguém digita estado</div>
@@ -2207,7 +2207,7 @@ export default class Viagem extends Tela {
                                 style={{
                                   display: 'flex',
                                   alignItems: 'center',
-                                  gap: '13px',
+                                  gap: '12px',
                                   padding: '10px 4px',
                                   borderBottom: '1px solid var(--superficie-2)',
                                 }}
@@ -2281,17 +2281,17 @@ export default class Viagem extends Tela {
                       </>
                     ) : null}
                   </div>
-                  <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 22px' }}>
+                  <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 24px' }}>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>
                       <div style={{ fontSize: '16px', fontWeight: '800' }}>Três últimas cargas</div>
                       <div style={{ fontSize: '13px', color: 'var(--texto-sec)' }}>
                         por compartimento; o regime sai da carga anterior pela IDTF
                       </div>
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '14px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '16px' }}>
                       {(Array.isArray(v.compsT3) ? v.compsT3 : []).map((cp, $index) => (
                         <Fragment key={$index}>
-                          <div style={{ border: '1px solid var(--borda-suave)', borderRadius: '16px', padding: '14px 16px' }}>
+                          <div style={{ border: '1px solid var(--borda-suave)', borderRadius: '16px', padding: '16px 16px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                               <span
                                 style={{
@@ -2405,7 +2405,7 @@ export default class Viagem extends Tela {
                   </div>
                   <div
                     id="tx-verif"
-                    style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 22px' }}
+                    style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 24px' }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <div style={{ fontSize: '16px', fontWeight: '800' }}>Verificação do compartimento</div>
@@ -2431,7 +2431,7 @@ export default class Viagem extends Tela {
                     <div style={{ fontSize: '13px', color: 'var(--texto-sec)', marginTop: '3px' }}>
                       O motorista responde e fotografa pelo link; o afretador confere aqui e aprova ou devolve com motivo.
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: '10px', marginTop: '14px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: '10px', marginTop: '16px' }}>
                       {(Array.isArray(v.itensCk) ? v.itensCk : []).map((it, $index) => (
                         <Fragment key={$index}>
                           <div role="button" tabIndex={0}
@@ -2529,13 +2529,13 @@ export default class Viagem extends Tela {
                       <>
                         <div
                           style={{
-                            marginTop: '14px',
+                            marginTop: '16px',
                             display: 'flex',
                             alignItems: 'center',
                             gap: '10px',
                             background: 'var(--superficie)',
                             borderRadius: '16px',
-                            padding: '12px 14px',
+                            padding: '12px 16px',
                           }}
                         >
                           <span
@@ -2590,7 +2590,7 @@ export default class Viagem extends Tela {
                   </div>
                   {v.mostraLimpeza ? (
                     <>
-                      <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 22px' }}>
+                      <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 24px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                           <div style={{ fontSize: '16px', fontWeight: '800' }}>Limpeza</div>
                           <div style={{ fontSize: '13px', color: 'var(--texto-sec)' }}>
@@ -2638,17 +2638,17 @@ export default class Viagem extends Tela {
                       </div>
                     </>
                   ) : null}
-                  <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 22px' }}>
+                  <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 24px' }}>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>
                       <div style={{ fontSize: '16px', fontWeight: '800' }}>Linha do tempo</div>
                       <div style={{ fontSize: '13px', color: 'var(--texto-sec)' }}>
                         nada se apaga: correção e cancelamento entram como evento novo
                       </div>
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', marginTop: '14px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', marginTop: '16px' }}>
                       {(Array.isArray(v.tempo) ? v.tempo : []).map((lt, $index) => (
                         <Fragment key={$index}>
-                          <div style={{ display: 'flex', gap: '14px' }}>
+                          <div style={{ display: 'flex', gap: '16px' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '14px', flex: 'none' }}>
                               <span
                                 style={{
@@ -2710,7 +2710,7 @@ export default class Viagem extends Tela {
                         <div style={{ fontSize: '12px', color: 'var(--texto-sec)' }}>{v.tTipo}</div>
                       </div>
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '14px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '16px' }}>
                       {(Array.isArray(v.tDocs) ? v.tDocs : []).map((td, $index) => (
                         <Fragment key={$index}>
                           <div
@@ -3004,7 +3004,7 @@ export default class Viagem extends Tela {
                   maxHeight: '90vh',
                   overflow: 'auto',
                   boxShadow: '0 40px 100px rgba(9,34,36,.4)',
-                  padding: '26px 28px',
+                  padding: '28px 28px',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -3044,7 +3044,7 @@ export default class Viagem extends Tela {
                 <div style={{ fontSize: '13px', color: 'var(--texto-sec)', marginTop: '4px', lineHeight: '1.55' }}>{v.mSub}</div>
                 {v.mMensagem ? (
                   <>
-                    <div style={{ marginTop: '14px', background: '#e7f1ec', borderRadius: '16px', padding: '16px' }}>
+                    <div style={{ marginTop: '16px', background: '#e7f1ec', borderRadius: '16px', padding: '16px' }}>
                       <div
                         style={{
                           background: 'var(--painel)',
@@ -3102,7 +3102,7 @@ export default class Viagem extends Tela {
                   <>
                     <div
                       style={{
-                        marginTop: '14px',
+                        marginTop: '16px',
                         height: '300px',
                         borderRadius: '16px',
                         background: v.fotoBg,
@@ -3177,7 +3177,7 @@ export default class Viagem extends Tela {
                         </Fragment>
                       ))}
                     </div>
-                    <div style={{ fontSize: '12px', fontWeight: '800', letterSpacing: '.6px', color: 'var(--texto-2)', marginTop: '14px' }}>
+                    <div style={{ fontSize: '12px', fontWeight: '800', letterSpacing: '.6px', color: 'var(--texto-2)', marginTop: '16px' }}>
                       MOTIVO (O MOTORISTA LÊ ISTO NO LINK)
                     </div>
                     <textarea
@@ -3197,7 +3197,7 @@ export default class Viagem extends Tela {
                         outline: 'none',
                       }}
                     ></textarea>
-                    <div style={{ display: 'flex', gap: '8px', marginTop: '14px', justifyContent: 'flex-end' }}>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
                       <span role="button" tabIndex={0}
                         onClick={v.fecharModal}
                         style={{
@@ -3256,7 +3256,7 @@ export default class Viagem extends Tela {
                         {' de 9'}
                       </span>
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '14px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '16px' }}>
                       <div>
                         <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)' }}>1. Regra liberada</div>
                         <div style={{ fontSize: '14px', fontWeight: '700', marginTop: '4px' }}>{v.libRegra}</div>
@@ -3492,7 +3492,7 @@ export default class Viagem extends Tela {
                         </div>
                       </div>
                     </div>
-                    <div style={{ display: 'flex', gap: '8px', marginTop: '18px', justifyContent: 'flex-end' }}>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '20px', justifyContent: 'flex-end' }}>
                       <span role="button" tabIndex={0}
                         onClick={v.fecharModal}
                         style={{
@@ -3527,7 +3527,7 @@ export default class Viagem extends Tela {
                 ) : null}
                 {v.mRegistro ? (
                   <>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '14px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '16px' }}>
                       {(Array.isArray(v.regCampos) ? v.regCampos : []).map((rc, $index) => (
                         <Fragment key={$index}>
                           <div
@@ -3572,7 +3572,7 @@ export default class Viagem extends Tela {
                         </Fragment>
                       ))}
                     </div>
-                    <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '14px' }}>
+                    <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '16px' }}>
                       MOTIVO (MÍNIMO 15 CARACTERES)
                     </div>
                     <textarea
@@ -3591,7 +3591,7 @@ export default class Viagem extends Tela {
                         resize: 'vertical',
                       }}
                     ></textarea>
-                    <div style={{ display: 'flex', gap: '8px', marginTop: '14px', justifyContent: 'flex-end' }}>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
                       <span role="button" tabIndex={0}
                         onClick={v.fecharModal}
                         style={{
@@ -3626,7 +3626,7 @@ export default class Viagem extends Tela {
                 ) : null}
                 {v.mRegularizar ? (
                   <>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '14px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '16px' }}>
                       {(Array.isArray(v.regOpcoes) ? v.regOpcoes : []).map((ro, $index) => (
                         <Fragment key={$index}>
                           <div role="button" tabIndex={0}
@@ -3635,7 +3635,7 @@ export default class Viagem extends Tela {
                               border: `1.5px solid ${ro?.bd ?? ''}`,
                               background: ro?.bg,
                               borderRadius: '15px',
-                              padding: '12px 14px',
+                              padding: '12px 16px',
                               cursor: ro?.cur,
                               opacity: ro?.op,
                             }}
@@ -3649,7 +3649,7 @@ export default class Viagem extends Tela {
                     </div>
                     {v.regA ? (
                       <>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '14px' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '16px' }}>
                           <div>
                             <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)' }}>Inspetor independente</div>
                             <input
@@ -3733,7 +3733,7 @@ export default class Viagem extends Tela {
                       placeholder="Buscar por placa ou nome do transportador"
                       style={{
                         width: '100%',
-                        marginTop: '14px',
+                        marginTop: '16px',
                         border: '1px solid var(--borda-campo)',
                         borderRadius: '12px',
                         padding: '10px 12px',
@@ -3803,7 +3803,7 @@ export default class Viagem extends Tela {
                         outline: 'none',
                       }}
                     />
-                    <div style={{ display: 'flex', gap: '8px', marginTop: '14px', justifyContent: 'flex-end' }}>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
                       <span role="button" tabIndex={0}
                         onClick={v.fecharModal}
                         style={{
@@ -3838,7 +3838,7 @@ export default class Viagem extends Tela {
                 ) : null}
                 {v.mLimpeza ? (
                   <>
-                    <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '14px' }}>COMPARTIMENTO</div>
+                    <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '16px' }}>COMPARTIMENTO</div>
                     <div style={{ display: 'flex', gap: '7px', flexWrap: 'wrap', marginTop: '6px' }}>
                       {(Array.isArray(v.limpComps) ? v.limpComps : []).map((lc, $index) => (
                         <Fragment key={$index}>
@@ -3912,7 +3912,7 @@ export default class Viagem extends Tela {
                         fontFamily: "'Spline Sans Mono',monospace",
                       }}
                     />
-                    <div style={{ display: 'flex', gap: '8px', marginTop: '14px', justifyContent: 'flex-end' }}>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
                       <span role="button" tabIndex={0}
                         onClick={v.fecharModal}
                         style={{
@@ -3947,7 +3947,7 @@ export default class Viagem extends Tela {
                 ) : null}
                 {v.mOcorrencia ? (
                   <>
-                    <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '14px' }}>TIPO</div>
+                    <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '16px' }}>TIPO</div>
                     <div style={{ display: 'flex', gap: '7px', flexWrap: 'wrap', marginTop: '6px' }}>
                       {(Array.isArray(v.ocTipos) ? v.ocTipos : []).map((ot, $index) => (
                         <Fragment key={$index}>
@@ -4008,7 +4008,7 @@ export default class Viagem extends Tela {
                         resize: 'vertical',
                       }}
                     ></textarea>
-                    <div style={{ display: 'flex', gap: '8px', marginTop: '14px', justifyContent: 'flex-end' }}>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
                       <span role="button" tabIndex={0}
                         onClick={v.fecharModal}
                         style={{
@@ -4043,7 +4043,7 @@ export default class Viagem extends Tela {
                 ) : null}
                 {v.mRetificar ? (
                   <>
-                    <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '14px' }}>FATO A CORRIGIR</div>
+                    <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '16px' }}>FATO A CORRIGIR</div>
                     <div style={{ display: 'flex', gap: '7px', marginTop: '6px' }}>
                       {(Array.isArray(v.retCampos) ? v.retCampos : []).map((rt, $index) => (
                         <Fragment key={$index}>
@@ -4115,7 +4115,7 @@ export default class Viagem extends Tela {
                         outline: 'none',
                       }}
                     />
-                    <div style={{ display: 'flex', gap: '8px', marginTop: '14px', justifyContent: 'flex-end' }}>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
                       <span role="button" tabIndex={0}
                         onClick={v.fecharModal}
                         style={{
@@ -4150,7 +4150,7 @@ export default class Viagem extends Tela {
                 ) : null}
                 {v.mCancelar ? (
                   <>
-                    <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '14px' }}>
+                    <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '16px' }}>
                       MOTIVO (MÍNIMO 15 CARACTERES)
                     </div>
                     <textarea
@@ -4169,7 +4169,7 @@ export default class Viagem extends Tela {
                         resize: 'vertical',
                       }}
                     ></textarea>
-                    <div style={{ display: 'flex', gap: '8px', marginTop: '14px', justifyContent: 'flex-end' }}>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
                       <span role="button" tabIndex={0}
                         onClick={v.fecharModal}
                         style={{

@@ -267,7 +267,7 @@ export default class Configuracoes extends Tela {
     return (
       <div style={{ minHeight: '100%' }} data-screen-label="Configurações" data-tela="Configuracoes">
         <div style={{ flex: '1', display: 'flex', flexDirection: 'column', padding: '24px 32px 48px', gap: '16px', minWidth: '0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <div>
               <div style={{ fontSize: '24px', fontWeight: '800' }}>Configurações</div>
               <div style={{ fontSize: '14px', color: 'var(--texto-sec)', marginTop: '2px' }}>
@@ -319,7 +319,7 @@ export default class Configuracoes extends Tela {
                   background: 'var(--painel)',
                   border: '1px solid var(--borda)',
                   borderRadius: '20px',
-                  padding: '20px 22px',
+                  padding: '20px 24px',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -449,7 +449,7 @@ export default class Configuracoes extends Tela {
                   background: 'var(--painel)',
                   border: '1px solid var(--borda)',
                   borderRadius: '20px',
-                  padding: '20px 22px',
+                  padding: '20px 24px',
                 }}
               >
                 <div style={{ fontSize: '16px', fontWeight: '800' }}>Alçadas de liberação</div>
@@ -459,7 +459,7 @@ export default class Configuracoes extends Tela {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '10px', marginTop: '12px' }}>
                   {(Array.isArray(v.alcadas) ? v.alcadas : []).map((al, $index) => (
                     <Fragment key={$index}>
-                      <div style={{ border: '1px solid var(--borda-suave)', borderRadius: '15px', padding: '13px 15px' }}>
+                      <div style={{ border: '1px solid var(--borda-suave)', borderRadius: '15px', padding: '12px 16px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <span style={{ width: '9px', height: '9px', borderRadius: '99px', background: al?.dot }}></span>
                           <b style={{ fontSize: '14px' }}>{al?.n}</b>
@@ -479,7 +479,7 @@ export default class Configuracoes extends Tela {
                   background: 'var(--painel)',
                   border: '1px solid var(--borda)',
                   borderRadius: '20px',
-                  padding: '20px 22px',
+                  padding: '20px 24px',
                 }}
               >
                 <div style={{ fontSize: '16px', fontWeight: '800' }}>Regras</div>
@@ -541,14 +541,14 @@ export default class Configuracoes extends Tela {
                   background: 'var(--painel)',
                   border: '1px solid var(--borda)',
                   borderRadius: '20px',
-                  padding: '20px 22px',
+                  padding: '20px 24px',
                 }}
               >
                 <div style={{ fontSize: '16px', fontWeight: '800' }}>Modelos</div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '12px' }}>
                   {(Array.isArray(v.modelos) ? v.modelos : []).map((md, $index) => (
                     <Fragment key={$index}>
-                      <div style={{ border: '1px solid var(--borda-suave)', borderRadius: '15px', padding: '13px 15px' }}>
+                      <div style={{ border: '1px solid var(--borda-suave)', borderRadius: '15px', padding: '12px 16px' }}>
                         <div style={{ display: 'flex', alignItems: 'center' }}>
                           <b style={{ fontSize: '14px' }}>{md?.n}</b>
                           <span style={{ marginLeft: '8px', fontSize: '12px', color: 'var(--texto-apagado)' }}>{md?.v}</span>
@@ -575,7 +575,7 @@ export default class Configuracoes extends Tela {
                   background: 'var(--painel)',
                   border: '1px solid var(--borda)',
                   borderRadius: '20px',
-                  padding: '20px 22px',
+                  padding: '20px 24px',
                 }}
               >
                 <div style={{ fontSize: '16px', fontWeight: '800' }}>LGPD e retenção</div>
@@ -598,7 +598,7 @@ export default class Configuracoes extends Tela {
                   background: 'var(--painel)',
                   border: '1px solid var(--borda)',
                   borderRadius: '20px',
-                  padding: '20px 22px',
+                  padding: '20px 24px',
                 }}
               >
                 <div style={{ fontSize: '16px', fontWeight: '800' }}>Integrações</div>
@@ -633,7 +633,7 @@ export default class Configuracoes extends Tela {
                   background: 'var(--painel)',
                   border: '1px solid var(--borda)',
                   borderRadius: '20px',
-                  padding: '20px 22px',
+                  padding: '20px 24px',
                 }}
               >
                 <div style={{ fontSize: '16px', fontWeight: '800' }}>Dados do protótipo</div>
@@ -686,7 +686,7 @@ export default class Configuracoes extends Tela {
                   maxHeight: '90vh',
                   overflow: 'auto',
                   boxShadow: '0 40px 100px rgba(9,34,36,.4)',
-                  padding: '26px 28px',
+                  padding: '28px 28px',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -712,7 +712,7 @@ export default class Configuracoes extends Tela {
                 <div style={{ fontSize: '13px', color: 'var(--texto-sec)', marginTop: '4px', lineHeight: '1.55' }}>{v.mSub}</div>
                 {v.mConvite ? (
                   <>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '14px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '16px' }}>
                       <div>
                         <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)' }}>Nome</div>
                         <input
