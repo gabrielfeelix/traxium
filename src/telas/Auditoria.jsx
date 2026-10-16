@@ -521,7 +521,7 @@ export default class Auditoria extends Tela {
                   <circle cx="7" cy="7" r="4.6"></circle>
                   <line x1="10.5" y1="10.5" x2="13.5" y2="13.5"></line>
                 </svg>
-                <input
+                <input aria-label="Placa, CT-e, NF ou ordem. QWM 4H57"
                   value={v.q ?? ''}
                   onChange={v.onQ}
                   data-tx-rastrear=""
@@ -618,7 +618,7 @@ export default class Auditoria extends Tela {
                       <div style={{ borderTop: '1px solid var(--superficie-2)', marginTop: '4px', padding: '10px 11px 6px' }}>
                         <div style={{ fontSize: '11px', fontWeight: '800', letterSpacing: '.8px', color: 'var(--texto-apagado)' }}>DATAS EXATAS</div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '7px' }}>
-                          <input
+                          <input aria-label="DD/MM/AAAA"
                             value={v.deTxt ?? ''}
                             onChange={v.onDeTxt}
                             data-tx-de=""
@@ -635,7 +635,7 @@ export default class Auditoria extends Tela {
                             }}
                           />
                           <span style={{ fontSize: '12px', color: 'var(--texto-apagado)' }}>a</span>
-                          <input
+                          <input aria-label="DD/MM/AAAA"
                             value={v.ateTxt ?? ''}
                             onChange={v.onAteTxt}
                             data-tx-ate=""

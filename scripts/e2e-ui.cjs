@@ -43,6 +43,26 @@ const ok = (c, m) => { console.log((c ? 'ok    ' : 'FALHOU ') + m); if (!c) falh
   ok(alvo && alvo.height >= 32, 'ações em texto têm alvo de pelo menos 32 px (' + (alvo && Math.round(alvo.height)) + ')');
   await pg.screenshot({ path: out + '/ui-hoje.png' });
 
+  // Hoje: PDF da ordem que não é PDF diz o porquê
+  await pg.click('[data-tx-nova-viagem]'); await pg.waitForTimeout(250);
+  await pg.setInputFiles('input[type="file"][accept=".pdf"]', { name: 'ordem.docx', mimeType: 'application/octet-stream', buffer: Buffer.from('x') });
+  await pg.waitForTimeout(150);
+  ok(/"ordem\.docx" não é PDF/.test(await texto('[data-tx-arquivo-erro]')), 'Nova viagem: arquivo que não é PDF mostra o erro junto da área de envio');
+  await pg.keyboard.press('Escape'); await pg.waitForTimeout(150);
+
+  // ---------------------------------------------------------------- Viagens
+  await ir('viagens');
+  ok(!!(await pg.getAttribute('[data-tx-busca]', 'aria-label')), 'Viagens: busca da lista tem nome acessível');
+  ok((await pg.evaluate(() => getComputedStyle(document.querySelector('[data-tx-linha]')).cursor)) === 'pointer' && (await pg.locator('a[data-tx-linha]').count()) > 0, 'Viagens: a linha inteira é link para a viagem');
+  await ir('viagens?visao=sem_cte&conciliar=1', 1300);
+  await pg.setInputFiles('[data-tx-modal="conciliar"] input[type="file"]', { name: 'cte.pdf', mimeType: 'application/pdf', buffer: Buffer.from('x') });
+  await pg.waitForTimeout(150);
+  ok(/"cte\.pdf" não é planilha nem XML de CT-e/.test(await texto('[data-tx-arquivo-erro]')), 'Conciliar: formato errado explica o que enviar');
+  ok((await pg.getAttribute('[data-tx-modal="conciliar"] [aria-label="Fechar"]', 'role')) === 'button', 'Conciliar: o ✕ tem nome (Fechar)');
+  await pg.focus('[data-tx-modal="conciliar"] input[type="file"]');
+  ok(await pg.evaluate(() => document.activeElement.type === 'file'), 'Conciliar: o seletor de arquivo é alcançável pelo teclado');
+  await pg.screenshot({ path: out + '/ui-viagens-conciliar.png' });
+
   ok(erros.length === 0, 'sem erro de JavaScript (' + erros.join(' | ') + ')');
   await browser.close();
   console.log(falhas ? falhas + ' falha(s)' : 'Revisão de UI: tudo certo');

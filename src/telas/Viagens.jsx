@@ -292,15 +292,13 @@ export default class Viagens extends Tela {
           onClick: () => set({ tipo: k }),
         })),
         temFiliais: u.filiais.length > 1,
-        filiais: [[null, 'Todas as filiais']]
-          .concat(u.filiais.map((f) => [f, TX.filial(f).nome]))
-          .map(([k, n]) => ({
-            k: k || 'todas',
-            n,
-            fw: (s.filial || null) === k ? '800' : '600',
-            ckD: (s.filial || null) === k ? 'block' : 'none',
-            onClick: () => set({ filial: k }),
-          })),
+        filiais: [[null, 'Todas as filiais']].concat(u.filiais.map((f) => [f, TX.filial(f).nome])).map(([k, n]) => ({
+          k: k || 'todas',
+          n,
+          fw: (s.filial || null) === k ? '800' : '600',
+          ckD: (s.filial || null) === k ? 'block' : 'none',
+          onClick: () => set({ filial: k }),
+        })),
         ativos,
         filtroAtivo,
         limpar: () => this.setState(Object.assign(this.entrarVisao(vi.k), { busca: '' })),
@@ -475,9 +473,13 @@ export default class Viagens extends Tela {
       arqBd: lote ? 'var(--primario)' : 'var(--borda-forte)',
       arqBg: lote ? 'var(--primario-fraco)' : '#fff',
       arqTitulo: lote ? 'Arquivo: ' + lote.arquivo : 'Escolher arquivo do TMS',
+      arqErro: s.arqErro,
       onArquivo: (e) => {
         const f = e.target.files && e.target.files[0];
-        if (f) {
+        const erro = TX.ui.conferirArquivo(f, ['.xml', '.csv', '.xlsx', '.zip'], 'planilha nem XML de CT-e');
+        e.target.value = '';
+        this.setState({ arqErro: erro });
+        if (f && !erro) {
           const l = TX.loteCTe();
           l.arquivo = f.name;
           this.setState({ lote: l });
@@ -532,7 +534,9 @@ export default class Viagens extends Tela {
               <div style={{ fontSize: '14px', color: 'var(--texto-sec)', marginTop: '2px' }}>{v.subtitulo}</div>
             </div>
             <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div role="button" tabIndex={0}
+              <div
+                role="button"
+                tabIndex={0}
                 onClick={v.exportar}
                 data-tx-exportar=""
                 title="Baixa a lista com os filtros da tela"
@@ -581,7 +585,9 @@ export default class Viagens extends Tela {
             >
               {(Array.isArray(v.abas) ? v.abas : []).map((ab, $index) => (
                 <Fragment key={$index}>
-                  <div role="button" tabIndex={0}
+                  <div
+                    role="button"
+                    tabIndex={0}
                     onClick={ab?.onClick}
                     data-tx-visao={ab?.k}
                     style={{
@@ -614,7 +620,9 @@ export default class Viagens extends Tela {
                     >
                       {ab?.q}
                     </span>
-                    <span role="button" tabIndex={0}
+                    <span
+                      role="button"
+                      tabIndex={0}
                       onClick={ab?.remover}
                       data-tx-apagar-visao={ab?.k}
                       title="Apagar esta visão"
@@ -666,6 +674,7 @@ export default class Viagens extends Tela {
                   <line x1="10.5" y1="10.5" x2="13.5" y2="13.5"></line>
                 </svg>
                 <input
+                  aria-label="Filtrar a lista: placa, CT-e, NF, ordem ou motorista"
                   value={v.busca ?? ''}
                   onChange={v.onBusca}
                   data-tx-busca=""
@@ -674,7 +683,9 @@ export default class Viagens extends Tela {
                 />
               </div>
               <div data-tx-pop="" style={{ position: 'relative' }}>
-                <div role="button" tabIndex={0}
+                <div
+                  role="button"
+                  tabIndex={0}
                   onClick={v.abrirPeriodo}
                   data-tx-dd="periodo"
                   style={{
@@ -725,7 +736,9 @@ export default class Viagens extends Tela {
                     >
                       {(Array.isArray(v.periodos) ? v.periodos : []).map((pd, $index) => (
                         <Fragment key={$index}>
-                          <div role="button" tabIndex={0}
+                          <div
+                            role="button"
+                            tabIndex={0}
                             onClick={pd?.onClick}
                             data-tx-periodo={pd?.k}
                             style={{
@@ -764,7 +777,9 @@ export default class Viagens extends Tela {
               {v.temSituacao ? (
                 <>
                   <div data-tx-pop="" style={{ position: 'relative' }}>
-                    <div role="button" tabIndex={0}
+                    <div
+                      role="button"
+                      tabIndex={0}
                       onClick={v.abrirSituacao}
                       data-tx-dd="situacao"
                       style={{
@@ -816,7 +831,9 @@ export default class Viagens extends Tela {
                         >
                           {(Array.isArray(v.situacoes) ? v.situacoes : []).map((st, $index) => (
                             <Fragment key={$index}>
-                              <div role="button" tabIndex={0}
+                              <div
+                                role="button"
+                                tabIndex={0}
                                 onClick={st?.onClick}
                                 data-tx-situacao={st?.k}
                                 style={{
@@ -869,7 +886,9 @@ export default class Viagens extends Tela {
                 </>
               ) : null}
               <div data-tx-pop="" style={{ position: 'relative' }}>
-                <div role="button" tabIndex={0}
+                <div
+                  role="button"
+                  tabIndex={0}
                   onClick={v.abrirFiltros}
                   data-tx-dd="filtros"
                   style={{
@@ -928,13 +947,21 @@ export default class Viagens extends Tela {
                       }}
                     >
                       <div
-                        style={{ fontSize: '11px', fontWeight: '800', letterSpacing: '.8px', color: 'var(--texto-apagado)', padding: '8px 11px 4px' }}
+                        style={{
+                          fontSize: '11px',
+                          fontWeight: '800',
+                          letterSpacing: '.8px',
+                          color: 'var(--texto-apagado)',
+                          padding: '8px 11px 4px',
+                        }}
                       >
                         TIPO
                       </div>
                       {(Array.isArray(v.tipos) ? v.tipos : []).map((tp, $index) => (
                         <Fragment key={$index}>
-                          <div role="button" tabIndex={0}
+                          <div
+                            role="button"
+                            tabIndex={0}
                             onClick={tp?.onClick}
                             data-tx-tipo={tp?.k}
                             style={{
@@ -983,7 +1010,9 @@ export default class Viagens extends Tela {
                           </div>
                           {(Array.isArray(v.filiais) ? v.filiais : []).map((fl, $index) => (
                             <Fragment key={$index}>
-                              <div role="button" tabIndex={0}
+                              <div
+                                role="button"
+                                tabIndex={0}
                                 onClick={fl?.onClick}
                                 data-tx-filial-chip={fl?.k}
                                 style={{
@@ -1023,7 +1052,9 @@ export default class Viagens extends Tela {
               </div>
               {(Array.isArray(v.ativos) ? v.ativos : []).map((at, $index) => (
                 <Fragment key={$index}>
-                  <span role="button" tabIndex={0}
+                  <span
+                    role="button"
+                    tabIndex={0}
                     onClick={at?.onClick}
                     title="Tirar este filtro"
                     style={{
@@ -1050,7 +1081,9 @@ export default class Viagens extends Tela {
                 {v.filtroAtivo ? (
                   <>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                      <span role="button" tabIndex={0}
+                      <span
+                        role="button"
+                        tabIndex={0}
                         onClick={v.limpar}
                         data-tx-limpar=""
                         style={{ fontSize: '13px', fontWeight: '700', color: 'var(--texto-sec)', cursor: 'pointer', whiteSpace: 'nowrap' }}
@@ -1060,10 +1093,18 @@ export default class Viagens extends Tela {
                       </span>
                       <div data-tx-pop="" style={{ position: 'relative' }}>
                         {' '}
-                        <span role="button" tabIndex={0}
+                        <span
+                          role="button"
+                          tabIndex={0}
                           onClick={v.abrirSalvar}
                           data-tx-salvar-visao=""
-                          style={{ fontSize: '13px', fontWeight: '800', color: 'var(--primario-2)', cursor: 'pointer', whiteSpace: 'nowrap' }}
+                          style={{
+                            fontSize: '13px',
+                            fontWeight: '800',
+                            color: 'var(--primario-2)',
+                            cursor: 'pointer',
+                            whiteSpace: 'nowrap',
+                          }}
                           className="tx-h76d8d79"
                         >
                           Salvar como visão
@@ -1089,6 +1130,7 @@ export default class Viagens extends Tela {
                                 Vira uma aba acima da lista, com estes filtros. Fica salva neste navegador.
                               </div>
                               <input
+                                aria-label="Nome da visão"
                                 value={v.nomeVisao ?? ''}
                                 onChange={v.onNomeVisao}
                                 onKeyDown={v.teclaVisao}
@@ -1105,7 +1147,9 @@ export default class Viagens extends Tela {
                                 }}
                               />
                               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-                                <span role="button" tabIndex={0}
+                                <span
+                                  role="button"
+                                  tabIndex={0}
                                   onClick={v.confirmarVisao}
                                   data-tx-confirmar-visao=""
                                   style={{
@@ -1129,7 +1173,14 @@ export default class Viagens extends Tela {
                     </div>
                   </>
                 ) : null}
-                <span style={{ fontSize: '13px', color: 'var(--texto-apagado)', whiteSpace: 'nowrap', fontFamily: "'Spline Sans Mono',monospace" }}>
+                <span
+                  style={{
+                    fontSize: '13px',
+                    color: 'var(--texto-apagado)',
+                    whiteSpace: 'nowrap',
+                    fontFamily: "'Spline Sans Mono',monospace",
+                  }}
+                >
                   {v.contagem}
                 </span>
               </div>
@@ -1151,7 +1202,9 @@ export default class Viagens extends Tela {
                   <div style={{ fontSize: '13px', color: 'var(--texto-2)', lineHeight: '1.5', flex: '1' }}>{v.dica}</div>
                   {v.temDicaAcao ? (
                     <>
-                      <span role="button" tabIndex={0}
+                      <span
+                        role="button"
+                        tabIndex={0}
                         onClick={v.dicaAcao}
                         data-tx-conciliar=""
                         style={{
@@ -1266,7 +1319,15 @@ export default class Viagens extends Tela {
                       {r?.produto}
                       <span style={{ fontWeight: '600', color: 'var(--texto-apagado)', fontSize: '12px' }}> {r?.assegTxt}</span>
                     </div>
-                    <div style={{ fontSize: '12px', color: 'var(--texto-sec)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <div
+                      style={{
+                        fontSize: '12px',
+                        color: 'var(--texto-sec)',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
                       {r?.rota}
                     </div>
                   </div>
@@ -1277,7 +1338,13 @@ export default class Viagens extends Tela {
                       {r?.transp}
                     </div>
                     <div
-                      style={{ fontSize: '12px', color: 'var(--texto-apagado)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                      style={{
+                        fontSize: '12px',
+                        color: 'var(--texto-apagado)',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
                     >
                       {r?.transpSub}
                     </div>
@@ -1337,7 +1404,9 @@ export default class Viagens extends Tela {
               {v.temPaginacao ? (
                 <>
                   <div style={{ marginLeft: 'auto', display: 'flex', gap: '5px', alignItems: 'center' }}>
-                    <span role="button" tabIndex={0}
+                    <span
+                      role="button"
+                      tabIndex={0}
                       onClick={v.pagAnt}
                       style={{ fontSize: '13px', fontWeight: '700', color: v.pagAntC, cursor: v.pagAntCur, padding: '4px 8px' }}
                     >
@@ -1345,7 +1414,9 @@ export default class Viagens extends Tela {
                     </span>
                     {(Array.isArray(v.paginas) ? v.paginas : []).map((pg, $index) => (
                       <Fragment key={$index}>
-                        <span role="button" tabIndex={0}
+                        <span
+                          role="button"
+                          tabIndex={0}
                           onClick={pg?.onClick}
                           style={{
                             fontFamily: "'Spline Sans Mono',monospace",
@@ -1367,7 +1438,9 @@ export default class Viagens extends Tela {
                         </span>
                       </Fragment>
                     ))}
-                    <span role="button" tabIndex={0}
+                    <span
+                      role="button"
+                      tabIndex={0}
                       onClick={v.pagProx}
                       style={{ fontSize: '13px', fontWeight: '700', color: v.pagProxC, cursor: v.pagProxCur, padding: '4px 8px' }}
                     >
@@ -1395,7 +1468,9 @@ export default class Viagens extends Tela {
                 padding: '32px',
               }}
             >
-              <div role="dialog" aria-modal="true"
+              <div
+                role="dialog"
+                aria-modal="true"
                 onClick={v.pararClique}
                 data-tx-modal="conciliar"
                 style={{
@@ -1410,7 +1485,11 @@ export default class Viagens extends Tela {
               >
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <div style={{ fontSize: '16px', fontWeight: '800' }}>Conciliar CT-e e NF em lote</div>
-                  <span role="button" tabIndex={0}
+                  <span
+                    role="button"
+                    aria-label="Fechar"
+                    title="Fechar"
+                    tabIndex={0}
                     onClick={v.fecharModal}
                     style={{
                       marginLeft: 'auto',
@@ -1445,15 +1524,26 @@ export default class Viagens extends Tela {
                     cursor: 'pointer',
                   }}
                 >
-                  <input type="file" accept=".xml,.csv,.xlsx,.zip" onChange={v.onArquivo} style={{ display: 'none' }} />
+                  <input type="file" accept=".xml,.csv,.xlsx,.zip" onChange={v.onArquivo} className="tx-so-leitor" />
                   <div style={{ flex: '1' }}>
                     <div style={{ fontSize: '14px', fontWeight: '800' }}>{v.arqTitulo}</div>
                     <div style={{ fontSize: '12px', color: 'var(--texto-sec)' }}>planilha (.xlsx, .csv) ou XML de CT-e (.xml, .zip)</div>
                   </div>
-                  <span role="button" tabIndex={0} onClick={v.usarExemplo} data-tx-lote-exemplo="" style={{ fontSize: '12px', fontWeight: '800', color: 'var(--primario-2)' }}>
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    onClick={v.usarExemplo}
+                    data-tx-lote-exemplo=""
+                    style={{ fontSize: '12px', fontWeight: '800', color: 'var(--primario-2)' }}
+                  >
                     usar o lote de exemplo
                   </span>
                 </label>
+                {v.arqErro ? (
+                  <div className="tx-erro" role="alert" data-tx-arquivo-erro="">
+                    {v.arqErro}
+                  </div>
+                ) : null}
                 {v.temLote ? (
                   <>
                     <div style={{ marginTop: '16px', border: '1px solid var(--borda-suave)', borderRadius: '14px', overflow: 'hidden' }}>
@@ -1505,7 +1595,9 @@ export default class Viagens extends Tela {
                   </>
                 ) : null}
                 <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
-                  <span role="button" tabIndex={0}
+                  <span
+                    role="button"
+                    tabIndex={0}
                     onClick={v.fecharModal}
                     style={{
                       background: 'var(--superficie-2)',
@@ -1518,7 +1610,9 @@ export default class Viagens extends Tela {
                   >
                     Cancelar
                   </span>
-                  <span role="button" tabIndex={0}
+                  <span
+                    role="button"
+                    tabIndex={0}
                     onClick={v.confirmarConciliar}
                     data-tx-confirmar=""
                     style={{

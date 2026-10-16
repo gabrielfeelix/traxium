@@ -736,7 +736,7 @@ export default class LinkDaViagem extends Tela {
                 <div style={{ background: 'var(--painel)', borderRadius: '20px', padding: '20px' }}>
                   <div style={{ fontSize: '17px', fontWeight: '800' }}>É você mesmo?</div>
                   <div style={{ fontSize: '13.5px', color: 'var(--texto-sec)', marginTop: '4px' }}>Digite os 3 primeiros números do seu CPF.</div>
-                  <input
+                  <input aria-label="000"
                     value={v.cpfIn ?? ''}
                     onChange={v.onCpf}
                     data-tx-campo="cpf"
@@ -906,7 +906,7 @@ export default class LinkDaViagem extends Tela {
                                   }}
                                 />
                               </div>
-                              <input
+                              <input aria-label="soja, adubo, casquinha"
                                 value={tl?.texto ?? ''}
                                 onChange={tl?.onTexto}
                                 data-tx-t3-produto={tl?.key}

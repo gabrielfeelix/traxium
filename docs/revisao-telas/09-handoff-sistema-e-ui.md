@@ -202,3 +202,19 @@ Os três primeiros temas da tabela da seção 5 valem igual para as dez telas; r
 | --- | --- |
 | Peso de uma viagem fica entre 1 e 80 t (rodotrem chega a 74 t de PBT) | Trocar o limite em `pesoOk` |
 | Vencimentos fica completo em Hoje, sem tela própria | Se a lista crescer muito, virar uma visão em Transportadores que inclua fornecedor e frota |
+
+### Etapa 8. Viagens, e campos e arquivos em todas as telas (15/10/2026)
+
+**Problema.** Em Viagens a tabela já estava certa (cabeçalho na mesma grade das linhas, linha inteira é link para a viagem, vazio por visão). O que faltava se repetia nas outras telas: 20 campos tinham só placeholder, sem nome para leitor de tela; sete botões "✕" não tinham nome; os quatro seletores de arquivo (ordem em PDF, lote de CT-e, planilha de transportadores, evidência da liberação) usavam `display:none`, fora do alcance do Tab, e aceitavam qualquer arquivo sem dizer nada.
+
+**O que mudou.**
+
+1. Campo sem rótulo visível ganhou `aria-label` com o texto do placeholder; "✕" ganhou nome "Fechar".
+2. Seletor de arquivo escondido só visualmente (`tx-so-leitor`): entra no Tab e acende a área de envio no foco.
+3. `TX.ui.conferirArquivo` confere formato, arquivo vazio e tamanho (limite de 20 MB). O erro aparece logo abaixo da área de envio, diz o nome do arquivo e o que enviar ("cte.pdf" não é planilha nem XML de CT-e. Envie XML, CSV, XLSX ou ZIP.). Evidência da liberação passa a aceitar PDF e foto.
+
+**Teste.** `e2e-ui.cjs`: PDF errado na Nova viagem, formato errado no lote, nome da busca, linha como link, nome do ✕, seletor de arquivo pelo teclado. Bateria inteira passa.
+
+| Premissa | O que muda se a resposta vier diferente |
+| --- | --- |
+| Limite de 20 MB por arquivo | Ajustar em `conferirArquivo` quando houver backend com limite real |

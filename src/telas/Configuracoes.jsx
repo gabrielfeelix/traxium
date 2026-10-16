@@ -691,7 +691,7 @@ export default class Configuracoes extends Tela {
               >
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <div style={{ fontSize: '16px', fontWeight: '800' }}>{v.mTitulo}</div>
-                  <span role="button" tabIndex={0}
+                  <span role="button" aria-label="Fechar" title="Fechar" tabIndex={0}
                     onClick={v.fecharModal}
                     style={{
                       marginLeft: 'auto',
@@ -732,7 +732,7 @@ export default class Configuracoes extends Tela {
                       </div>
                       <div>
                         <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)' }}>E-mail</div>
-                        <input
+                        <input aria-label="nome@transrural.com.br"
                           value={v.cvEmail ?? ''}
                           onChange={v.onCvEmail}
                           data-tx-campo="email"
@@ -816,7 +816,7 @@ export default class Configuracoes extends Tela {
                 ) : null}
                 {v.mTemMotivo ? (
                   <>
-                    <input
+                    <input aria-label="Motivo (mínimo 10 caracteres)"
                       value={v.fMotivo ?? ''}
                       onChange={v.onMotivo}
                       data-tx-campo="motivo"

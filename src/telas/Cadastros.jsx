@@ -604,7 +604,7 @@ export default class Cadastros extends Tela {
                         <circle cx="7" cy="7" r="4.6"></circle>
                         <line x1="10.5" y1="10.5" x2="13.5" y2="13.5"></line>
                       </svg>
-                      <input
+                      <input aria-label="Nome popular, comercial ou em inglês"
                         value={v.pq ?? ''}
                         onChange={v.onPq}
                         data-tx-busca=""
@@ -852,7 +852,7 @@ export default class Cadastros extends Tela {
                     <div style={{ fontSize: '13px', color: 'var(--texto-sec)', marginTop: '3px', lineHeight: '1.5' }}>
                       Para carga que não está na base. Até a classificação, viagem com ela como carga anterior fica travada.
                     </div>
-                    <input
+                    <input aria-label="escória de alto-forno"
                       value={v.pcTexto ?? ''}
                       onChange={v.onPcTexto}
                       data-tx-campo="classificar"
@@ -1204,7 +1204,7 @@ export default class Cadastros extends Tela {
               >
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <div style={{ fontSize: '16px', fontWeight: '800' }}>{v.mTitulo}</div>
-                  <span role="button" tabIndex={0}
+                  <span role="button" aria-label="Fechar" title="Fechar" tabIndex={0}
                     onClick={v.fecharModal}
                     style={{
                       marginLeft: 'auto',

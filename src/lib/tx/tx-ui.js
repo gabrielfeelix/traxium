@@ -198,6 +198,20 @@ import TX from './tx-dados';
     };
   }
 
+  // Arquivo escolhido pelo usuário: formato, vazio e tamanho. Devolve a mensagem de erro, ou ''.
+  function conferirArquivo(f, exts, oque) {
+    if (!f) return '';
+    const nome = f.name || '';
+    const ext = (nome.match(/\.[^.]+$/) || [''])[0].toLowerCase();
+    if (exts && exts.length && !exts.includes(ext)) {
+      const l = exts.map(x => x.slice(1).toUpperCase());
+      return '"' + nome + '" não é ' + oque + '. Envie ' + (l.length > 1 ? l.slice(0, -1).join(', ') + ' ou ' + l[l.length - 1] : l[0]) + '.';
+    }
+    if (f.size === 0) return '"' + nome + '" está vazio.';
+    if (f.size > 20 * 1024 * 1024) return '"' + nome + '" tem ' + Math.round(f.size / 1048576) + ' MB: o limite é 20 MB.';
+    return '';
+  }
+
   // Abre um documento imprimível numa aba nova (exportações do protótipo).
   function exportarDocumento(titulo, html) {
     const w = window.open('', '_blank');
@@ -211,7 +225,7 @@ import TX from './tx-dados';
   }
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 
-  const api = { roteador: null, moldura: false, urlPropria: null, trocarUrl, rolagem, ir, desmontar, abrirTopo, ROTULO_PAPEL, mascaraData, dataIso, avisoData, pedirLiberacao, nomeAlcada, buscaGlobal, tom, tomResultado, TOM, param, lerLS, gravarLS, copiar, montar, avisar, sel, chip, cta, ctaPerigo, base, paginar, exportarDocumento, esc };
+  const api = { conferirArquivo, roteador: null, moldura: false, urlPropria: null, trocarUrl, rolagem, ir, desmontar, abrirTopo, ROTULO_PAPEL, mascaraData, dataIso, avisoData, pedirLiberacao, nomeAlcada, buscaGlobal, tom, tomResultado, TOM, param, lerLS, gravarLS, copiar, montar, avisar, sel, chip, cta, ctaPerigo, base, paginar, exportarDocumento, esc };
   TX.ui = api;
 })();
 

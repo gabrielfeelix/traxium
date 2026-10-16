@@ -593,9 +593,13 @@ export default class Hoje extends Tela {
       pdfSub: s.nPdf
         ? 'Produto, embarcador, destinatário, data e peso preenchidos. Confira abaixo.'
         : 'O caminho mais rápido: o TMS já gerou a ordem, não precisa digitar de novo.',
+      pdfErro: s.pdfErro,
       onPdf: (e) => {
         const f = e.target.files && e.target.files[0];
-        if (f) this.preencherOrdem(f.name);
+        const erro = TX.ui.conferirArquivo(f, ['.pdf'], 'PDF');
+        e.target.value = '';
+        this.setState({ pdfErro: erro });
+        if (f && !erro) this.preencherOrdem(f.name);
       },
       usarOrdemExemplo: (e) => {
         e.preventDefault();
@@ -818,6 +822,7 @@ export default class Hoje extends Tela {
                   <line x1="10.5" y1="10.5" x2="13.5" y2="13.5"></line>
                 </svg>
                 <input
+                  aria-label="Filtrar esta mesa"
                   value={v.busca ?? ''}
                   onChange={v.onBusca}
                   data-tx-busca=""
@@ -1898,7 +1903,7 @@ export default class Hoje extends Tela {
                         cursor: 'pointer',
                       }}
                     >
-                      <input type="file" accept=".pdf" onChange={v.onPdf} style={{ display: 'none' }} />
+                      <input type="file" accept=".pdf" onChange={v.onPdf} className="tx-so-leitor" />
                       <span
                         style={{
                           width: '40px',
@@ -1940,6 +1945,11 @@ export default class Hoje extends Tela {
                         usar ordem de exemplo
                       </span>
                     </label>
+                    {v.pdfErro ? (
+                      <div className="tx-erro" role="alert" data-tx-arquivo-erro="">
+                        {v.pdfErro}
+                      </div>
+                    ) : null}
                     <div style={{ fontSize: '12px', color: 'var(--texto-apagado)', marginTop: '8px' }}>ou preencha o mínimo:</div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '8px' }}>
                       <div style={{ position: 'relative' }}>
@@ -2230,6 +2240,7 @@ export default class Hoje extends Tela {
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '10px' }}>
                                   <Campo id="nv-cm-nome" rotulo="Nome do motorista" erro={v.eCmNome}>
                                     <input
+                                      aria-label="Como no documento"
                                       value={v.cmNome ?? ''}
                                       onChange={v.onCmNome}
                                       data-tx-campo="cm-nome"
@@ -2247,6 +2258,7 @@ export default class Hoje extends Tela {
                                   </Campo>
                                   <Campo id="nv-cm-tel" rotulo="Celular com DDD" erro={v.eCmTel}>
                                     <input
+                                      aria-label="(66) 99999-0000"
                                       inputMode="tel"
                                       value={v.cmTel ?? ''}
                                       onChange={v.onCmTel}
@@ -2265,6 +2277,7 @@ export default class Hoje extends Tela {
                                   </Campo>
                                   <Campo id="nv-cm-cpf" rotulo="CPF (opcional)">
                                     <input
+                                      aria-label="000.000.000-00"
                                       inputMode="numeric"
                                       value={v.cmCpf ?? ''}
                                       onChange={v.onCmCpf}
@@ -2284,6 +2297,7 @@ export default class Hoje extends Tela {
                                   </Campo>
                                   <Campo id="nv-cm-placas" rotulo="Placas do conjunto" erro={v.eCmPlacas}>
                                     <input
+                                      aria-label="RCB 9M15, RCB 9M16"
                                       value={v.cmPlacas ?? ''}
                                       onChange={v.onCmPlacas}
                                       data-tx-campo="cm-placas"
