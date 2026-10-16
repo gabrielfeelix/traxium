@@ -46,3 +46,6 @@ next-env.d.ts
 # lixo do WSL e vinculos locais da Vercel
 *:Zone.Identifier
 .vercel.4yu-antigo/
+
+# protótipo .dc.html copiado no build (scripts/copiar-prototipo.mjs)
+/public/prototipo

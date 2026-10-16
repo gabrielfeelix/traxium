@@ -3,6 +3,8 @@
 Atualizado em 15/10/2026, ao fim da segunda rodada (quatro telas restantes e pente fino). Ponto de entrada para quem continuar. Substitui as versões de 08/10 e de 14/10 deste arquivo. As regras visuais de `SaaS moderno estilo Dribbble/CLAUDE.md` e `SaaS moderno estilo Dribbble/HANDOFF.md` (v1) continuam valendo.
 
 > **Próxima etapa (15/10/2026):** virar um sistema com moldura única e revisar UI e UX página por página. O plano está em `09-handoff-sistema-e-ui.md`; leia este arquivo para o contexto e aquele para o que fazer.
+>
+> **Atualização (15/10/2026, noite):** a moldura única foi feita (etapa 1 em `09-handoff-sistema-e-ui.md`, seção 8). O protótipo v2 agora é o app Next.js da raiz; o `.dc.html` ficou congelado como referência. A seção 2 abaixo já descreve como rodar o app novo; as seções 3 e 4 continuam valendo para entender as telas, que foram convertidas fiéis.
 
 ## 1. Situação
 
@@ -13,24 +15,29 @@ Atualizado em 15/10/2026, ao fim da segunda rodada (quatro telas restantes e pen
 
 ## 2. Como rodar e verificar
 
-- Servidor: `python3 -m http.server 8765` dentro de `SaaS moderno estilo Dribbble/`. Abrir `http://localhost:8765/` (redireciona para Hoje). HTML estático, sem build.
-- O servidor e a pasta temporária da sessão caíram mais de uma vez entre turnos. Antes de capturar, confira com `curl -s -o /dev/null -w "%{http_code}" http://localhost:8765/` e suba de novo em segundo plano se precisar.
-- Dados: tudo fica no `localStorage` (chave `tx-v2`) como log de operações sobre a semente. A semente está na **versão 10**; ao subir a versão, o log antigo é descartado. Para voltar ao início: Configurações, "Voltar à semente", ou `localStorage.clear()`.
-- Usuário da sessão: menu do avatar no header, "Entrar como". Rafael Antunes (qualidade, alçada de qualidade, todas as filiais) é o padrão. Diego Saldanha (afretador de Sorriso, sem alçada) mostra a mesa e o "Pedir liberação". Luiz Fernando Bastos (Direção e RT) assina o que pede Direção.
-- Captura: `node scripts/capturar.cjs <saida.png> <tela> [largura] [altura] [1|0] [js]`, versionado nesta rodada. Sai com erro se a tela tiver erro de JavaScript. Use 1366x768 e 1920x1080.
-- Chromium em `~/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome`; `playwright-core` em `/mnt/d/solar-buy-side-v2/node_modules/playwright-core`.
+App Next.js na raiz do repositório (desde 15/10/2026):
 
-Bateria (rodar dentro de `SaaS moderno estilo Dribbble/`, servidor de pé). Tudo passava em 15/10/2026 ao fim do commit `62dd1ad`:
+- `pnpm dev` para trabalhar (porta 3000), ou `./scripts/servir.sh` para compilar e subir em `http://localhost:8766`, que é onde a bateria roda. Os dois copiam antes o protótipo `.dc.html` para `public/prototipo/`.
+- Rotas: `/hoje`, `/viagens`, `/viagem?id=`, `/transportadores`, `/frota`, `/compartimento?placa=&pos=`, `/auditoria`, `/cadastros?aba=`, `/configuracoes`, `/link?id=` (celular, fora da moldura).
+- Dados: tudo fica no `localStorage` (chave `tx-v2`) como log de operações sobre a semente (`src/lib/tx/tx-dados.js`, **versão 10**). Para voltar ao início: Configurações, "Voltar à semente", ou `localStorage.clear()`.
+- Usuário da sessão: menu do avatar no header, "Entrar como". Rafael Antunes (qualidade) é o padrão; Diego Saldanha (afretador de Sorriso, sem alçada); Luiz Fernando Bastos (Direção e RT).
+- Captura: `node scripts/capturar.cjs <saida.png> <rota> [largura] [altura] [1|0] [js]` (base em `TX_BASE`, padrão 8766). Sai com erro se houver erro de JavaScript ou recurso 404.
+- Chromium em `~/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome`; `playwright-core` em `/mnt/d/solar-buy-side-v2/node_modules/playwright-core`.
+- O protótipo antigo ainda abre com `python3 -m http.server 8765` dentro de `SaaS moderno estilo Dribbble/`, para comparar.
+
+Bateria (na raiz, servidor de pé em 8766). Tudo passava em 15/10/2026 ao fim da etapa 1 da moldura:
 
 | Comando | O que confere |
 | --- | --- |
 | `node scripts/testar-tx-dados.mjs` | 674 conferências da base: referências, contagens, viagens canônicas, F1, F3, fila de assinatura e pedido de liberação, persistência |
-| `node scripts/gerar-sidebar.mjs --conferir` | Assinatura única de sidebar nas 9 telas com sidebar (sai com código 1 se divergir) |
-| `node scripts/conferir-v2.mjs` | Links quebrados, travessão, ponto médio, clicável sem ação, tags desbalanceadas |
-| `node scripts/e2e-f1.cjs http://localhost:8765 <pasta>` | F1 no navegador: mesa, link do motorista, conferência, declaração, nova viagem |
-| `node scripts/e2e-f5.cjs http://localhost:8765 <pasta>` | Auditoria (amostra, gatekeeper, ocorrências), Cadastros e Configurações com efeito no motor, erros de JavaScript em todas as telas |
-| `node scripts/e2e-revisao.cjs http://localhost:8765 <pasta>` | Fluxos das duas rodadas de revisão: pedido de liberação (Hoje e Viagem), fila de assinatura, visões de Viagens, busca global, planilha de ocorrências, Cadastros, Configurações, Compartimento, datas DD/MM/AAAA, drawer de Transportadores e o Link em 390x844 |
+| `node scripts/conferir-v2.mjs` | Nas fontes do app: links para rota inexistente, resto de `.dc.html`, travessão, ponto médio, clicável sem ação |
+| `node scripts/e2e-moldura.cjs http://localhost:8766 <pasta>` | Moldura única: sem recarregar, estado da sidebar, só o conteúdo rola, voltar do navegador, link direto, tela baixa, Link fora da moldura |
+| `node scripts/e2e-f1.cjs http://localhost:8766 <pasta>` | F1 no navegador: mesa, link do motorista, conferência, declaração, nova viagem |
+| `node scripts/e2e-f5.cjs http://localhost:8766 <pasta>` | Auditoria, Cadastros e Configurações com efeito no motor, erros de JavaScript em todas as telas |
+| `node scripts/e2e-revisao.cjs http://localhost:8766 <pasta>` | Fluxos das duas rodadas de revisão |
 | `node scripts/varrer-texto.cjs` | Texto renderizado de 61 estados sem travessão, ponto médio, `undefined`, `NaN` ou `null` |
+| `pnpm build` | Compila e confere os tipos |
+| `pnpm test:legado` | Testes de domínio do v1 em `legado/v1-next/` (127) |
 
 ## 3. Arquitetura técnica (o que importa para mexer)
 

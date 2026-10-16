@@ -35,7 +35,7 @@ Escrito em 15/10/2026 para o próximo agente. Leia antes `HANDOFF.md` (como roda
 | A favor | É exatamente o padrão do Autofluxos (Next 16, mesma versão do repositório), com código de moldura pronto para estudar. Vira a base do front-end real | Reaproveita os templates como estão. Mais rápido se o runtime aceitar trocar o filho por rota |
 | Contra | Reescrever dez templates (trabalho mecânico, mas grande). Decidir o que fazer com o v1 em `src/`. A publicação precisa de build Next | Não está provado que `dc-import` aceita troca por rota e estado compartilhado. Continua protótipo descartável |
 
-**Recomendação:** A. O pedido é "um sistema", o produto final vai ser React, e o Autofluxos já resolveu os mesmos problemas no mesmo framework. Antes de começar, mostre ao Gabriel em uma linha o custo (dez telas a converter) e o que acontece com `src/`; se ele não responder, siga com A, mantendo o protótipo `.dc.html` funcionando até a versão nova ter as dez telas (os sócios estão usando o link para testar).
+**Recomendação:** A. (Feito em 15/10/2026: etapa 1 do registro.) O pedido é "um sistema", o produto final vai ser React, e o Autofluxos já resolveu os mesmos problemas no mesmo framework. Antes de começar, mostre ao Gabriel em uma linha o custo (dez telas a converter) e o que acontece com `src/`; se ele não responder, siga com A, mantendo o protótipo `.dc.html` funcionando até a versão nova ter as dez telas (os sócios estão usando o link para testar).
 
 Se for A: o `AGENTS.md` da raiz avisa que esta versão do Next tem mudanças. Leia o guia em `node_modules/next/dist/docs/` antes de escrever código. Não apague `src/` sem o Gabriel; mova para uma pasta de legado com um aviso ou combine com ele.
 
@@ -96,4 +96,30 @@ Cada achado entra numa lista por tela; resolva, teste e registre.
 
 ## 8. Registro
 
-(vazio)
+### Etapa 1. Moldura única no Next.js (15/10/2026)
+
+**Problema.** Cada tela era um `.dc.html` com a própria cópia da sidebar e do header. Todo clique recarregava a página inteira e redesenhava a moldura; a sidebar dependia de `position:sticky` em cada tela e, abaixo de 600 px de altura, sobrava rolagem.
+
+**O que mudou.**
+
+1. O app Next.js da raiz agora é o protótipo v2. Sidebar, header com busca global, menu da pessoa, modais do topo e toast são um componente só (`src/components/moldura/moldura.tsx`), montado em `src/app/(painel)/layout.tsx`. Trocar de tela troca só o conteúdo.
+2. No desktop a página não rola: a sidebar é uma coluna na altura da janela e quem rola é a área de conteúdo (`[data-tx-conteudo]`). A sidebar rola por dentro em tela baixa; o rodapé não some mais (pendência 2 da seção 6 resolvida).
+3. Rotas: `/hoje`, `/viagens`, `/viagem?id=`, `/transportadores`, `/frota`, `/compartimento?placa=&pos=`, `/auditoria`, `/cadastros?aba=`, `/configuracoes` e `/link?id=` (fora da moldura). Os parâmetros de antes continuam, inclusive `&liberar=1` e `#ocorrencias`. A raiz leva a `/hoje`.
+4. As dez telas foram convertidas por `scripts/converter-dc.mjs`, que transforma o template e a classe de lógica de cada `.dc.html` num componente React com a mesma semântica (null seguro, `sc-if`, `sc-for`, `style-hover` em classe CSS). O resultado está em `src/telas/*.jsx` e já é código do app: o conversor não sobrescreve sem `--forcar`.
+5. `tx-dados.js` passou para `src/lib/tx/` com as rotas novas; `tx-ui.js` virou módulo e perdeu a parte da moldura. `TX.ui.montar` agora tem par: `desmontar` tira ouvintes e temporizadores quando a tela sai.
+6. Quando a mesma rota recebe outro parâmetro de fora (busca global, link, voltar do navegador), a tela monta de novo; quando a própria tela reescreve a URL (aba de Cadastros, filial de Hoje, drawer de Transportadores, por `TX.ui.trocarUrl`), não monta e o estado continua (`src/components/tela/chave-da-tela.tsx`).
+7. Na moldura, o que é clicável virou `button` ou link com foco visível; o item aceso usa `aria-current`; os diálogos do topo prendem o foco, fecham com Esc e devolvem o foco ao avatar. As telas em si ainda são as do protótipo: isso é a Parte 3.
+8. Tokens de cor criados em `src/app/globals.css` e usados pela moldura. As telas ainda têm as cores escritas à mão: isso é a Parte 2.
+9. O v1 em Next foi para `legado/v1-next/` com aviso, sem apagar nada; os testes de domínio dele rodam com `pnpm test:legado` (127 passam). O protótipo `.dc.html` continua intacto em `SaaS moderno estilo Dribbble/` e é copiado para `public/prototipo/` no build: "Versão anterior" abre por lá.
+
+**Teste.** Bateria da seção 2 do `HANDOFF.md` adaptada às rotas novas e movida para `scripts/` na raiz, mais `scripts/e2e-moldura.cjs` (21 conferências: sem recarregar ao trocar de tela, sidebar recolhida e acordeão mantidos, só o conteúdo rola, voltar e avançar do navegador, link direto, busca global na mesma rota, subitem de Cadastros, foco do diálogo, tela de 560 px e Link fora da moldura). Tudo passa. Capturas de Viagens antes e depois em 1366x768 e 1920x1080: idênticas no conteúdo.
+
+**Premissas.**
+
+| Premissa | O que muda se a resposta vier diferente |
+| --- | --- |
+| Opção A do handoff (Next.js da raiz), seguida sem esperar resposta, como o próprio handoff manda | Se o Gabriel preferir manter só o `.dc.html`, o protótipo antigo está intacto; a moldura nova serve de referência para a opção B |
+| O v1 em `src/` vira legado em `legado/v1-next/`, sem apagar | Apagar a pasta, ou voltá-la a um app separado, quando ele decidir |
+| As telas ficam em `.jsx` sem tipos, convertidas fiéis; tipar e extrair componentes vem na revisão tela a tela | Tipar tudo agora custaria a revisão inteira antes de qualquer melhoria visível |
+| A tela monta de novo a cada navegação, com o esqueleto de carregamento de 650 ms do protótipo | Se piscar demais, encurtar ou mostrar o esqueleto só na primeira visita |
+| Publicação: o projeto Vercel `traxium-prototipo` publica a pasta estática; o app Next precisa de um projeto com raiz no repositório (o `traxium` da outra conta já aponta para a raiz) | Quando o Gabriel quiser publicar, escolher o projeto e ligar o build Next |
