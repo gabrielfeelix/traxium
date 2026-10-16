@@ -229,3 +229,11 @@ Os três primeiros temas da tabela da seção 5 valem igual para as dez telas; r
 2. Rótulo visível logo antes de um campo virou `<label>` ligado a ele, em frase, nas telas que tinham esse padrão (Viagem 11, Configurações 2, Transportadores 2, Frota 1).
 
 **Teste.** `e2e-ui.cjs`: no modal de liberação, rodapé lista os sete itens que faltam, conta os caracteres da justificativa, botão apagado leva à justificativa, rótulo ligado. Bateria inteira passa.
+
+### Etapa 10. Link da Viagem, no celular (15/10/2026)
+
+**Problema.** Medido em 390x844: os campos das três últimas cargas tinham 30 a 33 px de altura (o mínimo de toque é 44) e fonte de 14 px, o que faz o iPhone dar zoom ao tocar no campo; "Simular envio pelo afretador" tinha 42 px. Nove tamanhos de fonte (de 10,5 a 21).
+
+**O que mudou.** Escala de celular: 12 legenda, 14 corpo, 16 destaque e campo, 20 título, 24 número. Espaçamento entre blocos em múltiplos de 4, como no escritório. Todo campo do Link com 44 px de altura e 16 px de fonte; clicável com pelo menos 32 px; "Simular envio" com 44 px. O resto do Link (o botão apagado que diz o que falta e leva até lá) já atendia desde a etapa 11 da rodada anterior.
+
+**Teste.** Medição de alvos em cada etapa do fluxo sem nenhum abaixo de 44 px, salvo o selo "com sinal" (32 px, de demonstração). Bateria inteira passa, inclusive o F1 com o motorista.

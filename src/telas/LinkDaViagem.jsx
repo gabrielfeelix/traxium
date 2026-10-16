@@ -559,7 +559,7 @@ export default class LinkDaViagem extends Tela {
             style={{
               background: 'linear-gradient(130deg,var(--primario-3),var(--primario-2) 60%,var(--azul) 140%)',
               color: '#fff',
-              padding: '18px 18px 16px',
+              padding: '20px 20px 16px',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -573,14 +573,14 @@ export default class LinkDaViagem extends Tela {
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontWeight: '800',
-                  fontSize: '13px',
+                  fontSize: '14px',
                 }}
               >
                 TR
               </span>
               <div style={{ flex: '1', minWidth: '0' }}>
-                <div style={{ fontSize: '14.5px', fontWeight: '800' }}>{v.empresa}</div>
-                <div style={{ fontSize: '11.5px', color: 'rgba(255,255,255,.7)' }}>
+                <div style={{ fontSize: '14px', fontWeight: '800' }}>{v.empresa}</div>
+                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,.7)' }}>
                   {'filial '}
                   {v.filialNome}
                   {', afretador '}
@@ -594,7 +594,7 @@ export default class LinkDaViagem extends Tela {
                 onClick={v.alternarSinal}
                 title="Demonstração: simular falta de sinal"
                 style={{
-                  fontSize: '11px',
+                  fontSize: '12px',
                   fontWeight: '700',
                   borderRadius: '99px',
                   padding: '4px 10px',
@@ -608,15 +608,15 @@ export default class LinkDaViagem extends Tela {
             </div>
             <div
               style={{
-                marginTop: '14px',
+                marginTop: '16px',
                 background: 'rgba(255,255,255,.1)',
                 border: '1px solid rgba(255,255,255,.16)',
                 borderRadius: '14px',
                 padding: '11px 13px',
               }}
             >
-              <div style={{ fontSize: '15px', fontWeight: '800' }}>{v.cargaTitulo}</div>
-              <div style={{ fontSize: '12.5px', color: 'rgba(255,255,255,.78)', marginTop: '2px' }}>{v.cargaSub}</div>
+              <div style={{ fontSize: '16px', fontWeight: '800' }}>{v.cargaTitulo}</div>
+              <div style={{ fontSize: '12px', color: 'rgba(255,255,255,.78)', marginTop: '2px' }}>{v.cargaSub}</div>
               <div
                 style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '12px', marginTop: '6px', color: 'rgba(255,255,255,.9)' }}
               >
@@ -625,14 +625,14 @@ export default class LinkDaViagem extends Tela {
             </div>
             {v.mostraProgresso ? (
               <>
-                <div style={{ display: 'flex', gap: '4px', marginTop: '14px' }}>
+                <div style={{ display: 'flex', gap: '4px', marginTop: '16px' }}>
                   {(Array.isArray(v.barra) ? v.barra : []).map((br, $index) => (
                     <Fragment key={$index}>
                       <span style={{ flex: '1', height: '5px', borderRadius: '99px', background: br?.bg }}></span>
                     </Fragment>
                   ))}
                 </div>
-                <div style={{ fontSize: '11.5px', color: 'rgba(255,255,255,.7)', marginTop: '6px' }}>{v.passoTxt}</div>
+                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,.7)', marginTop: '6px' }}>{v.passoTxt}</div>
               </>
             ) : null}
           </div>
@@ -643,7 +643,7 @@ export default class LinkDaViagem extends Tela {
                 style={{
                   background: '#fdf3e2',
                   color: '#8a5a0e',
-                  fontSize: '12.5px',
+                  fontSize: '12px',
                   fontWeight: '700',
                   padding: '10px 16px',
                   display: 'flex',
@@ -659,18 +659,18 @@ export default class LinkDaViagem extends Tela {
           <div
             style={{
               flex: '1',
-              padding: '18px 16px 110px',
+              padding: '20px 16px 112px',
               display: 'flex',
               flexDirection: 'column',
-              gap: '14px',
+              gap: '16px',
               animation: 'subir .25s ease',
             }}
           >
             {v.eNaoEnviado ? (
               <>
                 <div style={{ background: 'var(--painel)', borderRadius: '20px', padding: '20px' }}>
-                  <div style={{ fontSize: '17px', fontWeight: '800' }}>Este link ainda não foi enviado</div>
-                  <div style={{ fontSize: '13.5px', color: 'var(--texto-sec)', marginTop: '6px', lineHeight: '1.5' }}>
+                  <div style={{ fontSize: '16px', fontWeight: '800' }}>Este link ainda não foi enviado</div>
+                  <div style={{ fontSize: '14px', color: 'var(--texto-sec)', marginTop: '6px', lineHeight: '1.5' }}>
                     Na operação real, o motorista só recebe o link depois que o afretador manda a mensagem pelo WhatsApp.
                   </div>{' '}
                   <span
@@ -681,13 +681,14 @@ export default class LinkDaViagem extends Tela {
                     style={{
                       display: 'block',
                       textAlign: 'center',
-                      marginTop: '14px',
+                      marginTop: '16px',
                       background: 'linear-gradient(135deg,var(--primario),var(--azul))',
                       color: '#fff',
-                      fontSize: '14.5px',
+                      fontSize: '14px',
                       fontWeight: '800',
                       borderRadius: '14px',
-                      padding: '13px',
+                      padding: '12px',
+                      minHeight: '44px',
                       cursor: 'pointer',
                     }}
                   >
@@ -699,14 +700,14 @@ export default class LinkDaViagem extends Tela {
             {v.eCapa ? (
               <>
                 <div style={{ background: 'var(--painel)', borderRadius: '20px', padding: '20px' }}>
-                  <div style={{ fontSize: '19px', fontWeight: '800' }}>
+                  <div style={{ fontSize: '20px', fontWeight: '800' }}>
                     {'Olá, '}
                     {v.motPrimeiro}
                   </div>
                   <div style={{ fontSize: '14px', color: 'var(--texto-2)', marginTop: '6px', lineHeight: '1.55' }}>
                     Antes de carregar, a transportadora precisa de 4 coisas suas. Leva uns 5 minutos e não precisa instalar nada.
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '14px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '16px' }}>
                     {(Array.isArray(v.resumoPassos) ? v.resumoPassos : []).map((rp, $index) => (
                       <Fragment key={$index}>
                         <div style={{ display: 'flex', gap: '11px', alignItems: 'center', fontSize: '14px' }}>
@@ -718,7 +719,7 @@ export default class LinkDaViagem extends Tela {
                               background: 'var(--primario-fraco)',
                               color: 'var(--primario-2)',
                               fontWeight: '800',
-                              fontSize: '12.5px',
+                              fontSize: '12px',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
@@ -732,7 +733,7 @@ export default class LinkDaViagem extends Tela {
                       </Fragment>
                     ))}
                   </div>
-                  <div style={{ fontSize: '12px', color: 'var(--texto-apagado)', marginTop: '14px', lineHeight: '1.5' }}>
+                  <div style={{ fontSize: '12px', color: 'var(--texto-apagado)', marginTop: '16px', lineHeight: '1.5' }}>
                     Se o sinal cair, o que você fez fica salvo no celular e vai sozinho quando voltar. Seus dados servem só para a
                     transportadora provar a carga em auditoria GMP+.
                   </div>
@@ -746,11 +747,11 @@ export default class LinkDaViagem extends Tela {
                     background: 'var(--painel)',
                     border: '1.5px solid var(--perigo-borda)',
                     borderRadius: '20px',
-                    padding: '16px 18px',
+                    padding: '16px 20px',
                   }}
                 >
-                  <div style={{ fontSize: '15px', fontWeight: '800', color: 'var(--tecnico)' }}>A filial pediu foto nova</div>
-                  <div style={{ fontSize: '13.5px', color: 'var(--texto-2)', marginTop: '5px', lineHeight: '1.5' }}>"{v.devMotivo}"</div>
+                  <div style={{ fontSize: '16px', fontWeight: '800', color: 'var(--tecnico)' }}>A filial pediu foto nova</div>
+                  <div style={{ fontSize: '14px', color: 'var(--texto-2)', marginTop: '5px', lineHeight: '1.5' }}>"{v.devMotivo}"</div>
                   <div style={{ fontSize: '12px', color: 'var(--texto-apagado)', marginTop: '6px' }}>{v.devQuem}</div>
                 </div>
               </>
@@ -758,8 +759,8 @@ export default class LinkDaViagem extends Tela {
             {v.eId ? (
               <>
                 <div style={{ background: 'var(--painel)', borderRadius: '20px', padding: '20px' }}>
-                  <div style={{ fontSize: '17px', fontWeight: '800' }}>É você mesmo?</div>
-                  <div style={{ fontSize: '13.5px', color: 'var(--texto-sec)', marginTop: '4px' }}>
+                  <div style={{ fontSize: '16px', fontWeight: '800' }}>É você mesmo?</div>
+                  <div style={{ fontSize: '14px', color: 'var(--texto-sec)', marginTop: '4px' }}>
                     Digite os 3 primeiros números do seu CPF.
                   </div>
                   <input
@@ -775,7 +776,7 @@ export default class LinkDaViagem extends Tela {
                       marginTop: '12px',
                       border: `1.5px solid ${v.cpfBd ?? ''}`,
                       borderRadius: '14px',
-                      padding: '14px',
+                      padding: '16px',
                       fontSize: '24px',
                       letterSpacing: '10px',
                       textAlign: 'center',
@@ -783,8 +784,8 @@ export default class LinkDaViagem extends Tela {
                       fontFamily: "'Spline Sans Mono',monospace",
                     }}
                   />
-                  <div style={{ fontSize: '12.5px', color: v.cpfMsgC, marginTop: '6px', minHeight: '16px' }}>{v.cpfMsg}</div>
-                  <div style={{ fontSize: '12.5px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '10px' }}>
+                  <div style={{ fontSize: '12px', color: v.cpfMsgC, marginTop: '6px', minHeight: '16px' }}>{v.cpfMsg}</div>
+                  <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '10px' }}>
                     As placas estão certas?
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '6px' }}>
@@ -800,17 +801,17 @@ export default class LinkDaViagem extends Tela {
                             padding: '9px 12px',
                           }}
                         >
-                          <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--texto-apagado)', width: '66px' }}>
+                          <span style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-apagado)', width: '66px' }}>
                             {pc?.papel}
                           </span>
-                          <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '15px', fontWeight: '600' }}>
+                          <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '16px', fontWeight: '600' }}>
                             {pc?.placa}
                           </span>
                         </div>
                       </Fragment>
                     ))}
                   </div>
-                  <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)', marginTop: '8px' }}>
+                  <div style={{ fontSize: '12px', color: 'var(--texto-apagado)', marginTop: '8px' }}>
                     Placa diferente? Fale com o afretador antes de seguir: a carga é liberada para estas placas.
                   </div>
                 </div>
@@ -819,8 +820,8 @@ export default class LinkDaViagem extends Tela {
             {v.eDocs ? (
               <>
                 <div style={{ background: 'var(--painel)', borderRadius: '20px', padding: '20px' }}>
-                  <div style={{ fontSize: '17px', fontWeight: '800' }}>Só o que falta ou venceu</div>
-                  <div style={{ fontSize: '13.5px', color: 'var(--texto-sec)', marginTop: '4px' }}>
+                  <div style={{ fontSize: '16px', fontWeight: '800' }}>Só o que falta ou venceu</div>
+                  <div style={{ fontSize: '14px', color: 'var(--texto-sec)', marginTop: '4px' }}>
                     Tire foto do documento. O resto a transportadora já tem.
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
@@ -833,11 +834,11 @@ export default class LinkDaViagem extends Tela {
                             gap: '12px',
                             border: `1.5px solid ${dp?.bd ?? ''}`,
                             borderRadius: '14px',
-                            padding: '12px 13px',
+                            padding: '12px 12px',
                           }}
                         >
                           <div style={{ flex: '1' }}>
-                            <div style={{ fontSize: '14.5px', fontWeight: '800' }}>{dp?.n}</div>
+                            <div style={{ fontSize: '14px', fontWeight: '800' }}>{dp?.n}</div>
                             <div style={{ fontSize: '12px', color: dp?.subC }}>{dp?.sub}</div>
                           </div>
                           <span
@@ -848,7 +849,7 @@ export default class LinkDaViagem extends Tela {
                             style={{
                               background: dp?.btBg,
                               color: dp?.btC,
-                              fontSize: '13px',
+                              fontSize: '14px',
                               fontWeight: '800',
                               borderRadius: '99px',
                               padding: '9px 14px',
@@ -869,8 +870,8 @@ export default class LinkDaViagem extends Tela {
               <>
                 {(Array.isArray(v.t3Carretas) ? v.t3Carretas : []).map((tc, $index) => (
                   <Fragment key={$index}>
-                    <div style={{ background: 'var(--painel)', borderRadius: '20px', padding: '18px' }}>
-                      <div style={{ fontSize: '15.5px', fontWeight: '800', lineHeight: '1.35' }}>
+                    <div style={{ background: 'var(--painel)', borderRadius: '20px', padding: '20px' }}>
+                      <div style={{ fontSize: '16px', fontWeight: '800', lineHeight: '1.35' }}>
                         O que a carreta{' '}
                         <span
                           style={{
@@ -895,7 +896,7 @@ export default class LinkDaViagem extends Tela {
                             style={{
                               display: 'inline-block',
                               marginTop: '10px',
-                              fontSize: '12.5px',
+                              fontSize: '12px',
                               fontWeight: '800',
                               color: 'var(--primario-2)',
                               border: '1.5px solid #cfe3e1',
@@ -924,7 +925,7 @@ export default class LinkDaViagem extends Tela {
                               }}
                             >
                               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--texto-apagado)', width: '76px' }}>
+                                <span style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-apagado)', width: '76px' }}>
                                   {tl?.rot}
                                 </span>
                                 <input
@@ -936,7 +937,7 @@ export default class LinkDaViagem extends Tela {
                                     border: '1px solid var(--borda-campo)',
                                     borderRadius: '9px',
                                     padding: '5px 8px',
-                                    fontSize: '13px',
+                                    fontSize: '14px',
                                     outline: 'none',
                                     fontFamily: "'Spline Sans Mono',monospace",
                                     marginLeft: 'auto',
@@ -955,7 +956,7 @@ export default class LinkDaViagem extends Tela {
                                   border: 'none',
                                   borderBottom: '1.5px solid var(--borda-campo)',
                                   padding: '6px 2px',
-                                  fontSize: '15px',
+                                  fontSize: '16px',
                                   fontWeight: '700',
                                   outline: 'none',
                                   background: 'transparent',
@@ -973,7 +974,7 @@ export default class LinkDaViagem extends Tela {
                                           onClick={sg?.onClick}
                                           data-tx-sug={sg?.id}
                                           style={{
-                                            fontSize: '12.5px',
+                                            fontSize: '12px',
                                             fontWeight: '700',
                                             borderRadius: '99px',
                                             padding: '5px 11px',
@@ -1013,16 +1014,16 @@ export default class LinkDaViagem extends Tela {
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '11px', fontWeight: '800', letterSpacing: '.8px', color: 'var(--texto-apagado)' }}>
+                        <span style={{ fontSize: '12px', fontWeight: '800', letterSpacing: '.8px', color: 'var(--texto-apagado)' }}>
                           {ci?.i}
                           {' DE 5'}
                         </span>
-                        <span style={{ fontSize: '15px', fontWeight: '800' }}>{ci?.n}</span>
+                        <span style={{ fontSize: '16px', fontWeight: '800' }}>{ci?.n}</span>
                         {ci?.critico ? (
                           <>
                             <span
                               style={{
-                                fontSize: '10.5px',
+                                fontSize: '12px',
                                 fontWeight: '800',
                                 color: 'var(--tecnico)',
                                 border: '1px solid #ebc3c8',
@@ -1046,7 +1047,7 @@ export default class LinkDaViagem extends Tela {
                             textAlign: 'center',
                             borderRadius: '12px',
                             padding: '11px',
-                            fontSize: '14.5px',
+                            fontSize: '14px',
                             fontWeight: '800',
                             cursor: 'pointer',
                             border: `1.5px solid ${ci?.simBd ?? ''}`,
@@ -1065,7 +1066,7 @@ export default class LinkDaViagem extends Tela {
                             textAlign: 'center',
                             borderRadius: '12px',
                             padding: '11px',
-                            fontSize: '14.5px',
+                            fontSize: '14px',
                             fontWeight: '800',
                             cursor: 'pointer',
                             border: `1.5px solid ${ci?.naoBd ?? ''}`,
@@ -1109,13 +1110,13 @@ export default class LinkDaViagem extends Tela {
                           <path d="M2.5 5.5h2l1-1.6h5l1 1.6h2v7h-11z"></path>
                           <circle cx="8" cy="9" r="2.2"></circle>
                         </svg>
-                        <span style={{ fontSize: '13px', fontWeight: '800', color: ci?.fotoIc }}>{ci?.fotoRot}</span>
+                        <span style={{ fontSize: '14px', fontWeight: '800', color: ci?.fotoIc }}>{ci?.fotoRot}</span>
                       </div>
-                      <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)', marginTop: '6px' }}>{ci?.dica}</div>
+                      <div style={{ fontSize: '12px', color: 'var(--texto-apagado)', marginTop: '6px' }}>{ci?.dica}</div>
                       {ci?.alerta ? (
                         <>
                           <div
-                            style={{ marginTop: '8px', fontSize: '12.5px', color: 'var(--tecnico)', fontWeight: '700', lineHeight: '1.45' }}
+                            style={{ marginTop: '8px', fontSize: '12px', color: 'var(--tecnico)', fontWeight: '700', lineHeight: '1.45' }}
                           >
                             Com resto de carga a carreta não carrega ração. Limpe e responda de novo, ou avise o afretador.
                           </div>
@@ -1139,18 +1140,18 @@ export default class LinkDaViagem extends Tela {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '11px', fontWeight: '800', letterSpacing: '.8px', color: 'var(--texto-apagado)' }}>
+                    <span style={{ fontSize: '12px', fontWeight: '800', letterSpacing: '.8px', color: 'var(--texto-apagado)' }}>
                       MANUAL V{v.manualVersao}
                       {', CARTÃO '}
                       {v.cartaoN}
                       {' DE 5'}
                     </span>
                   </div>
-                  <div style={{ fontSize: '21px', fontWeight: '800', marginTop: '12px' }}>{v.cartaoT}</div>
+                  <div style={{ fontSize: '20px', fontWeight: '800', marginTop: '12px' }}>{v.cartaoT}</div>
                   <div style={{ fontSize: '16px', color: 'var(--texto-2)', marginTop: '10px', lineHeight: '1.6', flex: '1' }}>
                     {v.cartaoTxt}
                   </div>
-                  <div style={{ display: 'flex', gap: '5px', justifyContent: 'center', marginTop: '14px' }}>
+                  <div style={{ display: 'flex', gap: '5px', justifyContent: 'center', marginTop: '16px' }}>
                     {(Array.isArray(v.cartaoDots) ? v.cartaoDots : []).map((cd, $index) => (
                       <Fragment key={$index}>
                         <span
@@ -1165,13 +1166,13 @@ export default class LinkDaViagem extends Tela {
             {v.eTermo ? (
               <>
                 <div style={{ background: 'var(--painel)', borderRadius: '20px', padding: '20px' }}>
-                  <div style={{ fontSize: '17px', fontWeight: '800' }}>{v.termoTitulo}</div>
-                  <div style={{ fontSize: '11.5px', color: 'var(--texto-apagado)', marginTop: '2px' }}>
+                  <div style={{ fontSize: '16px', fontWeight: '800' }}>{v.termoTitulo}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--texto-apagado)', marginTop: '2px' }}>
                     {'versão '}
                     {v.termoVersao}
                   </div>
                   <div style={{ fontSize: '14px', color: 'var(--texto-2)', marginTop: '10px', lineHeight: '1.6' }}>{v.termoTexto}</div>
-                  <div style={{ fontSize: '12.5px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '14px' }}>Assine com o dedo</div>
+                  <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '16px' }}>Assine com o dedo</div>
                   <div
                     onPointerDown={v.assDown}
                     onPointerMove={v.assMove}
@@ -1206,7 +1207,7 @@ export default class LinkDaViagem extends Tela {
                         position: 'absolute',
                         left: '14px',
                         bottom: '10px',
-                        fontSize: '11.5px',
+                        fontSize: '12px',
                         color: 'var(--texto-apagado)',
                         pointerEvents: 'none',
                       }}
@@ -1223,7 +1224,7 @@ export default class LinkDaViagem extends Tela {
                         position: 'absolute',
                         right: '10px',
                         top: '8px',
-                        fontSize: '11.5px',
+                        fontSize: '12px',
                         fontWeight: '700',
                         color: 'var(--texto-apagado)',
                         cursor: 'pointer',
@@ -1273,7 +1274,7 @@ export default class LinkDaViagem extends Tela {
                       <path d="M3 8.5 6.5 12 13 4.5"></path>
                     </svg>
                   </span>
-                  <div style={{ fontSize: '19px', fontWeight: '800', marginTop: '14px' }}>{v.fimTitulo}</div>
+                  <div style={{ fontSize: '20px', fontWeight: '800', marginTop: '16px' }}>{v.fimTitulo}</div>
                   <div style={{ fontSize: '14px', color: 'var(--texto-2)', marginTop: '6px', lineHeight: '1.55' }}>{v.fimSub}</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '16px', width: '100%' }}>
                     {(Array.isArray(v.fimItens) ? v.fimItens : []).map((fi, $index) => (
@@ -1282,7 +1283,7 @@ export default class LinkDaViagem extends Tela {
                           style={{
                             display: 'flex',
                             justifyContent: 'space-between',
-                            fontSize: '13px',
+                            fontSize: '14px',
                             background: 'var(--superficie)',
                             borderRadius: '11px',
                             padding: '9px 12px',
@@ -1320,10 +1321,10 @@ export default class LinkDaViagem extends Tela {
                         background: 'var(--painel)',
                         border: '1.5px solid var(--borda-campo)',
                         color: 'var(--texto)',
-                        fontSize: '15px',
+                        fontSize: '16px',
                         fontWeight: '800',
                         borderRadius: '16px',
-                        padding: '15px 18px',
+                        padding: '16px 20px',
                         cursor: 'pointer',
                       }}
                     >
@@ -1343,10 +1344,10 @@ export default class LinkDaViagem extends Tela {
                     color: v.btC,
                     boxShadow: v.btSh,
                     cursor: v.btCur,
-                    fontSize: '15.5px',
+                    fontSize: '16px',
                     fontWeight: '800',
                     borderRadius: '16px',
-                    padding: '15px',
+                    padding: '16px',
                   }}
                 >
                   {v.btRot}
@@ -1368,7 +1369,7 @@ export default class LinkDaViagem extends Tela {
                   color: '#fff',
                   borderRadius: '14px',
                   padding: '11px 16px',
-                  fontSize: '13px',
+                  fontSize: '14px',
                   fontWeight: '600',
                   width: 'max-content',
                   maxWidth: 'min(398px,calc(100vw - 32px))',

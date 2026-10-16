@@ -126,3 +126,8 @@ label:has(> .tx-so-leitor:focus-visible) { outline: 2px solid var(--primario); o
 /* O que falta para o botão do rodapé acender. */
 .tx-falta { margin-right: auto; font-size: 12px; color: var(--texto-apagado); line-height: 1.4; }
 .tx-falta ~ [role='button'], .tx-falta ~ button { white-space: nowrap; flex: none; }
+
+/* Link do motorista (celular): campo com 44 px de alvo e fonte de 16 px (abaixo disso o iPhone dá zoom ao tocar). */
+[data-tela='LinkDaViagem'] input:not([type='checkbox']):not([type='radio']):not([type='file']),
+[data-tela='LinkDaViagem'] textarea, [data-tela='LinkDaViagem'] select { min-height: 44px; font-size: 16px !important; }
+[data-tela='LinkDaViagem'] [role='button'] { min-height: 32px; }
