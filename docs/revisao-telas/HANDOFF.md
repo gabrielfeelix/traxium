@@ -4,6 +4,8 @@ Atualizado em 15/10/2026, ao fim da segunda rodada (quatro telas restantes e pen
 
 > **Próxima etapa (15/10/2026):** virar um sistema com moldura única e revisar UI e UX página por página. O plano está em `09-handoff-sistema-e-ui.md`; leia este arquivo para o contexto e aquele para o que fazer.
 >
+> **Retomar por:** `09-handoff-sistema-e-ui.md`, seção 9 (o que falta, em ordem).
+>
 > **Atualização (15/10/2026, noite):** a moldura única foi feita (etapa 1 em `09-handoff-sistema-e-ui.md`, seção 8). O protótipo v2 agora é o app Next.js da raiz; o `.dc.html` ficou congelado como referência. A seção 2 abaixo já descreve como rodar o app novo; as seções 3 e 4 continuam valendo para entender as telas, que foram convertidas fiéis.
 
 ## 1. Situação
@@ -36,6 +38,9 @@ Bateria (na raiz, servidor de pé em 8766). Tudo passava em 15/10/2026 ao fim da
 | `node scripts/e2e-f5.cjs http://localhost:8766 <pasta>` | Auditoria, Cadastros e Configurações com efeito no motor, erros de JavaScript em todas as telas |
 | `node scripts/e2e-revisao.cjs http://localhost:8766 <pasta>` | Fluxos das duas rodadas de revisão |
 | `node scripts/varrer-texto.cjs` | Texto renderizado de 61 estados sem travessão, ponto médio, `undefined`, `NaN` ou `null` |
+| `node scripts/e2e-ui.cjs http://localhost:8766 <pasta>` | Revisão de UI e UX (Parte 3): formulários, erros junto do campo, teclado, arquivos |
+| `node scripts/conferir-largura.cjs` | Sem estouro lateral nem rótulo de botão quebrado em 1366 px |
+| `node scripts/conferir-alvos.cjs` | Alvos de clique de 32 px ou mais (21 conhecidos com 31 px, ver `09`, etapa 11) |
 | `pnpm build` | Compila e confere os tipos |
 | `pnpm test:legado` | Testes de domínio do v1 em `legado/v1-next/` (127) |
 

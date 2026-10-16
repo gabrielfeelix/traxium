@@ -427,6 +427,7 @@ export default class Frota extends Tela {
                     </span>
                     <span style={{ fontSize: '12px', color: 'var(--texto-apagado)', textAlign: 'right' }}>{cj?.escSub}</span>
                     <span
+                      className="tx-alvo"
                       role="button"
                       tabIndex={0}
                       onClick={cj?.alternar}

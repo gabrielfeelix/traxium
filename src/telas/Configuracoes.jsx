@@ -386,6 +386,7 @@ export default class Configuracoes extends Tela {
                         <span style={{ fontSize: '13px' }}>{us?.cargo}</span>
                         <span style={{ fontSize: '13px', color: 'var(--texto-sec)' }}>{us?.escopo}</span>
                         <span
+                          className="tx-alvo"
                           role="button"
                           tabIndex={0}
                           onClick={us?.entrar}
@@ -436,6 +437,7 @@ export default class Configuracoes extends Tela {
                         </div>
                         <span style={{ fontSize: '13px', color: 'var(--texto-sec)' }}>{cv?.escopo}</span>
                         <span
+                          className="tx-alvo"
                           role="button"
                           tabIndex={0}
                           onClick={cv?.cancelar}
@@ -517,6 +519,7 @@ export default class Configuracoes extends Tela {
                           {(Array.isArray(rg?.classes) ? rg?.classes : []).map((cl, $index) => (
                             <Fragment key={$index}>
                               <span
+                                className="tx-alvo"
                                 role="button"
                                 tabIndex={0}
                                 onClick={cl?.onClick}
@@ -563,6 +566,7 @@ export default class Configuracoes extends Tela {
                           <b style={{ fontSize: '14px' }}>{md?.n}</b>
                           <span style={{ marginLeft: '8px', fontSize: '12px', color: 'var(--texto-apagado)' }}>{md?.v}</span>
                           <span
+                            className="tx-alvo"
                             role="button"
                             tabIndex={0}
                             onClick={md?.copiar}
@@ -836,6 +840,7 @@ export default class Configuracoes extends Tela {
                           {(Array.isArray(v.cvFiliais) ? v.cvFiliais : []).map((cf, $index) => (
                             <Fragment key={$index}>
                               <span
+                                className="tx-alvo"
                                 role="button"
                                 tabIndex={0}
                                 onClick={cf?.onClick}

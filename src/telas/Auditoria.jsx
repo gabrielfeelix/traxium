@@ -746,6 +746,7 @@ export default class Auditoria extends Tela {
                 <div style={{ fontSize: '16px', fontWeight: '800' }}>Viagens encontradas</div>
                 <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '13px', color: 'var(--texto-sec)' }}>{v.nRes}</span>
                 <span
+                  className="tx-alvo"
                   role="button"
                   tabIndex={0}
                   onClick={v.selTodas}
@@ -792,6 +793,7 @@ export default class Auditoria extends Tela {
                     }}
                   >
                     <span
+                      className="tx-alvo"
                       role="button"
                       tabIndex={0}
                       onClick={r?.toggle}
@@ -813,7 +815,11 @@ export default class Auditoria extends Tela {
                     >
                       {r?.ckI}
                     </span>
-                    <A href={r?.href} style={{ fontFamily: "'Spline Sans Mono',monospace", fontWeight: '600', color: 'var(--texto)' }}>
+                    <A
+                      className="tx-alvo"
+                      href={r?.href}
+                      style={{ fontFamily: "'Spline Sans Mono',monospace", fontWeight: '600', color: 'var(--texto)' }}
+                    >
                       {r?.data}
                     </A>
                     <span style={{ fontFamily: "'Spline Sans Mono',monospace", color: r?.cteC, lineHeight: '1.45' }}>
@@ -852,6 +858,7 @@ export default class Auditoria extends Tela {
                       {(Array.isArray(v.paginas) ? v.paginas : []).map((pg, $index) => (
                         <Fragment key={$index}>
                           <span
+                            className="tx-alvo"
                             role="button"
                             tabIndex={0}
                             onClick={pg?.onClick}
@@ -941,7 +948,7 @@ export default class Auditoria extends Tela {
                               cursor: 'pointer',
                               whiteSpace: 'nowrap',
                             }}
-                            className="tx-h76d8d79"
+                            className="tx-alvo tx-h76d8d79"
                           >
                             {ap?.rot}
                           </span>
@@ -958,7 +965,7 @@ export default class Auditoria extends Tela {
                               cursor: 'pointer',
                               whiteSpace: 'nowrap',
                             }}
-                            className="tx-h76d8d79"
+                            className="tx-alvo tx-h76d8d79"
                           >
                             Planilha
                           </span>

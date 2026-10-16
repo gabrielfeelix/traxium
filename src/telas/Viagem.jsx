@@ -1424,7 +1424,7 @@ export default class Viagem extends Tela {
             <div
               style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--texto-sec)' }}
             >
-              <A href="/viagens" style={{ color: 'var(--texto-sec)' }} className="tx-h76d8d79">
+              <A href="/viagens" style={{ color: 'var(--texto-sec)' }} className="tx-alvo tx-h76d8d79">
                 Viagens
               </A>
               <span style={{ color: '#b8c6c4' }}>›</span>
@@ -1764,7 +1764,7 @@ export default class Viagem extends Tela {
                               fontWeight: '700',
                               cursor: 'pointer',
                             }}
-                            className="tx-h53feea5"
+                            className="tx-alvo tx-h53feea5"
                           >
                             <span
                               style={{
@@ -2277,7 +2277,7 @@ export default class Viagem extends Tela {
                           whiteSpace: 'nowrap',
                           marginLeft: '6px',
                         }}
-                        className="tx-h76d8d79"
+                        className="tx-alvo tx-h76d8d79"
                       >
                         {v.chToggleRot}
                       </span>
@@ -2351,6 +2351,7 @@ export default class Viagem extends Tela {
                                 {ck?.lib ? (
                                   <>
                                     <span
+                                      className="tx-alvo"
                                       role="button"
                                       tabIndex={0}
                                       onClick={v.verRegistro}
@@ -2449,7 +2450,7 @@ export default class Viagem extends Tela {
                                   {cp?.regL}
                                 </span>
                               </span>
-                              <A href={cp?.href} style={{ fontSize: '13px', fontWeight: '700' }} className="tx-h76d8d79">
+                              <A href={cp?.href} style={{ fontSize: '13px', fontWeight: '700' }} className="tx-alvo tx-h76d8d79">
                                 Histórico →
                               </A>
                             </div>
@@ -2502,7 +2503,7 @@ export default class Viagem extends Tela {
                                     <div style={{ fontSize: '14px', fontWeight: '700', marginTop: '5px', color: cg?.nc }}>{cg?.nome}</div>
                                     {cg?.temHref ? (
                                       <>
-                                        <A href={cg?.href} style={{ fontSize: '12px', fontWeight: '700' }}>
+                                        <A className="tx-alvo" href={cg?.href} style={{ fontSize: '12px', fontWeight: '700' }}>
                                           {cg?.fonte}
                                         </A>
                                       </>
@@ -2565,7 +2566,7 @@ export default class Viagem extends Tela {
                               background: 'var(--painel)',
                               transition: 'transform .15s',
                             }}
-                            className="tx-hb08bac3"
+                            className="tx-alvo tx-hb08bac3"
                           >
                             <div
                               style={{
@@ -2738,7 +2739,7 @@ export default class Viagem extends Tela {
                               color: 'var(--primario-2)',
                               cursor: 'pointer',
                             }}
-                            className="tx-h76d8d79"
+                            className="tx-alvo tx-h76d8d79"
                           >
                             Registrar limpeza
                           </span>
@@ -2896,7 +2897,11 @@ export default class Viagem extends Tela {
                         </Fragment>
                       ))}
                     </div>{' '}
-                    <A href={v.tHref} style={{ display: 'block', marginTop: '12px', fontSize: '13px', fontWeight: '700' }}>
+                    <A
+                      className="tx-alvo"
+                      href={v.tHref}
+                      style={{ display: 'block', marginTop: '12px', fontSize: '13px', fontWeight: '700' }}
+                    >
                       {v.tLink}
                       {' →'}
                     </A>{' '}
@@ -2958,7 +2963,7 @@ export default class Viagem extends Tela {
                                       borderRadius: '99px',
                                       padding: '2px 9px',
                                     }}
-                                    className="tx-h30bbaa9"
+                                    className="tx-alvo tx-h30bbaa9"
                                   >
                                     {cc?.pos}
                                   </A>
@@ -3083,7 +3088,7 @@ export default class Viagem extends Tela {
                         onClick={v.abrirOcorrencia}
                         data-tx-nova-ocorrencia=""
                         style={{ marginLeft: 'auto', fontSize: '13px', fontWeight: '800', color: 'var(--primario-2)', cursor: 'pointer' }}
-                        className="tx-h76d8d79"
+                        className="tx-alvo tx-h76d8d79"
                       >
                         Registrar
                       </span>
@@ -3321,6 +3326,7 @@ export default class Viagem extends Tela {
                       {(Array.isArray(v.devItens) ? v.devItens : []).map((di, $index) => (
                         <Fragment key={$index}>
                           <span
+                            className="tx-alvo"
                             role="button"
                             tabIndex={0}
                             onClick={di?.onClick}
@@ -3548,6 +3554,7 @@ export default class Viagem extends Tela {
                           {v.libTrocar ? (
                             <>
                               <span
+                                className="tx-alvo"
                                 role="button"
                                 tabIndex={0}
                                 onClick={v.abrirEntrar}
@@ -3565,6 +3572,7 @@ export default class Viagem extends Tela {
                           {(Array.isArray(v.libRiscos) ? v.libRiscos : []).map((lr, $index) => (
                             <Fragment key={$index}>
                               <span
+                                className="tx-alvo"
                                 role="button"
                                 tabIndex={0}
                                 onClick={lr?.onClick}
@@ -3591,6 +3599,7 @@ export default class Viagem extends Tela {
                           {(Array.isArray(v.libValidades) ? v.libValidades : []).map((lv, $index) => (
                             <Fragment key={$index}>
                               <span
+                                className="tx-alvo"
                                 role="button"
                                 tabIndex={0}
                                 onClick={lv?.onClick}
@@ -3638,6 +3647,7 @@ export default class Viagem extends Tela {
                           </div>
                         ) : null}
                         <span
+                          className="tx-alvo"
                           role="button"
                           tabIndex={0}
                           onClick={v.evidenciaExemplo}
@@ -3775,6 +3785,7 @@ export default class Viagem extends Tela {
                       {(Array.isArray(v.manterAcoes) ? v.manterAcoes : []).map((ma, $index) => (
                         <Fragment key={$index}>
                           <span
+                            className="tx-alvo"
                             role="button"
                             tabIndex={0}
                             onClick={ma?.onClick}
@@ -4125,6 +4136,7 @@ export default class Viagem extends Tela {
                       {(Array.isArray(v.limpComps) ? v.limpComps : []).map((lc, $index) => (
                         <Fragment key={$index}>
                           <span
+                            className="tx-alvo"
                             role="button"
                             tabIndex={0}
                             onClick={lc?.onClick}
@@ -4256,6 +4268,7 @@ export default class Viagem extends Tela {
                       {(Array.isArray(v.ocTipos) ? v.ocTipos : []).map((ot, $index) => (
                         <Fragment key={$index}>
                           <span
+                            className="tx-alvo"
                             role="button"
                             tabIndex={0}
                             onClick={ot?.onClick}
@@ -4372,6 +4385,7 @@ export default class Viagem extends Tela {
                       {(Array.isArray(v.retCampos) ? v.retCampos : []).map((rt, $index) => (
                         <Fragment key={$index}>
                           <span
+                            className="tx-alvo"
                             role="button"
                             tabIndex={0}
                             onClick={rt?.onClick}

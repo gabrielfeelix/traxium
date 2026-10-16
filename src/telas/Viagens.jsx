@@ -636,7 +636,7 @@ export default class Viagens extends Tela {
                         fontSize: '12px',
                         color: 'var(--texto-apagado)',
                       }}
-                      className="tx-ha5daa28"
+                      className="tx-alvo tx-ha5daa28"
                     >
                       ×
                     </span>
@@ -1070,7 +1070,7 @@ export default class Viagens extends Tela {
                       cursor: 'pointer',
                       whiteSpace: 'nowrap',
                     }}
-                    className="tx-h30bbaa9"
+                    className="tx-alvo tx-h30bbaa9"
                   >
                     {at?.n}
                     <span style={{ color: 'var(--texto-apagado)' }}>×</span>
@@ -1087,7 +1087,7 @@ export default class Viagens extends Tela {
                         onClick={v.limpar}
                         data-tx-limpar=""
                         style={{ fontSize: '13px', fontWeight: '700', color: 'var(--texto-sec)', cursor: 'pointer', whiteSpace: 'nowrap' }}
-                        className="tx-h39963fb"
+                        className="tx-alvo tx-h39963fb"
                       >
                         Limpar
                       </span>
@@ -1105,7 +1105,7 @@ export default class Viagens extends Tela {
                             cursor: 'pointer',
                             whiteSpace: 'nowrap',
                           }}
-                          className="tx-h76d8d79"
+                          className="tx-alvo tx-h76d8d79"
                         >
                           Salvar como visão
                         </span>{' '}
@@ -1226,7 +1226,7 @@ export default class Viagens extends Tela {
                   ) : null}
                   {v.temDicaLink ? (
                     <>
-                      <A href={v.dicaHref} style={{ fontSize: '13px', fontWeight: '800', whiteSpace: 'nowrap' }}>
+                      <A className="tx-alvo" href={v.dicaHref} style={{ fontSize: '13px', fontWeight: '800', whiteSpace: 'nowrap' }}>
                         {v.dicaLinkRot}
                         {' →'}
                       </A>
@@ -1405,6 +1405,7 @@ export default class Viagens extends Tela {
                 <>
                   <div style={{ marginLeft: 'auto', display: 'flex', gap: '5px', alignItems: 'center' }}>
                     <span
+                      className="tx-alvo"
                       role="button"
                       tabIndex={0}
                       onClick={v.pagAnt}
@@ -1415,6 +1416,7 @@ export default class Viagens extends Tela {
                     {(Array.isArray(v.paginas) ? v.paginas : []).map((pg, $index) => (
                       <Fragment key={$index}>
                         <span
+                          className="tx-alvo"
                           role="button"
                           tabIndex={0}
                           onClick={pg?.onClick}
@@ -1439,6 +1441,7 @@ export default class Viagens extends Tela {
                       </Fragment>
                     ))}
                     <span
+                      className="tx-alvo"
                       role="button"
                       tabIndex={0}
                       onClick={v.pagProx}
@@ -1530,6 +1533,7 @@ export default class Viagens extends Tela {
                     <div style={{ fontSize: '12px', color: 'var(--texto-sec)' }}>planilha (.xlsx, .csv) ou XML de CT-e (.xml, .zip)</div>
                   </div>
                   <span
+                    className="tx-alvo"
                     role="button"
                     tabIndex={0}
                     onClick={v.usarExemplo}

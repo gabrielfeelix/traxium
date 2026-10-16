@@ -223,13 +223,13 @@ export default class Compartimento extends Tela {
             <div
               style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--texto-sec)' }}
             >
-              <A href={v.voltarHref} style={{ color: 'var(--texto-sec)' }}>
+              <A className="tx-alvo" href={v.voltarHref} style={{ color: 'var(--texto-sec)' }}>
                 {v.voltarRot}
               </A>
               {v.temDono ? (
                 <>
                   <span style={{ color: '#b8c6c4' }}>›</span>
-                  <A href={v.donoHref} style={{ color: 'var(--texto-sec)' }}>
+                  <A className="tx-alvo" href={v.donoHref} style={{ color: 'var(--texto-sec)' }}>
                     {v.dono}
                   </A>
                 </>
@@ -413,6 +413,7 @@ export default class Compartimento extends Tela {
                       {(Array.isArray(v.irmaos) ? v.irmaos : []).map((ir, $index) => (
                         <Fragment key={$index}>
                           <A
+                            className="tx-alvo"
                             href={ir?.href}
                             data-tx-irmao={ir?.n}
                             style={{
@@ -509,7 +510,7 @@ export default class Compartimento extends Tela {
                   <div style={{ fontSize: '13px' }}>
                     {l?.temHref ? (
                       <>
-                        <A href={l?.href} style={{ fontWeight: '700' }}>
+                        <A className="tx-alvo" href={l?.href} style={{ fontWeight: '700' }}>
                           {l?.fonte}
                         </A>
                       </>

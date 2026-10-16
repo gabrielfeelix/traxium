@@ -933,6 +933,7 @@ export default class Cadastros extends Tela {
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <div style={{ fontSize: '16px', fontWeight: '800' }}>{v.manualTitulo}</div>
                     <span
+                      className="tx-alvo"
                       role="button"
                       tabIndex={0}
                       onClick={v.abrirPublicar}
@@ -1012,6 +1013,7 @@ export default class Cadastros extends Tela {
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <div style={{ fontSize: '16px', fontWeight: '800' }}>Treinamentos registrados</div>
                     <span
+                      className="tx-alvo"
                       role="button"
                       tabIndex={0}
                       onClick={v.abrirTreino}
@@ -1125,7 +1127,7 @@ export default class Cadastros extends Tela {
                                     onClick={fd?.onAtualizar}
                                     data-tx-atualizar-doc={fd?.k}
                                     style={{ fontWeight: '800', color: 'var(--primario-2)', cursor: 'pointer', paddingLeft: '6px' }}
-                                    className="tx-h76d8d79"
+                                    className="tx-alvo tx-h76d8d79"
                                   >
                                     Atualizar
                                   </span>
@@ -1160,7 +1162,7 @@ export default class Cadastros extends Tela {
                         <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '12px', color: 'var(--texto-sec)' }}>
                           {fl?.reg}
                         </span>
-                        <A href={fl?.hrefMesa} style={{ marginLeft: 'auto', fontSize: '13px', fontWeight: '800' }}>
+                        <A className="tx-alvo" href={fl?.hrefMesa} style={{ marginLeft: 'auto', fontSize: '13px', fontWeight: '800' }}>
                           Abrir a mesa →
                         </A>
                       </div>
@@ -1317,6 +1319,7 @@ export default class Cadastros extends Tela {
                       {(Array.isArray(v.mChips) ? v.mChips : []).map((mh, $index) => (
                         <Fragment key={$index}>
                           <span
+                            className="tx-alvo"
                             role="button"
                             tabIndex={0}
                             onClick={mh?.onClick}

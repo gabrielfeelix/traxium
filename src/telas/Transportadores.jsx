@@ -850,6 +850,7 @@ export default class Transportadores extends Tela {
                       {r?.cv}
                     </span>
                     <span
+                      className="tx-alvo"
                       role="button"
                       tabIndex={0}
                       onClick={r?.cvAcao}
@@ -880,6 +881,7 @@ export default class Transportadores extends Tela {
                     {(Array.isArray(v.paginas) ? v.paginas : []).map((pg, $index) => (
                       <Fragment key={$index}>
                         <span
+                          className="tx-alvo"
                           role="button"
                           tabIndex={0}
                           onClick={pg?.onClick}
@@ -1064,6 +1066,7 @@ export default class Transportadores extends Tela {
                               <div style={{ fontSize: '12px', color: dd?.c }}>{dd?.sub}</div>
                             </div>
                             <span
+                              className="tx-alvo"
                               role="button"
                               tabIndex={0}
                               onClick={dd?.onClick}
@@ -1089,6 +1092,7 @@ export default class Transportadores extends Tela {
                               {(Array.isArray(cj?.placas) ? cj?.placas : []).map((pl, $index) => (
                                 <Fragment key={$index}>
                                   <A
+                                    className="tx-alvo"
                                     href={pl?.href}
                                     style={{
                                       display: 'inline-flex',
@@ -1331,6 +1335,7 @@ export default class Transportadores extends Tela {
                       {(Array.isArray(v.cadTipos) ? v.cadTipos : []).map((ct, $index) => (
                         <Fragment key={$index}>
                           <span
+                            className="tx-alvo"
                             role="button"
                             tabIndex={0}
                             onClick={ct?.onClick}
@@ -1409,6 +1414,7 @@ export default class Transportadores extends Tela {
                       <input type="file" accept=".csv,.xlsx" onChange={v.onImpArq} className="tx-so-leitor" />
                       <div style={{ flex: '1', fontSize: '14px', fontWeight: '800' }}>{v.impTitulo}</div>
                       <span
+                        className="tx-alvo"
                         role="button"
                         tabIndex={0}
                         onClick={v.impExemplo}
@@ -1526,6 +1532,7 @@ export default class Transportadores extends Tela {
                     {v.revTrocar ? (
                       <>
                         <span
+                          className="tx-alvo"
                           role="button"
                           tabIndex={0}
                           onClick={v.abrirEntrar}

@@ -131,3 +131,8 @@ label:has(> .tx-so-leitor:focus-visible) { outline: 2px solid var(--primario); o
 [data-tela='LinkDaViagem'] input:not([type='checkbox']):not([type='radio']):not([type='file']),
 [data-tela='LinkDaViagem'] textarea, [data-tela='LinkDaViagem'] select { min-height: 44px; font-size: 16px !important; }
 [data-tela='LinkDaViagem'] [role='button'] { min-height: 32px; }
+
+/* Área de clique maior que o desenho: ação em texto ganha 8 px de alvo invisível em cima e embaixo
+   (e 4 px dos lados), sem mudar o layout. O alvo final passa de 32 px. */
+.tx-alvo { position: relative; }
+.tx-alvo::after { content: ''; position: absolute; inset: -8px -4px; }

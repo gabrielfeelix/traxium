@@ -237,3 +237,24 @@ Os três primeiros temas da tabela da seção 5 valem igual para as dez telas; r
 **O que mudou.** Escala de celular: 12 legenda, 14 corpo, 16 destaque e campo, 20 título, 24 número. Espaçamento entre blocos em múltiplos de 4, como no escritório. Todo campo do Link com 44 px de altura e 16 px de fonte; clicável com pelo menos 32 px; "Simular envio" com 44 px. O resto do Link (o botão apagado que diz o que falta e leva até lá) já atendia desde a etapa 11 da rodada anterior.
 
 **Teste.** Medição de alvos em cada etapa do fluxo sem nenhum abaixo de 44 px, salvo o selo "com sinal" (32 px, de demonstração). Bateria inteira passa, inclusive o F1 com o motorista.
+
+### Etapa 11. Alvos de clique nas telas do escritório (15/10/2026)
+
+**Problema.** `scripts/conferir-alvos.cjs` (novo) achou 93 alvos abaixo de 32 px nas nove telas: ações em texto sem padding ("Convidar", "Revogar", "Atualizar", "Entrar como", "Copiar", "Tirar do escopo", datas-link da Auditoria, migalha "Viagens"), chips de placa e de compartimento (22 a 24 px), seletor "Bloqueia / Só alerta" (28 px), checkbox da amostra (19 px) e paginação (25 px).
+
+**O que mudou.** Classe `tx-alvo`: um pseudo-elemento invisível estende o clique 8 px para cima e para baixo (4 px dos lados), sem mudar o layout. Aplicada a 60 clicáveis sem padding ou com padding vertical de até 6 px. Ficaram 21 com 31 px (botões com padding de 7 px: abas TAC/ETC, linhas da Frota, "Enviar link", "Revogar acesso", "Registrar comunicação"), para acertar com o componente de botão compartilhado.
+
+**Teste.** `conferir-alvos.cjs` conta a área de `tx-alvo`; bateria inteira passa.
+
+## 9. Onde parar e retomar (15/10/2026, fim da sessão)
+
+Feito: Parte 1 inteira (moldura única, etapa 1), Parte 2 menos a escolha do fundo (tokens, etapa 2; opções, etapa 3) e, da Parte 3, os temas que valem para todas as telas (contraste, teclado, foco, escala tipográfica, espaçamento, campos, arquivos, alvos) mais a revisão de Hoje, Viagens, Viagem e Link da Viagem.
+
+Falta, nesta ordem:
+
+1. **Fundo**: o Gabriel recebeu as três opções (A atual, B neutro claro, C moldura funda com folha clara). Com a resposta, tornar a escolhida padrão em `globals.css` e tirar as variantes `data-fundo` de `moldura.css`.
+2. **Revisão tela a tela** de Transportadores, Frota própria, Compartimento, Auditoria, Cadastros e Configurações, com o mesmo método das etapas 7 a 10: formulários dos modais com `Campo`/`Escolhas` e rodapé "Falta: ..." (o padrão da Viagem, `ctaOf(ok, falta)` e `levarAoQueFalta`), estados de erro, tabela (cabeçalho na grade, número à direita, linha clicável), hierarquia. Registrar cada uma aqui.
+3. **Componente de botão compartilhado** (`src/components/ui/`): primário, secundário, perigo e ação em texto, como `<button>`; trocar os `span role="button"` aos poucos, tela a tela. Resolve os 21 alvos de 31 px.
+4. Pendências antigas da seção 6, item 3 (premissas do `HANDOFF.md`, seção 7) seguem como estavam.
+
+Ferramentas novas desta rodada: `scripts/e2e-ui.cjs` (acrescentar uma seção por tela revista), `scripts/conferir-largura.cjs` e `scripts/conferir-alvos.cjs` (rodar depois de cada tela).

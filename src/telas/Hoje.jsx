@@ -1582,6 +1582,7 @@ export default class Hoje extends Tela {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <div style={{ fontSize: '16px', fontWeight: '800' }}>Pendências de registro</div>
                     <A
+                      className="tx-alvo"
                       href="/viagens?conciliar=1"
                       style={{ marginLeft: 'auto', fontSize: '13px', fontWeight: '800', whiteSpace: 'nowrap' }}
                     >
@@ -1811,7 +1812,11 @@ export default class Hoje extends Tela {
                   <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px' }}>
                     <div style={{ fontSize: '16px', fontWeight: '800' }}>Auditoria</div>
                     <div style={{ fontSize: '13px', color: 'var(--texto-sec)', marginTop: '4px', lineHeight: '1.5' }}>{v.simTxt}</div>{' '}
-                    <A href="/auditoria" style={{ display: 'inline-block', marginTop: '10px', fontSize: '13px', fontWeight: '800' }}>
+                    <A
+                      className="tx-alvo"
+                      href="/auditoria"
+                      style={{ display: 'inline-block', marginTop: '10px', fontSize: '13px', fontWeight: '800' }}
+                    >
                       Rastrear placa ou montar amostra →
                     </A>{' '}
                   </div>
@@ -2125,6 +2130,7 @@ export default class Hoje extends Tela {
                       {(Array.isArray(v.nTipos) ? v.nTipos : []).map((nt, $index) => (
                         <Fragment key={$index}>
                           <span
+                            className="tx-alvo"
                             role="button"
                             tabIndex={0}
                             onClick={nt?.onClick}
