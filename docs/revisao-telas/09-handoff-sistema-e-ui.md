@@ -181,3 +181,24 @@ Os três primeiros temas da tabela da seção 5 valem igual para as dez telas; r
 **O que mudou.** `gap`, margem vertical e `padding` de contêiner a partir de 12 px arredondados para o múltiplo de 4 mais próximo (empate para cima): 31 gaps, 41 margens e 80 paddings nas nove telas do escritório. O espaçamento miúdo de controle (abaixo de 12 px, como o `9px 12px` de um botão) ficou, para não mudar a altura de botões e campos já aprovados. Link do motorista fica para a etapa dele.
 
 **Teste.** `conferir-largura.cjs` sem estouro nem quebra em 1366 px; bateria inteira passa.
+
+### Etapa 7. Hoje (15/10/2026)
+
+**Problema.** Na Nova viagem, os rótulos eram `div` soltos (leitor de tela não sabia de que campo eram), o cadastro mínimo do motorista só tinha placeholder como rótulo, e o botão apagado listava sempre os seis campos, mesmo os já preenchidos. Horário "25:99" ou peso zero só deixavam o botão apagado, sem dizer por quê; o regex aceitava qualquer HH:MM. Os chips de embarcador e destinatário (contorno teal) e os de dia (preenchidos de escuro) tinham dois estilos de selecionado no mesmo formulário e não diziam a leitor de tela qual estava escolhido. "Ver todos" de Vencimentos levava a Transportadores, onde vencimento de fornecedor e de frota não aparece (pendência 1 da seção 6). Ações em texto ("Abrir a mesa da filial", "usar ordem de exemplo", "Ver a viagem") tinham alvo de 16 a 18 px. Texto cortado com reticências não tinha como ser lido inteiro.
+
+**O que mudou.**
+
+1. Componentes de formulário compartilhados em `src/components/ui/formulario.tsx`: `Campo` (rótulo `label` ligado, erro junto do campo com `aria-invalid` e `aria-describedby`), `Escolhas` (grupo de rádio com um só chip de selecionado) e `listaFalta`. Servem às próximas telas.
+2. Nova viagem: rodapé diz só o que falta ("Falta: produto e peso."). O botão apagado continua clicável: mostra o erro de cada campo pendente e leva o foco ao primeiro. Horário com máscara (1830 vira 18:30) e conferência de faixa; peso de 1 a 80 t. Erro de formato aparece já ao digitar; erro de campo vazio, só depois de tentar seguir. Cadastro mínimo com rótulos visíveis e erros por campo.
+3. Vencimentos: "Ver todos (N)" abre a lista inteira ali mesmo; cada item já leva ao lugar dele (transportador, frota própria ou fornecedor em Cadastros). Pendência 1 resolvida.
+4. Ação em texto ganhou classe `tx-acao-texto`: o texto fica onde estava e o alvo cresce para 32 px.
+5. Em todas as telas: texto cortado com reticências mostra o conteúdo inteiro como dica ao passar o ponteiro (`teclado.tsx`).
+
+**Teste.** `scripts/e2e-ui.cjs` novo, para esta revisão: rodapé com o que falta, quatro erros junto dos campos, foco no primeiro, rótulo ligado, máscara e faixa do horário, rádio marcado, Ver todos com fornecedor, alvo de 32 px. Bateria inteira passa; `conferir-largura.cjs` sem estouro.
+
+**Premissas.**
+
+| Premissa | O que muda se a resposta vier diferente |
+| --- | --- |
+| Peso de uma viagem fica entre 1 e 80 t (rodotrem chega a 74 t de PBT) | Trocar o limite em `pesoOk` |
+| Vencimentos fica completo em Hoje, sem tela própria | Se a lista crescer muito, virar uma visão em Transportadores que inclua fornecedor e frota |

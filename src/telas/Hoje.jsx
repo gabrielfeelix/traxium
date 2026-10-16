@@ -2,6 +2,7 @@
 'use client';
 import { Fragment } from 'react';
 import { TX, Tela, A, css } from '@/lib/tx/tela';
+import { Campo, Escolhas, listaFalta } from '@/components/ui/formulario';
 
 export default class Hoje extends Tela {
   state = { loading: true, busca: '', abertos: { falta: true, bloq: true, pronta: false }, nova: false };
@@ -242,6 +243,8 @@ export default class Hoje extends Tela {
           cmCpf: '',
           cmPlacas: '',
           nCriada: null,
+          nTentou1: false,
+          nTentou2: false,
         }),
     };
     if (todas) return Object.assign(base, this.painelVals(u));
@@ -438,15 +441,17 @@ export default class Hoje extends Tela {
       v15,
       v30,
       v60,
-      vencs: venc
-        .slice(0, 6)
-        .map((x) => ({
-          t: x.tipo + ' ' + x.ref,
-          dono: x.dono,
-          href: x.href,
-          d: x.estado === 'vencido' ? 'vencido' : x.dias + ' dias',
-          c: x.dias <= 15 ? 'var(--perigo)' : x.dias <= 30 ? 'var(--aviso)' : 'var(--texto-sec)',
-        })),
+      // Todos os vencimentos ficam aqui mesmo: cada um leva ao lugar dele (transportador, frota ou fornecedor).
+      vencMais: venc.length > 6,
+      vencTodosRot: this.state.vencTodos ? 'Mostrar menos' : 'Ver todos (' + venc.length + ')',
+      alternarVencs: () => this.setState({ vencTodos: !this.state.vencTodos }),
+      vencs: (this.state.vencTodos ? venc : venc.slice(0, 6)).map((x) => ({
+        t: x.tipo + ' ' + x.ref,
+        dono: x.dono,
+        href: x.href,
+        d: x.estado === 'vencido' ? 'vencido' : x.dias + ' dias',
+        c: x.dias <= 15 ? 'var(--perigo)' : x.dias <= 30 ? 'var(--aviso)' : 'var(--texto-sec)',
+      })),
       simTxt: sim
         ? 'Última simulação de rastreabilidade: ' +
           F.data(sim.em.slice(0, 10)) +
@@ -472,13 +477,25 @@ export default class Hoje extends Tela {
     const fechar = () => this.setState({ nova: false });
     const prod = s.nProd ? TX.produto(s.nProd) : null;
     const dest = s.nDest ? TX.destinatario(s.nDest) : null;
-    const v1 =
-      !!prod &&
-      !!s.nEmb &&
-      !!s.nDest &&
-      /^\d{2}:\d{2}$/.test(s.nJanela || '') &&
-      +(s.nPeso || 0) > 0 &&
-      (s.nOrdem || '').trim().length >= 3;
+    // Passo 1: o que falta, campo a campo. O erro só aparece depois de tentar seguir,
+    // salvo formato errado num campo já digitado (horário, peso).
+    const hm = /^(\d{2}):(\d{2})$/.exec(s.nJanela || '');
+    const janelaOk = !!hm && +hm[1] < 24 && +hm[2] < 60;
+    const pesoN = +String(s.nPeso || '').replace(',', '.');
+    const pesoOk = pesoN > 0 && pesoN <= 80;
+    const ordemOk = (s.nOrdem || '').trim().length >= 3;
+    const falta1 = [
+      ['produto', !prod],
+      ['ordem', !ordemOk],
+      ['embarcador', !s.nEmb],
+      ['destinatário', !s.nDest],
+      ['horário', !janelaOk],
+      ['peso', !pesoOk],
+    ]
+      .filter((x) => x[1])
+      .map((x) => x[0]);
+    const v1 = falta1.length === 0;
+    const t1 = !!s.nTentou1;
     const assegura = prod && dest ? prod.racao && dest.certificado : null;
     // passo 2
     const q = TX.norm(s.nQuem || '');
@@ -513,6 +530,22 @@ export default class Hoje extends Tela {
         ? TX.conjunto(s.nSel)
         : null;
     const v2 = terceiro ? !!s.nSel || (achados.length === 0 && q.length >= 3 && cmOk) : !!s.nSel;
+    const t2 = !!s.nTentou2;
+    const falta2 = v2
+      ? []
+      : !terceiro
+        ? ['o conjunto da frota']
+        : q.length < 3
+          ? ['placa do cavalo ou CPF de quem carrega']
+          : achados.length
+            ? ['escolher quem carrega na lista']
+            : [
+                ['nome', (s.cmNome || '').trim().length < 5],
+                ['telefone', TX.soDigitos(s.cmTel).length < 10],
+                ['placas', placasCm.length < 2],
+              ]
+                .filter((x) => x[1])
+                .map((x) => x[0]);
     const criar = () => {
       const d = {
         filial: fil,
@@ -546,7 +579,11 @@ export default class Hoje extends Tela {
         ['Ordem', 1],
         ['Quem carrega', 2],
         ['Link', 3],
-      ].map(([n, i]) => ({ n, bg: i <= p ? 'linear-gradient(90deg,var(--primario),var(--azul))' : 'var(--borda)', c: i <= p ? 'var(--primario-2)' : 'var(--texto-apagado)' })),
+      ].map(([n, i]) => ({
+        n,
+        bg: i <= p ? 'linear-gradient(90deg,var(--primario),var(--azul))' : 'var(--borda)',
+        c: i <= p ? 'var(--primario-2)' : 'var(--texto-apagado)',
+      })),
       nP1: p === 1,
       nP2: p === 2,
       nP3: p === 3,
@@ -576,20 +613,40 @@ export default class Hoje extends Tela {
       })),
       nOrdem: s.nOrdem,
       onOrdem: (e) => this.setState({ nOrdem: e.target.value }),
-      nEmbs: TX.db.embarcadores.map((x) =>
-        Object.assign({ n: x.nome, onClick: () => this.setState({ nEmb: x.id }) }, U.sel(s.nEmb === x.id)),
-      ),
-      nDests: TX.db.destinatarios.map((x) =>
-        Object.assign({ n: x.nome, onClick: () => this.setState({ nDest: x.id }) }, U.sel(s.nDest === x.id)),
-      ),
+      nEmbs: TX.db.embarcadores.map((x) => ({ k: x.id, n: x.nome, on: s.nEmb === x.id, onClick: () => this.setState({ nEmb: x.id }) })),
+      nDests: TX.db.destinatarios.map((x) => ({ k: x.id, n: x.nome, on: s.nDest === x.id, onClick: () => this.setState({ nDest: x.id }) })),
       nDias: [
         [TX.HOJE, 'hoje'],
         [TX.addDias(TX.HOJE, 1), 'amanhã'],
-      ].map(([d, n]) => Object.assign({ n, onClick: () => this.setState({ nDia: d }) }, U.chip(s.nDia === d))),
+      ].map(([d, n]) => ({ k: d, n, on: s.nDia === d, onClick: () => this.setState({ nDia: d }) })),
       nJanela: s.nJanela,
-      onJanela: (e) => this.setState({ nJanela: e.target.value }),
+      // Horário digitado só com números: 1830 vira 18:30.
+      onJanela: (e) => {
+        const d = TX.soDigitos(e.target.value).slice(0, 4);
+        this.setState({ nJanela: d.length > 2 ? d.slice(0, 2) + ':' + d.slice(2) : d });
+      },
       nPeso: s.nPeso,
       onPeso: (e) => this.setState({ nPeso: e.target.value.replace(/[^0-9,.]/g, '') }),
+      eProd: t1 && !prod ? ((s.nProdBusca || '').trim() ? 'Escolha o produto na lista.' : 'Informe o produto.') : '',
+      eOrdem: t1 && !ordemOk ? 'Informe a ordem, como OC 48140.' : '',
+      eEmb: t1 && !s.nEmb ? 'Escolha o embarcador.' : '',
+      eDest: t1 && !s.nDest ? 'Escolha o destinatário.' : '',
+      eJanela:
+        (t1 || (s.nJanela || '').length >= 5) && !janelaOk
+          ? s.nJanela
+            ? 'Horário inválido: de 00:00 a 23:59.'
+            : 'Informe o horário.'
+          : '',
+      ePeso: (t1 || s.nPeso) && !pesoOk ? (s.nPeso ? 'Peso em toneladas, de 1 a 80.' : 'Informe o peso.') : '',
+      eCmNome: t2 && (s.cmNome || '').trim().length < 5 ? 'Nome e sobrenome.' : '',
+      eCmTel: t2 && TX.soDigitos(s.cmTel).length < 10 ? 'Celular com DDD, para mandar o link.' : '',
+      eCmPlacas: t2 && placasCm.length < 2 ? 'Cavalo e pelo menos uma carreta, separados por vírgula.' : '',
+      eQuem:
+        t2 && terceiro && !v2 && (q.length < 3 || achados.length > 0)
+          ? q.length < 3
+            ? 'Digite a placa do cavalo ou o CPF.'
+            : 'Escolha quem carrega na lista.'
+          : '',
       asTxt:
         assegura === null
           ? 'Escolha produto e destinatário: o sistema diz se a viagem leva a declaração GMP+.'
@@ -662,11 +719,18 @@ export default class Hoje extends Tela {
       nCriadaTxt: criada ? criada.ordem + ' criada para ' + TX.pessoa(criada.motorista).nome : '',
       nMensagem: criada ? TX.mensagemLink(criada) : '',
       nHref: criada ? '/viagem?id=' + criada.id : '',
+      // O botão apagado diz o que falta, e só o que falta.
       nDica:
         p === 1
-          ? 'Produto, ordem, embarcador, destinatário, horário e peso.'
+          ? v1
+            ? 'Tudo preenchido.'
+            : 'Falta: ' + listaFalta(falta1) + '.'
           : p === 2
-            ? 'Placa ou CPF trazem o cadastro e os documentos de volta.'
+            ? v2
+              ? 'Pronto para criar a viagem.'
+              : terceiro && q.length < 3
+                ? 'Placa ou CPF trazem o cadastro e os documentos de volta.'
+                : 'Falta: ' + listaFalta(falta2) + '.'
             : '',
       nVoltar: p === 2,
       nVoltarFn: () => this.setState({ nPasso: 1 }),
@@ -674,10 +738,12 @@ export default class Hoje extends Tela {
       nAvancar: () => {
         if (p === 1) {
           if (v1) this.setState({ nPasso: 2 });
+          else this.setState({ nTentou1: true }, () => this.focarFalta(falta1[0]));
           return;
         }
         if (p === 2) {
           if (v2) criar();
+          else this.setState({ nTentou2: true }, () => this.focarFalta(falta2[0]));
           return;
         }
         TX.ui.copiar(TX.mensagemLink(criada));
@@ -691,6 +757,23 @@ export default class Hoje extends Tela {
       ctaCur: c.cur,
     };
     return vals;
+  }
+  // Leva o foco ao primeiro campo que falta (o botão apagado continua clicável para isso).
+  focarFalta(k) {
+    const sel =
+      {
+        produto: '[data-tx-campo="produto"]',
+        ordem: '[data-tx-campo="ordem"]',
+        embarcador: '[data-tx-grupo="nv-emb"] button',
+        destinatário: '[data-tx-grupo="nv-dest"] button',
+        horário: '[data-tx-campo="janela"]',
+        peso: '[data-tx-campo="peso"]',
+        nome: '[data-tx-campo="cm-nome"]',
+        telefone: '[data-tx-campo="cm-tel"]',
+        placas: '[data-tx-campo="cm-placas"]',
+      }[k] || '[data-tx-campo="quem"]';
+    const el = document.querySelector(sel);
+    if (el) el.focus();
   }
   preencherOrdem(nome) {
     const fil = this.filialAtual() === 'todas' ? TX.sessao().filiais[0] : this.filialAtual();
@@ -753,7 +836,9 @@ export default class Hoje extends Tela {
               {v.temFiliais ? (
                 <>
                   <div data-tx-pop="" style={{ position: 'relative' }}>
-                    <div role="button" tabIndex={0}
+                    <div
+                      role="button"
+                      tabIndex={0}
                       onClick={v.onFilial}
                       data-tx-filial=""
                       style={{
@@ -790,7 +875,9 @@ export default class Hoje extends Tela {
                         >
                           {(Array.isArray(v.filiais) ? v.filiais : []).map((fl, $index) => (
                             <Fragment key={$index}>
-                              <div role="button" tabIndex={0}
+                              <div
+                                role="button"
+                                tabIndex={0}
                                 onClick={fl?.onClick}
                                 data-tx-filial-op={fl?.id}
                                 style={{
@@ -808,7 +895,9 @@ export default class Hoje extends Tela {
                               >
                                 <span style={{ width: '7px', height: '7px', borderRadius: '99px', background: fl?.dot }}></span>
                                 <span style={{ flex: '1' }}>{fl?.n}</span>
-                                <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '12px', color: 'var(--texto-apagado)' }}>
+                                <span
+                                  style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '12px', color: 'var(--texto-apagado)' }}
+                                >
                                   {fl?.q}
                                 </span>
                               </div>
@@ -820,7 +909,9 @@ export default class Hoje extends Tela {
                   </div>
                 </>
               ) : null}
-              <span role="button" tabIndex={0}
+              <span
+                role="button"
+                tabIndex={0}
                 onClick={v.abrirNova}
                 data-tx-nova-viagem=""
                 style={{
@@ -898,7 +989,9 @@ export default class Hoje extends Tela {
                     </div>
                     {(Array.isArray(v.resItens) ? v.resItens : []).map((ri, $index) => (
                       <Fragment key={$index}>
-                        <span role="button" tabIndex={0}
+                        <span
+                          role="button"
+                          tabIndex={0}
                           onClick={ri?.onClick}
                           data-tx-ir-grupo={ri?.k}
                           style={{
@@ -1005,7 +1098,9 @@ export default class Hoje extends Tela {
               {(Array.isArray(v.grupos) ? v.grupos : []).map((gr, $index) => (
                 <Fragment key={$index}>
                   <div id={gr?.ancora} style={{ display: 'flex', flexDirection: 'column', gap: '10px', scrollMarginTop: '16px' }}>
-                    <div role="button" tabIndex={0}
+                    <div
+                      role="button"
+                      tabIndex={0}
                       onClick={gr?.toggle}
                       style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '4px 4px 0', cursor: 'pointer' }}
                     >
@@ -1019,11 +1114,20 @@ export default class Hoje extends Tela {
                         }}
                       ></span>
                       <div style={{ fontSize: '16px', fontWeight: '800' }}>{gr?.n}</div>
-                      <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '13px', fontWeight: '600', color: 'var(--texto-sec)' }}>
+                      <span
+                        style={{
+                          fontFamily: "'Spline Sans Mono',monospace",
+                          fontSize: '13px',
+                          fontWeight: '600',
+                          color: 'var(--texto-sec)',
+                        }}
+                      >
                         {gr?.q}
                       </span>
                       <div style={{ fontSize: '13px', color: 'var(--texto-apagado)' }}>{gr?.sub}</div>
-                      <span style={{ marginLeft: 'auto', fontSize: '13px', fontWeight: '700', color: 'var(--primario-2)' }}>{gr?.toggleRot}</span>
+                      <span style={{ marginLeft: 'auto', fontSize: '13px', fontWeight: '700', color: 'var(--primario-2)' }}>
+                        {gr?.toggleRot}
+                      </span>
                     </div>
                     {gr?.aberto ? (
                       <>
@@ -1085,7 +1189,9 @@ export default class Hoje extends Tela {
                                     >
                                       {ln?.motorista}
                                     </span>
-                                    <span style={{ fontSize: '12px', color: 'var(--texto-apagado)', whiteSpace: 'nowrap' }}>{ln?.tipo}</span>
+                                    <span style={{ fontSize: '12px', color: 'var(--texto-apagado)', whiteSpace: 'nowrap' }}>
+                                      {ln?.tipo}
+                                    </span>
                                   </div>
                                   <div
                                     style={{
@@ -1142,7 +1248,13 @@ export default class Hoje extends Tela {
                                       }}
                                     ></span>
                                     {ln?.linkRot}
-                                    <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontWeight: '500', color: 'var(--texto-apagado)' }}>
+                                    <span
+                                      style={{
+                                        fontFamily: "'Spline Sans Mono',monospace",
+                                        fontWeight: '500',
+                                        color: 'var(--texto-apagado)',
+                                      }}
+                                    >
                                       {ln?.linkHora}
                                     </span>
                                   </div>
@@ -1175,7 +1287,9 @@ export default class Hoje extends Tela {
                               </A>
                               {ln?.temAcao ? (
                                 <>
-                                  <span role="button" tabIndex={0}
+                                  <span
+                                    role="button"
+                                    tabIndex={0}
                                     onClick={ln?.onAcao}
                                     data-tx-acao-linha={ln?.acaoK}
                                     style={{
@@ -1388,7 +1502,7 @@ export default class Hoje extends Tela {
                         <>
                           <div style={{ fontSize: '13px', color: 'var(--texto-sec)', paddingTop: '10px' }}>
                             {v.acimaTxt}{' '}
-                            <A href={v.acimaHref} style={{ fontWeight: '800' }}>
+                            <A className="tx-acao-texto" href={v.acimaHref} style={{ fontWeight: '800' }}>
                               {v.acimaLink}
                               {' →'}
                             </A>
@@ -1415,7 +1529,9 @@ export default class Hoje extends Tela {
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <div style={{ fontSize: '16px', fontWeight: '800' }}>{cf?.n}</div>
-                        <span style={{ fontSize: '11px', color: 'var(--texto-apagado)', fontFamily: "'Spline Sans Mono',monospace" }}>{cf?.reg}</span>
+                        <span style={{ fontSize: '11px', color: 'var(--texto-apagado)', fontFamily: "'Spline Sans Mono',monospace" }}>
+                          {cf?.reg}
+                        </span>
                       </div>
                       <div style={{ display: 'flex', gap: '16px', fontSize: '13px' }}>
                         <span>
@@ -1435,7 +1551,9 @@ export default class Hoje extends Tela {
                         {'afretador: '}
                         {cf?.afretador}
                       </div>
-                      <span role="button" tabIndex={0}
+                      <span
+                        role="button"
+                        tabIndex={0}
                         onClick={cf?.onClick}
                         data-tx-abrir-mesa={cf?.id}
                         style={{
@@ -1446,7 +1564,7 @@ export default class Hoje extends Tela {
                           color: 'var(--primario-2)',
                           cursor: 'pointer',
                         }}
-                        className="tx-h76d8d79"
+                        className="tx-acao-texto tx-h76d8d79"
                       >
                         Abrir a mesa da filial →
                       </span>
@@ -1547,9 +1665,18 @@ export default class Hoje extends Tela {
                   <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px' }}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                       <div style={{ fontSize: '16px', fontWeight: '800' }}>Vencimentos</div>
-                      <A href="/transportadores?filtro=vencendo" style={{ marginLeft: 'auto', fontSize: '13px', fontWeight: '800' }}>
-                        Ver todos →
-                      </A>
+                      {v.vencMais ? (
+                        <button
+                          type="button"
+                          onClick={v.alternarVencs}
+                          data-tx-venc-todos=""
+                          className="tx-acao-texto"
+                          style={{ marginLeft: 'auto' }}
+                          aria-expanded={v.vencTodosRot === 'Mostrar menos'}
+                        >
+                          {v.vencTodosRot}
+                        </button>
+                      ) : null}
                     </div>
                     <div
                       style={{
@@ -1565,7 +1692,16 @@ export default class Hoje extends Tela {
                       <div style={{ width: v.vW2, background: 'linear-gradient(90deg,#f4c15d,var(--aviso-2))' }}></div>
                       <div style={{ width: v.vW3, background: 'linear-gradient(90deg,#9fc9c6,#6ba8a4)' }}></div>
                     </div>
-                    <div style={{ display: 'flex', gap: '16px', marginTop: '9px', fontSize: '12px', color: 'var(--texto-sec)', fontWeight: '600' }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: '16px',
+                        marginTop: '9px',
+                        fontSize: '12px',
+                        color: 'var(--texto-sec)',
+                        fontWeight: '600',
+                      }}
+                    >
                       <span>
                         <span
                           style={{
@@ -1695,7 +1831,9 @@ export default class Hoje extends Tela {
                 padding: '28px',
               }}
             >
-              <div role="dialog" aria-modal="true"
+              <div
+                role="dialog"
+                aria-modal="true"
                 onClick={v.pararClique}
                 data-tx-modal="nova"
                 style={{
@@ -1714,7 +1852,9 @@ export default class Hoje extends Tela {
                     {'filial '}
                     {v.nFilialNome}
                   </span>
-                  <span role="button" tabIndex={0}
+                  <span
+                    role="button"
+                    tabIndex={0}
                     onClick={v.fecharModal}
                     style={{
                       marginLeft: 'auto',
@@ -1789,7 +1929,10 @@ export default class Hoje extends Tela {
                         <div style={{ fontSize: '14px', fontWeight: '800' }}>{v.pdfTitulo}</div>
                         <div style={{ fontSize: '12px', color: 'var(--texto-sec)' }}>{v.pdfSub}</div>
                       </div>
-                      <span role="button" tabIndex={0}
+                      <span
+                        className="tx-acao-texto"
+                        role="button"
+                        tabIndex={0}
                         onClick={v.usarOrdemExemplo}
                         data-tx-ordem-exemplo=""
                         style={{ fontSize: '12px', fontWeight: '800', color: 'var(--primario-2)', whiteSpace: 'nowrap' }}
@@ -1800,10 +1943,15 @@ export default class Hoje extends Tela {
                     <div style={{ fontSize: '12px', color: 'var(--texto-apagado)', marginTop: '8px' }}>ou preencha o mínimo:</div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '8px' }}>
                       <div style={{ position: 'relative' }}>
-                        <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)' }}>Produto</div>
+                        <label htmlFor="nv-produto" className="tx-rotulo">
+                          Produto
+                        </label>
                         <input
                           value={v.nProdBusca ?? ''}
                           onChange={v.onProdBusca}
+                          id="nv-produto"
+                          aria-invalid={v.eProd ? true : undefined}
+                          aria-describedby={v.eProd ? 'nv-produto-erro' : undefined}
                           data-tx-campo="produto"
                           placeholder="farelo, milho, casquinha…"
                           style={{
@@ -1816,6 +1964,11 @@ export default class Hoje extends Tela {
                             outline: 'none',
                           }}
                         />
+                        {v.eProd ? (
+                          <div id="nv-produto-erro" className="tx-erro" role="alert">
+                            {v.eProd}
+                          </div>
+                        ) : null}
                         {v.nProdLista ? (
                           <>
                             <div
@@ -1823,7 +1976,7 @@ export default class Hoje extends Tela {
                                 position: 'absolute',
                                 left: '0',
                                 right: '0',
-                                top: '66px',
+                                top: '62px',
                                 background: 'var(--painel)',
                                 border: '1px solid var(--borda)',
                                 borderRadius: '12px',
@@ -1834,7 +1987,9 @@ export default class Hoje extends Tela {
                             >
                               {(Array.isArray(v.nProdOps) ? v.nProdOps : []).map((po, $index) => (
                                 <Fragment key={$index}>
-                                  <div role="button" tabIndex={0}
+                                  <div
+                                    role="button"
+                                    tabIndex={0}
                                     onClick={po?.onClick}
                                     data-tx-produto-op={po?.id}
                                     style={{ padding: '7px 10px', borderRadius: '8px', cursor: 'pointer', fontSize: '13px' }}
@@ -1849,10 +2004,15 @@ export default class Hoje extends Tela {
                         ) : null}
                       </div>
                       <div>
-                        <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)' }}>Ordem de carregamento</div>
+                        <label htmlFor="nv-ordem" className="tx-rotulo">
+                          Ordem de carregamento
+                        </label>
                         <input
                           value={v.nOrdem ?? ''}
                           onChange={v.onOrdem}
+                          id="nv-ordem"
+                          aria-invalid={v.eOrdem ? true : undefined}
+                          aria-describedby={v.eOrdem ? 'nv-ordem-erro' : undefined}
                           data-tx-campo="ordem"
                           placeholder="OC 48140"
                           style={{
@@ -1866,81 +2026,28 @@ export default class Hoje extends Tela {
                             fontFamily: "'Spline Sans Mono',monospace",
                           }}
                         />
+                        {v.eOrdem ? (
+                          <div id="nv-ordem-erro" className="tx-erro" role="alert">
+                            {v.eOrdem}
+                          </div>
+                        ) : null}
                       </div>
-                      <div>
-                        <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)' }}>Embarcador</div>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
-                          {(Array.isArray(v.nEmbs) ? v.nEmbs : []).map((ne, $index) => (
-                            <Fragment key={$index}>
-                              <span role="button" tabIndex={0}
-                                onClick={ne?.onClick}
-                                style={{
-                                  fontSize: '12px',
-                                  fontWeight: '700',
-                                  borderRadius: '99px',
-                                  padding: '5px 11px',
-                                  cursor: 'pointer',
-                                  border: `1.5px solid ${ne?.bd ?? ''}`,
-                                  background: ne?.bg,
-                                  color: ne?.c,
-                                }}
-                              >
-                                {ne?.n}
-                              </span>
-                            </Fragment>
-                          ))}
-                        </div>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)' }}>Destinatário</div>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
-                          {(Array.isArray(v.nDests) ? v.nDests : []).map((nd, $index) => (
-                            <Fragment key={$index}>
-                              <span role="button" tabIndex={0}
-                                onClick={nd?.onClick}
-                                style={{
-                                  fontSize: '12px',
-                                  fontWeight: '700',
-                                  borderRadius: '99px',
-                                  padding: '5px 11px',
-                                  cursor: 'pointer',
-                                  border: `1.5px solid ${nd?.bd ?? ''}`,
-                                  background: nd?.bg,
-                                  color: nd?.c,
-                                }}
-                              >
-                                {nd?.n}
-                              </span>
-                            </Fragment>
-                          ))}
-                        </div>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)' }}>Carregamento</div>
-                        <div style={{ display: 'flex', gap: '6px', marginTop: '6px', alignItems: 'center' }}>
-                          {(Array.isArray(v.nDias) ? v.nDias : []).map((nx, $index) => (
-                            <Fragment key={$index}>
-                              <span role="button" tabIndex={0}
-                                onClick={nx?.onClick}
-                                style={{
-                                  fontSize: '12px',
-                                  fontWeight: '700',
-                                  borderRadius: '99px',
-                                  padding: '5px 11px',
-                                  cursor: 'pointer',
-                                  border: `1.5px solid ${nx?.bd ?? ''}`,
-                                  background: nx?.bg,
-                                  color: nx?.c,
-                                }}
-                              >
-                                {nx?.n}
-                              </span>
-                            </Fragment>
-                          ))}
+                      <Escolhas id="nv-emb" rotulo="Embarcador" itens={v.nEmbs} erro={v.eEmb} />
+                      <Escolhas id="nv-dest" rotulo="Destinatário" itens={v.nDests} erro={v.eDest} />
+                      <Escolhas
+                        id="nv-dia"
+                        rotulo="Carregamento"
+                        itens={v.nDias}
+                        erro={v.eJanela}
+                        depois={
                           <input
                             value={v.nJanela ?? ''}
                             onChange={v.onJanela}
                             data-tx-campo="janela"
+                            aria-label="Horário do carregamento"
+                            aria-invalid={v.eJanela ? true : undefined}
+                            inputMode="numeric"
+                            placeholder="18:30"
                             style={{
                               width: '76px',
                               border: '1px solid var(--borda-campo)',
@@ -1951,13 +2058,19 @@ export default class Hoje extends Tela {
                               fontFamily: "'Spline Sans Mono',monospace",
                             }}
                           />
-                        </div>
-                      </div>
+                        }
+                      />
                       <div>
-                        <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)' }}>Peso (t)</div>
+                        <label htmlFor="nv-peso" className="tx-rotulo">
+                          Peso (t)
+                        </label>
                         <input
                           value={v.nPeso ?? ''}
                           onChange={v.onPeso}
+                          id="nv-peso"
+                          aria-invalid={v.ePeso ? true : undefined}
+                          aria-describedby={v.ePeso ? 'nv-peso-erro' : undefined}
+                          inputMode="decimal"
                           data-tx-campo="peso"
                           style={{
                             width: '100%',
@@ -1970,6 +2083,11 @@ export default class Hoje extends Tela {
                             fontFamily: "'Spline Sans Mono',monospace",
                           }}
                         />
+                        {v.ePeso ? (
+                          <div id="nv-peso-erro" className="tx-erro" role="alert">
+                            {v.ePeso}
+                          </div>
+                        ) : null}
                       </div>
                     </div>
                     <div
@@ -1996,7 +2114,9 @@ export default class Hoje extends Tela {
                     <div style={{ display: 'flex', gap: '6px', marginTop: '16px' }}>
                       {(Array.isArray(v.nTipos) ? v.nTipos : []).map((nt, $index) => (
                         <Fragment key={$index}>
-                          <span role="button" tabIndex={0}
+                          <span
+                            role="button"
+                            tabIndex={0}
                             onClick={nt?.onClick}
                             data-tx-tipo={nt?.k}
                             style={{
@@ -2017,10 +2137,13 @@ export default class Hoje extends Tela {
                     </div>
                     {v.nTerceiro ? (
                       <>
-                        <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--texto-2)', marginTop: '16px' }}>
-                          PLACA DO CAVALO OU CPF DO MOTORISTA
-                        </div>
+                        <label htmlFor="nv-quem" className="tx-rotulo" style={{ marginTop: '16px' }}>
+                          Placa do cavalo ou CPF do motorista
+                        </label>
                         <input
+                          id="nv-quem"
+                          aria-invalid={v.eQuem ? true : undefined}
+                          aria-describedby={v.eQuem ? 'nv-quem-erro' : undefined}
                           value={v.nQuem ?? ''}
                           onChange={v.onQuem}
                           data-tx-campo="quem"
@@ -2036,10 +2159,17 @@ export default class Hoje extends Tela {
                             fontFamily: "'Spline Sans Mono',monospace",
                           }}
                         />
+                        {v.eQuem ? (
+                          <div id="nv-quem-erro" className="tx-erro" role="alert">
+                            {v.eQuem}
+                          </div>
+                        ) : null}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '10px' }}>
                           {(Array.isArray(v.nAchados) ? v.nAchados : []).map((na, $index) => (
                             <Fragment key={$index}>
-                              <div role="button" tabIndex={0}
+                              <div
+                                role="button"
+                                tabIndex={0}
                                 onClick={na?.onClick}
                                 data-tx-achado={na?.id}
                                 style={{
@@ -2098,60 +2228,78 @@ export default class Hoje extends Tela {
                                   O resto (CNH, RNTRC, CRLV) o motorista manda pelo link.
                                 </div>
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '10px' }}>
-                                  <input
-                                    value={v.cmNome ?? ''}
-                                    onChange={v.onCmNome}
-                                    data-tx-campo="cm-nome"
-                                    placeholder="Nome do motorista"
-                                    style={{
-                                      border: '1px solid var(--borda-campo)',
-                                      borderRadius: '11px',
-                                      padding: '9px 12px',
-                                      fontSize: '14px',
-                                      outline: 'none',
-                                    }}
-                                  />
-                                  <input
-                                    value={v.cmTel ?? ''}
-                                    onChange={v.onCmTel}
-                                    data-tx-campo="cm-tel"
-                                    placeholder="(66) 99999-0000"
-                                    style={{
-                                      border: '1px solid var(--borda-campo)',
-                                      borderRadius: '11px',
-                                      padding: '9px 12px',
-                                      fontSize: '14px',
-                                      outline: 'none',
-                                    }}
-                                  />
-                                  <input
-                                    value={v.cmCpf ?? ''}
-                                    onChange={v.onCmCpf}
-                                    data-tx-campo="cm-cpf"
-                                    placeholder="CPF"
-                                    style={{
-                                      border: '1px solid var(--borda-campo)',
-                                      borderRadius: '11px',
-                                      padding: '9px 12px',
-                                      fontSize: '14px',
-                                      outline: 'none',
-                                      fontFamily: "'Spline Sans Mono',monospace",
-                                    }}
-                                  />
-                                  <input
-                                    value={v.cmPlacas ?? ''}
-                                    onChange={v.onCmPlacas}
-                                    data-tx-campo="cm-placas"
-                                    placeholder="Placas: cavalo, carreta 1, carreta 2"
-                                    style={{
-                                      border: '1px solid var(--borda-campo)',
-                                      borderRadius: '11px',
-                                      padding: '9px 12px',
-                                      fontSize: '14px',
-                                      outline: 'none',
-                                      fontFamily: "'Spline Sans Mono',monospace",
-                                    }}
-                                  />
+                                  <Campo id="nv-cm-nome" rotulo="Nome do motorista" erro={v.eCmNome}>
+                                    <input
+                                      value={v.cmNome ?? ''}
+                                      onChange={v.onCmNome}
+                                      data-tx-campo="cm-nome"
+                                      placeholder="Como no documento"
+                                      style={{
+                                        width: '100%',
+                                        marginTop: '6px',
+                                        border: '1px solid var(--borda-campo)',
+                                        borderRadius: '11px',
+                                        padding: '9px 12px',
+                                        fontSize: '14px',
+                                        outline: 'none',
+                                      }}
+                                    />
+                                  </Campo>
+                                  <Campo id="nv-cm-tel" rotulo="Celular com DDD" erro={v.eCmTel}>
+                                    <input
+                                      inputMode="tel"
+                                      value={v.cmTel ?? ''}
+                                      onChange={v.onCmTel}
+                                      data-tx-campo="cm-tel"
+                                      placeholder="(66) 99999-0000"
+                                      style={{
+                                        width: '100%',
+                                        marginTop: '6px',
+                                        border: '1px solid var(--borda-campo)',
+                                        borderRadius: '11px',
+                                        padding: '9px 12px',
+                                        fontSize: '14px',
+                                        outline: 'none',
+                                      }}
+                                    />
+                                  </Campo>
+                                  <Campo id="nv-cm-cpf" rotulo="CPF (opcional)">
+                                    <input
+                                      inputMode="numeric"
+                                      value={v.cmCpf ?? ''}
+                                      onChange={v.onCmCpf}
+                                      data-tx-campo="cm-cpf"
+                                      placeholder="000.000.000-00"
+                                      style={{
+                                        width: '100%',
+                                        marginTop: '6px',
+                                        border: '1px solid var(--borda-campo)',
+                                        borderRadius: '11px',
+                                        padding: '9px 12px',
+                                        fontSize: '14px',
+                                        outline: 'none',
+                                        fontFamily: "'Spline Sans Mono',monospace",
+                                      }}
+                                    />
+                                  </Campo>
+                                  <Campo id="nv-cm-placas" rotulo="Placas do conjunto" erro={v.eCmPlacas}>
+                                    <input
+                                      value={v.cmPlacas ?? ''}
+                                      onChange={v.onCmPlacas}
+                                      data-tx-campo="cm-placas"
+                                      placeholder="RCB 9M15, RCB 9M16"
+                                      style={{
+                                        width: '100%',
+                                        marginTop: '6px',
+                                        border: '1px solid var(--borda-campo)',
+                                        borderRadius: '11px',
+                                        padding: '9px 12px',
+                                        fontSize: '14px',
+                                        outline: 'none',
+                                        fontFamily: "'Spline Sans Mono',monospace",
+                                      }}
+                                    />
+                                  </Campo>
                                 </div>
                               </div>
                             </>
@@ -2164,7 +2312,9 @@ export default class Hoje extends Tela {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '16px' }}>
                           {(Array.isArray(v.nConjs) ? v.nConjs : []).map((nc, $index) => (
                             <Fragment key={$index}>
-                              <div role="button" tabIndex={0}
+                              <div
+                                role="button"
+                                tabIndex={0}
                                 onClick={nc?.onClick}
                                 style={{
                                   display: 'flex',
@@ -2266,7 +2416,9 @@ export default class Hoje extends Tela {
                   <span style={{ fontSize: '12px', color: 'var(--texto-apagado)', marginRight: 'auto' }}>{v.nDica}</span>
                   {v.nVoltar ? (
                     <>
-                      <span role="button" tabIndex={0}
+                      <span
+                        role="button"
+                        tabIndex={0}
                         onClick={v.nVoltarFn}
                         style={{
                           background: 'var(--superficie-2)',
@@ -2298,7 +2450,9 @@ export default class Hoje extends Tela {
                       </A>
                     </>
                   ) : null}
-                  <span role="button" tabIndex={0}
+                  <span
+                    role="button"
+                    tabIndex={0}
                     onClick={v.nAvancar}
                     data-tx-confirmar=""
                     style={{

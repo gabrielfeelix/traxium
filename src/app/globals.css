@@ -98,3 +98,24 @@ input[style*="border: none"]:focus-visible, textarea[style*="border: none"]:focu
 @keyframes deslizar { from { transform: translateX(40px); opacity: 0 } to { transform: none; opacity: 1 } }
 @keyframes subir { from { transform: translateY(12px); opacity: 0 } to { transform: none; opacity: 1 } }
 @keyframes flash { 0% { opacity: .9 } 100% { opacity: 0 } }
+
+/* ---------------------------------------------------------------- formulário (src/components/ui/formulario.tsx) */
+.tx-rotulo { display: block; font-size: 12px; font-weight: 800; color: var(--texto-2); }
+.tx-erro { font-size: 12px; font-weight: 600; color: var(--perigo); margin-top: 4px; }
+.tx-dica { font-size: 12px; color: var(--texto-apagado); margin-top: 4px; }
+input[aria-invalid='true'], textarea[aria-invalid='true'] { border-color: var(--perigo) !important; }
+.tx-escolhas { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; align-items: center; }
+.tx-chip {
+  font-size: 12px; font-weight: 700; border-radius: 99px; padding: 5px 12px; min-height: 30px; cursor: pointer;
+  border: 1.5px solid var(--borda-campo); background: var(--painel); color: var(--texto-2);
+}
+.tx-chip:hover { border-color: var(--borda-forte); }
+.tx-chip[aria-checked='true'] { border-color: var(--primario); background: var(--primario-fraco); color: var(--primario-2); }
+[aria-invalid='true'] > .tx-chip:not([aria-checked='true']) { border-color: var(--perigo-borda); }
+
+/* Ação em texto (Ver todos, Abrir a mesa, usar exemplo): o texto fica onde estava, o alvo cresce para 32 px. */
+.tx-acao-texto {
+  display: inline-flex; align-items: center; min-height: 32px; padding: 0 8px; margin: -6px -8px; border-radius: 8px;
+  font-size: 13px; font-weight: 800; color: var(--primario-2); background: none; border: none; cursor: pointer;
+}
+.tx-acao-texto:hover { background: var(--superficie-hover); color: var(--primario); }

@@ -5,6 +5,7 @@
  * 2. Modal ou drawer aberto (role="dialog" aria-modal="true"): o foco entra nele, Tab circula
  *    só por dentro e, quando ele fecha, o foco volta a quem abriu. Esc fecha (TX.ui.montar).
  * Os diálogos da moldura cuidam do próprio foco (data-foco-proprio).
+ * 3. Texto cortado com reticências ganha o texto inteiro como dica ao passar o ponteiro.
  */
 import { useEffect } from 'react';
 
@@ -60,9 +61,17 @@ export function TecladoClicavel() {
       }
     });
     obs.observe(document.body, { childList: true, subtree: true });
+    const dica = (ev: MouseEvent) => {
+      let el = ev.target as HTMLElement | null;
+      for (let i = 0; el && i < 3; i++, el = el.parentElement) {
+        if (el.title || el.hasAttribute('data-sem-dica')) return;
+        if (getComputedStyle(el).textOverflow === 'ellipsis' && el.scrollWidth > el.clientWidth + 1) { el.title = el.innerText.trim(); return; }
+      }
+    };
+    document.addEventListener('mouseover', dica);
     document.addEventListener('keydown', tecla);
     document.addEventListener('focusin', foco);
-    return () => { obs.disconnect(); document.removeEventListener('keydown', tecla); document.removeEventListener('focusin', foco); };
+    return () => { obs.disconnect(); document.removeEventListener('keydown', tecla); document.removeEventListener('focusin', foco); document.removeEventListener('mouseover', dica); };
   }, []);
   return null;
 }
