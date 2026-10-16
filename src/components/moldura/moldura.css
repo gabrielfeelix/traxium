@@ -139,3 +139,15 @@
 
 /* carregando a primeira vez (antes de ler o navegador) */
 .mo-esqueleto { flex: 1; margin: 12px; border-radius: 22px; background: linear-gradient(90deg, #eef2f1 25%, #f7faf9 40%, #eef2f1 55%); background-size: 600px 100%; animation: txsh 1.3s linear infinite; }
+
+/* ---------------------------------------------------------------- opções de fundo (escolha do Gabriel, 15/10/2026)
+ * A: atual. B: neutro esverdeado claro. C: moldura no tom fundo e conteúdo numa folha clara.
+ * Para ver: document.documentElement.dataset.fundo = 'b' (ou 'c'). Some quando a escolha for feita. */
+:root[data-fundo='b'] { --fundo: #f7f9f8; }
+:root[data-fundo='c'] { --fundo: #f7f9f8; }
+:root[data-fundo='c'] body { background: var(--fundo-fundo); }
+:root[data-fundo='c'] .mo-conteudo {
+  background: var(--fundo); border: 1px solid var(--borda); border-right: none; border-bottom: none;
+  border-top-left-radius: 20px; margin-left: 12px;
+}
+:root[data-fundo='c'] .mo-hd { padding-left: 32px; }

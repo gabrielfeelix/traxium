@@ -135,3 +135,11 @@ Cada achado entra numa lista por tela; resolva, teste e registre.
 3. Dois tons quase iguais viraram um só: `#dfe7e5` e `#e0e7e5` (borda de campo), `#f5f8f7` e `#f7faf9` (superfície).
 
 **Teste.** Captura das dez telas antes e depois comparada pixel a pixel: só ruído de antialiasing de fonte. Bateria inteira passa.
+
+### Etapa 3. Opções de fundo (15/10/2026)
+
+Três opções mostradas ao Gabriel em captura de 1366x768 (Hoje e Viagens): A, o fundo atual (`#f2f5f4`); B, um neutro esverdeado mais claro (`#f7f9f8`), no espírito do `--canvas` do Autofluxos; C, a moldura no tom mais fundo (`--fundo-fundo`, `#e9efed`) com o conteúdo numa folha clara de borda fina e canto de 20 px. As variantes estão em `src/components/moldura/moldura.css`, ligadas por `data-fundo` no `<html>`; a escolhida vira o padrão e as outras saem.
+
+| Premissa | O que muda se a resposta vier diferente |
+| --- | --- |
+| Até a escolha, fica o fundo atual (A) | Trocar o padrão é mudar dois tokens e tirar as variantes |
