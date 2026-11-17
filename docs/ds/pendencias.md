@@ -86,3 +86,24 @@ API nova descrita no topo de `src/lib/tx/tx-dados.js`. O motor já recusa; as te
 - gestao (e2e): Configurações segue página única com índice que acompanha a rolagem, não abas (U90), porque `e2e-f5.cjs` linha 42 e `e2e-revisao.cjs` linhas 135 a 140 dependem das seções na mesma página e da âncora a 80-100 px. Se o time quiser abas (`?secao=`), atualizar os dois scripts; a tela já aceita `?secao=` e rola até a seção.
 - gestao (e2e): `scripts/e2e-moldura.cjs` função `titulo()` procura `div` com 24 px; o título agora é `h1` (CabecalhoPagina). Trocar por `[data-tela] h1`.
 - gestao (e2e): `scripts/e2e-revisao.cjs` linha 144 cancela convite com um clique e espera sumir. A tela executa na hora com toast "Desfazer" (reversível, Top 5), não confirmação: compatível.
+- mobile: caminho de demonstração no motor para montar exemplos sem depender da sessão (por exemplo `TX.demo(op, dados)` gravando `por: 'sistema'` e passando pela validação, sem a checagem de papel). Hoje `/mobile` tenta com `TX.tentar` e, se a sessão for recusada (consultoria, frota), grava a operação direto no log `tx-v2` como `sistema`, do mesmo jeito que "Reiniciar este link" apaga. Sem log gravado ainda, mostra um aviso pedindo para entrar como afretador ou qualidade. Arquivo: `src/app/(painel)/mobile/prototipo-mobile.tsx`, função `preparar`.
+
+## ds2: peças da revisão de UX (17/11/2026)
+
+- ds2: **moldura (para o agente de gestão)**. `avisar({ texto, tom, acao, duracao })` de `@/components/ui` já funciona sem mexer na moldura: sem posto montado, ele cria o seu no `<body>`. Para ter um toast só na tela (o `.mo-toast` e o novo hoje podem aparecer juntos), trocar em `src/components/moldura/moldura.tsx`:
+
+  ```tsx
+  // 1. import
+  import { PostoAvisos, avisar as avisarDS } from '@/components/ui';
+  // 2. apagar: const [toast, setToast] = useState<string | null>(null); e const toastT = useRef(...)
+  // 3. o avisar da moldura passa a delegar (TX.ui.avisar e o evento 'tx-aviso' continuam iguais):
+  const avisar = useCallback((msg: string) => { avisarDS({ texto: msg }); }, []);
+  // 4. no lugar do bloco {toast && (<div data-tx-toast className="mo-toast" ...>)}:
+  <PostoAvisos />
+  ```
+
+  O `Toast` novo mantém `data-tx-toast`, `role="status"` e o desenho do `.mo-toast` (pílula escura, ícone verde), então o e2e que procura `[data-tx-toast]` continua achando. Depois disso, `.mo-toast` e `.mo-toast-ok` saem de `moldura.css`.
+- ds2: moldura, véu do modal: a revisão (3.10) pede desfoque de no máximo 2 px em modal. `.tx-veu` continua com `blur(3px)` para não mudar as telas no meio da migração; Drawer e Confirmar já usam `--veu-leve` sem desfoque. Trocar para `blur(2px)` quando as telas estiverem estáveis.
+- ds2: `Combobox` (seleção múltipla com busca, pedida em Cadastros para participantes de treinamento) ainda não existe. Saída provisória: `CampoBusca` + lista de `Checkbox` com "Selecionar todos da frota própria".
+- ds2: `Tabela` não virtualiza; para a base IDTF acima de 500 linhas, paginar com `Paginacao` (50 por página).
+- ds2: `TabelaCabecalho` com filhos `<span>` simples continua sem `role="columnheader"`; trocar por `TabelaColuna` ao mexer na tela.

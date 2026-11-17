@@ -1,0 +1,65 @@
+/*
+ * Transportadores: diretório com drawer (prefixo tx-transp-). Só tokens.
+ * Reusa de Frota.css o menu da linha (.tx-frota-menu*), as placas (.tx-frota-placa) e as listas do drawer
+ * (.tx-frota-lista, .tx-frota-dados, .tx-frota-viagem). Promoção proposta em docs/ds/pendencias.md.
+ */
+
+.tx-transp-cab-titulo { display: flex; align-items: baseline; gap: var(--esp-3); flex-wrap: wrap; }
+.tx-transp-ferramentas { display: flex; align-items: center; gap: var(--esp-3); flex-wrap: wrap; padding: var(--esp-3) var(--esp-5); border-bottom: 1px solid var(--borda-suave); }
+.tx-transp-ferramentas .tx-entrada-caixa { margin-top: 0; width: 340px; max-width: 100%; }
+.tx-transp-dica { padding: var(--esp-2-5) var(--esp-5); border-bottom: 1px solid var(--borda-suave); background: var(--superficie); font: var(--tipo-denso); color: var(--texto-sec); }
+
+/* Linha: o mouse abre o drawer em qualquer ponto; o teclado usa o botão do nome. */
+.tx-transp-linha { cursor: pointer; transition: background-color var(--dur-rapida) var(--curva); }
+.tx-transp-linha:hover { background: var(--superficie-hover); }
+.tx-transp-nome {
+  display: flex; align-items: center; gap: var(--esp-2-5); min-width: 0; min-height: var(--controle-p); padding: var(--esp-1);
+  margin: calc(-1 * var(--esp-1)); border: none; border-radius: var(--raio-p); background: none; color: inherit; font: inherit; text-align: left; cursor: pointer;
+}
+.tx-transp-nome:focus-visible { outline: 2px solid var(--primario); outline-offset: 0; }
+
+/* Identidade: iniciais neutras para pessoa, ícone de prédio para empresa. */
+.tx-transp-avatar {
+  flex: none; width: 28px; height: 28px; border-radius: var(--raio-pilula); display: flex; align-items: center; justify-content: center;
+  background: var(--primario-fraco); color: var(--primario-3); font: var(--tipo-legenda); font-weight: 800;
+}
+.tx-transp-avatar--empresa { background: var(--superficie-2); color: var(--texto-sec); border-radius: var(--raio-p); }
+
+/* Cabeçalho ordenável. */
+.tx-transp-ordem {
+  display: inline-flex; align-items: center; gap: var(--esp-1); min-height: var(--controle-p); margin: calc(-1 * var(--esp-2)) calc(-1 * var(--esp-1));
+  padding: 0 var(--esp-1); border: none; border-radius: var(--raio-xs); background: none; color: inherit; font: inherit; letter-spacing: inherit;
+  text-transform: inherit; cursor: pointer;
+}
+.tx-transp-ordem:hover { color: var(--texto); }
+.tx-transp-ordem:focus-visible { outline: 2px solid var(--primario); outline-offset: 0; }
+.tx-transp-ordem__seta { opacity: 0.35; }
+[aria-sort='ascending'] .tx-transp-ordem__seta, [aria-sort='descending'] .tx-transp-ordem__seta { opacity: 1; color: var(--primario-2); }
+
+/* Drawer sem véu escuro: a lista continua visível ao lado. */
+[data-tela='Transportadores'] .tx-veu--lateral { background: transparent; backdrop-filter: none; }
+.tx-transp-drawer .tx-drawer__corpo { gap: var(--esp-4); background: var(--painel); padding-top: 0; }
+.tx-transp-drawer .tx-abas { min-height: max-content; position: sticky; top: 0; z-index: var(--z-fixo); margin: 0 calc(-1 * var(--esp-7)); padding: 0 var(--esp-7); background: var(--painel); }
+.tx-transp-selos { display: flex; flex-wrap: wrap; gap: var(--esp-1-5); padding-top: var(--esp-4); }
+.tx-transp-painel { display: grid; gap: var(--esp-5); }
+.tx-transp-secao { display: grid; gap: var(--esp-2); }
+.tx-transp-secao h3 { margin: 0; }
+
+.tx-transp-conj { display: grid; gap: var(--esp-2-5); padding: var(--esp-3) 0; border-top: 1px solid var(--borda-suave); }
+.tx-transp-conj__placa { display: flex; align-items: center; gap: var(--esp-3); flex-wrap: wrap; }
+.tx-transp-oc { display: grid; gap: var(--esp-1); padding: var(--esp-3) 0; border-top: 1px solid var(--borda-suave); font: var(--tipo-denso); }
+.tx-transp-oc p { margin: 0; color: var(--texto-2); line-height: var(--lh-paragrafo); }
+
+/* Modais: placas em chips com validação, prévia da planilha, área de arquivo. */
+.tx-transp-chips { display: flex; flex-wrap: wrap; gap: var(--esp-1-5); margin-top: var(--esp-2); }
+.tx-transp-arquivo {
+  display: flex; align-items: center; gap: var(--esp-3); padding: var(--esp-3) var(--esp-4); border: 1.5px dashed var(--borda-forte);
+  border-radius: var(--raio-m); cursor: pointer; transition: border-color var(--dur-rapida) var(--curva);
+}
+.tx-transp-arquivo:hover { border-color: var(--primario); }
+.tx-transp-arquivo:focus-within { border-color: var(--primario); box-shadow: var(--foco-anel); }
+.tx-transp-arquivo[data-cheio] { border-style: solid; border-color: var(--primario); background: var(--primario-fraco); }
+.tx-transp-previa { list-style: none; margin: 0; padding: 0; display: grid; }
+.tx-transp-previa li { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: var(--esp-3); min-height: 40px; border-top: 1px solid var(--borda-suave); font: var(--tipo-denso); }
+.tx-transp-perigo, .tx-botao.tx-transp-perigo { color: var(--perigo); }
+.tx-botao.tx-transp-perigo:hover { color: var(--perigo); background: var(--perigo-fundo); }

@@ -1,10 +1,51 @@
-// Gerado de "SaaS moderno estilo Dribbble/Compartimento v2.dc.html" por scripts/converter-dc.mjs.
+// Compartimento: ficha de leitura. Primeiro a resposta (pode carregar ração? sim ou não, e por quê), depois o histórico.
 'use client';
-import { Fragment } from 'react';
-import { TX, Tela, A, css } from '@/lib/tx/tela';
+import { TX, Tela, A } from '@/lib/tx/tela';
+import {
+  Botao,
+  Situacao,
+  Badge,
+  Tabela,
+  TabelaCabecalho,
+  TabelaLinha,
+  EstadoVazio,
+  Cartao,
+  EntradaCaixa,
+  TabelaEsqueleto,
+} from '@/components/ui';
+import { SeloRegime, REGIME } from './Frota';
+import './Compartimento.css';
+
+const COLS = '44px 100px minmax(0,1.5fr) minmax(0,1fr) minmax(0,1.4fr) minmax(0,1.1fr)';
+const BAIXAR = (
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 16 16"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.6"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden
+  >
+    <path d="M8 2.5v8M4.5 7 8 10.5 11.5 7M3 13.5h10" />
+  </svg>
+);
+const LUPA = (
+  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden>
+    <circle cx="7" cy="7" r="4.6" />
+    <line x1="10.5" y1="10.5" x2="13.5" y2="13.5" />
+  </svg>
+);
+const ICONE = {
+  sim: <path d="M5 10.5 8.5 14 15 6.5" />,
+  nao: <path d="M6 6l8 8M14 6l-8 8" />,
+  talvez: <path d="M10 5.5v5.5M10 14.2v.1" />,
+};
 
 export default class Compartimento extends Tela {
-  state = { loading: true };
+  state = { loading: true, procura: '' };
   componentDidMount() {
     TX.ui.montar(this);
   }
@@ -12,33 +53,55 @@ export default class Compartimento extends Tela {
     TX.ui.avisar(this, m);
   }
   sbAtivo() {
-    const p = TX.placa(this.alvo().placa);
-    return p && p.dono === 'propria' ? 'frota' : 'transportadores';
+    const a = this.alvo();
+    const p = a && TX.placa(a.placa);
+    return !p || p.dono === 'propria' ? 'frota' : 'transportadores';
   }
+  // Placa e posição da URL. Placa que não existe ou não é carreta, ou posição que a carreta não tem: null (estado "não encontrado").
   alvo() {
-    const pl = TX.ui.param('placa');
-    const pos = TX.ui.param('pos') || 'C1';
+    // Aceita a placa sem espaço ou com hífen (QHG7L34, QHG-7L34) e a posição só com o número (1 = C1).
+    const bruta = (TX.ui.param('placa') || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const achada = bruta && TX.db.placas.find((x) => x.placa.replace(/[^A-Z0-9]/g, '') === bruta);
+    const pl = achada ? achada.placa : TX.ui.param('placa');
+    const pr = (TX.ui.param('pos') || 'C1').toUpperCase();
+    const pos = /^\d+$/.test(pr) ? 'C' + pr : pr;
     const p = pl && TX.placa(pl);
-    return p && p.tipo === 'carreta'
-      ? { placa: pl, pos: (p.comps || ['C1']).includes(pos) ? pos : 'C1' }
-      : { placa: 'SQT 6B77', pos: 'C1' };
+    if (!p || p.tipo !== 'carreta' || !(p.comps || ['C1']).includes(pos)) return null;
+    return { placa: pl, pos };
+  }
+  valsProcura() {
+    const s = this.state;
+    const q = TX.norm(s.procura || '');
+    const achados =
+      q.length >= 2
+        ? TX.db.placas
+            .filter((p) => p.tipo === 'carreta' && TX.norm(p.placa).replace(/\s/g, '').includes(q.replace(/\s/g, '')))
+            .flatMap((p) =>
+              (p.comps || ['C1']).map((pos) => ({
+                n: p.placa + ' ' + pos,
+                href: '/compartimento?placa=' + encodeURIComponent(p.placa) + '&pos=' + pos,
+              })),
+            )
+            .slice(0, 8)
+        : [];
+    return { procura: s.procura || '', onProcura: (e) => this.setState({ procura: e.target.value }), achados };
   }
   renderVals() {
     const U = TX.ui,
       F = TX.fmt;
     const a = this.alvo();
+    if (!a) {
+      const pl = TX.ui.param('placa');
+      const pos = TX.ui.param('pos');
+      return Object.assign({}, U.base(this), this.valsProcura(), {
+        naoAchou: true,
+        pedido: pl ? pl + (pos ? ' posição ' + pos : '') : '',
+      });
+    }
     const p = TX.placa(a.placa);
     const conj = TX.db.conjuntos.find((c) => c.carretas.includes(a.placa));
     const propria = p.dono === 'propria';
     const hist = TX.historico(a.placa, a.pos);
-    const regT = (r) =>
-      ({
-        A: ['linear-gradient(135deg,#48c78e,var(--ok))', '#fff'],
-        B: ['linear-gradient(135deg,#f1d55a,#e3c235)', '#5b4b05'],
-        C: ['linear-gradient(135deg,#f4c15d,var(--aviso-2))', '#fff'],
-        D: ['linear-gradient(135deg,#e88a5f,#d06a3c)', '#fff'],
-        X: ['linear-gradient(135deg,#e46969,var(--perigo))', '#fff'],
-      })[r] || ['var(--borda)', 'var(--texto-apagado)'];
     const key = a.placa + '#' + a.pos;
     const limpezas = TX.db.viagens.flatMap((v) =>
       (v.limpezas || []).filter((l) => l.comp === key).map((l) => Object.assign({ viagem: v.id }, l)),
@@ -68,32 +131,44 @@ export default class Compartimento extends Tela {
       C: 'Sim, depois de lavar com detergente',
       D: 'Sim, depois de lavar e desinfetar',
     };
-    let pode, podeSub, podeDot;
+    let pode, porque, tom, icone;
     if (quarentena) {
       pode = 'Não: em quarentena';
-      podeSub = TX.produto(proib.produto).nome + ' em ' + F.data(proib.data) + ', carga proibida';
-      podeDot = '#ff8a8a';
+      porque =
+        'Porque ' +
+        TX.produto(proib.produto).nome.toLowerCase() +
+        ', carga proibida, foi carregada em ' +
+        F.data(proib.data) +
+        '. Limpeza não resolve: precisa de inspeção independente e laudo, registrados na viagem pela TS1.9.' +
+        (vReg
+          ? ' A ' + vReg.ordem + ', de ' + F.data(vReg.data) + ', está travada por isso.'
+          : ' Faça na próxima viagem que usar esta carreta.');
+      tom = 'perigo';
+      icone = 'nao';
     } else if (!t3.length) {
       pode = 'Ainda não se sabe';
-      podeSub = 'T-3 vazio: a primeira viagem pede as três últimas cargas';
-      podeDot = 'var(--aviso-2)';
+      porque = 'Porque não há carga registrada. A primeira viagem pede ao motorista as três últimas cargas (T-3).';
+      tom = 'aviso';
+      icone = 'talvez';
     } else if (foraBase) {
       pode = 'Ainda não';
-      podeSub = 'carga fora da base IDTF no T-3, esperando classificação';
-      podeDot = 'var(--aviso-2)';
+      porque = 'Porque uma das três últimas cargas está fora da base IDTF e espera classificação.';
+      tom = 'aviso';
+      icone = 'talvez';
     } else if (regs.length) {
       pode = LIMP.A;
-      podeSub = 'regularizado pela TS1.9, laudo ' + regs[0].laudo;
-      podeDot = '#3ddc97';
+      porque = 'Porque o compartimento foi regularizado pela TS1.9, laudo ' + regs[0].laudo + '.';
+      tom = 'ok';
+      icone = 'sim';
     } else {
       pode = LIMP[t1.regime];
-      podeSub = 'pela última carga: ' + t1.nome.toLowerCase() + ', regime ' + t1.regime;
-      podeDot = '#3ddc97';
+      porque = 'Porque a última carga foi ' + t1.nome.toLowerCase() + ', regime ' + t1.regime + ' na base IDTF.';
+      tom = 'ok';
+      icone = 'sim';
     }
     const linhas = hist.map((h, i) => {
       const pr = h.produto ? TX.produto(h.produto) : null;
       const r = pr ? pr.regime : null;
-      const t = regT(r);
       const lp = limpezas.find((l) => l.em.slice(0, 10) >= h.data);
       const fonte =
         h.fonte === 'viagem'
@@ -102,73 +177,51 @@ export default class Compartimento extends Tela {
             ? 'declarada pelo motorista na ' + TX.viagem(h.viagem).ordem
             : 'registro inicial da frota';
       return {
+        k: h.data + '-' + i,
         t: i < 3 ? 'T-' + (i + 1) : '',
-        tVis: i < 3 ? 'visible' : 'hidden',
-        tC: r === 'X' ? 'var(--perigo)' : 'var(--primario-2)',
-        tBd: r === 'X' ? 'var(--perigo-borda)' : '#cfe3e1',
-        op: i < 3 ? '1' : '.62',
-        lC: r === 'X' ? 'var(--perigo)' : 'var(--texto-sec)',
+        t3: i < 3,
+        proibida: r === 'X',
         data: F.data(h.data),
         produto: pr ? pr.nome : '"' + h.texto + '"',
         cat: pr ? pr.cat + (pr.racao ? ', ração' : '') : 'fora da base IDTF',
-        nc: r === 'X' ? 'var(--perigo)' : 'var(--texto)',
-        bg: r === 'X' ? '#fdf8f8' : '#fff',
-        r: r === 'X' ? '✕' : r || '?',
-        rBg: t[0],
-        rC: t[1],
+        r,
+        rotulo: r ? (r === 'X' ? 'proibida' : REGIME[r].n) : 'a classificar',
         fonte,
-        temHref: !!h.viagem,
-        semHref: !h.viagem,
         href: h.viagem ? '/viagem?id=' + h.viagem : '',
+        // Só a carga feita em viagem do Traxium tem checklist; a declarada ou inicial não tem registro de limpeza próprio.
         limpeza:
-          r === 'A'
-            ? 'seca, no checklist'
+          r === 'X'
+            ? 'não resolve'
             : lp
               ? 'regime ' + lp.regime + ', ' + lp.comprovante
-              : r === 'X'
-                ? 'não resolve'
-                : 'sem comprovante',
+              : r === 'A' && h.fonte === 'viagem'
+                ? 'seca, no checklist'
+                : 'não registrada',
+        limpezaAlerta: r === 'X',
       };
     });
+    const dono = propria ? 'Frota própria' : TX.nomeTransportador(p.dono);
     return Object.assign({}, U.base(this), {
+      naoAchou: false,
       titulo,
-      modelo: p.modelo + ', CRLV ' + TX.docEstado(p.crlv && p.crlv.validade).rotulo,
-      voltarHref: propria ? '/frota' : '/transportadores',
-      voltarRot: propria ? 'Frota própria' : 'Transportadores',
-      temDono: !propria,
-      donoHref: '/transportadores?id=' + p.dono,
-      dono: propria ? 'Frota própria' : TX.nomeTransportador(p.dono),
-      conjuntoTxt: conj ? 'hoje com o cavalo ' + conj.cavalo : 'sem conjunto',
+      modelo: p.modelo,
+      crlv: TX.docEstado(p.crlv && p.crlv.validade),
+      trilha: propria
+        ? [{ n: 'Frota própria', href: '/frota' }].concat(conj ? [{ n: conj.cavalo, href: '/frota', mono: true }] : [])
+        : [
+            { n: 'Transportadores', href: '/transportadores' },
+            { n: dono, href: '/transportadores?id=' + p.dono },
+          ],
+      dono,
+      conjuntoTxt: conj ? 'cavalo ' + conj.cavalo : 'sem conjunto hoje',
       pode,
-      podeSub,
-      podeDot,
-      t3: [0, 1, 2].map((i) => {
-        const h = t3[i];
-        const pr = h && h.produto ? TX.produto(h.produto) : null;
-        const r = pr ? pr.regime : null;
-        const t = regT(r);
-        return {
-          k: 'T-' + (i + 1),
-          data: h ? F.data(h.data).slice(0, 5) : 'sem dado',
-          r: !h ? '' : r === 'X' ? '✕' : r || '?',
-          rBg: h ? t[0] : 'rgba(255,255,255,.12)',
-          rC: t[1],
-          tip: h ? (pr ? pr.nome : h.texto) + ', ' + F.data(h.data) : 'sem carga registrada',
-        };
-      }),
+      porque,
+      tom,
+      icone,
       quarentena: !!quarentena,
       qTemViagem: !!vReg,
       qHref: vReg ? '/viagem?id=' + vReg.id : '',
       qRot: vReg ? 'Regularizar na ' + vReg.ordem : '',
-      qTexto: quarentena
-        ? 'Limpeza não tira o compartimento da quarentena. Precisa de inspeção independente e laudo, registrados na viagem pela TS1.9.' +
-          (vReg
-            ? ' A ' + vReg.ordem + ', de ' + F.data(vReg.data) + ', está travada por isso.'
-            : ' Faça na próxima viagem que usar esta carreta.')
-        : '',
-      heroBg: quarentena
-        ? 'linear-gradient(115deg,#3a1219,#6e1f2b 60%,var(--tecnico) 130%)'
-        : 'linear-gradient(115deg,var(--primario-3),var(--primario-2) 60%,var(--azul) 140%)',
       linhas,
       vazio: !hist.length,
       temIrmaos: !!conj && TX.compsDoConjunto(conj).length > 1,
@@ -176,9 +229,7 @@ export default class Compartimento extends Tela {
         ? TX.compsDoConjunto(conj).map((k) => ({
             n: k.placa + ' ' + k.pos,
             href: '/compartimento?placa=' + encodeURIComponent(k.placa) + '&pos=' + k.pos,
-            c: k.key === key ? 'var(--texto)' : 'var(--texto-sec)',
-            bg: k.key === key ? '#fff' : 'transparent',
-            sh: k.key === key ? '0 1px 4px rgba(9,61,68,.12)' : 'none',
+            atual: k.key === key,
           }))
         : [],
       exportar: () => {
@@ -190,6 +241,8 @@ export default class Compartimento extends Tela {
           e(p.modelo) +
           '. Dono: ' +
           e(propria ? 'frota própria' : TX.nomeTransportador(p.dono)) +
+          '. Pode carregar ração: ' +
+          e(pode) +
           '.</div><table><tr><th>Data</th><th>Produto</th><th>Regime IDTF</th><th>Origem</th><th>Limpeza</th></tr>' +
           linhas
             .map(
@@ -199,7 +252,7 @@ export default class Compartimento extends Tela {
                 '</td><td>' +
                 e(l.produto) +
                 '</td><td>' +
-                e(l.r) +
+                e(l.r || '?') +
                 '</td><td>' +
                 e(l.fonte) +
                 '</td><td>' +
@@ -214,329 +267,214 @@ export default class Compartimento extends Tela {
     });
   }
 
+  renderNaoAchou(v) {
+    return (
+      <div className="tx-pagina">
+        <nav aria-label="Caminho" className="tx-compartimento-trilha">
+          <A href="/frota">Frota própria</A>
+          <span aria-hidden>›</span>
+          <span aria-current="page">Compartimento</span>
+        </nav>
+        <Cartao>
+          <EstadoVazio titulo={v.pedido ? 'Compartimento não encontrado: ' + v.pedido : 'Escolha um compartimento'}>
+            {v.pedido
+              ? 'Nenhuma carreta com essa placa e posição na base. Confira a placa ou procure abaixo.'
+              : 'Digite a placa da carreta para ver o histórico de cargas de cada compartimento.'}
+          </EstadoVazio>
+          <div className="tx-compartimento-procura">
+            <EntradaCaixa
+              icone={LUPA}
+              value={v.procura}
+              onChange={v.onProcura}
+              placeholder="Placa da carreta, por exemplo SQT 6B77"
+              aria-label="Procurar compartimento pela placa da carreta"
+              data-tx-procura=""
+              autoFocus
+            />
+            {v.achados.length ? (
+              <ul className="tx-compartimento-achados">
+                {v.achados.map((x) => (
+                  <li key={x.href}>
+                    <Botao tamanho="p" variante="contorno" href={x.href}>
+                      <span className="tx-mono">{x.n}</span>
+                    </Botao>
+                  </li>
+                ))}
+              </ul>
+            ) : v.procura.trim().length >= 2 ? (
+              <p className="tx-tipo-denso tx-sec" role="status" style={{ margin: 0 }}>
+                Nenhuma carreta com esse trecho de placa.
+              </p>
+            ) : null}
+            <div style={{ display: 'flex', gap: 'var(--esp-2)', justifyContent: 'center' }}>
+              <Botao tamanho="p" variante="texto" href="/frota">
+                Ir para Frota própria
+              </Botao>
+              <Botao tamanho="p" variante="texto" href="/transportadores">
+                Ir para Transportadores
+              </Botao>
+            </div>
+          </div>
+        </Cartao>
+      </div>
+    );
+  }
+
   render() {
     const v = this.renderVals();
+    if (v.naoAchou)
+      return (
+        <div style={{ minHeight: '100%' }} data-screen-label="Compartimento" data-tela="Compartimento" data-tx-nao-encontrado="">
+          {this.renderNaoAchou(v)}
+        </div>
+      );
     return (
       <div style={{ minHeight: '100%' }} data-screen-label="Compartimento" data-tela="Compartimento">
-        <div style={{ flex: '1', display: 'flex', flexDirection: 'column', padding: '24px 32px 48px', gap: '20px', minWidth: '0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div
-              style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: '600', color: 'var(--texto-sec)' }}
-            >
-              <A className="tx-alvo" href={v.voltarHref} style={{ color: 'var(--texto-sec)' }}>
-                {v.voltarRot}
-              </A>
-              {v.temDono ? (
-                <>
-                  <span style={{ color: '#b8c6c4' }}>›</span>
-                  <A className="tx-alvo" href={v.donoHref} style={{ color: 'var(--texto-sec)' }}>
-                    {v.dono}
-                  </A>
-                </>
-              ) : null}
-              <span style={{ color: '#b8c6c4' }}>›</span>
-              <span style={{ fontFamily: "'Spline Sans Mono',monospace", color: 'var(--texto)' }}>{v.titulo}</span>
-            </div>
-            <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div
-                role="button"
-                tabIndex={0}
-                onClick={v.exportar}
-                data-tx-exportar=""
-                style={{
-                  background: 'var(--primario-3)',
-                  color: '#fff',
-                  borderRadius: '11px',
-                  padding: '9px 16px',
-                  fontSize: '14px',
-                  fontWeight: '700',
-                  cursor: 'pointer',
-                }}
-                className="tx-hae10539"
-              >
-                Exportar histórico
+        <div className="tx-pagina">
+          <nav aria-label="Caminho" className="tx-compartimento-trilha">
+            {v.trilha.map((t) => (
+              <span key={t.n} style={{ display: 'contents' }}>
+                <A href={t.href} className={t.mono ? 'tx-mono' : ''}>
+                  {t.n}
+                </A>
+                <span aria-hidden>›</span>
+              </span>
+            ))}
+            <span aria-current="page" className="tx-mono">
+              {v.titulo}
+            </span>
+          </nav>
+
+          <div className="tx-compartimento-cab">
+            <div style={{ minWidth: 0 }}>
+              <h1 className="tx-compartimento-titulo tx-mono">{v.titulo}</h1>
+              <div className="tx-compartimento-meta">
+                <span>{v.modelo}</span>
+                <span>
+                  CRLV{' '}
+                  <Situacao tom={v.crlv.estado === 'ok' ? 'ok' : v.crlv.estado === 'vence' ? 'falta' : 'bloqueio'}>
+                    {v.crlv.rotulo}
+                  </Situacao>
+                </span>
+                <span style={{ display: 'inline' }}>
+                  Dono hoje: <b>{v.dono}</b>, {v.conjuntoTxt}
+                </span>
               </div>
+            </div>
+            <div className="tx-pagina-cab__acoes">
+              <Botao variante="contorno" icone={BAIXAR} onClick={v.exportar} data-tx-exportar="">
+                Exportar histórico
+              </Botao>
             </div>
           </div>
-          <div
+
+          <section
+            className={'tx-compartimento-veredito tx-compartimento-veredito--' + v.tom}
+            aria-labelledby="comp-pergunta"
             data-tx-hero=""
-            style={{
-              position: 'relative',
-              overflow: 'hidden',
-              borderRadius: '22px',
-              background: v.heroBg,
-              color: '#fff',
-              padding: '24px 28px',
-              display: 'grid',
-              gridTemplateColumns: '1.1fr 1fr 1.25fr 1.15fr',
-              gap: '24px',
-              alignItems: 'center',
-            }}
+            {...(v.quarentena ? { 'data-tx-quarentena': '' } : {})}
           >
-            <div>
-              <div style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '1.4px', color: 'rgba(255,255,255,.6)' }}>
-                COMPARTIMENTO
-              </div>
-              <div
-                style={{
-                  fontFamily: "'Spline Sans Mono',monospace",
-                  fontSize: '24px',
-                  fontWeight: '600',
-                  marginTop: '4px',
-                  whiteSpace: 'nowrap',
-                }}
+            <span className="tx-compartimento-veredito__icone" aria-hidden>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
-                {v.titulo}
-              </div>
-              <div style={{ fontSize: '13px', color: 'rgba(255,255,255,.75)' }}>{v.modelo}</div>
-            </div>
-            <div style={{ borderLeft: '1px solid rgba(255,255,255,.15)', paddingLeft: '20px' }}>
-              <div style={{ fontSize: '13px', color: 'rgba(255,255,255,.7)' }}>Dono hoje</div>
-              <div style={{ fontSize: '16px', fontWeight: '800', marginTop: '3px' }}>{v.dono}</div>
-              <div style={{ fontSize: '12px', color: 'rgba(255,255,255,.6)' }}>{v.conjuntoTxt}</div>
-            </div>
-            <div style={{ borderLeft: '1px solid rgba(255,255,255,.15)', paddingLeft: '20px' }}>
-              <div style={{ fontSize: '13px', color: 'rgba(255,255,255,.7)' }}>Pode carregar ração?</div>
-              <div
-                data-tx-pode=""
-                style={{ display: 'flex', alignItems: 'center', gap: '9px', fontSize: '16px', fontWeight: '800', marginTop: '3px' }}
-              >
-                <span
-                  style={{
-                    width: '9px',
-                    height: '9px',
-                    borderRadius: '99px',
-                    background: v.podeDot,
-                    boxShadow: '0 0 0 3px rgba(255,255,255,.18)',
-                    flex: 'none',
-                  }}
-                ></span>
+                {ICONE[v.icone]}
+              </svg>
+            </span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <h2 id="comp-pergunta" className="tx-tipo-rotulo" style={{ margin: 0 }}>
+                Pode carregar ração?
+              </h2>
+              <div className="tx-compartimento-veredito__resposta" data-tx-pode="">
                 {v.pode}
               </div>
-              <div style={{ fontSize: '12px', color: 'rgba(255,255,255,.7)', marginTop: '1px' }}>{v.podeSub}</div>
+              <p className="tx-compartimento-veredito__porque">{v.porque}</p>
             </div>
-            <div style={{ borderLeft: '1px solid rgba(255,255,255,.15)', paddingLeft: '20px' }}>
-              <div style={{ fontSize: '13px', color: 'rgba(255,255,255,.7)' }}>Três últimas cargas (T-3)</div>
-              <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
-                {(Array.isArray(v.t3) ? v.t3 : []).map((t, $index) => (
-                  <Fragment key={$index}>
-                    <div
-                      title={t?.tip}
-                      style={{
-                        flex: '1',
-                        minWidth: '0',
-                        background: 'rgba(255,255,255,.08)',
-                        border: '1px solid rgba(255,255,255,.12)',
-                        borderRadius: '11px',
-                        padding: '6px 8px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '7px',
-                      }}
+            {v.qTemViagem ? (
+              <Botao variante="primario" href={v.qHref} data-tx-regularizar-viagem="">
+                {v.qRot}
+              </Botao>
+            ) : null}
+          </section>
+
+          <Cartao
+            lista
+            titulo="Histórico de cargas"
+            sub="A mais recente em cima. As três primeiras são o T-3 da próxima viagem."
+            acoes={
+              v.temIrmaos ? (
+                <nav aria-label="Compartimentos do mesmo conjunto" className="tx-compartimento-seg">
+                  {v.irmaos.map((ir) => (
+                    <A
+                      key={ir.n}
+                      href={ir.href}
+                      data-tx-irmao={ir.n}
+                      aria-current={ir.atual ? 'page' : undefined}
+                      className="tx-compartimento-seg__item"
                     >
-                      <span
-                        style={{
-                          width: '22px',
-                          height: '22px',
-                          borderRadius: '7px',
-                          background: t?.rBg,
-                          color: t?.rC,
-                          fontSize: '11px',
-                          fontWeight: '800',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          flex: 'none',
-                        }}
-                      >
-                        {t?.r}
-                      </span>
-                      <div style={{ minWidth: '0' }}>
-                        <div style={{ fontSize: '11px', fontWeight: '800', color: 'rgba(255,255,255,.6)' }}>{t?.k}</div>
-                        <div style={{ fontSize: '11px', fontFamily: "'Spline Sans Mono',monospace", whiteSpace: 'nowrap' }}>{t?.data}</div>
-                      </div>
-                    </div>
-                  </Fragment>
-                ))}
-              </div>
-            </div>
-            {v.quarentena ? (
-              <>
-                <div
-                  data-tx-quarentena=""
-                  style={{
-                    gridColumn: '1 / -1',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '16px',
-                    borderTop: '1px solid rgba(255,255,255,.15)',
-                    paddingTop: '16px',
-                  }}
-                >
-                  <div style={{ flex: '1', fontSize: '13px', lineHeight: '1.55', color: 'rgba(255,255,255,.88)' }}>{v.qTexto}</div>
-                  {v.qTemViagem ? (
-                    <>
-                      <A
-                        href={v.qHref}
-                        data-tx-regularizar-viagem=""
-                        style={{
-                          background: 'var(--painel)',
-                          color: '#6e1f2b',
-                          borderRadius: '99px',
-                          padding: '10px 18px',
-                          fontSize: '13px',
-                          fontWeight: '800',
-                          whiteSpace: 'nowrap',
-                        }}
-                        className="tx-haf27d80"
-                      >
-                        {v.qRot}
-                        {' →'}
-                      </A>
-                    </>
-                  ) : null}
-                </div>
-              </>
-            ) : null}
-          </div>
-          <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-              <div style={{ fontSize: '16px', fontWeight: '800' }}>Histórico de cargas</div>
-              <div style={{ fontSize: '13px', color: 'var(--texto-sec)' }}>
-                a mais recente em cima; as três primeiras são o T-3 da próxima viagem
-              </div>
-              {v.temIrmaos ? (
-                <>
-                  <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '12px', color: 'var(--texto-apagado)', fontWeight: '600' }}>No mesmo conjunto</span>
-                    <div style={{ display: 'flex', background: 'var(--superficie-2)', borderRadius: '11px', padding: '3px', gap: '2px' }}>
-                      {(Array.isArray(v.irmaos) ? v.irmaos : []).map((ir, $index) => (
-                        <Fragment key={$index}>
-                          <A
-                            className="tx-alvo"
-                            href={ir?.href}
-                            data-tx-irmao={ir?.n}
-                            style={{
-                              fontFamily: "'Spline Sans Mono',monospace",
-                              fontSize: '12px',
-                              fontWeight: '600',
-                              borderRadius: '9px',
-                              padding: '5px 11px',
-                              color: ir?.c,
-                              background: ir?.bg,
-                              boxShadow: ir?.sh,
-                              whiteSpace: 'nowrap',
-                            }}
-                          >
-                            {ir?.n}
-                          </A>
-                        </Fragment>
-                      ))}
-                    </div>
-                  </div>
-                </>
+                      {ir.n}
+                    </A>
+                  ))}
+                </nav>
+              ) : null
+            }
+          >
+            <Tabela colunas={COLS} rotulo={'Histórico de cargas de ' + v.titulo}>
+              <TabelaCabecalho>
+                <span role="columnheader">
+                  <span className="tx-so-leitor">Posição no T-3</span>
+                </span>
+                <span role="columnheader">Data</span>
+                <span role="columnheader">Produto</span>
+                <span role="columnheader">Limpeza antes de ração</span>
+                <span role="columnheader">Origem do registro</span>
+                <span role="columnheader">Limpeza feita</span>
+              </TabelaCabecalho>
+              {v.loading ? (
+                <TabelaEsqueleto linhas={3} />
+              ) : (
+                v.linhas.map((l) => (
+                  <TabelaLinha
+                    key={l.k}
+                    data-tx-carga=""
+                    className={
+                      (l.t3 ? 'tx-compartimento-t3' : 'tx-compartimento-antiga') + (l.proibida ? ' tx-compartimento-proibida' : '')
+                    }
+                  >
+                    <span role="cell" className="tx-compartimento-t">
+                      {l.t}
+                    </span>
+                    <span role="cell" className="num tx-mono">
+                      {l.data}
+                    </span>
+                    <span role="cell" className="tx-tabela__celula">
+                      <span className="tx-tabela__forte">{l.produto}</span>
+                      <span className="tx-tabela__sub">{l.cat}</span>
+                    </span>
+                    <span role="cell">
+                      <SeloRegime r={l.r} rotulo={l.rotulo} />
+                    </span>
+                    <span role="cell">{l.href ? <A href={l.href}>{l.fonte}</A> : <span className="tx-sec">{l.fonte}</span>}</span>
+                    <span role="cell" className={l.limpezaAlerta ? 'tx-compartimento-alerta' : 'tx-sec'}>
+                      {l.limpeza}
+                    </span>
+                  </TabelaLinha>
+                ))
+              )}
+              {v.vazio && !v.loading ? (
+                <EstadoVazio titulo="Nenhuma carga registrada">
+                  O T-3 nasce vazio: a primeira viagem pede ao motorista as três últimas cargas deste compartimento.
+                </EstadoVazio>
               ) : null}
-            </div>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '46px 96px 1.4fr 70px 1.3fr 1fr',
-                gap: '12px',
-                padding: '14px 4px 8px',
-                fontSize: '11px',
-                fontWeight: '800',
-                letterSpacing: '.7px',
-                color: 'var(--texto-apagado)',
-                borderBottom: '1px solid var(--borda-suave)',
-              }}
-            >
-              <span></span>
-              <span>DATA</span>
-              <span>PRODUTO</span>
-              <span>REGIME</span>
-              <span>ORIGEM DO REGISTRO</span>
-              <span>LIMPEZA</span>
-            </div>
-            {(Array.isArray(v.linhas) ? v.linhas : []).map((l, $index) => (
-              <Fragment key={$index}>
-                <div
-                  data-tx-carga=""
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '46px 96px 1.4fr 70px 1.3fr 1fr',
-                    gap: '12px',
-                    padding: '11px 4px',
-                    borderBottom: '1px solid var(--superficie-2)',
-                    alignItems: 'center',
-                    background: l?.bg,
-                    opacity: l?.op,
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: '11px',
-                      fontWeight: '800',
-                      color: l?.tC,
-                      border: `1px solid ${l?.tBd ?? ''}`,
-                      borderRadius: '7px',
-                      padding: '2px 0',
-                      textAlign: 'center',
-                      visibility: l?.tVis,
-                    }}
-                  >
-                    {l?.t}
-                  </span>
-                  <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '13px' }}>{l?.data}</span>
-                  <div>
-                    <div style={{ fontSize: '14px', fontWeight: '700', color: l?.nc }}>{l?.produto}</div>
-                    <div style={{ fontSize: '12px', color: 'var(--texto-apagado)' }}>{l?.cat}</div>
-                  </div>
-                  <span
-                    style={{
-                      width: '24px',
-                      height: '24px',
-                      borderRadius: '8px',
-                      background: l?.rBg,
-                      color: l?.rC,
-                      fontSize: '12px',
-                      fontWeight: '800',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    {l?.r}
-                  </span>
-                  <div style={{ fontSize: '13px' }}>
-                    {l?.temHref ? (
-                      <>
-                        <A className="tx-alvo" href={l?.href} style={{ fontWeight: '700' }}>
-                          {l?.fonte}
-                        </A>
-                      </>
-                    ) : null}
-                    {l?.semHref ? (
-                      <>
-                        <span style={{ color: 'var(--texto-sec)' }}>{l?.fonte}</span>
-                      </>
-                    ) : null}
-                  </div>
-                  <span style={{ fontSize: '12px', color: l?.lC }}>{l?.limpeza}</span>
-                </div>
-              </Fragment>
-            ))}
-            {v.vazio ? (
-              <>
-                <div style={{ padding: '28px 4px', fontSize: '13px', color: 'var(--texto-sec)' }}>
-                  Nenhuma carga registrada neste compartimento. O T-3 nasce vazio e a primeira viagem pede as três últimas cargas.
-                </div>
-              </>
-            ) : null}
-            <div style={{ fontSize: '12px', color: 'var(--texto-apagado)', marginTop: '12px', lineHeight: '1.55' }}>
-              A limpeza exigida antes de ração sai da carga anterior, pela base IDTF. Carga proibida no T-3 põe o compartimento em
-              quarentena: limpeza não resolve, só a regularização da TS1.9 registrada na viagem.
-            </div>
-          </div>
+            </Tabela>
+          </Cartao>
         </div>
       </div>
     );

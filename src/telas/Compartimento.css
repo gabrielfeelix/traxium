@@ -1,0 +1,56 @@
+/*
+ * Compartimento: ficha de leitura (prefixo tx-compartimento-). Só tokens.
+ * O selo de regime com dica vem de Frota.css (.tx-frota-termo); ver docs/ds/pendencias.md.
+ */
+
+/* Trilha: de onde o compartimento vem (Frota própria › cavalo, ou Transportadores › nome). */
+.tx-compartimento-trilha { display: flex; align-items: center; flex-wrap: wrap; gap: var(--esp-2); font: var(--tipo-denso); font-weight: 600; color: var(--texto-sec); }
+.tx-compartimento-trilha a { display: inline-flex; align-items: center; min-height: var(--controle-p); color: var(--texto-sec); text-decoration: none; border-radius: var(--raio-p); }
+.tx-compartimento-trilha a:hover { color: var(--primario-2); text-decoration: underline; }
+.tx-compartimento-trilha > span[aria-hidden] { color: var(--borda-controle); }
+.tx-compartimento-trilha [aria-current] { color: var(--texto); }
+
+/* Cabeçalho de detalhe: o objeto em mono grande, metadados em uma linha. */
+.tx-compartimento-cab { display: flex; align-items: flex-start; gap: var(--esp-4); }
+.tx-compartimento-titulo { margin: 0; font-size: var(--fs-pagina); font-weight: 600; line-height: var(--lh-pagina); color: var(--texto); }
+.tx-compartimento-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--esp-1) var(--esp-5); margin-top: var(--esp-1-5); font: var(--tipo-denso); color: var(--texto-sec); }
+.tx-compartimento-meta > span { display: inline-flex; align-items: center; gap: var(--esp-1-5); }
+.tx-compartimento-meta b { color: var(--texto); font-weight: 700; }
+
+/* Veredito: faixa clara com a resposta colorida. O tom vem do resultado. */
+.tx-compartimento-veredito {
+  --_c: var(--ok); --_borda: var(--ok-borda); --_fundo: var(--ok-fundo); --_icone: var(--ok);
+  display: flex; align-items: center; gap: var(--esp-4); padding: var(--esp-5) var(--esp-6);
+  background: var(--_fundo); border: 1px solid var(--_borda); border-left: 4px solid var(--_icone); border-radius: var(--raio-xg);
+}
+.tx-compartimento-veredito--aviso { --_c: var(--aviso); --_borda: var(--aviso-borda); --_fundo: var(--aviso-fundo); --_icone: var(--aviso-2); }
+.tx-compartimento-veredito--perigo { --_c: var(--tecnico); --_borda: var(--tecnico-borda); --_fundo: var(--tecnico-fundo); --_icone: var(--tecnico); }
+.tx-compartimento-veredito__icone {
+  flex: none; width: 44px; height: 44px; border-radius: var(--raio-pilula); display: flex; align-items: center; justify-content: center;
+  background: var(--_icone); color: var(--texto-inverso);
+}
+.tx-compartimento-veredito__resposta { margin-top: var(--esp-0-5); font: var(--tipo-destaque); color: var(--_c); }
+.tx-compartimento-veredito__porque { margin: var(--esp-1) 0 0; max-width: 820px; font: var(--tipo-denso); line-height: var(--lh-paragrafo); color: var(--texto-2); }
+
+/* Seletor dos compartimentos do mesmo conjunto (links, o atual marcado). */
+.tx-compartimento-seg { display: flex; gap: var(--esp-0-5); padding: var(--esp-1); background: var(--superficie-2); border-radius: var(--raio-m); }
+.tx-compartimento-seg__item {
+  display: inline-flex; align-items: center; min-height: var(--controle-p); padding: 0 var(--esp-3); border-radius: var(--raio-p);
+  font-family: var(--fonte-mono); font-size: var(--fs-legenda); font-weight: 600; color: var(--texto-sec); text-decoration: none; white-space: nowrap;
+}
+.tx-compartimento-seg__item:hover { color: var(--texto); background: var(--superficie-3); }
+.tx-compartimento-seg__item[aria-current='page'] { background: var(--painel); color: var(--texto); box-shadow: var(--sombra-xs); }
+
+/* Linhas do T-3 marcadas com faixa lateral; as antigas ficam mais leves. */
+.tx-compartimento-t3 { box-shadow: inset 3px 0 0 var(--primario); }
+.tx-compartimento-antiga { color: var(--texto-sec); }
+.tx-compartimento-proibida { background: var(--perigo-fundo); box-shadow: inset 3px 0 0 var(--perigo); }
+.tx-compartimento-proibida .tx-tabela__forte { color: var(--perigo); }
+.tx-compartimento-t { font: var(--tipo-rotulo); letter-spacing: var(--ls-rotulo); color: var(--primario-2); }
+.tx-compartimento-proibida .tx-compartimento-t { color: var(--perigo); }
+.tx-compartimento-alerta { color: var(--perigo); font-weight: 700; }
+
+/* Não encontrado: procura pela placa. */
+.tx-compartimento-procura { display: grid; gap: var(--esp-3); max-width: 420px; margin: 0 auto var(--esp-6); }
+.tx-compartimento-procura .tx-entrada-caixa { margin-top: 0; }
+.tx-compartimento-achados { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--esp-2); }
