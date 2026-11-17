@@ -9,14 +9,16 @@ import TX from './tx-dados';
 (function () {
   'use strict';
 
+  // Tons da situação. Cada um traz a classe do design system (cls, para <Situacao> ou .tx-situacao)
+  // e os valores antigos (dot, ring, c, bd) para as telas que ainda não migraram. Tudo por token.
   const TOM = {
-    ok: { dot: 'linear-gradient(135deg,#48c78e,var(--ok))', ring: 'rgba(26,143,87,.16)', c: 'var(--ok)', bd: 'var(--ok-borda)' },
-    falta: { dot: 'linear-gradient(135deg,#f4c15d,var(--aviso-2))', ring: 'rgba(232,163,61,.2)', c: 'var(--aviso)', bd: 'var(--aviso-borda)' },
-    bloqueio: { dot: 'linear-gradient(135deg,#e46969,var(--perigo))', ring: 'rgba(196,61,61,.16)', c: 'var(--perigo)', bd: 'var(--perigo-borda)' },
-    tecnico: { dot: 'linear-gradient(135deg,var(--perigo),#7d2232)', ring: 'rgba(147,49,63,.2)', c: 'var(--tecnico)', bd: '#ebc3c8' },
-    na: { dot: '#dde5e3', ring: 'rgba(157,176,174,.14)', c: 'var(--texto-apagado)', bd: 'var(--borda)' },
-    info: { dot: 'linear-gradient(135deg,#5b8def,var(--azul))', ring: 'rgba(14,120,181,.16)', c: 'var(--azul)', bd: 'var(--info-borda)' },
-    autoridade: { dot: 'linear-gradient(135deg,#f4c15d,#d97544)', ring: 'rgba(217,117,68,.18)', c: '#b85a2e', bd: '#f0d3bf' }
+    ok: { k: 'ok', cls: 'tx-situacao tx-situacao--ok', dot: 'linear-gradient(135deg,var(--ok-claro),var(--ok))', ring: 'rgba(26,143,87,.16)', c: 'var(--ok)', bd: 'var(--ok-borda)', bg: 'var(--ok-fundo)' },
+    falta: { k: 'falta', cls: 'tx-situacao tx-situacao--falta', dot: 'linear-gradient(135deg,var(--aviso-claro),var(--aviso-2))', ring: 'rgba(232,163,61,.2)', c: 'var(--aviso)', bd: 'var(--aviso-borda)', bg: 'var(--aviso-fundo)' },
+    bloqueio: { k: 'bloqueio', cls: 'tx-situacao tx-situacao--bloqueio', dot: 'linear-gradient(135deg,var(--perigo-claro),var(--perigo))', ring: 'rgba(196,61,61,.16)', c: 'var(--perigo)', bd: 'var(--perigo-borda)', bg: 'var(--perigo-fundo)' },
+    tecnico: { k: 'tecnico', cls: 'tx-situacao tx-situacao--tecnico', dot: 'linear-gradient(135deg,var(--perigo),var(--tecnico-escuro))', ring: 'rgba(147,49,63,.2)', c: 'var(--tecnico)', bd: 'var(--tecnico-borda)', bg: 'var(--tecnico-fundo)' },
+    na: { k: 'na', cls: 'tx-situacao tx-situacao--na', dot: 'var(--neutro-ponto)', ring: 'rgba(157,176,174,.14)', c: 'var(--texto-apagado)', bd: 'var(--borda)', bg: 'var(--superficie)' },
+    info: { k: 'info', cls: 'tx-situacao tx-situacao--info', dot: 'linear-gradient(135deg,var(--info-claro),var(--azul))', ring: 'rgba(14,120,181,.16)', c: 'var(--info)', bd: 'var(--info-borda)', bg: 'var(--info-fundo)' },
+    autoridade: { k: 'autoridade', cls: 'tx-situacao tx-situacao--autoridade', dot: 'linear-gradient(135deg,var(--aviso-claro),var(--autoridade-2))', ring: 'rgba(217,117,68,.18)', c: 'var(--autoridade)', bd: 'var(--autoridade-borda)', bg: 'var(--autoridade-fundo)' }
   };
   const RES = {
     pronta: 'ok', falta: 'falta', bloqueada: 'bloqueio', tecnico: 'tecnico', cancelada: 'na', nao_assegurada: 'na'
@@ -101,29 +103,37 @@ import TX from './tx-dados';
     c._txToast = setTimeout(() => c.setState({ toast: null }), 4200);
   }
 
-  // Estilo de opção selecionável (radio ou chip).
+  // Estilo de opção selecionável (radio ou chip). cls e aria: o que <OpcaoCartao> (.tx-opcao) usa.
   function sel(on, habilitado) {
     const ok = habilitado !== false;
     return {
-      bd: on ? 'var(--primario)' : ok ? 'var(--borda-campo)' : 'var(--borda-suave)', bg: on ? 'var(--primario-fraco)' : ok ? '#fff' : '#fafcfb',
-      dot: on ? 'linear-gradient(135deg,var(--primario),var(--azul))' : '#fff', dotBd: on ? 'var(--primario)' : 'var(--borda-forte)',
+      cls: 'tx-opcao', checked: !!on, ariaDisabled: ok ? undefined : true,
+      bd: on ? 'var(--primario)' : ok ? 'var(--borda-campo)' : 'var(--borda-suave)', bg: on ? 'var(--primario-fraco)' : ok ? 'var(--painel)' : 'var(--superficie)',
+      dot: on ? 'var(--degrade-primario)' : 'var(--painel)', dotBd: on ? 'var(--primario)' : 'var(--borda-controle)',
       c: on ? 'var(--primario-2)' : ok ? 'var(--texto-2)' : 'var(--texto-desab)', cur: ok ? 'pointer' : 'not-allowed', op: ok ? '1' : '.5'
     };
   }
+  // Chip de filtro: escuro quando ligado. cls e pressed: o que <Chip tipo="filtro"> (.tx-chip--filtro) usa.
   function chip(on) {
-    return { bg: on ? 'var(--texto)' : '#fff', c: on ? '#fff' : 'var(--texto-2)', bd: on ? 'var(--texto)' : 'var(--borda-campo)' };
+    return { cls: 'tx-chip tx-chip--filtro', pressed: !!on, bg: on ? 'var(--texto)' : 'var(--painel)', c: on ? 'var(--texto-inverso)' : 'var(--texto-2)', bd: on ? 'var(--texto)' : 'var(--borda-campo)' };
   }
   // Botão primário: habilitado só quando o obrigatório está preenchido.
+  // cls e ariaDisabled: o que <Botao variante="primario" inativo={!pronto}> escreve.
   function cta(pronto) {
-    return pronto
-      ? { bg: 'linear-gradient(135deg,var(--primario),var(--azul))', c: '#fff', sh: '0 8px 18px rgba(18,118,112,.35)', cur: 'pointer' }
-      : { bg: 'var(--borda-suave)', c: 'var(--texto-desab)', sh: 'none', cur: 'not-allowed' };
+    const base = { cls: 'tx-botao tx-botao--primario', ariaDisabled: pronto ? undefined : true };
+    return Object.assign(base, pronto
+      ? { bg: 'var(--degrade-primario)', c: 'var(--texto-inverso)', sh: 'var(--sombra-cta)', cur: 'pointer' }
+      : { bg: 'var(--borda-suave)', c: 'var(--texto-desab)', sh: 'none', cur: 'not-allowed' });
   }
+  // Perigo: o degradê começa em --perigo-cta (o antigo #e46969 dava 3,22:1 com texto branco).
   function ctaPerigo(pronto) {
-    return pronto
-      ? { bg: 'linear-gradient(135deg,#e46969,var(--perigo))', c: '#fff', sh: '0 8px 18px rgba(196,61,61,.3)', cur: 'pointer' }
-      : { bg: 'var(--borda-suave)', c: 'var(--texto-desab)', sh: 'none', cur: 'not-allowed' };
+    const base = { cls: 'tx-botao tx-botao--perigo', ariaDisabled: pronto ? undefined : true };
+    return Object.assign(base, pronto
+      ? { bg: 'linear-gradient(135deg,var(--perigo-cta),var(--perigo))', c: 'var(--texto-inverso)', sh: 'var(--sombra-perigo)', cur: 'pointer' }
+      : { bg: 'var(--borda-suave)', c: 'var(--texto-desab)', sh: 'none', cur: 'not-allowed' });
   }
+  // Classe da situação por chave de TOM ou pela decisão: 'tx-situacao tx-situacao--falta'.
+  function tomClasse(k, selo) { return tom(k).cls + (selo ? ' tx-situacao--selo' : ''); }
 
   const ROTULO_PAPEL = { qualidade: 'Qualidade', direcao: 'Direção', afretador: 'Afretador', frota: 'Frota', consultoria: 'Consultoria' };
 
@@ -191,6 +201,8 @@ import TX from './tx-dados';
       vals: {
         temPaginacao: n > 1,
         pagInfo: lista.length === 0 ? 'nenhum registro' : 'mostrando ' + (ini + 1) + ' a ' + fim + ' de ' + lista.length + ' ' + rotulo,
+        // pagina, total e irPara: o que <Paginacao pagina total info aoIr> recebe.
+        pagina: p, total: n, irPara: x => c.setState({ [k]: Math.max(1, Math.min(n, x)) }),
         paginas: Array.from({ length: n }, (_, i) => i + 1).map(x => Object.assign({ n: x, onClick: () => c.setState({ [k]: x }) }, chip(x === p))),
         pagAnt: () => { if (p > 1) c.setState({ [k]: p - 1 }); }, pagProx: () => { if (p < n) c.setState({ [k]: p + 1 }); },
         pagAntC: p > 1 ? 'var(--texto-2)' : 'var(--borda-forte)', pagProxC: p < n ? 'var(--texto-2)' : 'var(--borda-forte)', pagAntCur: p > 1 ? 'pointer' : 'not-allowed', pagProxCur: p < n ? 'pointer' : 'not-allowed'
@@ -218,14 +230,14 @@ import TX from './tx-dados';
     if (!w) return false;
     w.document.write('<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>' + titulo + '</title><style>' +
       'body{font-family:Arial,Helvetica,sans-serif;color:#1d2b2c;margin:36px 44px;font-size:12.5px;line-height:1.5}h1{font-size:19px;margin:0 0 4px}h2{font-size:14px;margin:22px 0 8px;border-bottom:1px solid #ccd6d4;padding-bottom:4px}' +
-      'table{border-collapse:collapse;width:100%;margin:6px 0 10px}th,td{border:1px solid #d5dedc;padding:5px 8px;text-align:left;vertical-align:top}th{background:#f1f5f4;font-weight:bold}.sub{color:var(--texto-sec)}.mono{font-family:Consolas,monospace}.aus{color:#a33}@media print{body{margin:14mm}}' +
+      'table{border-collapse:collapse;width:100%;margin:6px 0 10px}th,td{border:1px solid #d5dedc;padding:5px 8px;text-align:left;vertical-align:top}th{background:#f1f5f4;font-weight:bold}.sub{color:#526664}.mono{font-family:Consolas,monospace}.aus{color:#a33}@media print{body{margin:14mm}}' +
       '</style></head><body>' + html + '<p class="sub" style="margin-top:28px">Gerado pelo Traxium em ' + TX.fmt.data(TX.HOJE) + '. Protótipo: dados fictícios.</p></body></html>');
     w.document.close();
     return true;
   }
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
 
-  const api = { conferirArquivo, roteador: null, moldura: false, urlPropria: null, trocarUrl, rolagem, ir, desmontar, abrirTopo, ROTULO_PAPEL, mascaraData, dataIso, avisoData, pedirLiberacao, nomeAlcada, buscaGlobal, tom, tomResultado, TOM, param, lerLS, gravarLS, copiar, montar, avisar, sel, chip, cta, ctaPerigo, base, paginar, exportarDocumento, esc };
+  const api = { conferirArquivo, roteador: null, moldura: false, urlPropria: null, trocarUrl, rolagem, ir, desmontar, abrirTopo, ROTULO_PAPEL, mascaraData, dataIso, avisoData, pedirLiberacao, nomeAlcada, buscaGlobal, tom, tomResultado, tomClasse, TOM, param, lerLS, gravarLS, copiar, montar, avisar, sel, chip, cta, ctaPerigo, base, paginar, exportarDocumento, esc };
   TX.ui = api;
 })();
 

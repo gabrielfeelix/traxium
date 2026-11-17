@@ -16,142 +16,131 @@ Documento de referência para o design system do Traxium SaaS. Todas as decisõe
 
 ## 2. Paleta
 
+Fonte única: os tokens de `src/app/globals.css`. A página `/design-system` mostra cada um com o valor lido em execução, e a biblioteca do Figma usa os mesmos nomes. Contrastes medidos em `docs/ds/contraste.md`; evidência de cada valor em `docs/ds/inventario.md`.
+
 ### 2.1 Marca
 
-| Token | HSL | Hex aprox. | Uso |
-| --- | --- | --- | --- |
-| `brand-500` | `174 78% 32%` | `#127670` | Verde-azulado primário. Botões, links, indicadores. |
-| `brand-600` | `176 84% 25%` | `#0C5862` | Hover/pressed estado primário. |
-| `brand-700` | `180 80% 18%` | `#093D44` | Textos sobre fundo claro, ênfase máxima da marca. |
-| `sky-500` | `200 90% 36%` | `#0E78B5` | Azul de apoio. CTAs secundários, indicadores. |
-| `sky-600` | `202 92% 30%` | `#0A638F` | Hover do azul. |
-
-### 2.2 Funcionais
-
-| Token | HSL | Uso |
+| Token | Hex | Uso |
 | --- | --- | --- |
-| `success-500` | `142 71% 36%` | Aprovação, conformidade, regime A. |
-| `warning-500` | `28 92% 48%` | Atenção, regime C, certificação a vencer, risco médio/alto. |
-| `danger-500` | `0 78% 50%` | Bloqueio, NC crítica, regime D, risco crítico. |
+| `--primario` | `#127670` | Teal primário. Foco, borda de campo ativo, aba ativa, início do degradê. |
+| `--primario-2` | `#0C5862` | Link, ação em texto, chip escolhido, código. |
+| `--primario-3` | `#093D44` | Ênfase máxima, início do degradê escuro, sidebar. |
+| `--azul` | `#0E78B5` | Azul de apoio: fim do degradê e preenchimento informativo. Não é cor de texto. |
+| `--primario-fraco` | `#eef7f6` | Fundo de chip, opção ou linha escolhida. |
+| `--degrade-primario` | `135deg, #127670, #0e78b5` | Botão primário, caixa marcada, switch ligado. |
+| `--degrade-escuro` | `130deg, --primario-3, --primario-2, --azul` | Cabeçalho do drawer, capa. |
 
-### 2.3 Surface
+### 2.2 Situação (funcionais)
 
-| Token | HSL | Uso |
+Cada tom tem cor de texto (4,5:1 no branco e na `--superficie-2`), borda, fundo tingido e o par claro do ponto em degradê. Os tons são as chaves de `TX.ui.TOM`.
+
+| Tom | Texto | Uso |
 | --- | --- | --- |
-| `bg` | `180 14% 97%` | Fundo principal. Não branco puro — leve toque verde-azulado. |
-| `bg-elev` | `0 0% 100%` | Cards e elementos elevados. |
-| `fg` | `200 25% 12%` | Texto primário. |
-| `fg-muted` | `210 14% 42%` | Texto secundário. |
-| `border` | `200 18% 88%` | Bordas. |
-| `ink` | `195 30% 8%` | Sidebar escura. |
+| `ok` | `--ok` `#177d4c` | Pronta para assegurar, conforme. |
+| `falta` | `--aviso` `#9a6210` (ponto `--aviso-2` `#e8a33d`) | Falta algo, pendência. |
+| `bloqueio` | `--perigo` `#c43d3d` | Bloqueada, erro, ação destrutiva. |
+| `tecnico` | `--tecnico` `#93313f` | Bloqueio técnico, nenhuma alçada libera. |
+| `autoridade` | `--autoridade` `#a5502a` | Liberada por autoridade. |
+| `info` | `--info` `#0c6ca3` | Em trânsito, informativo. |
+| `na` | `--texto-apagado` | Sem declaração GMP+, cancelada. |
+
+### 2.3 Superfície, texto e borda
+
+| Token | Hex | Uso |
+| --- | --- | --- |
+| `--fundo` | `#f2f5f4` | Fundo da página. Não é branco puro: leve toque verde-azulado. |
+| `--painel` | `#ffffff` | Cartão, modal, campo. |
+| `--superficie`, `--superficie-2`, `--superficie-3` | `#f7faf9`, `#f0f4f3`, `#e4eae8` | Cabeçalho de tabela; botão secundário; hover do secundário. |
+| `--texto` | `#0b2224` | Texto primário. |
+| `--texto-2`, `--texto-sec`, `--texto-apagado` | `#3c4f4e`, `#526664`, `#5f7270` | Rótulo; descrição; legenda e cabeçalho de tabela. Todos 4,5:1 ou mais. |
+| `--borda-suave`, `--borda`, `--borda-campo`, `--borda-forte` | `#eef2f1` a `#c9d5d3` | Divisória, cartão, campo, hover. |
+| `--borda-controle` | `#7f9290` | Borda que é o único sinal do controle (caixa de seleção, switch). 3:1. |
 
 ### 2.4 Gradiente da marca
 
-```css
-linear-gradient(135deg, hsl(176 84% 25%) 0%, hsl(180 80% 18%) 50%, hsl(200 92% 24%) 100%)
-```
-
-Uso restrito: logo, banners hero, CTAs primários, ícones de identidade.
+Sempre em diagonal (135 graus no primário, 130 no escuro). Uso restrito: logo, botão primário, controle marcado, cabeçalho do drawer, sidebar.
 
 ---
 
 ## 3. Tipografia
 
-- **Família principal:** Geist Sans
-- **Família monoespaçada:** Geist Mono — para códigos de viagem, CAR, HS Codes, DDS, hashes
-- **Letter-spacing global:** `-0.005em` (otimização sutil de leitura)
-- **Números:** sempre `font-variant-numeric: tabular-nums` (classe `.num`)
+- **Família principal:** Hanken Grotesk (`--fonte`), pesos 400, 600, 700 e 800, carregada do Google Fonts no layout raiz.
+- **Família monoespaçada:** Spline Sans Mono (`--fonte-mono`), pesos 500 e 600, para códigos de viagem, ordem, CT-e, placa, RNTRC, contador e tecla de atalho.
+- As telas escrevem os nomes `'Hanken Grotesk'` e `'Spline Sans Mono'`; não trocar por `next/font` sem trocar os nomes.
+- **Números:** sempre `font-variant-numeric: tabular-nums` (classe `.num`) em coluna e destaque.
 
-### 3.1 Escala
+### 3.1 Escala (7 passos)
 
-| Token | Tamanho | Peso | Uso |
-| --- | --- | --- | --- |
-| Display | 28–34px | 700 | Hero KPIs, números grandes. Tracking `-0.02em`. |
-| H1 | 22–26px | 700 | Título de página. Tracking `-0.015em`. |
-| H2 | 15px | 600 | Card title. Tracking `-0.01em`. |
-| Body | 13px | 400/500 | Texto padrão. |
-| Small | 12px | 400/500 | Descriptions, labels. |
-| Micro | 10–11px | 600/700 | Uppercase labels, badges, kbd. Tracking `0.12em–0.14em`. |
+| Token | Tamanho | Peso | Entrelinha | Uso |
+| --- | --- | --- | --- | --- |
+| `--tipo-rotulo` | 11 px | 800 | 1,3 | Rótulo em caixa alta (cabeçalho de tabela), tracking `--ls-rotulo` 0,7 px. |
+| `--tipo-legenda` | 12 px | 600 | 1,4 | Legenda, rótulo de campo (800), dica, erro, chip, selo. |
+| `--tipo-denso` | 13 px | 400 | 1,5 | Corpo denso: linha de tabela, subtítulo de modal. |
+| `--tipo-corpo` | 14 px | 400 | 1,5 | Corpo e controles: campo, botão, aba. |
+| `--tipo-titulo` | 16 px | 800 | 1,3 | Título de cartão, modal e estado vazio. |
+| `--tipo-destaque` | 20 px | 800 | 1,2 | Número de destaque, título do drawer. |
+| `--tipo-pagina` | 24 px | 800 | 1,2 | Título de página, tracking -0,2 px. |
+
+32 e 40 px (`--fs-painel`, `--fs-painel-g`) só no número grande de painel. O Link do motorista usa 12, 14, 16, 20 e 24, com campo de 16 px. Parágrafo: `--lh-paragrafo` 1,55. Classes: `.tx-tipo-*` e `.tx-peso-*`.
 
 ### 3.2 Regras
 
 - Títulos sempre alinhados à esquerda.
-- Códigos técnicos (DDS, viagem, CAR) em monoespaçada para reforçar legibilidade.
+- Códigos técnicos (ordem, placa, CT-e, RNTRC) em monoespaçada.
 - Nunca usar mais de 3 níveis hierárquicos em uma página.
-- Uppercase labels sempre com tracking acima de 0.1em.
+- Rótulo em caixa alta sempre com `--ls-rotulo`.
 
 ---
 
-## 4. Espaçamento e grid
+## 4. Espaçamento e alturas
 
-Base 4px. Container principal `max-w-screen-2xl` com `px-6 py-6`.
+Base 4: `--esp-1` (4) a `--esp-12` (48), com `--esp-0-5` (2), `--esp-1-5` (6) e `--esp-2-5` (10). 6 e 10 existem por serem o ritmo de chips e listas; 7 e 9 não existem.
 
-- Padding interno de card: `px-5 pt-5 pb-3` no header, `px-5 pb-5` no body.
-- Gap entre cards em grid de KPI: `gap-4` (16px).
-- Gap entre seções dentro de uma página: `gap-5` (20px).
-- Sidebar `260px`. Topbar `60px`.
+- Página: `.tx-pagina`, padding 24 / 32 / 48, gap 16 entre blocos.
+- Cartão: padding 20 / 24. Linha de tabela: 12 / 20.
+- Controles: `--controle-p` 32 px (alvo mínimo do escritório), `--controle-m` 40 px (botão e campo), `--controle-mobile` 44 px (celular).
 
 ---
 
-## 5. Radius e elevação
+## 5. Raio, elevação, camada e movimento
 
 | Token | Valor | Uso |
 | --- | --- | --- |
-| `rounded-sm` | 4px | Badges micro. |
-| `rounded-md` | 6–8px | Inputs, botões, dropdowns. |
-| `rounded-lg` | 12px | Tabs, modais. |
-| `rounded-xl` | 16px | Cards. |
+| `--raio-xxs` | 4 px | Barra fina. |
+| `--raio-xs` | 6 px | Tecla, código em linha, caixa de seleção. |
+| `--raio-p` | 8 px | Ação em texto, página da paginação, item de menu. |
+| `--raio-m` | 12 px | Campo, botão de contorno, linha dentro de cartão. |
+| `--raio-g` | 16 px | Popover, opção com descrição, aviso. |
+| `--raio-xg` | 20 px | Cartão. |
+| `--raio-xxg` | 24 px | Modal. |
+| `--raio-pilula` | 999 px | Botão, chip, selo, toast. |
 
-Sombras customizadas (brand-tinted):
+Sombras tingidas com a marca, nunca preto: `--sombra-xs` (campo de busca), `--sombra-p` (hover de cartão), `--sombra-m` (popover), `--sombra-g` (sidebar), `--sombra-xg` (modal), `--sombra-drawer`, `--sombra-toast`, `--sombra-cta`, `--sombra-cta-p`, `--sombra-perigo`.
 
-- `shadow-brand-sm` em cards estáticos
-- `shadow-brand-md` em popovers, hover de cards
-- `shadow-brand-lg` em modais e elementos hero
-
-Sombras são em HSL azul-acinzentado, nunca preto puro.
+Camadas: `--z-fixo` 5, `--z-cabecalho` 35, `--z-sidebar` 40, `--z-pop` 60, `--z-menu` 80, `--z-busca` 90, `--z-drawer` 900, `--z-modal` 1000, `--z-toast` 1200. Durações: `--dur-rapida` 0,15 s, `--dur-media` 0,2 s, `--dur-lenta` 0,3 s, `--dur-carga` 1,3 s; tudo para com `prefers-reduced-motion`.
 
 ---
 
-## 6. Componentes-chave
+## 6. Componentes
 
-### 6.1 Botão
+Código em `src/components/ui` (importar de `@/components/ui`), estilo em `src/components/ui/ui.css`, classes `tx-` em BEM. Referência viva com todas as variantes e estados: `/design-system`. Troca do estilo inline das telas: `docs/ds/guia-migracao.md`.
 
-Variantes: `default` (verde-azulado), `gradient` (gradiente da marca), `secondary` (azul), `outline`, `ghost`, `destructive`, `link`.
+| Componente | Variantes e estados |
+| --- | --- |
+| `Botao` | primario, secundario, contorno, perigo, texto, icone; tamanhos p (32) e m (40); hover, foco, inativo (aria-disabled, ainda clicável para levar ao que falta), desabilitado, carregando. 44 px no celular. |
+| `Campo` + `Entrada`, `AreaTexto`, `Selecao`, `CampoData`, `EntradaCaixa` | rótulo ligado, dica, erro com aria-invalid e aria-describedby, opcional, mono, data DD/MM/AAAA. |
+| `Checkbox`, `Switch` | marcado, inválido, desabilitado; input nativo. |
+| `Chip`, `Escolhas`, `OpcaoCartao` | opção (rádio), filtro (escuro quando ligado), inativo, grupo com erro. |
+| `Situacao` | 7 tons de `TX.ui.TOM`; forma ponto (tabela) e selo; motivo embaixo. |
+| `Badge` | neutro, marca, ok, aviso, perigo, tecnico, info, autoridade; mono, contador, cheio. |
+| `Aviso` | info, ok, aviso, perigo, tecnico; título, ação. |
+| `Abas` | ativa, contador, botão ou link. |
+| `Tabela` | cabeçalho, linha (link, botão), hover, selecionada, esqueleto, vazio, rodapé. |
+| `Paginacao`, `EstadoVazio`, `Cartao`, `Linha`, `CabecalhoPagina` | |
+| `Modal` | p, m, g, xg; rodapé com o padrão "Falta:". |
+| `Drawer`, `Toast` | |
 
-- Altura padrão: 36px (`h-9`).
-- Tipografia: 13px peso 500.
-- Hover em `gradient`: leve translate-y -1px e shadow-brand-lg.
-
-### 6.2 Card
-
-- Fundo branco, borda `border` (HSL 200 18% 92%), radius `xl`, sombra `brand-sm`.
-- Header com `CardTitle` (15px peso 600) e `CardDescription` (12px muted).
-
-### 6.3 Badge
-
-Variantes: `default` (verde-azulado claro), `secondary` (azul claro), `success`, `warning`, `destructive`, `muted`, `outline`, e variantes específicas `regimeA/B/C/D`.
-
-Texto: 11px, peso 600. Padding `px-2 py-0.5`.
-
-### 6.4 Tabela
-
-- Header com `bg-muted` (HSL 200 18% 97%), texto uppercase 10px tracking 0.1em.
-- Linha padrão `py-3` (12px+12px). Border bottom HSL 200 18% 94%.
-- Hover linha em HSL 174 64% 98%.
-
-### 6.5 Status de viagem
-
-Combina ícone + label + cor. Sempre 3 sinais (não só cor).
-
-### 6.6 KPI card
-
-Estrutura:
-
-1. Label uppercase 10px tracking 0.12em
-2. Valor principal 28px peso 700 com `.num`
-3. Delta como badge (TrendingUp/Down) com background semântico
-4. Sparkline opcional (12 barras)
-5. Hint em rodapé 11px muted
+Status de viagem combina ponto, rótulo e cor. Sempre os três sinais, nunca só cor.
 
 ---
 
@@ -240,7 +229,7 @@ Toda página segue:
 
 - Sombras coloridas (brand-tinted) em vez de preto puro
 - Bordas em HSL 200 (toque azul) em vez de cinza neutro
-- Números sempre tabular (.num)
+- Números sempre tabular (`.num`)
 - Uppercase labels com tracking acima de 0.12em
 - Gradientes da marca em diagonal 135° (não horizontal)
 - Sidebar com grid pattern overlay sutil (opacity 0.025)
@@ -254,13 +243,14 @@ Toda página segue:
 
 ## 13. Estados
 
-Cada componente tem: Default, Hover, Focus (`ring-2 ring-brand-500/18`), Active, Disabled (opacity 50%), Loading (skeleton ou spinner), Empty (ilustração + CTA), Error.
+Cada componente tem: repouso, hover, foco (contorno de 2 px em `--primario`), inativo ou desabilitado (`--borda-suave` com `--texto-desab`, sem opacidade), carregando (esqueleto ou giro), vazio (título e o que fazer, sem ilustração) e erro (junto do campo).
 
 ---
 
 ## 14. Acessibilidade
 
-- Contraste mínimo 4.5:1 para texto em todos os pares de cor.
+- Contraste mínimo 4,5:1 para texto em todos os pares de cor e 3:1 para borda que é o único sinal de um controle (`docs/ds/contraste.md`).
+- Alvo de clique de 32 px no escritório e 44 px no celular.
 - Foco visível em todos os controles interativos.
 - Labels associadas a inputs via `htmlFor`.
 - Botões só com ícone têm `aria-label`.
@@ -276,5 +266,5 @@ Cada componente tem: Default, Hover, Focus (`ring-2 ring-brand-500/18`), Active,
 - **Multi-tenant** é representado por seletor explícito no topbar, com initials coloridas, não por subdomínio.
 - **Mapa real** (Leaflet + OSM + Esri Satellite) substitui SVGs estáticos.
 - **Polígonos de fazenda** têm pelo menos 15 vértices para parecer realista.
-- **Tipografia** Geist com letter-spacing negativo sutil em títulos.
+- **Tipografia** Hanken Grotesk e Spline Sans Mono (o que está no ar desde o protótipo), com letter-spacing negativo sutil só no título de página. Geist foi descartada em 17/11/2026 para não divergir do código.
 - **Não usar emojis** decorativos exceto onde regulatoriamente justificado.

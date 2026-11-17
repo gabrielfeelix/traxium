@@ -1,0 +1,12 @@
+// Ponto único de importação: import { Botao, Campo, Situacao } from '@/components/ui';
+export { cx } from './util';
+export { Botao, classeBotao, type BotaoProps, type BotaoVariante, type BotaoTamanho } from './botao';
+export { Campo, Entrada, AreaTexto, Selecao, EntradaCaixa, CampoData, mascaraData, dataValida, type CampoProps } from './campo';
+export { Checkbox, Switch, Chip, Escolhas, OpcaoCartao, type ChipProps, type Opcao } from './escolha';
+export { Situacao, Badge, tomDaDecisao, classeSituacao, classeBadge, TONS, ROTULO_TOM, type Tom, type BadgeTom, type SituacaoProps, type BadgeProps } from './situacao';
+export { Abas, type Aba } from './abas';
+export { Tabela, TabelaCabecalho, TabelaLinha, TabelaEsqueleto, TabelaRodape, Celula } from './tabela';
+export { Paginacao } from './paginacao';
+export { Modal, Drawer, Toast, IconeFechar, type ModalProps, type DrawerProps } from './sobreposicao';
+export { Cartao, Linha, CabecalhoPagina, EstadoVazio, Aviso, type CartaoProps, type AvisoTom } from './cartao';
+export { listaFalta, textoFalta } from './falta';

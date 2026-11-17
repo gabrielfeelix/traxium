@@ -1,57 +1,91 @@
 /*
- * Tokens do Traxium. Toda cor da moldura e das telas sai daqui: é o que permite
- * trocar o fundo, ou ajustar um cinza que reprova em contraste, num lugar só.
+ * Tokens do Traxium. Toda cor, raio, sombra, espaço, tamanho de texto, camada e duração sai daqui:
+ * é o que permite ajustar um valor num lugar só e o que a biblioteca do Figma espelha, um para um.
+ * Inventário que justifica cada valor: docs/ds/inventario.md. Contrastes: docs/ds/contraste.md.
+ * Os componentes (src/components/ui) ficam em src/components/ui/ui.css e só usam estes tokens.
  *
  * Paleta aprovada: teal #127670, #0C5862, #093D44, azul #0E78B5; verde #1a8f57,
  * âmbar #b97514 e #e8a33d, vermelho #c43d3d.
+ *
+ * Regra dos nomes: nenhum token antigo foi removido. Tokens novos só acrescentam.
  */
 :root {
-  /* fundos */
+  /* ------------------------------------------------------------ fundos */
   --fundo: #f2f5f4;
   --fundo-fundo: #e9efed;
   --painel: #ffffff;
-  --superficie: #f7faf9;
+  --superficie: #f7faf9;          /* recebe #fafcfb, #fbfdfc e #f7f9f8 (quase iguais) */
   --superficie-2: #f0f4f3;
-  --superficie-hover: #f6f9f8;
+  --superficie-3: #e4eae8;        /* hover do botão secundário e do fechar; recebe #e4ebe9 */
+  --superficie-hover: #f6f9f8;    /* hover de linha e de item de menu */
+  --veu: rgba(9, 34, 36, 0.45);   /* fundo atrás de modal e drawer */
 
-  /* bordas */
+  /* ------------------------------------------------------------ bordas */
   --borda-suave: #eef2f1;
-  --borda: #e4eae8;
+  --borda: #e4eae8;               /* recebe #e2e9e7, #e8eef0, #dfeaea */
   --borda-campo: #e0e7e5;
-  --borda-forte: #c9d5d3;
+  --borda-forte: #c9d5d3;         /* recebe #d9e5e3, #d8e4e2 */
+  /* Borda que é o único sinal do controle (caixa de seleção, trilho do switch, ponto da opção):
+     3,27:1 no branco, passa os 3:1 da WCAG 1.4.11. #c9d5d3 dava 1,51:1. */
+  --borda-controle: #7f9290;
 
-  /* texto */
+  /* ------------------------------------------------------------ texto */
   --texto: #0b2224;
   --texto-2: #3c4f4e;
   /* Medidos contra a superfície mais escura em que texto cai (#f0f4f3), não só contra o branco.
      Antes: #5c706e dava 4,74:1 ali, #7c8f8d dava 3,07:1 e o placeholder 2,49:1. */
   --texto-sec: #526664;     /* 6,10:1 no branco, 5,50:1 na superfície */
-  --texto-apagado: #5f7270; /* 5,09:1 e 4,59:1 */
+  --texto-apagado: #5f7270; /* 5,09:1 e 4,59:1; recebe #7c8f8d, que reprovava (3,40:1) */
   --placeholder: #66797a;   /* 4,58:1 no branco, que é o fundo dos campos */
   --texto-desab: #9db0ae;   /* só controle desabilitado, que a WCAG isenta */
+  --texto-inverso: #ffffff;                    /* texto sobre a marca, o toast e o drawer */
+  --texto-inverso-2: rgba(255, 255, 255, 0.8); /* subtítulo sobre a marca: 5,0:1 no #0c5862 */
 
-  /* marca */
+  /* ------------------------------------------------------------ marca */
   --primario: #127670;
   --primario-2: #0c5862;
   --primario-3: #093d44;
   --azul: #0e78b5;
-  --primario-fraco: #eef7f6;
+  --primario-fraco: #eef7f6;      /* recebe #f3faf8 (linha selecionada) */
+  --primario-borda: #cfe3e1;      /* borda do código em pílula e do papel */
   --degrade-primario: linear-gradient(135deg, #127670, #0e78b5);
+  --degrade-escuro: linear-gradient(130deg, var(--primario-3), var(--primario-2) 55%, var(--azul) 130%);
 
-  /* semânticas */
+  /* ------------------------------------------------------------ semânticas (situação da viagem)
+     Cada tom tem: cor de texto (4,5:1 no branco e na --superficie-2), borda, fundo tingido,
+     e o par claro que forma o ponto em degradê. */
   /* Verde e âmbar de texto escurecidos para AA: #1a8f57 dava 4,11:1 e #b97514, 3,74:1. */
   --ok: #177d4c;
-  --aviso: #9a6210;
-  --aviso-2: #e8a33d;
-  --perigo: #c43d3d;
-  --tecnico: #93313f;
+  --ok-claro: #48c78e;
   --ok-borda: #cfe9dc;
+  --ok-fundo: #eff8f3;
+  --aviso: #9a6210;
+  --aviso-2: #e8a33d;             /* só preenchimento (ponto, faixa). Nunca texto: 2,16:1 */
+  --aviso-claro: #f4c15d;
   --aviso-borda: #f3dfb8;
+  --aviso-fundo: #fdf6ec;
+  --perigo: #c43d3d;
+  --perigo-claro: #e46969;        /* só preenchimento: com texto branco dava 3,22:1 */
   --perigo-borda: #f1caca;
-  --perigo-fundo: #fdf6f6;
-  --info-borda: #cfe1ef;
+  --perigo-fundo: #fdf6f6;        /* recebe #fdf8f8 e #fdf1f1 */
+  --perigo-cta: #cf4444;          /* início do degradê do botão de perigo: 4,60:1 com branco */
+  --tecnico: #93313f;
+  --tecnico-escuro: #7d2232;
+  --tecnico-borda: #ebc3c8;
+  --tecnico-fundo: #fbf2f3;
+  /* Azul de texto: --azul dá 4,80:1 no branco e reprova na --superficie-2 (4,33:1). */
+  --info: #0c6ca3;
+  --info-claro: #5b8def;
+  --info-borda: #cfe1ef;          /* recebe #cfe3ee */
+  --info-fundo: #eff6fb;
+  /* Liberada por autoridade: #b85a2e dava 4,17:1 na --superficie-2. */
+  --autoridade: #a5502a;
+  --autoridade-2: #d97544;
+  --autoridade-borda: #f0d3bf;
+  --autoridade-fundo: #fdf5ef;
+  --neutro-ponto: #dde5e3;        /* ponto de "sem declaração" e "cancelada" */
 
-  /* sidebar */
+  /* ------------------------------------------------------------ sidebar */
   --sb-fundo: radial-gradient(120% 55% at 0% 0%, rgba(26, 158, 147, 0.42), transparent 62%),
     radial-gradient(110% 45% at 100% 100%, rgba(14, 120, 181, 0.34), transparent 64%),
     linear-gradient(178deg, #093d44, #0a4650);
@@ -59,12 +93,99 @@
   --sb-ativo: linear-gradient(90deg, rgba(26, 158, 147, 0.35), rgba(14, 120, 181, 0.28));
 
   --foco: 0 0 0 2px #fff, 0 0 0 4px #127670;
+  --foco-anel: 0 0 0 3px rgba(18, 118, 112, 0.14);
 
-  /* Escala tipográfica do escritório (px): 11 rótulo, 12 legenda, 13 corpo denso (tabela),
-     14 corpo e controles, 16 título de cartão, 20 número de destaque, 24 título de página;
-     32 e 40 só para o número grande de painel. O Link do motorista tem escala de celular. */
+  /* ------------------------------------------------------------ tipografia
+     Escala do escritório (7 passos): 11 rótulo, 12 legenda, 13 corpo denso (tabela), 14 corpo e
+     controles, 16 título de cartão, 20 número de destaque, 24 título de página; 32 e 40 só para o
+     número grande de painel. O Link do motorista usa 12, 14, 16, 20 e 24, com campo de 16 px.
+     Cada passo tem tamanho (--fs), entrelinha (--lh), peso (--fw) e o atalho --tipo-* para
+     `font: var(--tipo-corpo)`, que é o estilo de texto do Figma com o mesmo nome. */
   --fonte: 'Hanken Grotesk', system-ui, sans-serif;
   --fonte-mono: 'Spline Sans Mono', ui-monospace, monospace;
+
+  --fs-rotulo: 11px;   --lh-rotulo: 1.3;   --fw-rotulo: 800;   --ls-rotulo: 0.7px;
+  --fs-legenda: 12px;  --lh-legenda: 1.4;  --fw-legenda: 600;
+  --fs-denso: 13px;    --lh-denso: 1.5;    --fw-denso: 400;
+  --fs-corpo: 14px;    --lh-corpo: 1.5;    --fw-corpo: 400;
+  --fs-titulo: 16px;   --lh-titulo: 1.3;   --fw-titulo: 800;
+  --fs-destaque: 20px; --lh-destaque: 1.2; --fw-destaque: 800;
+  --fs-pagina: 24px;   --lh-pagina: 1.2;   --fw-pagina: 800;   --ls-pagina: -0.2px;
+  --fs-painel: 32px;   --fs-painel-g: 40px; --lh-painel: 1.1;
+  --lh-paragrafo: 1.55; /* parágrafo de várias linhas */
+
+  --tipo-rotulo: var(--fw-rotulo) var(--fs-rotulo) / var(--lh-rotulo) var(--fonte);
+  --tipo-legenda: var(--fw-legenda) var(--fs-legenda) / var(--lh-legenda) var(--fonte);
+  --tipo-denso: var(--fw-denso) var(--fs-denso) / var(--lh-denso) var(--fonte);
+  --tipo-corpo: var(--fw-corpo) var(--fs-corpo) / var(--lh-corpo) var(--fonte);
+  --tipo-titulo: var(--fw-titulo) var(--fs-titulo) / var(--lh-titulo) var(--fonte);
+  --tipo-destaque: var(--fw-destaque) var(--fs-destaque) / var(--lh-destaque) var(--fonte);
+  --tipo-pagina: var(--fw-pagina) var(--fs-pagina) / var(--lh-pagina) var(--fonte);
+
+  /* ------------------------------------------------------------ espaçamento (base 4)
+     7 vira 8 e 9 vira 8 ou 10 conforme o vizinho. 6 e 10 ficam: 6 é o vão entre chips e entre
+     rótulo e campo (36 usos), 10 é o vão mais usado das telas (83 usos de gap: 10px). */
+  --esp-0: 0;
+  --esp-0-5: 2px;
+  --esp-1: 4px;
+  --esp-1-5: 6px;
+  --esp-2: 8px;
+  --esp-2-5: 10px;
+  --esp-3: 12px;
+  --esp-4: 16px;
+  --esp-5: 20px;
+  --esp-6: 24px;
+  --esp-7: 28px;
+  --esp-8: 32px;
+  --esp-10: 40px;
+  --esp-12: 48px;
+
+  /* ------------------------------------------------------------ alturas de controle */
+  --controle-p: 32px;       /* alvo mínimo do escritório */
+  --controle-m: 40px;       /* botão e campo padrão (era 38 a 39 px, padding 9 ou 10) */
+  --controle-mobile: 44px;  /* Link do motorista e qualquer .tx-mobile */
+
+  /* ------------------------------------------------------------ raios
+     3 e 5 viram 4; 7 e 9 viram 8; 10, 11 e 13 viram 12; 14 e 15 viram 16; 18 e 22 viram 20. */
+  --raio-xxs: 4px;   /* barra fina, marcador */
+  --raio-xs: 6px;    /* tecla, código em linha, caixa de seleção */
+  --raio-p: 8px;     /* alvo de ação em texto, item de menu, página da paginação */
+  --raio-m: 12px;    /* campo, botão de contorno, linha dentro de cartão */
+  --raio-g: 16px;    /* popover, opção com descrição, aviso */
+  --raio-xg: 20px;   /* cartão de conteúdo */
+  --raio-xxg: 24px;  /* modal */
+  --raio-pilula: 999px; /* botão, chip, selo, contador, avatar, toast (era 99px) */
+
+  /* ------------------------------------------------------------ sombras (tingidas com a marca, nunca preto) */
+  --sombra-xs: 0 2px 10px rgba(9, 61, 68, 0.04);    /* campo de busca */
+  --sombra-p: 0 12px 30px rgba(9, 61, 68, 0.09);    /* hover de cartão clicável */
+  --sombra-m: 0 16px 40px rgba(9, 61, 68, 0.16);    /* popover, menu (recebe .14, .18 e .22) */
+  --sombra-g: 0 18px 44px rgba(9, 61, 68, 0.22);    /* sidebar, resultado da busca */
+  --sombra-xg: 0 40px 100px rgba(9, 34, 36, 0.4);   /* modal */
+  --sombra-drawer: -30px 0 80px rgba(9, 34, 36, 0.35);
+  --sombra-toast: 0 16px 40px rgba(9, 34, 36, 0.35);
+  --sombra-cta: 0 8px 18px rgba(18, 118, 112, 0.35);    /* botão primário */
+  --sombra-cta-p: 0 6px 14px rgba(18, 118, 112, 0.3);   /* botão primário pequeno (recebe .25 e .28) */
+  --sombra-perigo: 0 8px 18px rgba(196, 61, 61, 0.3);
+
+  /* ------------------------------------------------------------ camadas */
+  --z-base: 1;
+  --z-fixo: 5;          /* cabeçalho grudado dentro da tela */
+  --z-cabecalho: 35;
+  --z-sidebar: 40;
+  --z-pop: 60;          /* popover de filtro */
+  --z-menu: 80;
+  --z-busca: 90;
+  --z-drawer: 900;
+  --z-modal: 1000;
+  --z-toast: 1200;
+
+  /* ------------------------------------------------------------ movimento */
+  --dur-rapida: 0.15s;  /* hover, cor, borda */
+  --dur-media: 0.2s;    /* sombra, transformação */
+  --dur-lenta: 0.3s;    /* entrada de drawer, barra de progresso */
+  --dur-carga: 1.3s;    /* brilho do esqueleto */
+  --curva: ease;
 }
 
 * { box-sizing: border-box; }
@@ -90,7 +211,7 @@ input:not([style*="border: none"]):focus-visible, textarea:not([style*="border: 
 }
 input[style*="border: none"]:focus-visible, textarea[style*="border: none"]:focus-visible { outline: none !important; }
 :has(> input[style*="border: none"]:focus-visible), :has(> textarea[style*="border: none"]:focus-visible) {
-  border-color: var(--primario) !important; box-shadow: 0 0 0 3px rgba(18, 118, 112, .14) !important;
+  border-color: var(--primario) !important; box-shadow: var(--foco-anel) !important;
 }
 
 @keyframes txsh { from { background-position: -600px 0 } to { background-position: 600px 0 } }
@@ -98,41 +219,38 @@ input[style*="border: none"]:focus-visible, textarea[style*="border: none"]:focu
 @keyframes deslizar { from { transform: translateX(40px); opacity: 0 } to { transform: none; opacity: 1 } }
 @keyframes subir { from { transform: translateY(12px); opacity: 0 } to { transform: none; opacity: 1 } }
 @keyframes flash { 0% { opacity: .9 } 100% { opacity: 0 } }
+@keyframes txgiro { to { transform: rotate(360deg) } }
 
-/* ---------------------------------------------------------------- formulário (src/components/ui/formulario.tsx) */
-.tx-rotulo { display: block; font-size: 12px; font-weight: 800; color: var(--texto-2); }
-.tx-erro { font-size: 12px; font-weight: 600; color: var(--perigo); margin-top: 4px; }
-.tx-dica { font-size: 12px; color: var(--texto-apagado); margin-top: 4px; }
-input[aria-invalid='true'], textarea[aria-invalid='true'] { border-color: var(--perigo) !important; }
-.tx-escolhas { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; align-items: center; }
-.tx-chip {
-  font-size: 12px; font-weight: 700; border-radius: 99px; padding: 5px 12px; min-height: 30px; cursor: pointer;
-  border: 1.5px solid var(--borda-campo); background: var(--painel); color: var(--texto-2);
-}
-.tx-chip:hover { border-color: var(--borda-forte); }
-.tx-chip[aria-checked='true'] { border-color: var(--primario); background: var(--primario-fraco); color: var(--primario-2); }
-[aria-invalid='true'] > .tx-chip:not([aria-checked='true']) { border-color: var(--perigo-borda); }
-
-/* Ação em texto (Ver todos, Abrir a mesa, usar exemplo): o texto fica onde estava, o alvo cresce para 32 px. */
-.tx-acao-texto {
-  display: inline-flex; align-items: center; min-height: 32px; padding: 0 8px; margin: -6px -8px; border-radius: 8px;
-  font-size: 13px; font-weight: 800; color: var(--primario-2); background: none; border: none; cursor: pointer;
-}
-.tx-acao-texto:hover { background: var(--superficie-hover); color: var(--primario); }
-
-/* Fora da vista, mas no Tab e no leitor de tela (seletor de arquivo dentro de um rótulo clicável). */
-.tx-so-leitor { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-label:has(> .tx-so-leitor:focus-visible) { outline: 2px solid var(--primario); outline-offset: 2px; }
-/* O que falta para o botão do rodapé acender. */
-.tx-falta { margin-right: auto; font-size: 12px; color: var(--texto-apagado); line-height: 1.4; }
-.tx-falta ~ [role='button'], .tx-falta ~ button { white-space: nowrap; flex: none; }
+/* ---------------------------------------------------------------- utilitários de texto */
+.num { font-variant-numeric: tabular-nums; }
+.tx-mono { font-family: var(--fonte-mono); }
+.tx-tipo-rotulo { font: var(--tipo-rotulo); letter-spacing: var(--ls-rotulo); text-transform: uppercase; color: var(--texto-apagado); }
+.tx-tipo-legenda { font: var(--tipo-legenda); }
+.tx-tipo-denso { font: var(--tipo-denso); }
+.tx-tipo-corpo { font: var(--tipo-corpo); }
+.tx-tipo-titulo { font: var(--tipo-titulo); }
+.tx-tipo-destaque { font: var(--tipo-destaque); font-variant-numeric: tabular-nums; }
+.tx-tipo-pagina { font: var(--tipo-pagina); letter-spacing: var(--ls-pagina); }
+.tx-peso-400 { font-weight: 400; }
+.tx-peso-600 { font-weight: 600; }
+.tx-peso-700 { font-weight: 700; }
+.tx-peso-800 { font-weight: 800; }
+.tx-sec { color: var(--texto-sec); }
+.tx-apagado { color: var(--texto-apagado); }
 
 /* Link do motorista (celular): campo com 44 px de alvo e fonte de 16 px (abaixo disso o iPhone dá zoom ao tocar). */
 [data-tela='LinkDaViagem'] input:not([type='checkbox']):not([type='radio']):not([type='file']),
 [data-tela='LinkDaViagem'] textarea, [data-tela='LinkDaViagem'] select { min-height: 44px; font-size: 16px !important; }
 [data-tela='LinkDaViagem'] [role='button'] { min-height: 32px; }
 
+/* Fora da vista, mas no Tab e no leitor de tela (seletor de arquivo dentro de um rótulo clicável). */
+.tx-so-leitor { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+label:has(> .tx-so-leitor:focus-visible) { outline: 2px solid var(--primario); outline-offset: 2px; }
+
 /* Área de clique maior que o desenho: ação em texto ganha 8 px de alvo invisível em cima e embaixo
    (e 4 px dos lados), sem mudar o layout. O alvo final passa de 32 px. */
 .tx-alvo { position: relative; }
 .tx-alvo::after { content: ''; position: absolute; inset: -8px -4px; }
+
+/* As classes de componente (.tx-rotulo, .tx-chip, .tx-falta, .tx-acao-texto e as novas .tx-botao,
+   .tx-campo, .tx-situacao...) estão em src/components/ui/ui.css, importado no layout raiz. */

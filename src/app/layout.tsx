@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import '@/components/ui/ui.css';
 import '@/telas/estados.css';
 import { TecladoClicavel } from '@/components/tela/teclado';
 
