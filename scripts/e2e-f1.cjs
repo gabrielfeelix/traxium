@@ -42,7 +42,7 @@ const ok = (c, m) => { console.log((c ? 'ok    ' : 'FALHOU ') + m); if (!c) falh
   await av(); await cel.waitForTimeout(300);
   await mesa.waitForTimeout(300);
   ok(/em preenchimento/.test(await linha.innerText()), 'mesa vê o motorista em preenchimento');
-  for (const k of ['lona', 'correntes', 'cintas', 'carroceria', 'interior']) { await cel.click(`[data-tx-sim="${k}"]`); await cel.click(`[data-tx-foto-ck="${k}"]`); }
+  for (const k of ['lona', 'correntes', 'cintas', 'carroceria', 'interior']) { await cel.click(`[data-tx-sim="${k}"]`); await cel.click(`[data-tx-foto-ck="${k}"]`); await cel.click("[data-tx-camera-disparar]"); await cel.click("[data-tx-camera-usar]"); }
   await cel.screenshot({ path: out + '/c-link-check.png', fullPage: true });
   await av(); await cel.waitForTimeout(200);
   for (let i = 0; i < 5; i++) { await av(); await cel.waitForTimeout(120); }

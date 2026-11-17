@@ -171,11 +171,11 @@ const ok = (c, m) => { console.log((c ? 'ok    ' : 'FALHOU ') + m); if (!c) falh
   ok(/antes desta carga/.test(await cel.locator('[data-tx-t3-linha]').first().innerText()), 'Link: data do T-3 depois da carga é apontada');
   for (const [i, d, t] of [[0, '2026-10-05', 'soja'], [1, '2026-09-28', 'milho'], [2, '2026-09-20', 'farelo de soja']]) { await dd[i].fill(d); await pp[i].fill(t); }
   await cel.click('[data-tx-avancar]'); await cel.waitForTimeout(200);
-  for (const k of ['lona', 'correntes', 'cintas', 'carroceria']) { await cel.click(`[data-tx-sim="${k}"]`); await cel.click(`[data-tx-foto-ck="${k}"]`); }
+  for (const k of ['lona', 'correntes', 'cintas', 'carroceria']) { await cel.click(`[data-tx-sim="${k}"]`); await cel.click(`[data-tx-foto-ck="${k}"]`); await cel.click("[data-tx-camera-disparar]"); await cel.click("[data-tx-camera-usar]"); }
   ok(await bt() === 'Falta 1 item', 'Link: checklist diz quantos itens faltam');
   await cel.click('[data-tx-avancar]'); await cel.waitForTimeout(300);
   ok(/rgb\(232, 163, 61\)/.test(await cel.locator('[data-tx-ck="interior"]').evaluate(e => getComputedStyle(e).borderColor)), 'Link: tocar no botão realça o item que falta');
-  await cel.click('[data-tx-sim="interior"]'); await cel.click('[data-tx-foto-ck="interior"]'); await cel.click('[data-tx-avancar]');
+  await cel.click('[data-tx-sim="interior"]'); await cel.click('[data-tx-foto-ck="interior"]'); await cel.click("[data-tx-camera-disparar]"); await cel.click("[data-tx-camera-usar]"); await cel.click('[data-tx-avancar]');
   for (let i = 0; i < 5; i++) { await cel.click('[data-tx-avancar]'); await cel.waitForTimeout(80); }
   const bx = await cel.locator('[data-tx-assinatura]').boundingBox(); await cel.mouse.move(bx.x + 20, bx.y + 60); await cel.mouse.down(); for (let i = 0; i < 30; i++) await cel.mouse.move(bx.x + 20 + i * 8, bx.y + 60 + Math.sin(i / 2) * 25); await cel.mouse.up();
   ok(await cel.evaluate(() => String(getSelection())) === '', 'Link: assinar não seleciona texto da página');

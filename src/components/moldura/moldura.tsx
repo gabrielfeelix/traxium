@@ -40,7 +40,7 @@ const CADASTROS = [
 ];
 const RODAPE: Item[] = [
   { k: 'config', n: 'Configurações', href: '/configuracoes' },
-  { k: 'link', n: 'Link do motorista', tag: 'demo', href: '/link?id=VG-3122', novaAba: true, tip: 'Abre em outra aba a página que o motorista recebe pelo WhatsApp' },
+  { k: 'link', n: 'Protótipo mobile', tag: 'demo', href: '/mobile', tip: 'O link que o motorista recebe pelo WhatsApp, num celular, com as viagens de exemplo' },
   // O protótipo .dc.html (v1 e v2) é copiado para public/prototipo no build: scripts/copiar-prototipo.mjs.
   { k: 'anterior', n: 'Versão anterior', href: '/prototipo/versao-anterior.html', externo: true }
 ];
@@ -54,6 +54,7 @@ function itemAtivo(rota: string, busca: URLSearchParams): string | null {
     return p && p.dono === 'propria' ? 'frota' : 'transportadores';
   }
   if (r === 'configuracoes') return 'config';
+  if (r === 'mobile') return 'link';
   return r || null;
 }
 function abaCadastros(busca: URLSearchParams) {
