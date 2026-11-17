@@ -1,0 +1,297 @@
+/*
+ * Viagem: detalhe da viagem. Classes locais da tela (tx-viagem-*), valores só por token.
+ * Exceção: o desenho das fotos do checklist (.tx-viagem-foto--<item>) é ilustração, não interface,
+ * e mantém as cores do protótipo (guia de migração, seção 2.3).
+ * Candidatos a componente estão em docs/ds/pendencias.md (escopo viagem).
+ */
+
+.tx-viagem { min-height: 100%; }
+.tx-viagem p { margin: 0; }
+.tx-viagem ul,
+.tx-viagem ol { list-style: none; margin: 0; padding: 0; }
+.tx-viagem dl,
+.tx-viagem dd { margin: 0; }
+.tx-viagem-h3 { margin: 0; }
+.tx-viagem-meta { margin-top: var(--esp-2); }
+.tx-viagem-pend { color: var(--aviso); }
+.tx-viagem-link { color: var(--primario-2); font-weight: 700; text-decoration: underline; text-decoration-color: var(--primario-borda); text-underline-offset: 3px; }
+.tx-viagem-link:hover { text-decoration-color: currentColor; }
+
+/* ---------------------------------------------------------------- trilha e cabeçalho */
+.tx-viagem { position: relative; }
+.tx-viagem-sentinela { position: absolute; top: 0; left: 0; width: 1px; height: 120px; pointer-events: none; }
+
+.tx-viagem-cab { display: flex; flex-direction: column; gap: var(--esp-1-5); }
+.tx-viagem-cab__topo { display: flex; align-items: center; gap: var(--esp-4); }
+.tx-viagem-cab__linha { display: flex; align-items: center; flex-wrap: wrap; gap: var(--esp-2) var(--esp-4); }
+.tx-viagem-cab__rota { font: var(--tipo-corpo); color: var(--texto-2); }
+.tx-viagem-cab__rota b { font-weight: 700; color: var(--texto); }
+.tx-viagem-cab__seta { margin: 0 var(--esp-1-5); color: var(--texto-apagado); }
+
+/* Fatos da viagem: lista de definição em uma faixa, sem caixa por item. */
+.tx-viagem-fatos { display: flex; flex-wrap: wrap; gap: var(--esp-2) var(--esp-8); margin-top: var(--esp-2); padding: var(--esp-3) 0; border-top: 1px solid var(--borda); }
+.tx-viagem-fatos__item { display: flex; flex-direction: column; gap: var(--esp-0-5); min-width: 0; }
+.tx-viagem-fatos__item dd { font: var(--tipo-denso); font-weight: 700; color: var(--texto); white-space: nowrap; }
+.tx-viagem-fatos__item dd.tx-mono { font-family: var(--fonte-mono); }
+.tx-viagem-fatos__item dd.tx-sec { color: var(--texto-sec); font-weight: 600; }
+.tx-viagem-fatos__apagado { color: var(--texto-apagado) !important; font-weight: 400 !important; }
+.tx-viagem-fatos__placas { display: flex; gap: var(--esp-1-5); }
+
+
+
+/* Barra fixa: ao rolar, OC, produto, situação e a ação do momento ficam à vista. */
+.tx-viagem-fixa { position: sticky; top: 0; height: 0; z-index: var(--z-fixo); }
+.tx-viagem-fixa__barra { position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: var(--esp-3); min-height: 56px; padding: var(--esp-2) var(--esp-8); background: var(--painel); border-bottom: 1px solid var(--borda); box-shadow: var(--sombra-xs); font: var(--tipo-denso); animation: tx-viagem-desce var(--dur-media) var(--curva); }
+.tx-viagem-fixa__titulo { font-weight: 700; color: var(--texto); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tx-viagem-fixa__acao { margin-left: auto; }
+@keyframes tx-viagem-desce { from { transform: translateY(-100%); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .tx-viagem-fixa__barra { animation: none; } }
+
+/* Menu Ações */
+.tx-viagem-menu { position: relative; }
+.tx-viagem-menu__seta { margin-left: var(--esp-1); transition: transform var(--dur-rapida) var(--curva); }
+[aria-expanded='true'] > .tx-viagem-menu__seta,
+[aria-expanded='true'] .tx-viagem-menu__seta { transform: rotate(180deg); }
+.tx-viagem-menu__lista { position: absolute; right: 0; top: calc(100% + var(--esp-1-5)); z-index: var(--z-menu); width: 300px; padding: var(--esp-1-5); display: flex; flex-direction: column; gap: var(--esp-0-5); background: var(--painel); border: 1px solid var(--borda); border-radius: var(--raio-g); box-shadow: var(--sombra-m); }
+.tx-viagem-menu__item { display: flex; flex-direction: column; align-items: flex-start; gap: var(--esp-0-5); width: 100%; min-height: var(--controle-m); padding: var(--esp-2) var(--esp-3); border: 0; border-radius: var(--raio-m); background: transparent; text-align: left; cursor: pointer; color: var(--texto); font: inherit; }
+.tx-viagem-menu__item:hover,
+.tx-viagem-menu__item:focus-visible { background: var(--superficie-hover); }
+.tx-viagem-menu__item:focus-visible { outline: 2px solid var(--primario); outline-offset: -2px; }
+.tx-viagem-menu__item[aria-disabled='true'] { cursor: not-allowed; color: var(--texto-desab); }
+.tx-viagem-menu__item[aria-disabled='true']:hover { background: transparent; }
+.tx-viagem-menu__item--perigo { color: var(--perigo); }
+.tx-viagem-menu__item--perigo:hover { background: var(--perigo-fundo); }
+.tx-viagem-menu__nome { font: var(--tipo-denso); font-weight: 700; }
+.tx-viagem-menu__sub { font: var(--tipo-legenda); font-weight: 400; color: var(--texto-apagado); }
+.tx-viagem-menu__sep { height: 1px; margin: var(--esp-1) var(--esp-2); background: var(--borda); }
+
+.tx-viagem-carregando { display: flex; flex-direction: column; gap: var(--esp-4); }
+.tx-viagem-carregando .tx-esqueleto { display: block; height: 18px; }
+
+/* ---------------------------------------------------------------- decisão */
+.tx-viagem-decisao {
+  --_c: var(--texto-apagado); --_fundo: var(--superficie); --_borda: var(--borda); --_icone: var(--neutro-ponto); --_icone-c: var(--texto-2);
+  position: relative; background: var(--painel); border: 1px solid var(--_borda); border-radius: var(--raio-xg); overflow: hidden;
+  box-shadow: inset 4px 0 0 var(--_c);
+}
+.tx-viagem-decisao--ok { --_c: var(--ok); --_fundo: var(--ok-fundo); --_borda: var(--ok-borda); --_icone: var(--degrade-primario); --_icone-c: var(--texto-inverso); }
+.tx-viagem-decisao--autoridade { --_c: var(--autoridade); --_fundo: var(--autoridade-fundo); --_borda: var(--autoridade-borda); --_icone: linear-gradient(135deg, var(--aviso-claro), var(--autoridade-2)); --_icone-c: var(--texto-inverso); }
+.tx-viagem-decisao--falta { --_c: var(--aviso-2); --_fundo: var(--aviso-fundo); --_borda: var(--aviso-borda); --_icone: linear-gradient(135deg, var(--aviso-claro), var(--aviso-2)); --_icone-c: var(--texto-inverso); }
+.tx-viagem-decisao--bloqueio { --_c: var(--perigo); --_fundo: var(--perigo-fundo); --_borda: var(--perigo-borda); --_icone: linear-gradient(135deg, var(--perigo-cta), var(--perigo)); --_icone-c: var(--texto-inverso); }
+.tx-viagem-decisao--tecnico { --_c: var(--tecnico); --_fundo: var(--tecnico-fundo); --_borda: var(--tecnico-borda); --_icone: linear-gradient(135deg, var(--perigo), var(--tecnico-escuro)); --_icone-c: var(--texto-inverso); }
+.tx-viagem-decisao__cab { display: flex; align-items: flex-start; gap: var(--esp-4); padding: var(--esp-5) var(--esp-6); background: var(--_fundo); border-bottom: 1px solid var(--_borda); }
+.tx-viagem-decisao__icone { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--raio-pilula); background: var(--_icone); color: var(--_icone-c); }
+.tx-viagem-decisao__titulos { flex: 1; min-width: 0; }
+.tx-viagem-decisao__olho { color: var(--_c); }
+.tx-viagem-decisao--falta .tx-viagem-decisao__olho { color: var(--aviso); }
+.tx-viagem-decisao__titulo { margin: var(--esp-0-5) 0 0; font: var(--tipo-destaque); color: var(--texto); }
+.tx-viagem-decisao__sub { margin-top: var(--esp-1); font: var(--tipo-corpo); line-height: var(--lh-paragrafo); color: var(--texto-2); max-width: 760px; }
+.tx-viagem-decisao__acoes { flex: none; display: flex; align-items: center; gap: var(--esp-2-5); align-self: center; }
+.tx-viagem-decisao__acoes:empty { display: none; }
+.tx-viagem-decisao__corpo { display: flex; flex-direction: column; gap: var(--esp-3); padding: var(--esp-4) var(--esp-6); }
+.tx-viagem-decisao__como { font: var(--tipo-corpo); line-height: var(--lh-paragrafo); color: var(--texto); }
+.tx-viagem-decisao__linha { display: flex; align-items: center; flex-wrap: wrap; gap: var(--esp-3); }
+.tx-viagem-decisao__mais { margin-left: auto; display: flex; align-items: center; gap: var(--esp-2-5); }
+
+.tx-viagem-declaracao { display: flex; flex-direction: column; gap: var(--esp-2); padding: var(--esp-4) var(--esp-5); background: var(--superficie); border: 1px dashed var(--primario-borda); border-radius: var(--raio-g); }
+.tx-viagem-declaracao__texto { font-family: var(--fonte-mono); font-size: var(--fs-corpo); line-height: var(--lh-paragrafo); color: var(--texto); }
+.tx-viagem-declaracao__rodape { display: flex; align-items: center; flex-wrap: wrap; gap: var(--esp-3); }
+
+/* Andamento: no cabeçalho, logo abaixo dos fatos (U34). */
+.tx-viagem-passos { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--esp-2); padding-top: var(--esp-3); border-top: 1px solid var(--borda); }
+.tx-viagem-passos__item { position: relative; display: flex; align-items: center; gap: var(--esp-2); min-width: 0; }
+.tx-viagem-passos__item::after { content: ''; flex: 1; height: 2px; min-width: var(--esp-2); margin-right: var(--esp-1); background: var(--borda); align-self: center; }
+.tx-viagem-passos__item:last-child::after { display: none; }
+.tx-viagem-passos__item--feito::after { background: var(--primario); }
+.tx-viagem-passos__marca { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: var(--raio-pilula); background: var(--superficie-2); color: var(--texto-apagado); font: var(--tipo-legenda); font-weight: 800; }
+.tx-viagem-passos__item--feito .tx-viagem-passos__marca { background: var(--degrade-primario); color: var(--texto-inverso); }
+.tx-viagem-passos__item--atual .tx-viagem-passos__marca { background: var(--painel); color: var(--primario-2); box-shadow: inset 0 0 0 2px var(--primario); }
+.tx-viagem-passos__item--bloq .tx-viagem-passos__marca { background: linear-gradient(135deg, var(--perigo-cta), var(--perigo)); color: var(--texto-inverso); }
+.tx-viagem-passos__texto { display: flex; flex-direction: column; min-width: 0; flex: none; max-width: 140px; }
+.tx-viagem-passos__nome { font: var(--tipo-legenda); font-weight: 700; color: var(--texto); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tx-viagem-passos__item--pend .tx-viagem-passos__nome { color: var(--texto-sec); }
+.tx-viagem-passos__sub { font: var(--tipo-legenda); font-weight: 400; color: var(--texto-apagado); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tx-viagem-passos__item--atual .tx-viagem-passos__sub { color: var(--aviso); font-weight: 600; }
+.tx-viagem-passos__item--bloq .tx-viagem-passos__sub { color: var(--perigo); font-weight: 600; }
+
+/* Pendências agrupadas por quem resolve. */
+.tx-viagem-grupos { display: flex; flex-direction: column; }
+.tx-viagem-grupo { padding: var(--esp-3) var(--esp-6) var(--esp-4); }
+.tx-viagem-grupo + .tx-viagem-grupo { border-top: 1px solid var(--borda-suave); }
+.tx-viagem-grupo__cab { display: flex; align-items: center; gap: var(--esp-3); margin-bottom: var(--esp-2); }
+.tx-viagem-grupo__cab .tx-botao { margin-left: auto; }
+.tx-viagem-pendencias { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--esp-2) var(--esp-6); }
+.tx-viagem-pendencias__item { display: flex; align-items: flex-start; gap: var(--esp-2-5); font: var(--tipo-denso); }
+.tx-viagem-pendencias__marca { flex: none; width: 12px; height: 12px; margin-top: var(--esp-1); border-radius: var(--raio-pilula); border: 2px solid var(--aviso-2); }
+.tx-viagem-pendencias__nome { display: block; font-weight: 700; color: var(--texto); }
+.tx-viagem-pendencias__det { display: block; font: var(--tipo-legenda); font-weight: 400; color: var(--texto-sec); }
+
+.tx-viagem-caminhos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--esp-3) var(--esp-6); padding: var(--esp-4) var(--esp-6); }
+.tx-viagem-caminhos dt { font: var(--tipo-denso); font-weight: 700; color: var(--texto); }
+.tx-viagem-caminhos dd { margin-top: var(--esp-0-5); font: var(--tipo-legenda); font-weight: 400; color: var(--texto-sec); }
+
+.tx-viagem-decisao__rodape { display: flex; align-items: center; justify-content: space-between; gap: var(--esp-3); padding: var(--esp-2) var(--esp-6) var(--esp-3); border-top: 1px solid var(--borda-suave); }
+.tx-viagem-decisao > .tx-viagem-checagens { margin: 0; padding: 0 var(--esp-6) var(--esp-4); }
+
+/* ---------------------------------------------------------------- grade */
+.tx-viagem-grade { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: var(--esp-4); align-items: start; }
+.tx-viagem-col { display: flex; flex-direction: column; gap: var(--esp-4); min-width: 0; }
+.tx-viagem-col > .tx-cartao { scroll-margin-top: var(--esp-12); }
+@media (min-width: 1600px) {
+  .tx-viagem-grade { grid-template-columns: minmax(0, 1fr) 380px; }
+}
+@media (max-width: 1100px) {
+  .tx-viagem-grade { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 1280px) {
+  .tx-viagem-decisao__cab { flex-wrap: wrap; }
+  .tx-viagem-decisao__acoes { width: 100%; justify-content: flex-end; }
+}
+@media (max-width: 1200px) {
+  .tx-viagem-passos { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: var(--esp-3); }
+  .tx-viagem-passos__item:nth-child(3)::after { display: none; }
+}
+@media (max-width: 720px) {
+  .tx-viagem-cab__topo { flex-wrap: wrap; }
+  .tx-viagem-decisao__cab { padding: var(--esp-4); }
+  .tx-viagem-pendencias,
+  .tx-viagem-caminhos { grid-template-columns: minmax(0, 1fr); }
+  .tx-viagem-passos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tx-viagem-passos__item::after { display: none; }
+  .tx-viagem-t3__carga { grid-template-columns: 32px 52px minmax(0, 1fr) auto; }
+  .tx-viagem-t3__fonte { grid-column: 3 / -1; }
+  .tx-viagem-fotos { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .tx-viagem-fixa__barra { padding: var(--esp-2) var(--esp-4); }
+  .tx-viagem-fixa__titulo { display: none; }
+}
+
+/* ---------------------------------------------------------------- três últimas cargas */
+/* Uma linha por T-n com divisor, sem caixa interna (U39). */
+.tx-viagem-t3 { display: flex; flex-direction: column; gap: var(--esp-5); }
+.tx-viagem-t3__cab { display: flex; align-items: center; flex-wrap: wrap; gap: var(--esp-2) var(--esp-3); font: var(--tipo-denso); }
+.tx-viagem-t3__exigido { display: inline-flex; align-items: center; gap: var(--esp-1-5); margin-left: auto; }
+.tx-viagem-t3__cargas { margin-top: var(--esp-2); }
+.tx-viagem-t3__carga { display: grid; grid-template-columns: 32px 52px minmax(0, 1fr) 28px minmax(0, 1fr); align-items: center; gap: var(--esp-3); padding: var(--esp-2-5) var(--esp-2); border-top: 1px solid var(--borda-suave); font: var(--tipo-denso); }
+.tx-viagem-t3__carga--proibida { background: var(--perigo-fundo); border-radius: var(--raio-p); }
+.tx-viagem-t3__produto { font-weight: 700; color: var(--texto); min-width: 0; }
+.tx-viagem-t3__carga--vazia .tx-viagem-t3__produto { color: var(--texto-apagado); font-weight: 600; }
+.tx-viagem-t3__carga--proibida .tx-viagem-t3__produto { color: var(--perigo); }
+.tx-viagem-t3__fonte { font: var(--tipo-legenda); font-weight: 400; color: var(--texto-apagado); text-align: right; }
+a.tx-viagem-t3__fonte { font-weight: 700; color: var(--primario-2); }
+
+/* Regime não definido ("?"): o SeloRegime compartilhado cobre A a D e X. */
+.tx-viagem-regime { display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 var(--esp-1); border-radius: var(--raio-xs); font: var(--tipo-legenda); font-weight: 800; border: 1px solid transparent; }
+.tx-viagem-regime--nd { background: var(--superficie-2); color: var(--texto-apagado); border-color: var(--borda); }
+
+/* ---------------------------------------------------------------- verificação */
+.tx-viagem-fotos { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--esp-3); margin-top: var(--esp-3); }
+.tx-viagem-fotos__item { display: flex; flex-direction: column; gap: var(--esp-0-5); width: 100%; padding: 0 0 var(--esp-2-5); background: var(--painel); border: 1px solid var(--borda); border-radius: var(--raio-g); overflow: hidden; text-align: left; font: inherit; color: inherit; }
+.tx-viagem-fotos__item--botao { cursor: pointer; transition: box-shadow var(--dur-media) var(--curva), border-color var(--dur-media) var(--curva); }
+.tx-viagem-fotos__item--botao:hover { border-color: var(--borda-forte); box-shadow: var(--sombra-p); }
+.tx-viagem-fotos__item--botao:focus-visible { outline: 2px solid var(--primario); outline-offset: 2px; }
+.tx-viagem-fotos__item--nao { border-color: var(--perigo-borda); }
+.tx-viagem-fotos__item--dev { border-color: var(--perigo); }
+.tx-viagem-fotos__nome { padding: var(--esp-2) var(--esp-3) 0; font: var(--tipo-denso); font-weight: 700; }
+.tx-viagem-fotos__sub { padding: 0 var(--esp-3); font: var(--tipo-legenda); font-weight: 400; color: var(--texto-apagado); }
+.tx-viagem-fotos__item--botao .tx-viagem-fotos__sub { color: var(--primario-2); font-weight: 700; }
+.tx-viagem-fotos__sub--dev { color: var(--perigo) !important; }
+.tx-viagem-fotos__critico { color: var(--tecnico); font-weight: 600; }
+
+.tx-viagem-foto { position: relative; display: grid; place-items: center; height: 84px; color: var(--texto-inverso-2); }
+.tx-viagem-foto--vazia { background: repeating-linear-gradient(-45deg, var(--superficie) 0 7px, var(--borda-suave) 7px 14px); color: var(--borda-forte); }
+.tx-viagem-foto--grande { height: 300px; border-radius: var(--raio-g); }
+.tx-viagem-foto__hora { position: absolute; left: var(--esp-1-5); bottom: var(--esp-1-5); padding: var(--esp-0-5) var(--esp-1-5); border-radius: var(--raio-xxs); background: var(--veu); color: var(--texto-inverso); font-size: var(--fs-legenda); font-weight: 600; }
+.tx-viagem-foto__resp { position: absolute; right: var(--esp-1-5); top: var(--esp-1-5); padding: var(--esp-0-5) var(--esp-2); border-radius: var(--raio-pilula); color: var(--texto-inverso); font: var(--tipo-legenda); font-weight: 800; }
+.tx-viagem-foto__resp--ok { background: var(--ok); }
+.tx-viagem-foto__resp--nao { background: var(--perigo); }
+/* Ilustração das fotos (não é interface). */
+.tx-viagem-foto--lona { background: repeating-linear-gradient(90deg, #2f5d73 0 14px, #33657c 14px 28px); }
+.tx-viagem-foto--correntes { background: radial-gradient(circle at 30% 40%, #8a9aa0, #4c5c62 70%); }
+.tx-viagem-foto--cintas { background: repeating-linear-gradient(-30deg, #c46a2a 0 10px, #d07a34 10px 20px); }
+.tx-viagem-foto--carroceria { background: linear-gradient(160deg, #5d7a7a, #3f5757); }
+.tx-viagem-foto--interior { background: repeating-linear-gradient(0deg, #8b6f4e 0 12px, #957857 12px 24px); }
+.tx-viagem-foto--grande.tx-viagem-foto--lona { background: repeating-linear-gradient(90deg, #2f5d73 0 22px, #33657c 22px 44px); }
+.tx-viagem-foto--grande.tx-viagem-foto--cintas { background: repeating-linear-gradient(-30deg, #c46a2a 0 16px, #d07a34 16px 32px); }
+.tx-viagem-foto--grande.tx-viagem-foto--interior { background: repeating-linear-gradient(0deg, #8b6f4e 0 18px, #957857 18px 36px); }
+
+.tx-viagem-conferir { display: flex; align-items: center; flex-wrap: wrap; gap: var(--esp-3); margin-top: var(--esp-4); padding: var(--esp-3) var(--esp-4); background: var(--aviso-fundo); border: 1px solid var(--aviso-borda); border-radius: var(--raio-g); }
+.tx-viagem-conferir__texto { flex: 1; min-width: 240px; font: var(--tipo-denso); line-height: var(--lh-paragrafo); color: var(--texto); }
+.tx-viagem-col .tx-aviso { margin-top: var(--esp-3); }
+
+/* ---------------------------------------------------------------- checagens */
+.tx-viagem-barra { height: 6px; border-radius: var(--raio-pilula); background: var(--superficie-2); overflow: hidden; }
+.tx-viagem-barra > span { display: block; height: 100%; border-radius: var(--raio-pilula); background: var(--aviso-2); transition: width var(--dur-lenta) var(--curva); }
+.tx-viagem-barra--ok > span { background: var(--degrade-primario); }
+.tx-viagem-checagens { margin-top: var(--esp-3); }
+.tx-viagem-checagens__item { display: flex; align-items: center; gap: var(--esp-3); padding: var(--esp-2-5) 0; border-top: 1px solid var(--borda-suave); font: var(--tipo-denso); }
+.tx-viagem-checagens__texto { flex: 1; min-width: 0; }
+.tx-viagem-checagens__item--na .tx-viagem-checagens__texto { color: var(--texto-apagado); }
+.tx-viagem-checagens__rot { flex: none; min-width: 84px; justify-content: flex-end; font: var(--tipo-legenda); font-weight: 700; }
+
+/* ---------------------------------------------------------------- linha do tempo */
+.tx-viagem-tempo { position: relative; }
+.tx-viagem-tempo__item { position: relative; display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; gap: var(--esp-3); padding: var(--esp-2) 0 var(--esp-2-5); font: var(--tipo-denso); }
+.tx-viagem-tempo__item::before { content: ''; position: absolute; left: 7px; top: 20px; bottom: -6px; width: 2px; background: var(--borda-suave); }
+.tx-viagem-tempo__item:last-child::before { display: none; }
+.tx-viagem-tempo__marca { position: relative; z-index: 1; margin-top: var(--esp-1); justify-content: center; }
+.tx-viagem-tempo__quando { white-space: nowrap; padding-top: var(--esp-0-5); }
+
+/* ---------------------------------------------------------------- lateral */
+/* Um painel só; seções separadas por título e divisor, sem borda individual. */
+.tx-viagem-lado { background: var(--painel); border: 1px solid var(--borda); border-radius: var(--raio-xg); padding: var(--esp-1) var(--esp-5); min-width: 0; }
+.tx-viagem-lado__secao { padding: var(--esp-4) 0; }
+.tx-viagem-lado__secao + .tx-viagem-lado__secao { border-top: 1px solid var(--borda); }
+.tx-viagem-lado__cab { display: flex; align-items: center; justify-content: space-between; gap: var(--esp-3); margin-bottom: var(--esp-2); }
+.tx-viagem-pessoa { display: flex; align-items: center; gap: var(--esp-3); }
+.tx-viagem-pessoa__titulos { min-width: 0; }
+
+.tx-viagem-dados { margin: var(--esp-3) 0 var(--esp-2); }
+.tx-viagem-dados__linha { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: var(--esp-3); padding: var(--esp-2) 0; border-bottom: 1px solid var(--borda-suave); font: var(--tipo-denso); }
+.tx-viagem-dados__linha dt { color: var(--texto-sec); }
+.tx-viagem-dados__linha dd { display: flex; flex-direction: column; gap: var(--esp-0-5); min-width: 0; font-weight: 700; color: var(--texto); }
+.tx-viagem-dados__val { font: var(--tipo-legenda); font-weight: 600; }
+.tx-viagem-dados__val .tx-situacao__ponto { width: 6px; height: 6px; }
+
+.tx-viagem-placas { margin-top: var(--esp-2); }
+.tx-viagem-placas__item { display: grid; grid-template-columns: 88px minmax(0, 1fr); align-items: center; justify-items: start; gap: var(--esp-1) var(--esp-3); padding: var(--esp-2) 0; border-bottom: 1px solid var(--borda-suave); font: var(--tipo-denso); }
+.tx-viagem-placas__item:last-child { border-bottom: 0; }
+.tx-viagem-placas__item > .tx-viagem-dados__val { grid-column: 2; }
+.tx-viagem-placas__papel { grid-row: span 3; align-self: start; padding-top: var(--esp-0-5); }
+.tx-viagem-placas__comps { grid-column: 2; display: flex; flex-wrap: wrap; gap: var(--esp-2); }
+
+.tx-viagem-checklist__item { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; align-items: center; gap: var(--esp-2-5); padding: var(--esp-1-5) 0; font: var(--tipo-denso); color: var(--texto-sec); }
+.tx-viagem-checklist__item--feito { color: var(--texto); }
+.tx-viagem-checklist__marca { display: grid; place-items: center; width: 18px; height: 18px; border-radius: var(--raio-pilula); border: 1.5px dashed var(--borda-controle); color: var(--texto-inverso); }
+.tx-viagem-checklist__item--feito .tx-viagem-checklist__marca { border: 0; background: linear-gradient(135deg, var(--ok-claro), var(--ok)); }
+.tx-viagem-botoes { display: flex; flex-wrap: wrap; gap: var(--esp-2); margin-top: var(--esp-3); }
+.tx-viagem-botoes > * { flex: 1; }
+.tx-viagem-auditoria__item { display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; align-items: center; gap: var(--esp-2-5); padding: var(--esp-2) 0; border-bottom: 1px solid var(--borda-suave); font: var(--tipo-denso); }
+.tx-viagem-auditoria__item:last-child { border-bottom: 0; }
+.tx-viagem-auditoria__nome { min-width: 0; }
+
+.tx-viagem-lista__item { display: flex; align-items: center; flex-wrap: wrap; gap: var(--esp-2) var(--esp-3); padding: var(--esp-2-5) 0; border-bottom: 1px solid var(--borda-suave); font: var(--tipo-denso); }
+.tx-viagem-lista__item:last-child { border-bottom: 0; }
+.tx-viagem-lista__fim { margin-left: auto; }
+.tx-viagem-ocorrencia { padding: var(--esp-2-5) 0; border-bottom: 1px solid var(--borda-suave); }
+.tx-viagem-ocorrencia:last-child { border-bottom: 0; }
+.tx-viagem-ocorrencia__cab { display: flex; align-items: center; justify-content: space-between; gap: var(--esp-3); margin-bottom: var(--esp-1); }
+
+/* ---------------------------------------------------------------- modais */
+.tx-viagem-pilha { display: flex; flex-direction: column; gap: var(--esp-2); }
+.tx-viagem-duas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--esp-3); }
+.tx-viagem-rolagem { max-height: 280px; overflow-y: auto; padding: var(--esp-0-5); }
+.tx-viagem-progresso-linha { display: flex; align-items: center; gap: var(--esp-3); }
+.tx-viagem-progresso-linha .tx-viagem-barra { flex: 1; }
+.tx-viagem-progresso-linha .tx-viagem-barra > span { background: var(--degrade-primario); }
+.tx-viagem-mensagem { padding: var(--esp-4); background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio-g); font: var(--tipo-denso); line-height: var(--lh-paragrafo); white-space: pre-wrap; color: var(--texto); }
+.tx-viagem-arquivo { display: flex; align-items: center; flex-wrap: wrap; gap: var(--esp-3); }
+.tx-viagem-arquivo label { cursor: pointer; }
+.tx-viagem-valor { display: flex; align-items: center; min-height: var(--controle-m); padding: 0 var(--esp-3); background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio-m); font: var(--tipo-corpo); color: var(--texto-sec); }
+.tx-viagem-registro__valor { text-align: right; font-weight: 700; color: var(--texto); }
+
+.tx-viagem-troca__selos { display: flex; flex-direction: column; align-items: flex-end; gap: var(--esp-1); margin-left: auto; }
+.tx-viagem-grupo-form { display: flex; flex-direction: column; gap: var(--esp-3); }
+.tx-viagem-grupo-form + .tx-viagem-grupo-form { padding-top: var(--esp-4); border-top: 1px solid var(--borda); }
+.tx-viagem-drawer .tx-drawer__rodape { flex-wrap: wrap; }
+.tx-viagem-drawer__conta { color: var(--texto-sec); }
+.tx-viagem-drawer__botoes { display: flex; gap: var(--esp-2); margin-left: auto; }
