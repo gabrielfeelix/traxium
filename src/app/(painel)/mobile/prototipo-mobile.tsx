@@ -248,7 +248,7 @@ export function PrototipoMobile() {
                     <span style={{ flex: 1, minWidth: 0 }}>
                       <span className="mb-cenario-t">{c.t}</span>
                       <span className="mb-cenario-sub">{c.sub}</span>
-                      <span className="mb-cenario-meta"><span className="mb-mono">{c.id}</span>, {pp.nome}</span>
+                      <span className="mb-cenario-meta"><span className="mb-mono">{c.id}</span>, {pp.nome}, CPF para testar: <strong className="mb-mono">{TX.soDigitos(pp.cpf).slice(0, 3)}</strong></span>
                     </span>
                     <span className="mb-estado" data-k={e.k}>{e.n}</span>
                   </button>
