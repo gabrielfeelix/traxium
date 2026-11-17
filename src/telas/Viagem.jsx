@@ -22,6 +22,7 @@ import {
   Modal,
   Drawer,
   Trilha,
+  Abas,
   Placa,
   Avatar,
   IconeTipo,
@@ -789,6 +790,8 @@ export default class Viagem extends Tela {
       tAnel,
       tQual,
       tEmpresa: !!t && t.tipo === 'ETC',
+      alertaTxt: alertas.length > 0,
+      bloqQuem: bloqItem.quem || '',
       conjPlacas,
       linkRot: le.n,
       linkTom,
@@ -1627,29 +1630,42 @@ export default class Viagem extends Tela {
 
   render() {
     const v = this.renderVals();
+    const s = this.state;
     const TAM_MODAL = { foto: 'g', registro: 'g', regularizar: 'g' };
-    const icoDecisao = {
-      ok: 'M3.5 8.4 6.6 11.4 12.5 5',
-      autoridade: 'M3.5 8.4 6.6 11.4 12.5 5',
-      falta: 'M8 4v5M8 11.6v.1',
-      bloqueio: 'M4.8 4.8l6.4 6.4M11.2 4.8l-6.4 6.4',
-      tecnico: 'M4.8 4.8l6.4 6.4M11.2 4.8l-6.4 6.4',
-      na: 'M4.5 8h7',
-      info: 'M8 7v4.5M8 4.6v.1',
-    }[v.resTom];
     const heroK = v.heroPronta ? 'pronta' : v.heroFalta ? 'falta' : v.heroBloq ? 'bloqueada' : v.heroTec ? 'tecnico' : undefined;
-    const olho = v.heroTec
-      ? 'Bloqueio técnico: ninguém aprova'
-      : v.resK === 'cancelada'
-        ? 'Viagem encerrada'
-        : v.heroNeutro
-          ? 'Fora do afretamento GMP+'
-          : 'Decisão do motor';
-    // Ação primária do momento, repetida na barra fixa ao rolar (sem os data-tx, que ficam no bloco da decisão).
-    const g0 = v.faltaGrupos[0];
+
+    // Andamento: uma linha fina no cabeçalho, com a etapa atual em texto.
+    const iAtual = v.passos.findIndex((p) => p.st !== 'feito');
+    const pAtual = iAtual < 0 ? v.passos[v.passos.length - 1] : v.passos[iAtual];
+    const etapaTxt =
+      iAtual < 0
+        ? 'Todas as etapas concluídas'
+        : 'Etapa ' +
+          (iAtual + 1) +
+          ' de ' +
+          v.passos.length +
+          ': ' +
+          pAtual.n.replace(/^[A-Z][a-z]/, (x) => x.toLowerCase()) +
+          ', ' +
+          pAtual.sub;
+
+    // O que falta: a ação aparece uma vez. Se todas as linhas pedem a mesma, ela vai para a frase.
+    const acoesUnicas = [...new Set(v.faltaGrupos.filter((g) => g.acao).map((g) => g.acao))];
+    const acaoNaFrase = v.heroFalta && acoesUnicas.length === 1 ? v.faltaGrupos.find((g) => g.acao) : null;
+    const jaMostrada = new Set();
+    const linhasFalta = v.faltaGrupos.flatMap((g) =>
+      g.itens.map((f) => {
+        const mostra = !acaoNaFrase && f.acao && !jaMostrada.has(f.acao);
+        if (mostra) jaMostrada.add(f.acao);
+        return Object.assign({}, f, { quem: g.quem, mostra });
+      }),
+    );
+
+    // Ação primária do momento, repetida na barra fixa ao rolar.
+    const g0 = v.faltaGrupos.find((g) => g.acao);
     const prim =
-      v.heroFalta && v.faltaPrim
-        ? { rot: (v.faltaGrupos.find((g) => g.acao) || {}).acao, onClick: (v.faltaGrupos.find((g) => g.acao) || {}).onClick }
+      v.heroFalta && g0
+        ? { rot: g0.acao, onClick: g0.onClick }
         : v.heroBloq && v.podeLiberar
           ? { rot: 'Liberar por autoridade', onClick: v.abrirLiberar }
           : v.heroBloq && v.podePedir
@@ -1659,8 +1675,8 @@ export default class Viagem extends Tela {
               : v.heroPronta
                 ? { rot: 'Copiar declaração', onClick: v.copiarDeclaracao }
                 : null;
+
     const placa = (pl) => <Placa key={pl} placa={pl} tamanho="p" />;
-    // Selo do regime: o compartilhado para A a D e X; "?" (não definido) fica local.
     const selo = (k, nome, letra) =>
       k === 'nd' ? (
         <span className="tx-viagem-regime tx-viagem-regime--nd" title={nome}>
@@ -1670,15 +1686,83 @@ export default class Viagem extends Tela {
         <SeloRegime regime={k} />
       );
 
+    // Fotos do checklist: usadas na conferência (dentro da decisão) e na aba Fotos.
+    const fotos = (
+      <ul className="tx-viagem-fotos" aria-label="Fotos do checklist">
+        {v.itensCk.map((it) => {
+          const conteudo = (
+            <>
+              <span className={'tx-viagem-foto' + (it.temFoto ? ' tx-viagem-foto--' + it.k : ' tx-viagem-foto--vazia')}>
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  <path d={it.icon} />
+                </svg>
+                {it.resp ? <span className={'tx-viagem-foto__resp tx-viagem-foto__resp--' + it.resp}>{it.respRot}</span> : null}
+              </span>
+              <span className="tx-viagem-fotos__nome">{it.n}</span>
+              <span className={'tx-viagem-fotos__sub' + (it.dev ? ' tx-viagem-fotos__sub--dev' : '')}>
+                {it.critico && !it.temFoto ? 'item crítico' : it.sub}
+              </span>
+            </>
+          );
+          return (
+            <li key={it.k}>
+              {it.temFoto ? (
+                <button
+                  type="button"
+                  onClick={it.onClick}
+                  data-tx-foto={it.k}
+                  className={
+                    'tx-viagem-fotos__item tx-viagem-fotos__item--botao' +
+                    (it.dev ? ' tx-viagem-fotos__item--dev' : '') +
+                    (it.resp === 'nao' ? ' tx-viagem-fotos__item--nao' : '')
+                  }
+                  aria-label={'Abrir foto: ' + it.n + (it.respRot ? ', resposta ' + it.respRot : '')}
+                >
+                  {conteudo}
+                </button>
+              ) : (
+                <div data-tx-foto={it.k} className="tx-viagem-fotos__item">
+                  {conteudo}
+                </div>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    );
+
+    // Últimas cargas: a origem do dado vira uma nota só quando é a mesma em todas as linhas.
+    const fontes = new Set(v.compsT3.flatMap((cp) => cp.cargas.map((cg) => (cg.temHref ? '#' : cg.fonte))));
+    const notaFonte = fontes.size === 1 && !fontes.has('#') ? [...fontes][0] : '';
+
+    const aba = s.aba || 'tempo';
+    const abas = [
+      { k: 'tempo', n: 'Linha do tempo' },
+      { k: 'fotos', n: 'Fotos do checklist' },
+      { k: 'auditoria', n: 'Registro para auditoria', q: v.auditItens.filter((a) => a.tom === 'falta' && !a.acima).length },
+      { k: 'ocorrencias', n: 'Ocorrências', q: v.ocorrencias.length, qTom: 'neutro' },
+    ].map((a) => Object.assign(a, { ativa: a.k === aba, onClick: () => this.setState({ aba: a.k }) }));
+
     return (
       <div className="tx-viagem" data-screen-label="Viagem" data-tela="Viagem">
         <div className="tx-viagem-sentinela" ref={(el) => (this._sentinela = el)} aria-hidden />
-        {v.pronto && this.state.compacto ? (
+        {v.pronto && s.compacto ? (
           <div className="tx-viagem-fixa">
             <div className="tx-viagem-fixa__barra">
-              <span className="tx-mono tx-peso-700">{v.vOrdem}</span>
               <span className="tx-viagem-fixa__titulo">{v.vTitulo}</span>
-              <Situacao tom={v.resTom}>{v.resRotulo}</Situacao>
+              <Situacao tom={v.resTom} forma="selo">
+                {v.resRotulo}
+              </Situacao>
               {prim ? (
                 <Botao variante="primario" tamanho="p" onClick={prim.onClick} className="tx-viagem-fixa__acao">
                   {prim.rot}
@@ -1688,13 +1772,15 @@ export default class Viagem extends Tela {
           </div>
         ) : null}
 
-        <div className="tx-pagina">
+        <div className="tx-pagina tx-viagem-pagina">
+          {/* ---------------------------------------------------------------- cabeçalho único */}
           <header className="tx-viagem-cab">
             <div className="tx-viagem-cab__topo">
               <Trilha passos={[{ rotulo: 'Viagens', href: '/viagens' }, { rotulo: <span className="tx-mono">{v.vOrdem}</span> }]} />
               <div className="tx-pagina-cab__acoes">
                 <Botao
                   variante="contorno"
+                  tamanho="p"
                   onClick={v.abrirExportar}
                   title="Abre o registro da viagem pronto para imprimir ou salvar em PDF"
                   icone={
@@ -1718,7 +1804,8 @@ export default class Viagem extends Tela {
                 {v.temAcoesMenu ? (
                   <div data-tx-pop="" className="tx-viagem-menu">
                     <Botao
-                      variante="secundario"
+                      variante="contorno"
+                      tamanho="p"
                       onClick={v.abrirAcoes}
                       data-tx-acoes=""
                       aria-haspopup="menu"
@@ -1771,259 +1858,264 @@ export default class Viagem extends Tela {
                 ) : null}
               </div>
             </div>
+
             <div className="tx-viagem-cab__linha">
               <h1 className="tx-pagina-cab__titulo">{v.vTitulo}</h1>
               {v.pronto ? (
-                <>
-                  <Situacao tom={v.resTom} data-tx-resultado={v.resK}>
-                    {v.resRotulo}
-                  </Situacao>
-                  {v.cicloTxt ? <span className="tx-tipo-denso tx-sec">{v.cicloTxt}</span> : null}
-                </>
+                <Situacao tom={v.resTom} forma="selo" data-tx-resultado={v.resK}>
+                  {v.resRotulo}
+                </Situacao>
               ) : null}
             </div>
             <p className="tx-viagem-cab__rota">
-              <b>{v.embNome}</b>, {v.embCidade}
+              {v.embNome}, {v.embCidade}
               <span aria-label=" para " className="tx-viagem-cab__seta">
                 →
               </span>
-              <b>{v.destNome}</b>, {v.destCidade}
+              {v.destNome}, {v.destCidade}
+              {v.cicloTxt ? <span className="tx-viagem-cab__quando">{v.cicloTxt}</span> : null}
             </p>
+
             {v.pronto ? (
               <>
                 <dl className="tx-viagem-fatos">
-                  {v.ids.map((id) => (
-                    <div key={id.l} className="tx-viagem-fatos__item">
-                      <dt className="tx-tipo-rotulo">{id.l}</dt>
-                      <dd className={(id.mono ? 'tx-mono ' : '') + (id.apagado ? 'tx-viagem-fatos__apagado' : id.sec ? 'tx-sec' : '')}>
-                        {id.v}
-                      </dd>
-                    </div>
-                  ))}
-                  <div className="tx-viagem-fatos__item">
-                    <dt className="tx-tipo-rotulo">Placas</dt>
-                    <dd className="tx-viagem-fatos__placas">{v.placas.map(placa)}</dd>
-                  </div>
+                  {v.ids
+                    .filter((id) => id.l !== 'Código')
+                    .map((id) => (
+                      <div key={id.l} className="tx-viagem-fatos__item">
+                        <dt>{id.l}</dt>
+                        <dd className={(id.mono ? 'tx-mono ' : '') + (id.apagado ? 'tx-viagem-fatos__apagado' : '')}>{id.v}</dd>
+                      </div>
+                    ))}
                 </dl>
-                <ol className="tx-viagem-passos" aria-label="Andamento da viagem">
-                  {v.passos.map((ps) => (
-                    <li
-                      key={ps.n}
-                      className={'tx-viagem-passos__item tx-viagem-passos__item--' + ps.st}
-                      aria-current={ps.st === 'atual' ? 'step' : undefined}
-                    >
-                      <span className="tx-viagem-passos__marca" aria-hidden>
-                        {ps.icon}
-                      </span>
-                      <span className="tx-viagem-passos__texto">
-                        <span className="tx-viagem-passos__nome">{ps.n}</span>
-                        <span className="tx-viagem-passos__sub">{ps.sub}</span>
-                      </span>
-                    </li>
-                  ))}
-                </ol>
+                <div className="tx-viagem-progresso">
+                  <ol className="tx-viagem-progresso__trilho" aria-label="Andamento da viagem">
+                    {v.passos.map((ps) => (
+                      <li
+                        key={ps.n}
+                        className={'tx-viagem-progresso__seg tx-viagem-progresso__seg--' + ps.st}
+                        title={ps.n + ': ' + ps.sub}
+                        aria-current={ps.st === 'atual' ? 'step' : undefined}
+                      >
+                        <span className="tx-so-leitor">
+                          {ps.n}: {ps.sub}
+                        </span>
+                      </li>
+                    ))}
+                  </ol>
+                  <span className="tx-viagem-progresso__txt" aria-hidden>
+                    {etapaTxt}
+                  </span>
+                </div>
               </>
             ) : null}
           </header>
 
           {v.loading ? (
             <div className="tx-viagem-carregando" role="status" aria-label="Carregando a viagem">
+              <span className="tx-esqueleto" style={{ width: '50%' }} />
+              <span className="tx-esqueleto" style={{ width: '80%' }} />
               <span className="tx-esqueleto" style={{ height: '160px' }} />
-              <span className="tx-esqueleto" style={{ width: '70%' }} />
-              <span className="tx-esqueleto" style={{ height: '220px' }} />
             </div>
           ) : null}
 
           {v.pronto ? (
-            <>
+            <div className="tx-viagem-folha">
               {/* ---------------------------------------------------------------- decisão */}
-              <section
-                className={'tx-viagem-decisao tx-viagem-decisao--' + v.resTom}
-                aria-labelledby="viagem-decisao-titulo"
-                data-tx-hero={heroK}
-              >
-                <div className="tx-viagem-decisao__cab">
-                  <span className="tx-viagem-decisao__icone" aria-hidden>
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d={icoDecisao} />
-                    </svg>
-                  </span>
-                  <div className="tx-viagem-decisao__titulos">
-                    <div className="tx-tipo-rotulo tx-viagem-decisao__olho">{olho}</div>
-                    <h2 id="viagem-decisao-titulo" className="tx-viagem-decisao__titulo">
-                      {v.heroFalta ? v.faltaTitulo : v.heroTitulo}
-                    </h2>
-                    {v.heroSub ? <p className="tx-viagem-decisao__sub">{v.heroSub}</p> : null}
-                  </div>
-                  <div className="tx-viagem-decisao__acoes">
-                    {v.heroFalta && v.faltaGrupos.length === 1 && g0.acao ? (
-                      <Botao variante="primario" onClick={g0.onClick} data-tx-falta-acao={g0.k}>
-                        {g0.acao}
-                      </Botao>
-                    ) : null}
-                    {v.heroBloq && v.podeManter ? (
-                      <Botao onClick={v.abrirManter} data-tx-manter="">
-                        Manter bloqueio
-                      </Botao>
-                    ) : null}
-                    {v.heroBloq && v.podePedir ? (
-                      <Botao variante="primario" onClick={v.pedirLib} data-tx-pedir-liberacao="">
-                        Pedir liberação
-                      </Botao>
-                    ) : null}
-                    {v.heroBloq && v.podeLiberar ? (
-                      <Botao variante="primario" onClick={v.abrirLiberar} data-tx-liberar="">
-                        Liberar por autoridade
-                      </Botao>
-                    ) : null}
-                    {v.heroTec && v.podeRegularizar ? (
-                      <Botao variante="contorno" onClick={v.abrirRegularizar} data-tx-regularizar="">
-                        {v.tecAcao2}
-                      </Botao>
-                    ) : null}
-                    {v.heroTec && v.podeTrocar ? (
-                      <Botao variante="primario" onClick={v.abrirTrocar} data-tx-trocar="">
-                        Trocar o conjunto
-                      </Botao>
-                    ) : null}
-                  </div>
-                </div>
-
+              <section className="tx-viagem-decisao" aria-label="Decisão" data-tx-hero={heroK}>
                 {v.heroPronta ? (
-                  <div className="tx-viagem-decisao__corpo">
-                    <div className="tx-viagem-declaracao">
-                      <div className="tx-tipo-rotulo">Declaração para o CT-e</div>
-                      <p className="tx-viagem-declaracao__texto" data-tx-declaracao="">
-                        {v.declaracao}
+                  <>
+                    <div className="tx-viagem-decisao__frase">
+                      <p>
+                        {v.heroAut
+                          ? 'Liberada por autoridade. Copie a declaração no CT-e.'
+                          : v.alertaTxt
+                            ? v.heroTitulo + '. Copie a declaração no CT-e.'
+                            : 'Pronta. Copie a declaração no CT-e.'}
                       </p>
-                      <div className="tx-viagem-declaracao__rodape">
-                        <Botao variante="primario" onClick={v.copiarDeclaracao} data-tx-copiar-declaracao="">
-                          Copiar texto
-                        </Botao>
-                        <span className="tx-tipo-legenda tx-sec">CT-e emitido no TMS. O número chega pela conciliação em lote.</span>
-                      </div>
+                    </div>
+                    <div className="tx-viagem-declaracao">
+                      <span className="tx-viagem-declaracao__texto" data-tx-declaracao="">
+                        {v.declaracao}
+                      </span>
+                      <Botao variante="primario" tamanho="p" onClick={v.copiarDeclaracao} data-tx-copiar-declaracao="">
+                        Copiar
+                      </Botao>
                     </div>
                     {v.temAutoridade ? (
-                      <Aviso
-                        tom="info"
-                        acao={
-                          <Botao tamanho="p" onClick={v.verRegistro}>
-                            Ver o registro
-                          </Botao>
-                        }
-                      >
-                        {v.autoridadeTxt}
-                      </Aviso>
+                      <p className="tx-viagem-decisao__nota">
+                        {v.autoridadeTxt}{' '}
+                        <Botao variante="texto" tamanho="p" onClick={v.verRegistro}>
+                          Ver o registro da liberação
+                        </Botao>
+                      </p>
                     ) : null}
-                  </div>
+                  </>
                 ) : null}
 
                 {v.heroFalta ? (
-                  <div className="tx-viagem-grupos">
-                    {v.faltaGrupos.map((g, gi) => (
-                      <div key={g.quem} className="tx-viagem-grupo">
-                        {v.faltaGrupos.length > 1 ? (
-                          <div className="tx-viagem-grupo__cab">
-                            <span className="tx-tipo-rotulo">{g.quem}</span>
-                            {g.acao ? (
+                  <>
+                    <div className="tx-viagem-decisao__frase">
+                      <p>{v.faltaTitulo}.</p>
+                      {acaoNaFrase ? (
+                        <Botao variante="primario" onClick={acaoNaFrase.onClick} data-tx-falta-acao={acaoNaFrase.k}>
+                          {acaoNaFrase.acao}
+                        </Botao>
+                      ) : null}
+                    </div>
+                    <ul className={'tx-viagem-faltas' + (v.faltaGrupos.length === 1 ? ' tx-viagem-faltas--um' : '')}>
+                      {linhasFalta.map((f) => (
+                        <li key={f.k} className="tx-viagem-faltas__item">
+                          <div className="tx-viagem-faltas__texto">
+                            <span className="tx-viagem-faltas__nome">{f.o}</span>
+                            <span className="tx-viagem-faltas__det">{f.detalhe}</span>
+                          </div>
+                          <span className="tx-viagem-faltas__quem">{f.quem}</span>
+                          <span className="tx-viagem-faltas__acao">
+                            {f.mostra ? (
                               <Botao
-                                variante={gi === 0 ? 'primario' : 'secundario'}
+                                variante={f.acao === (g0 || {}).acao ? 'primario' : 'secundario'}
                                 tamanho="p"
-                                onClick={g.onClick}
-                                data-tx-falta-acao={g.k}
+                                onClick={f.onClick}
+                                data-tx-falta-acao={f.k}
                               >
-                                {g.acao}
+                                {f.acao}
                               </Botao>
                             ) : null}
-                          </div>
-                        ) : null}
-                        <ul className="tx-viagem-pendencias" aria-label={'Com ' + g.quem}>
-                          {g.itens.map((fl) => (
-                            <li key={fl.k} className="tx-viagem-pendencias__item">
-                              <span className="tx-viagem-pendencias__marca" aria-hidden />
-                              <span>
-                                <span className="tx-viagem-pendencias__nome">{fl.o}</span>
-                                <span className="tx-viagem-pendencias__det">{fl.detalhe}</span>
-                              </span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
                 ) : null}
 
                 {v.heroBloq ? (
-                  <div className="tx-viagem-decisao__corpo">
-                    {v.bloqResolver ? <p className="tx-viagem-decisao__como">{v.bloqResolver}</p> : null}
-                    {v.semLiberacao ? <p className="tx-tipo-legenda tx-sec">{v.semLiberacaoTxt}</p> : null}
+                  <>
+                    <div className="tx-viagem-decisao__frase">
+                      <p>{v.heroTitulo}.</p>
+                    </div>
+                    <ul className="tx-viagem-faltas">
+                      <li className="tx-viagem-faltas__item">
+                        <div className="tx-viagem-faltas__texto">
+                          <span className="tx-viagem-faltas__nome">{v.heroSub}</span>
+                          {v.bloqResolver ? <span className="tx-viagem-faltas__det">{v.bloqResolver}</span> : null}
+                          {v.semLiberacao ? <span className="tx-viagem-faltas__det">{v.semLiberacaoTxt}</span> : null}
+                        </div>
+                        <span className="tx-viagem-faltas__quem">{v.bloqQuem}</span>
+                        <span className="tx-viagem-faltas__acao">
+                          {v.podePedir ? (
+                            <Botao variante="primario" tamanho="p" onClick={v.pedirLib} data-tx-pedir-liberacao="">
+                              Pedir liberação
+                            </Botao>
+                          ) : null}
+                          {v.podeLiberar ? (
+                            <Botao variante="primario" tamanho="p" onClick={v.abrirLiberar} data-tx-liberar="">
+                              Liberar por autoridade
+                            </Botao>
+                          ) : null}
+                        </span>
+                      </li>
+                    </ul>
                     {v.podePedir ? (
-                      <Campo
-                        id="viagem-nota-pedido"
-                        rotulo="Nota para quem assina"
-                        opcional
-                        dica="Ex.: CRLV renovado, protocolo Detran 2026/883311. A nota abre preenchida na liberação."
-                      >
-                        <Entrada value={v.fNotaPedido} onChange={v.onNotaPedido} maxLength={160} />
+                      <Campo id="viagem-nota-pedido" rotulo="Nota para quem assina" opcional className="tx-viagem-nota">
+                        <Entrada
+                          value={v.fNotaPedido}
+                          onChange={v.onNotaPedido}
+                          maxLength={160}
+                          placeholder="Ex.: CRLV renovado, protocolo Detran 2026/883311"
+                        />
                       </Campo>
                     ) : null}
-                    {v.temPedido || v.docHref || v.bloqTemHref ? (
-                      <div className="tx-viagem-decisao__linha">
-                        {v.temPedido ? (
-                          <Badge tom="autoridade" data-tx-pedido-lib="">
-                            {v.pedidoTxt}
-                          </Badge>
-                        ) : null}
-                        {v.docHref ? (
-                          <Botao variante="texto" href={v.docHref}>
-                            {v.docRot}
-                          </Botao>
-                        ) : null}
-                        {v.bloqTemHref ? (
-                          <Botao variante="texto" href={v.bloqHref}>
-                            Resolver em Cadastros
-                          </Botao>
-                        ) : null}
-                      </div>
-                    ) : null}
-                  </div>
+                    <div className="tx-viagem-decisao__mais">
+                      {v.temPedido ? (
+                        <Badge tom="autoridade" data-tx-pedido-lib="">
+                          {v.pedidoTxt}
+                        </Badge>
+                      ) : null}
+                      {v.docHref ? (
+                        <Botao variante="texto" tamanho="p" href={v.docHref}>
+                          {v.docRot}
+                        </Botao>
+                      ) : null}
+                      {v.bloqTemHref ? (
+                        <Botao variante="texto" tamanho="p" href={v.bloqHref}>
+                          Resolver em Cadastros
+                        </Botao>
+                      ) : null}
+                      {v.podeManter ? (
+                        <Botao variante="texto" tamanho="p" onClick={v.abrirManter} data-tx-manter="">
+                          Manter bloqueio
+                        </Botao>
+                      ) : null}
+                    </div>
+                  </>
                 ) : null}
 
                 {v.heroTec ? (
-                  <dl className="tx-viagem-caminhos">
-                    <div>
-                      <dt>Trocar o conjunto</dt>
-                      <dd>Outro TAC ou outra carreta. T-3 e checklist voltam a ser pedidos.</dd>
+                  <>
+                    <div className="tx-viagem-decisao__frase">
+                      <p>{v.heroTitulo}. Ninguém aprova: troque o conjunto ou regularize.</p>
                     </div>
-                    <div>
-                      <dt>{v.tecAcao2}</dt>
-                      <dd>{v.tecAcao2Sub}</dd>
-                    </div>
-                  </dl>
+                    <ul className="tx-viagem-faltas">
+                      <li className="tx-viagem-faltas__item">
+                        <div className="tx-viagem-faltas__texto">
+                          <span className="tx-viagem-faltas__nome">{v.heroSub}</span>
+                        </div>
+                        <span className="tx-viagem-faltas__quem">Afretador</span>
+                        <span className="tx-viagem-faltas__acao">
+                          {v.podeRegularizar ? (
+                            <Botao variante="contorno" tamanho="p" onClick={v.abrirRegularizar} data-tx-regularizar="">
+                              {v.tecAcao2}
+                            </Botao>
+                          ) : null}
+                          {v.podeTrocar ? (
+                            <Botao variante="primario" tamanho="p" onClick={v.abrirTrocar} data-tx-trocar="">
+                              Trocar o conjunto
+                            </Botao>
+                          ) : null}
+                        </span>
+                      </li>
+                    </ul>
+                  </>
                 ) : null}
 
-                <div className="tx-viagem-decisao__rodape">
-                  <span className="tx-tipo-denso tx-sec num">
-                    {v.okN} de {v.totalN} checagens passaram
-                  </span>
+                {v.heroNeutro ? (
+                  <div className="tx-viagem-decisao__frase">
+                    <p>{v.heroTitulo}.</p>
+                    {v.heroSub ? <span className="tx-viagem-decisao__nota">{v.heroSub}</span> : null}
+                  </div>
+                ) : null}
+
+                {v.podeConferir && v.podeConferirOp ? (
+                  <div id="tx-verif" className="tx-viagem-conferir">
+                    {fotos}
+                    <div className="tx-viagem-conferir__acoes">
+                      <span className="tx-viagem-decisao__nota">Item crítico (interior) reprovado bloqueia a viagem.</span>
+                      <Botao variante="contorno" tamanho="p" onClick={v.abrirDevolver} data-tx-devolver="">
+                        Devolver ao motorista
+                      </Botao>
+                      <Botao variante="primario" tamanho="p" onClick={v.aprovar} data-tx-aprovar="">
+                        Aprovar verificação
+                      </Botao>
+                    </div>
+                  </div>
+                ) : null}
+                {v.verifDevolvida ? <p className="tx-viagem-decisao__nota tx-viagem-pend">Devolvido ao motorista {v.verifDevTxt}</p> : null}
+
+                <div className="tx-viagem-decisao__checagens">
                   <Botao
                     variante="texto"
+                    tamanho="p"
                     onClick={v.chToggle}
                     data-tx-ver-checagens=""
                     aria-expanded={v.chAberto}
                     aria-controls="viagem-checagens"
                   >
-                    {v.chAberto ? 'Recolher as checagens' : 'Ver as ' + v.totalN + ' checagens'}
+                    {v.chAberto ? 'Esconder as checagens' : 'Ver as ' + v.totalN + ' checagens'}
                   </Botao>
+                  <span className="tx-viagem-decisao__nota num">
+                    {v.okN} de {v.totalN} passaram
+                  </span>
                 </div>
                 {v.chAberto ? (
                   <ul id="viagem-checagens" className="tx-viagem-checagens">
@@ -2034,404 +2126,250 @@ export default class Viagem extends Tela {
                         data-tx-estado={ck.estado}
                         className={'tx-viagem-checagens__item' + (ck.na ? ' tx-viagem-checagens__item--na' : '')}
                       >
-                        <span className={'tx-situacao tx-situacao--' + ck.tom} aria-hidden>
-                          <span className="tx-situacao__ponto" />
+                        <span className="tx-viagem-checagens__texto">
+                          <span className="tx-peso-700">{ck.nome}</span>
+                          <span className="tx-viagem-checagens__det">{ck.detalhe}</span>
                         </span>
-                        <div className="tx-viagem-checagens__texto">
-                          <div className="tx-peso-700">{ck.nome}</div>
-                          <div className="tx-tipo-legenda tx-sec tx-peso-400">{ck.detalhe}</div>
-                        </div>
-                        {ck.aviso ? <Badge tom="aviso">a vencer</Badge> : null}
                         {ck.lib ? (
                           <Botao variante="texto" tamanho="p" onClick={v.verRegistro}>
                             liberada por autoridade
                           </Botao>
                         ) : null}
-                        <span className={'tx-situacao tx-situacao--' + ck.tom + ' tx-viagem-checagens__rot'}>{ck.rot}</span>
+                        <span className={'tx-situacao tx-situacao--' + ck.tom + ' tx-viagem-checagens__rot'}>
+                          <span className="tx-situacao__ponto" aria-hidden />
+                          {ck.aviso ? 'a vencer' : ck.rot}
+                        </span>
                       </li>
                     ))}
                   </ul>
                 ) : null}
               </section>
 
-              <div className="tx-viagem-grade">
-                {/* ---------------------------------------------------------------- coluna principal */}
-                <div className="tx-viagem-col">
-                  <Cartao
-                    como="section"
-                    titulo={<>Três últimas cargas</>}
-                    sub={
-                      <>
-                        Por compartimento, da mais recente para a mais antiga (<Termo termo="T-3" />
-                        ). A carga anterior define o <Termo termo="regime">regime de limpeza</Termo> pela <Termo termo="IDTF" />.
-                      </>
-                    }
-                  >
-                    <div className="tx-viagem-t3">
-                      {v.compsT3.map((cp) => (
-                        <div key={cp.placa + cp.pos} className="tx-viagem-t3__comp">
-                          <div className="tx-viagem-t3__cab">
-                            {placa(cp.placa)}
-                            <span className="tx-peso-700">Compartimento {cp.pos}</span>
-                            <span className="tx-tipo-legenda tx-apagado">{cp.origemTxt}</span>
-                            <span className="tx-viagem-t3__exigido">
-                              <span className="tx-tipo-legenda tx-sec">Regime exigido</span>
-                              {selo(cp.regK, cp.regN, cp.regL)}
-                            </span>
-                            <Botao
-                              variante="texto"
-                              tamanho="p"
-                              href={cp.href}
-                              title="O histórico pertence ao compartimento (placa da carreta e posição), não ao cavalo."
-                              aria-label={'Histórico do compartimento ' + cp.pos + ' da ' + cp.placa}
-                            >
-                              Histórico
+              {/* ---------------------------------------------------------------- duas seções */}
+              <div className="tx-viagem-duas-secoes">
+                <section className="tx-viagem-secao" aria-labelledby="viagem-sec-mot">
+                  <div className="tx-viagem-secao__cab">
+                    <h2 id="viagem-sec-mot" className="tx-viagem-secao__titulo">
+                      Motorista e conjunto
+                    </h2>
+                    <Botao variante="texto" tamanho="p" href={v.tHref}>
+                      {v.tLink}
+                    </Botao>
+                  </div>
+                  <div className="tx-viagem-pessoa">
+                    {v.tEmpresa ? <IconeTipo tipo="transportadora" /> : <Avatar nome={v.tNome} tamanho="p" />}
+                    <div className="tx-viagem-pessoa__titulos">
+                      <span className="tx-peso-700">{v.tNome}</span>
+                      <span className="tx-viagem-fraco">{v.tTipo}</span>
+                    </div>
+                    {v.tQual ? (
+                      <Situacao tom={v.tAnel} className="tx-viagem-pessoa__qual">
+                        {v.tQual}
+                      </Situacao>
+                    ) : null}
+                  </div>
+                  <dl className="tx-viagem-linhas">
+                    {v.tDocs.map((td) => (
+                      <div key={td.l} className="tx-viagem-linhas__item">
+                        <dt>{td.l}</dt>
+                        <dd>
+                          <span className="tx-mono">{td.v}</span>
+                          {td.tom && td.tom !== 'ok' ? (
+                            <span className={'tx-viagem-linhas__alerta tx-viagem-linhas__alerta--' + td.tom}>{td.tip}</span>
+                          ) : null}
+                        </dd>
+                      </div>
+                    ))}
+                    {v.conjPlacas.map((cj) => (
+                      <div key={cj.placa} className="tx-viagem-linhas__item">
+                        <dt>{cj.papel}</dt>
+                        <dd>
+                          {placa(cj.placa)}
+                          {cj.crlvTom !== 'ok' ? (
+                            <span className={'tx-viagem-linhas__alerta tx-viagem-linhas__alerta--' + cj.crlvTom}>{cj.crlv}</span>
+                          ) : null}
+                        </dd>
+                      </div>
+                    ))}
+                    <div className="tx-viagem-linhas__item">
+                      <dt>Link</dt>
+                      <dd>
+                        <span>
+                          {v.linkRot}
+                          <span className="tx-viagem-fraco num">
+                            , {v.linkFeitos} de {v.linkPassos.length} etapas
+                          </span>
+                        </span>
+                        {v.podeLink ? (
+                          <span className="tx-viagem-linhas__acoes">
+                            <Botao variante="texto" tamanho="p" onClick={v.abrirMensagem} data-tx-mensagem="">
+                              Mensagem
                             </Botao>
-                          </div>
-                          <ol className="tx-viagem-t3__cargas">
-                            {cp.cargas.map((cg) => (
-                              <li
-                                key={cg.rot}
-                                className={
-                                  'tx-viagem-t3__carga' +
-                                  (cg.vazio ? ' tx-viagem-t3__carga--vazia' : '') +
-                                  (cg.proib ? ' tx-viagem-t3__carga--proibida' : '')
-                                }
-                              >
-                                <span className="tx-tipo-rotulo">{cg.rot}</span>
-                                <span className="tx-mono tx-tipo-legenda tx-sec">{cg.data}</span>
-                                <span className="tx-viagem-t3__produto">{cg.nome}</span>
-                                {cg.temReg ? selo(cg.regK, cg.regN, cg.regL) : <span />}
-                                {cg.temHref ? (
+                            <Botao variante="texto" tamanho="p" href={v.linkHref} target="_blank" rel="noopener" data-tx-abrir-link="">
+                              Abrir como motorista
+                            </Botao>
+                          </span>
+                        ) : null}
+                      </dd>
+                    </div>
+                  </dl>
+                </section>
+
+                <section className="tx-viagem-secao" aria-labelledby="viagem-sec-t3">
+                  <div className="tx-viagem-secao__cab">
+                    <h2 id="viagem-sec-t3" className="tx-viagem-secao__titulo">
+                      Últimas cargas (<Termo termo="T-3" />)
+                    </h2>
+                  </div>
+                  {v.compsT3.map((cp) => (
+                    <div key={cp.placa + cp.pos} className="tx-viagem-t3">
+                      <div className="tx-viagem-t3__cab">
+                        {placa(cp.placa)}
+                        <span className="tx-peso-700">{cp.pos}</span>
+                        <span className="tx-viagem-t3__exigido">
+                          <Termo termo="regime">Limpeza exigida</Termo>
+                          {selo(cp.regK, cp.regN, cp.regL)}
+                        </span>
+                        <Botao
+                          variante="texto"
+                          tamanho="p"
+                          href={cp.href}
+                          aria-label={'Histórico do compartimento ' + cp.pos + ' da ' + cp.placa}
+                        >
+                          Histórico
+                        </Botao>
+                      </div>
+                      <ol className="tx-viagem-linhas">
+                        {cp.cargas.map((cg) => (
+                          <li
+                            key={cg.rot}
+                            className={
+                              'tx-viagem-t3__carga' +
+                              (cg.vazio ? ' tx-viagem-t3__carga--vazia' : '') +
+                              (cg.proib ? ' tx-viagem-t3__carga--proibida' : '')
+                            }
+                          >
+                            <span className="tx-viagem-fraco tx-mono">{cg.rot}</span>
+                            <span className="tx-viagem-fraco tx-mono">{cg.data}</span>
+                            <span className="tx-viagem-t3__produto">
+                              {cg.nome}
+                              {!notaFonte ? (
+                                cg.temHref ? (
                                   <A className="tx-viagem-t3__fonte tx-viagem-link" href={cg.href}>
                                     {cg.fonte}
                                   </A>
                                 ) : (
                                   <span className="tx-viagem-t3__fonte">{cg.fonte}</span>
-                                )}
-                              </li>
-                            ))}
-                          </ol>
-                        </div>
-                      ))}
-                    </div>
-                  </Cartao>
-
-                  <Cartao
-                    como="section"
-                    id="tx-verif"
-                    titulo="Verificação do compartimento"
-                    sub={v.verifMeta || 'O motorista fotografa pelo link; a filial confere aqui.'}
-                    acoes={
-                      <Situacao tom={v.verifTom} forma="selo" data-tx-verif={v.verifK}>
-                        {v.verifRot}
-                      </Situacao>
-                    }
-                  >
-                    <ul className="tx-viagem-fotos" aria-label="Fotos do checklist">
-                      {v.itensCk.map((it) => {
-                        const conteudo = (
-                          <>
-                            <span className={'tx-viagem-foto' + (it.temFoto ? ' tx-viagem-foto--' + it.k : ' tx-viagem-foto--vazia')}>
-                              <svg
-                                width="28"
-                                height="28"
-                                viewBox="0 0 16 16"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="1.3"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                aria-hidden
-                              >
-                                <path d={it.icon} />
-                              </svg>
-                              {it.hora ? <span className="tx-viagem-foto__hora tx-mono">{it.hora}</span> : null}
-                              {it.resp ? (
-                                <span className={'tx-viagem-foto__resp tx-viagem-foto__resp--' + it.resp}>{it.respRot}</span>
+                                )
                               ) : null}
                             </span>
-                            <span className="tx-viagem-fotos__nome">{it.n}</span>
-                            <span className={'tx-viagem-fotos__sub' + (it.dev ? ' tx-viagem-fotos__sub--dev' : '')}>
-                              {it.sub}
-                              {it.critico ? <span className="tx-viagem-fotos__critico">, item crítico</span> : null}
-                            </span>
-                          </>
-                        );
-                        return (
-                          <li key={it.k}>
-                            {it.temFoto ? (
-                              <button
-                                type="button"
-                                onClick={it.onClick}
-                                data-tx-foto={it.k}
-                                className={
-                                  'tx-viagem-fotos__item tx-viagem-fotos__item--botao' +
-                                  (it.dev ? ' tx-viagem-fotos__item--dev' : '') +
-                                  (it.resp === 'nao' ? ' tx-viagem-fotos__item--nao' : '')
-                                }
-                                aria-label={'Abrir foto: ' + it.n + (it.respRot ? ', resposta ' + it.respRot : '')}
-                              >
-                                {conteudo}
-                              </button>
-                            ) : (
-                              <div data-tx-foto={it.k} className={'tx-viagem-fotos__item' + (it.dev ? ' tx-viagem-fotos__item--dev' : '')}>
-                                {conteudo}
-                              </div>
-                            )}
+                            {cg.temReg ? selo(cg.regK, cg.regN, cg.regL) : <span />}
                           </li>
-                        );
-                      })}
-                    </ul>
-                    {v.verifDevolvida ? (
-                      <Aviso tom="perigo" titulo="Devolvido ao motorista.">
-                        {v.verifDevTxt}
-                      </Aviso>
-                    ) : null}
-                    {v.podeConferir && v.podeConferirOp ? (
-                      <div className="tx-viagem-conferir">
-                        <div className="tx-viagem-conferir__texto">
-                          <b>Sua vez de conferir.</b> Abra cada foto se precisar. Item crítico (interior) reprovado bloqueia a viagem.
-                        </div>
-                        <Botao variante="contorno" onClick={v.abrirDevolver} data-tx-devolver="">
-                          Devolver ao motorista
-                        </Botao>
-                        <Botao variante="primario" onClick={v.aprovar} data-tx-aprovar="">
-                          Aprovar verificação
-                        </Botao>
-                      </div>
-                    ) : null}
-                  </Cartao>
-
+                        ))}
+                      </ol>
+                    </div>
+                  ))}
+                  {notaFonte ? <p className="tx-viagem-fraco tx-viagem-t3__nota">Origem: {notaFonte}.</p> : null}
                   {v.mostraLimpeza ? (
-                    <Cartao
-                      como="section"
-                      titulo="Limpeza"
-                      sub="Regime acima de seco pede lavador credenciado e comprovante."
-                      acoes={
-                        v.podeLimpeza ? (
-                          <Botao tamanho="p" onClick={v.abrirLimpeza}>
-                            Registrar limpeza
-                          </Botao>
-                        ) : null
-                      }
-                    >
+                    <div className="tx-viagem-limpeza">
+                      <span className="tx-peso-700">Limpeza</span>
                       {v.semLimpeza ? (
-                        <p className="tx-tipo-denso tx-sec">Nenhuma limpeza registrada ainda.</p>
+                        <span className="tx-viagem-fraco">nenhuma registrada</span>
                       ) : (
-                        <ul className="tx-viagem-lista">
-                          {v.limpezas.map((lp, i) => (
-                            <li key={i} className="tx-viagem-lista__item">
-                              <SeloRegime regime={lp.regime} />
-                              <span className="tx-peso-700">{lp.comp}</span>
-                              <span className="tx-sec">{lp.lavador}</span>
-                              <span className="tx-mono tx-tipo-legenda tx-sec tx-viagem-lista__fim">{lp.comprovante}</span>
-                            </li>
-                          ))}
-                        </ul>
+                        v.limpezas.map((lp, i) => (
+                          <span key={i} className="tx-viagem-limpeza__item">
+                            <SeloRegime regime={lp.regime} /> {lp.comp}, {lp.lavador}, <span className="tx-mono">{lp.comprovante}</span>
+                          </span>
+                        ))
                       )}
-                    </Cartao>
+                      {v.podeLimpeza ? (
+                        <Botao variante="texto" tamanho="p" onClick={v.abrirLimpeza}>
+                          Registrar limpeza
+                        </Botao>
+                      ) : null}
+                    </div>
                   ) : null}
+                </section>
+              </div>
 
-                  <Cartao
-                    como="section"
-                    titulo={
-                      <Dica conteudo="Nada se apaga: correção e cancelamento entram como evento novo.">
-                        <span className="tx-termo" tabIndex={0}>
-                          Linha do tempo
-                        </span>
-                      </Dica>
-                    }
-                  >
+              {/* ---------------------------------------------------------------- abas: o resto, recolhido */}
+              <section className="tx-viagem-abas" aria-label="Histórico e registros">
+                <div className="tx-viagem-abas__barra">
+                  <Abas rotulo="Histórico e registros" itens={abas} />
+                  {v.podeOcorrencia ? (
+                    <Botao variante="texto" tamanho="p" onClick={v.abrirOcorrencia} data-tx-nova-ocorrencia="">
+                      Registrar ocorrência
+                    </Botao>
+                  ) : null}
+                </div>
+                <div className="tx-viagem-abas__painel" role="tabpanel">
+                  {aba === 'tempo' ? (
                     <ol className="tx-viagem-tempo">
                       {v.tempo.map((lt, i) => (
                         <li key={i} className="tx-viagem-tempo__item">
+                          <time className="tx-mono tx-viagem-fraco tx-viagem-tempo__quando">{lt.quando}</time>
                           <span className={'tx-situacao tx-situacao--' + lt.tom + ' tx-viagem-tempo__marca'} aria-hidden>
                             <span className="tx-situacao__ponto" />
                           </span>
-                          <div className="tx-viagem-tempo__texto">
-                            <div className="tx-peso-700">{lt.texto}</div>
-                            <div className="tx-tipo-legenda tx-apagado">{lt.quem}</div>
-                          </div>
-                          <time className="tx-mono tx-tipo-legenda tx-sec tx-viagem-tempo__quando">{lt.quando}</time>
+                          <span className="tx-viagem-tempo__texto">
+                            {lt.texto}
+                            <span className="tx-viagem-fraco"> {lt.quem}</span>
+                          </span>
                         </li>
                       ))}
                     </ol>
-                  </Cartao>
-                </div>
-
-                {/* ---------------------------------------------------------------- coluna lateral: um painel, seções por divisor */}
-                <aside className="tx-viagem-lado" aria-label="Quem transporta e registros">
-                  <section className="tx-viagem-lado__secao" aria-labelledby="viagem-lado-transp">
-                    <div className="tx-viagem-pessoa">
-                      {v.tEmpresa ? <IconeTipo tipo="transportadora" /> : <Avatar nome={v.tNome} />}
-                      <div className="tx-viagem-pessoa__titulos">
-                        <h3 id="viagem-lado-transp" className="tx-tipo-titulo tx-viagem-h3">
-                          {v.tNome}
-                        </h3>
-                        <div className="tx-tipo-legenda tx-sec tx-peso-400">{v.tTipo}</div>
-                      </div>
+                  ) : null}
+                  {aba === 'fotos' ? (
+                    <div id={v.podeConferir ? undefined : 'tx-verif'}>
+                      <p className="tx-viagem-fraco tx-viagem-abas__meta">
+                        <Situacao tom={v.verifTom} data-tx-verif={v.verifK}>
+                          {v.verifRot}
+                        </Situacao>{' '}
+                        {v.verifMeta}
+                      </p>
+                      {fotos}
                     </div>
-                    {v.tQual ? (
-                      <div className="tx-viagem-meta">
-                        <Situacao tom={v.tAnel}>{v.tQual}</Situacao>
-                      </div>
-                    ) : null}
-                    <dl className="tx-viagem-dados">
-                      {v.tDocs.map((td) => (
-                        <div key={td.l} className="tx-viagem-dados__linha">
-                          <dt>{td.l}</dt>
-                          <dd>
-                            <span className="tx-mono">{td.v}</span>
-                            {td.tom ? (
-                              <span className={'tx-situacao tx-situacao--' + td.tom + ' tx-viagem-dados__val'}>{td.tip}</span>
-                            ) : null}
-                          </dd>
-                        </div>
-                      ))}
-                    </dl>
-                    <Botao variante="texto" tamanho="p" href={v.tHref}>
-                      {v.tLink}
-                    </Botao>
-                  </section>
-
-                  <section className="tx-viagem-lado__secao" aria-labelledby="viagem-lado-conj">
-                    <h3 id="viagem-lado-conj" className="tx-tipo-titulo tx-viagem-h3">
-                      Conjunto
-                    </h3>
-                    <ul className="tx-viagem-placas">
-                      {v.conjPlacas.map((cj) => (
-                        <li key={cj.placa} className="tx-viagem-placas__item">
-                          <span className="tx-tipo-rotulo tx-viagem-placas__papel">{cj.papel}</span>
-                          {placa(cj.placa)}
-                          <span className={'tx-situacao tx-situacao--' + cj.crlvTom + ' tx-viagem-dados__val'}>{cj.crlv}</span>
-                          {cj.comps.length ? (
-                            <span className="tx-viagem-placas__comps">
-                              {cj.comps.map((cc) => (
-                                <Botao
-                                  key={cc.pos}
-                                  variante="texto"
-                                  tamanho="p"
-                                  href={cc.href}
-                                  title="O histórico pertence ao compartimento (placa da carreta e posição), não ao cavalo."
-                                  aria-label={'Histórico do compartimento ' + cc.pos + ' da ' + cj.placa}
-                                >
-                                  Histórico do {cc.pos}
-                                </Botao>
-                              ))}
-                            </span>
-                          ) : null}
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
-
-                  <section className="tx-viagem-lado__secao" aria-labelledby="viagem-lado-link">
-                    <div className="tx-viagem-lado__cab">
-                      <h3 id="viagem-lado-link" className="tx-tipo-titulo tx-viagem-h3">
-                        Link do motorista
-                      </h3>
-                      <Situacao tom={v.linkTom}>{v.linkRot}</Situacao>
-                    </div>
-                    <ol className="tx-viagem-checklist">
-                      {v.linkPassos.map((lk) => (
-                        <li key={lk.n} className={'tx-viagem-checklist__item' + (lk.feito ? ' tx-viagem-checklist__item--feito' : '')}>
-                          <span className="tx-viagem-checklist__marca" aria-hidden>
-                            {lk.feito ? (
-                              <svg
-                                width="10"
-                                height="10"
-                                viewBox="0 0 12 12"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2.2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              >
-                                <path d="M2.5 6.2 5 8.6l4.5-5" />
-                              </svg>
-                            ) : null}
-                          </span>
-                          <span className="tx-viagem-checklist__nome">
-                            {lk.n}
-                            <span className="tx-so-leitor">{lk.feito ? ', feito' : ', pendente'}</span>
-                          </span>
-                          <span className="tx-mono tx-tipo-legenda tx-sec">{lk.em}</span>
-                        </li>
-                      ))}
-                    </ol>
-                    {v.podeLink ? (
-                      <div className="tx-viagem-botoes">
-                        <Botao variante="contorno" tamanho="p" onClick={v.abrirMensagem} data-tx-mensagem="">
-                          Copiar mensagem
-                        </Botao>
-                        <Botao variante="contorno" tamanho="p" href={v.linkHref} target="_blank" rel="noopener" data-tx-abrir-link="">
-                          Abrir como motorista
-                        </Botao>
-                      </div>
-                    ) : null}
-                  </section>
-
-                  <section className="tx-viagem-lado__secao" aria-labelledby="viagem-lado-aud">
-                    <div className="tx-viagem-lado__cab">
-                      <h3 id="viagem-lado-aud" className="tx-tipo-titulo tx-viagem-h3">
-                        Registro para auditoria
-                      </h3>
-                      <span className="tx-tipo-legenda tx-sec num">
-                        {v.auditOkN} de {v.auditItens.length}
-                      </span>
-                    </div>
-                    <ul className="tx-viagem-auditoria">
+                  ) : null}
+                  {aba === 'auditoria' ? (
+                    <ul className="tx-viagem-linhas">
                       {v.auditItens.map((au) => (
-                        <li key={au.k} className="tx-viagem-auditoria__item">
-                          <span className={'tx-situacao tx-situacao--' + (au.acima ? 'na' : au.tom)} aria-hidden>
-                            <span className="tx-situacao__ponto" />
-                          </span>
-                          <span className="tx-viagem-auditoria__nome">{au.n}</span>
+                        <li key={au.k} className="tx-viagem-linhas__item">
+                          <span>{au.n}</span>
                           {au.registro ? (
                             <Botao variante="texto" tamanho="p" onClick={v.verRegistro}>
                               Ver registro
                             </Botao>
                           ) : au.acima ? (
-                            <span className="tx-tipo-legenda tx-apagado">ver pendência acima</span>
+                            <span className="tx-viagem-fraco">ver pendência acima</span>
                           ) : (
-                            <span className={'tx-mono tx-tipo-legenda ' + (au.tom === 'falta' ? 'tx-viagem-pend' : 'tx-sec')}>{au.v}</span>
+                            <span className={'tx-mono ' + (au.tom === 'falta' ? 'tx-viagem-pend' : 'tx-viagem-fraco')}>{au.v}</span>
                           )}
                         </li>
                       ))}
                     </ul>
-                  </section>
-
-                  <section className="tx-viagem-lado__secao" aria-labelledby="viagem-lado-oc">
-                    <div className="tx-viagem-lado__cab">
-                      <h3 id="viagem-lado-oc" className="tx-tipo-titulo tx-viagem-h3">
-                        Ocorrências
-                      </h3>
-                      {v.podeOcorrencia ? (
-                        <Botao variante="texto" tamanho="p" onClick={v.abrirOcorrencia} data-tx-nova-ocorrencia="">
-                          Registrar
-                        </Botao>
-                      ) : null}
+                  ) : null}
+                  {aba === 'ocorrencias' ? (
+                    <div>
+                      {v.semOcorrencia ? (
+                        <p className="tx-viagem-fraco">Nenhuma ocorrência nesta viagem.</p>
+                      ) : (
+                        <ul className="tx-viagem-linhas">
+                          {v.ocorrencias.map((oc) => (
+                            <li key={oc.id} className="tx-viagem-linhas__item">
+                              <span>
+                                <Situacao tom={oc.grave ? 'bloqueio' : 'falta'}>{oc.tipo}</Situacao>
+                                <span className="tx-viagem-fraco"> {oc.descricao}</span>
+                              </span>
+                              <span className="tx-mono tx-viagem-fraco">{oc.id}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </div>
-                    {v.semOcorrencia ? (
-                      <p className="tx-tipo-legenda tx-sec tx-peso-400">Nenhuma ocorrência nesta viagem.</p>
-                    ) : (
-                      <ul className="tx-viagem-lista">
-                        {v.ocorrencias.map((oc) => (
-                          <li key={oc.id} className="tx-viagem-ocorrencia">
-                            <div className="tx-viagem-ocorrencia__cab">
-                              <Situacao tom={oc.grave ? 'bloqueio' : 'falta'}>{oc.tipo}</Situacao>
-                              <span className="tx-mono tx-tipo-legenda tx-sec">{oc.id}</span>
-                            </div>
-                            <p className="tx-tipo-legenda tx-sec tx-peso-400">{oc.descricao}</p>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </section>
-                </aside>
-              </div>
-            </>
+                  ) : null}
+                </div>
+              </section>
+            </div>
           ) : null}
         </div>
 
