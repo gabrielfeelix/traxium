@@ -1,0 +1,156 @@
+/*
+ * Viagens: tabela de dados (revisão 12, seção 3.2). Uma folha só: visões em abas, uma barra de
+ * filtros com o valor visível, situação em chips com contagem, cabeçalho fixo e ordenável,
+ * seleção com barra de ações. Classes locais, prefixo tx-viagens-; valores só por token.
+ * O que pode virar componente está anotado em docs/ds/pendencias.md (escopo hoje-viagens).
+ */
+
+.tx-pagina.tx-viagens { gap: var(--esp-4); }
+.tx-viagens-titulo { display: inline-flex; align-items: baseline; gap: var(--esp-2-5); }
+.tx-viagens-titulo__q { font: var(--tipo-corpo); font-weight: 600; color: var(--texto-apagado); letter-spacing: 0; }
+.tx-entrada-caixa.tx-viagens-busca { width: 300px; margin-top: 0; }
+
+/* A folha não corta o conteúdo (overflow visível), senão o cabeçalho fixo da tabela não gruda. */
+.tx-viagens-folha { background: var(--painel); border: 1px solid var(--borda); border-radius: var(--raio-xg); min-width: 0; }
+.tx-viagens-abas { border-radius: var(--raio-xg) var(--raio-xg) 0 0; }
+.tx-viagens-apagar {
+  display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; margin-left: calc(var(--esp-1) * -1);
+  border-radius: var(--raio-pilula); font: var(--tipo-corpo); font-weight: 700; color: var(--texto-apagado); cursor: pointer;
+  position: relative;
+}
+.tx-viagens-apagar::after { content: ''; position: absolute; inset: -5px; }
+.tx-viagens-apagar:hover { background: var(--perigo-fundo); color: var(--perigo); }
+.tx-viagens-apagar:focus-visible { outline: 2px solid var(--primario); outline-offset: 1px; }
+.tx-viagens-desfazer {
+  display: flex; align-items: center; gap: var(--esp-3); margin: var(--esp-3) var(--esp-5) 0; padding: var(--esp-1) var(--esp-4);
+  border-radius: var(--raio-m); background: var(--texto); color: var(--texto-inverso); font: var(--tipo-denso); font-weight: 600;
+}
+.tx-viagens-desfazer .tx-botao--texto { color: var(--ok-claro); margin: 0 0 0 auto; }
+.tx-viagens-desfazer .tx-botao--texto:hover { background: color-mix(in srgb, var(--texto-inverso) 12%, transparent); color: var(--texto-inverso); }
+
+/* ---------------------------------------------------------------- barra de filtros */
+.tx-viagens-barra { display: flex; align-items: center; gap: var(--esp-2); flex-wrap: wrap; padding: var(--esp-3) var(--esp-5) 0; }
+.tx-viagens-barra__fim { margin-left: auto; display: flex; align-items: center; gap: var(--esp-4); }
+.tx-viagens-pop { position: relative; }
+.tx-viagens-filtro {
+  display: inline-flex; align-items: center; gap: var(--esp-1-5); min-height: var(--controle-p); padding: 0 var(--esp-3);
+  border: 1px solid var(--borda-campo); border-radius: var(--raio-pilula); background: var(--painel); cursor: pointer;
+  font: var(--tipo-denso); color: var(--texto);
+  transition: border-color var(--dur-rapida) var(--curva), background-color var(--dur-rapida) var(--curva);
+}
+.tx-viagens-filtro:hover { border-color: var(--borda-forte); }
+.tx-viagens-filtro__rot { color: var(--texto-apagado); font-weight: 600; }
+.tx-viagens-filtro__val { font-weight: 700; }
+.tx-viagens-filtro svg { color: var(--texto-apagado); transition: transform var(--dur-rapida) var(--curva); }
+.tx-viagens-filtro[aria-expanded='true'] svg { transform: rotate(180deg); }
+.tx-viagens-filtro--on { border-color: var(--primario); background: var(--primario-fraco); }
+.tx-viagens-filtro--on .tx-viagens-filtro__val { color: var(--primario-2); }
+.tx-viagens-menu {
+  position: absolute; left: 0; top: calc(100% + var(--esp-1-5)); z-index: var(--z-pop); min-width: 200px; padding: var(--esp-1-5);
+  display: flex; flex-direction: column; gap: var(--esp-0-5);
+  background: var(--painel); border: 1px solid var(--borda); border-radius: var(--raio-g); box-shadow: var(--sombra-m);
+}
+.tx-viagens-menu--salvar { left: auto; right: 0; width: 300px; padding: var(--esp-4); gap: 0; }
+.tx-viagens-menu__op {
+  display: flex; align-items: center; gap: var(--esp-2); width: 100%; min-height: var(--controle-p); padding: var(--esp-1-5) var(--esp-3);
+  border: none; border-radius: var(--raio-p); background: none; text-align: left; cursor: pointer;
+  font: var(--tipo-denso); font-weight: 600; color: var(--texto);
+}
+.tx-viagens-menu__op:hover { background: var(--superficie-hover); }
+.tx-viagens-menu__op[aria-checked='true'] { background: var(--primario-fraco); font-weight: 800; color: var(--primario-2); }
+.tx-viagens-menu__op[aria-checked='true']::after { content: '✓'; margin-left: auto; color: var(--primario); }
+
+.tx-viagens-chips { display: flex; align-items: flex-start; gap: var(--esp-3); padding: var(--esp-3) var(--esp-5); }
+.tx-viagens-chips__rot { flex: none; padding-top: var(--esp-2); font: var(--tipo-rotulo); letter-spacing: var(--ls-rotulo); text-transform: uppercase; color: var(--texto-apagado); }
+.tx-viagens-chips__lista { display: flex; gap: var(--esp-1-5); flex-wrap: wrap; }
+.tx-viagens-chips__q { font-family: var(--fonte-mono); font-size: var(--fs-legenda); font-weight: 600; opacity: 0.75; }
+.tx-viagens-chips .tx-situacao__ponto { width: 7px; height: 7px; box-shadow: none; }
+
+.tx-viagens-dica { padding: 0 var(--esp-5) var(--esp-3); }
+.tx-viagens-selecao {
+  position: sticky; top: 0; z-index: var(--z-menu); display: flex; align-items: center; gap: var(--esp-3);
+  margin: 0 var(--esp-5) var(--esp-3); padding: var(--esp-2) var(--esp-4); border-radius: var(--raio-m);
+  background: var(--primario-fraco); border: 1px solid var(--primario-borda); font: var(--tipo-denso); color: var(--primario-3);
+}
+
+/* ---------------------------------------------------------------- tabela */
+.tx-viagens-tabela { border-top: 1px solid var(--borda-suave); }
+.tx-viagens-linha {
+  position: relative; display: grid; align-items: center; gap: var(--esp-4); padding: var(--esp-2-5) var(--esp-5);
+  grid-template-columns: 24px 104px 112px minmax(0, 1.5fr) minmax(0, 1fr) 128px minmax(190px, 1.1fr);
+  border-bottom: 1px solid var(--superficie-2); font: var(--tipo-denso); color: var(--texto);
+  transition: background-color var(--dur-rapida) var(--curva);
+}
+.tx-viagens-linha:not(.tx-viagens-cab):hover { background: var(--superficie-hover); }
+.tx-viagens-linha[aria-selected='true'] { background: var(--primario-fraco); box-shadow: inset 3px 0 0 var(--primario); }
+/* Cabeçalho fixo ao rolar (U24): gruda no topo da área de conteúdo da moldura. */
+.tx-viagens-cab {
+  position: sticky; top: 0; z-index: var(--z-fixo); padding-top: var(--esp-1); padding-bottom: var(--esp-1);
+  background: var(--superficie); border-bottom: 1px solid var(--borda);
+  font: var(--tipo-rotulo); letter-spacing: var(--ls-rotulo); text-transform: uppercase; color: var(--texto-apagado);
+}
+.tx-viagens-ordenar {
+  display: inline-flex; align-items: center; gap: var(--esp-1); min-height: var(--controle-p); padding: 0 var(--esp-1-5); margin-left: calc(var(--esp-1-5) * -1);
+  border: none; border-radius: var(--raio-p); background: none; cursor: pointer;
+  font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit;
+}
+.tx-viagens-ordenar:hover { background: var(--superficie-2); color: var(--texto); }
+.tx-viagens-ordenar__seta { font-family: var(--fonte-mono); color: var(--texto-desab); }
+[aria-sort='ascending'] .tx-viagens-ordenar, [aria-sort='descending'] .tx-viagens-ordenar { color: var(--primario-2); }
+[aria-sort='ascending'] .tx-viagens-ordenar__seta, [aria-sort='descending'] .tx-viagens-ordenar__seta { color: var(--primario); }
+
+.tx-viagens-sel { position: relative; z-index: var(--z-base); display: flex; align-items: center; }
+.tx-viagens-sel .tx-check { padding: 0; min-height: 24px; }
+.tx-viagens-sel .tx-check__texto { display: none; }
+.tx-viagens-sel .tx-check__caixa { margin-top: 0; }
+
+/* A linha inteira abre a viagem: o link da ordem se estica por cima da linha. */
+.tx-viagens-abrir {
+  display: block; font-family: var(--fonte-mono); font-size: var(--fs-denso); font-weight: 600; color: var(--primario-2); text-decoration: none;
+  cursor: pointer; white-space: nowrap;
+}
+.tx-viagens-abrir::after { content: ''; position: absolute; inset: 0; }
+.tx-viagens-abrir:focus-visible { outline: none; }
+.tx-viagens-linha:has(.tx-viagens-abrir:focus-visible) { outline: 2px solid var(--primario); outline-offset: -2px; }
+.tx-viagens-linha:hover .tx-viagens-abrir { text-decoration: underline; }
+
+.tx-viagens-mono { font-family: var(--fonte-mono); font-size: var(--fs-denso); }
+.tx-viagens-forte { display: block; font-weight: 700; }
+.tx-viagens-sub { display: block; font: var(--tipo-legenda); font-weight: 400; color: var(--texto-apagado); }
+.tx-viagens-sub.tx-viagens-mono { font-family: var(--fonte-mono); }
+.tx-viagens-corta { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tx-viagens-rota { min-width: 0; max-width: 420px; }
+.tx-viagens-semgmp { font: var(--tipo-legenda); font-weight: 600; color: var(--texto-apagado); }
+.tx-viagens-placas { display: flex; flex-wrap: wrap; gap: var(--esp-1); }
+.tx-viagens-placa {
+  display: inline-block; padding: 0 var(--esp-1-5); border-radius: var(--raio-xxs); background: var(--superficie-2);
+  font-family: var(--fonte-mono); font-size: var(--fs-legenda); font-weight: 600; color: var(--texto-2); white-space: nowrap;
+}
+.tx-viagens-motivo {
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  margin-top: var(--esp-0-5); font: var(--tipo-legenda); font-weight: 400; color: var(--texto-apagado);
+}
+.tx-viagens-rodape { padding: var(--esp-3) var(--esp-5); border-radius: 0 0 var(--raio-xg) var(--raio-xg); }
+
+/* ---------------------------------------------------------------- conciliação */
+.tx-viagens-arquivo {
+  display: flex; align-items: center; gap: var(--esp-3); padding: var(--esp-3) var(--esp-4); cursor: pointer;
+  border: 1.5px dashed var(--borda-forte); border-radius: var(--raio-g); background: var(--painel);
+  transition: border-color var(--dur-rapida) var(--curva);
+}
+.tx-viagens-arquivo:hover { border-color: var(--primario); }
+.tx-viagens-arquivo--ok { border-style: solid; border-color: var(--primario); background: var(--primario-fraco); }
+.tx-viagens-lote { border: 1px solid var(--borda-suave); border-radius: var(--raio-g); overflow: hidden; }
+.tx-viagens-lote__linha {
+  display: grid; grid-template-columns: 88px 80px 92px 52px minmax(0, 1fr) 170px; gap: var(--esp-3); align-items: center;
+  padding: var(--esp-2) var(--esp-4); border-bottom: 1px solid var(--superficie-2); font: var(--tipo-legenda); font-weight: 400;
+}
+.tx-viagens-lote__linha:last-child { border-bottom: none; }
+.tx-viagens-lote__cab { background: var(--superficie); font: var(--tipo-rotulo); letter-spacing: var(--ls-rotulo); text-transform: uppercase; color: var(--texto-apagado); }
+.tx-viagens-lote__linha--alerta { background: var(--aviso-fundo); box-shadow: inset 3px 0 0 var(--aviso-2); }
+.tx-viagens-lote__sem { color: var(--aviso); font-weight: 700; }
+.tx-viagens-lote .tx-situacao { font: var(--tipo-legenda); font-weight: 700; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tx-viagens-linha, .tx-viagens-filtro, .tx-viagens-filtro svg { transition: none; }
+}

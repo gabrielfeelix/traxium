@@ -1,7 +1,97 @@
 // Gerado de "SaaS moderno estilo Dribbble/Viagens v2.dc.html" por scripts/converter-dc.mjs.
 'use client';
-import { Fragment } from 'react';
-import { TX, Tela, A, css } from '@/lib/tx/tela';
+import { TX, Tela, A } from '@/lib/tx/tela';
+import {
+  Abas,
+  Aviso,
+  Badge,
+  Botao,
+  CabecalhoPagina,
+  Checkbox,
+  Chip,
+  EntradaCaixa,
+  EstadoVazio,
+  Modal,
+  Paginacao,
+  Situacao,
+  TabelaEsqueleto,
+} from '@/components/ui';
+import './Viagens.css';
+
+// Permissões do usuário atual. TX.pode chega com a revisão do motor (M40); até lá vale a premissa
+// da matriz: consultoria só lê e exporta, frota não concilia CT-e.
+function pode(op, alvo) {
+  if (TX.pode) return TX.pode(op, alvo);
+  const papel = TX.sessao().papel;
+  if (papel === 'consultoria') return false;
+  if (papel === 'frota') return op === 'escopoFrota' || op === 'atualizarDocumento';
+  return true;
+}
+// Motivo em forma de falha (M09, M42): o motor passa a devolver item.motivo ou TX.rotuloFalha;
+// até lá, o mesmo mapa da mesa (Hoje) para as checagens escritas como afirmação positiva.
+const FALHA = {
+  ocorrencia: 'Transportador em revisão após ocorrência grave',
+  'docs-conj': 'CRLV vencido no conjunto',
+  'docs-mot': 'CNH vencida',
+  'docs-transp': 'RNTRC vencido',
+  produto: 'Produto não é ração',
+};
+function motivoFalha(f, dec) {
+  const t = motivoFalhaBruto(f, dec);
+  return t ? t.charAt(0).toUpperCase() + t.slice(1) : '';
+}
+function motivoFalhaBruto(f, dec) {
+  if (!f) return '';
+  if (f.motivo) return f.motivo;
+  const r = TX.rotuloFalha ? TX.rotuloFalha(f.k) : '';
+  if (r) return r.replace(/^./, (c) => c.toUpperCase());
+  if (FALHA[f.k]) return FALHA[f.k];
+  if (dec && dec.cobertura === 'gatekeeper' && f.k === 'cobertura') return 'Filial sem comunicação à certificadora';
+  if (f.tecnico || f.alcada === 'tecnico') return f.detalhe.split(':')[0];
+  return f.o;
+}
+const Chevron = (
+  <svg
+    width="11"
+    height="11"
+    viewBox="0 0 12 12"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.7"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden
+  >
+    <path d="M3 4.5 6 7.5l3-3" />
+  </svg>
+);
+const IconeBusca = (
+  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden>
+    <circle cx="7" cy="7" r="4.6" />
+    <line x1="10.5" y1="10.5" x2="13.5" y2="13.5" />
+  </svg>
+);
+const IconeBaixar = (
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 16 16"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.7"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden
+  >
+    <path d="M8 2.5v8" />
+    <path d="M4.8 7.5 8 10.7l3.2-3.2" />
+    <path d="M3 13.2h10" />
+  </svg>
+);
+// Ordem das situações quando a coluna Situação ordena: o que pede ação primeiro.
+const PESO_SIT = { tecnico: 0, bloqueada: 1, falta: 2, sem_cte: 3, pronta: 4, transito: 5, concluida: 6, cancelada: 7 };
+// Parâmetros da URL na ordem em que aparecem (deep link: visão, filtros, ordem e página).
+const URL_PARAMS = ['visao', 'periodo', 'q', 'situacao', 'tipo', 'filial', 'ordem', 'pag'];
 
 export default class Viagens extends Tela {
   state = {
@@ -15,6 +105,9 @@ export default class Viagens extends Tela {
     modal: null,
     popAberto: null,
     nomeVisao: '',
+    ordem: 'carga-desc',
+    sel: {},
+    apagada: null,
   };
   componentDidMount() {
     TX.ui.montar(this);
@@ -25,7 +118,35 @@ export default class Viagens extends Tela {
     if (P('q')) ini.busca = P('q');
     if (P('situacao')) ini.sit = P('situacao');
     if (P('periodo')) ini.periodo = P('periodo');
+    if (P('tipo')) ini.tipo = P('tipo');
+    if (P('filial') && TX.sessao().filiais.includes(P('filial'))) ini.filial = P('filial');
+    if (P('ordem')) ini.ordem = P('ordem');
+    if (P('pag')) ini.pag = Math.max(1, +P('pag') || 1);
     this.setState(ini);
+  }
+  // A URL acompanha visão, busca, filtros, ordem e página, para mandar o link de uma lista filtrada.
+  componentDidUpdate(_, antes) {
+    const s = this.state;
+    const mudou = ['visao', 'busca', 'periodo', 'tipo', 'filial', 'sit', 'ordem', 'pag'].some((k) => antes[k] !== s[k]);
+    if (!mudou) return;
+    const vi = this.visao(s.visao);
+    const perDef = vi.usuario ? (vi.filtros && vi.filtros.periodo) || '30' : vi.periodo;
+    const val = {
+      visao: s.visao !== 'todas' ? s.visao : '',
+      periodo: s.periodo !== perDef ? s.periodo : '',
+      q: s.busca || '',
+      situacao: s.sit !== 'todas' ? s.sit : '',
+      tipo: s.tipo !== 'todos' ? s.tipo : '',
+      filial: s.filial || '',
+      ordem: s.ordem !== 'carga-desc' ? s.ordem : '',
+      pag: s.pag > 1 ? String(s.pag) : '',
+    };
+    const qs = URL_PARAMS.filter((k) => val[k])
+      .map((k) => k + '=' + encodeURIComponent(val[k]))
+      .join('&');
+    try {
+      TX.ui.trocarUrl('/viagens' + (qs ? '?' + qs : ''));
+    } catch (e) {}
   }
   avisar(m) {
     TX.ui.avisar(this, m);
@@ -58,7 +179,7 @@ export default class Viagens extends Tela {
         periodo: 'tudo',
         conta: true,
         semSituacao: true,
-        cor: '#d97544',
+        cor: 'var(--autoridade-2)',
         f: (x) => this.sitDe(x) === 'sem_cte',
         dica: 'Viagens já carregadas que ainda não têm CT-e. Importe o arquivo do TMS e o Traxium casa cada CT-e com a viagem pela placa e pela data.',
         acao: 'Conciliar CT-e em lote',
@@ -68,7 +189,7 @@ export default class Viagens extends Tela {
         k: 'autoridade',
         n: 'Liberadas por autoridade',
         periodo: '90',
-        cor: '#b85a2e',
+        cor: 'var(--autoridade)',
         f: (x) => x.dec.porAutoridade,
         dica: 'Viagens que seguiram com um bloqueio liberado pela Qualidade ou pela Direção. Quem assinou, o motivo e a medida ficam registrados em cada viagem.',
         vazio: ['Nenhuma liberação por autoridade no período', 'Amplie o período para ver liberações mais antigas.'],
@@ -91,7 +212,7 @@ export default class Viagens extends Tela {
   }
   entrarVisao(k) {
     const vi = this.visao(k);
-    const limpo = { busca: '', tipo: 'todos', filial: null, sit: 'todas', pag: 1, popAberto: null };
+    const limpo = { busca: '', tipo: 'todos', filial: null, sit: 'todas', pag: 1, popAberto: null, sel: {} };
     if (vi.usuario) return Object.assign(limpo, vi.filtros, { visao: vi.k });
     return Object.assign(limpo, { periodo: vi.periodo, visao: vi.k });
   }
@@ -165,18 +286,27 @@ export default class Viagens extends Tela {
     const pred = this.predicado(vi);
     const base = this.filtrar(todasEnr).filter(pred);
     const SIT = [
-      ['todas', 'Todas', U.tom('na')],
-      ['falta', 'Falta algo', U.tom('falta')],
-      ['bloqueada', 'Bloqueadas', U.tom('bloqueio')],
-      ['tecnico', 'Bloqueio técnico', U.tom('tecnico')],
-      ['pronta', 'Prontas', U.tom('ok')],
-      ['transito', 'Em trânsito', U.tom('info')],
-      ['concluida', 'Concluídas', U.tom('ok')],
-      ['cancelada', 'Canceladas', U.tom('na')],
+      ['todas', 'Todas', 'na'],
+      ['falta', 'Falta algo', 'falta'],
+      ['bloqueada', 'Bloqueadas', 'bloqueio'],
+      ['tecnico', 'Bloqueio técnico', 'tecnico'],
+      ['pronta', 'Prontas', 'ok'],
+      ['transito', 'Em trânsito', 'info'],
+      ['concluida', 'Concluídas', 'ok'],
+      ['cancelada', 'Canceladas', 'na'],
     ];
+    // Ordenação por coluna (U21): chave-direção, padrão carregamento mais recente primeiro.
+    const [oc, od] = (s.ordem || 'carga-desc').split('-');
+    const chave =
+      {
+        carga: (x) => x.v.data + x.v.janela,
+        ordem: (x) => x.v.ordem,
+        transp: (x) => TX.norm(x.t ? TX.nomeTransportador(x.t) : 'frota propria'),
+        sit: (x) => String(PESO_SIT[this.sitDe(x)] ?? 9) + (x.v.data + x.v.janela),
+      }[oc] || ((x) => x.v.data + x.v.janela);
     const lista = base
       .filter((x) => s.sit === 'todas' || this.sitDe(x) === s.sit)
-      .sort((a, b) => (b.v.data + b.v.janela).localeCompare(a.v.data + a.v.janela));
+      .sort((a, b) => (od === 'asc' ? 1 : -1) * chave(a).localeCompare(chave(b)));
     const pg = U.paginar(this, lista, 'viagens');
     const set = (o) => this.setState(Object.assign({ pag: 1, popAberto: null }, o));
     const pop = (k) => () => this.setState((st) => ({ popAberto: st.popAberto === k ? null : k }));
@@ -193,10 +323,6 @@ export default class Viagens extends Tela {
       ['afretamento', 'Afretamento'],
       ['propria', 'Frota própria'],
     ];
-    const sitAtual = SIT.find((x) => x[0] === s.sit) || SIT[0];
-    const ativos = [];
-    if (s.tipo !== 'todos') ativos.push({ n: TIPOS.find((x) => x[0] === s.tipo)[1], onClick: () => set({ tipo: 'todos' }) });
-    if (s.filial) ativos.push({ n: 'Filial ' + TX.filial(s.filial).nome, onClick: () => set({ filial: null }) });
     const filtroAtivo = !!(s.busca || s.sit !== 'todas' || s.tipo !== 'todos' || s.filial || s.periodo !== perDef);
     const nomeOk = TX.norm(s.nomeVisao || '').length > 0;
     const salvar = () => {
@@ -214,92 +340,79 @@ export default class Viagens extends Tela {
       this.setState({ visao: k, popAberto: null, nomeVisao: '', txv: Date.now() });
       this.avisar('Visão "' + s.nomeVisao.trim() + '" salva. Ela abre como aba acima da lista.');
     };
-    const tm = vi.cor || 'var(--primario)';
-    const escopoTxt = s.filial
-      ? 'filial ' + TX.filial(s.filial).nome
-      : u.filiais.length > 1
-        ? 'todas as filiais'
-        : 'filial ' + TX.filial(u.filiais[0]).nome;
+    const sel = s.sel || {};
+    const selecionadas = lista.filter((x) => sel[x.v.id]);
+    const idsPagina = pg.itens.map((x) => x.v.id);
+    const todasPagina = idsPagina.length > 0 && idsPagina.every((id) => sel[id]);
+    const ordenar = (c) => () => {
+      const atual = (s.ordem || 'carga-desc').split('-');
+      const dir = atual[0] === c ? (atual[1] === 'asc' ? 'desc' : 'asc') : c === 'carga' ? 'desc' : 'asc';
+      this.setState({ ordem: c + '-' + dir, pag: 1 });
+    };
+    const colOrdem = (c) => (oc === c ? (od === 'asc' ? 'ascending' : 'descending') : 'none');
     return Object.assign(
       {
-        subtitulo: 'Toda viagem com a situação e o histórico, ' + escopoTxt,
+        contagem: lista.length === 1 ? '1 viagem' : lista.length + ' viagens',
         abas: VIS.map((x) => {
-          const on = x.k === vi.k;
           const q = x.conta ? todasEnr.filter(typeof x.conta === 'function' ? x.conta : x.f).length : 0;
           return {
             k: x.k,
             n: x.n,
-            fw: on ? '800' : '600',
-            c: on ? 'var(--texto)' : 'var(--texto-sec)',
-            bd: on ? 'var(--primario)' : 'transparent',
             q,
-            qD: x.conta && q ? 'inline-block' : 'none',
-            qC: 'var(--aviso)',
-            qBd: 'var(--aviso-borda)',
-            xD: x.usuario ? 'inline-flex' : 'none',
+            on: x.k === vi.k,
+            usuario: !!x.usuario,
             onClick: () => this.setState(this.entrarVisao(x.k)),
-            remover: (e) => {
-              e.stopPropagation();
-              U.gravarLS('tx-v2-visoes', JSON.stringify(this.visoesSalvas().filter((y) => y.k !== x.k)));
-              this.setState(Object.assign(on ? this.entrarVisao('todas') : {}, { txv: Date.now() }));
-              this.avisar('Visão "' + x.n + '" apagada.');
+            // Apagar uma visão salva é reversível: apaga na hora e oferece Desfazer por 8 s.
+            remover: () => {
+              const salvas = this.visoesSalvas();
+              const i = salvas.findIndex((y) => y.k === x.k);
+              U.gravarLS('tx-v2-visoes', JSON.stringify(salvas.filter((y) => y.k !== x.k)));
+              clearTimeout(this._desfazer);
+              this._desfazer = setTimeout(() => this.setState({ apagada: null }), 8000);
+              this.setState(
+                Object.assign(x.k === vi.k ? this.entrarVisao('todas') : {}, { txv: Date.now(), apagada: { item: salvas[i], i } }),
+              );
             },
           };
         }),
+        apagadaNome: s.apagada ? s.apagada.item.n : '',
+        desfazerApagar: () => {
+          const a = s.apagada;
+          if (!a) return;
+          const salvas = this.visoesSalvas();
+          salvas.splice(a.i, 0, a.item);
+          U.gravarLS('tx-v2-visoes', JSON.stringify(salvas));
+          clearTimeout(this._desfazer);
+          this.setState({ apagada: null, txv: Date.now() });
+        },
         busca: s.busca,
         onBusca: (e) => this.setState({ busca: e.target.value, pag: 1 }),
         perRot: (PER.find((x) => x[0] === s.periodo) || PER[2])[1].replace('Últimos ', ''),
-        perBd: s.periodo !== perDef ? 'var(--primario)' : 'var(--borda-campo)',
+        perMudou: s.periodo !== perDef,
         popPeriodo: s.popAberto === 'periodo',
         abrirPeriodo: pop('periodo'),
-        periodos: PER.map(([k, n]) => ({
-          k,
-          n,
-          fw: s.periodo === k ? '800' : '600',
-          ckD: s.periodo === k ? 'block' : 'none',
-          onClick: () => set({ periodo: k }),
-        })),
+        periodos: PER.map(([k, n]) => ({ k, n, on: s.periodo === k, onClick: () => set({ periodo: k }) })),
         temSituacao: !vi.semSituacao,
-        sitRot: sitAtual[1],
-        sitDot: sitAtual[2].dot,
-        sitDotD: s.sit === 'todas' ? 'none' : 'inline-block',
-        sitBd: s.sit !== 'todas' ? 'var(--primario)' : 'var(--borda-campo)',
-        popSituacao: s.popAberto === 'situacao',
-        abrirSituacao: pop('situacao'),
-        situacoes: SIT.map(([k, n, t]) => {
+        situacoes: SIT.map(([k, n, tom]) => {
           const q = k === 'todas' ? base.length : base.filter((x) => this.sitDe(x) === k).length;
-          return {
-            k,
-            n,
-            q,
-            dot: t.dot,
-            fw: s.sit === k ? '800' : '600',
-            cor: q || s.sit === k ? 'var(--texto)' : 'var(--texto-apagado)',
-            ckOp: s.sit === k ? '1' : '0',
-            onClick: () => set({ sit: k }),
-          };
-        }),
-        popFiltros: s.popAberto === 'filtros',
-        abrirFiltros: pop('filtros'),
-        filQ: ativos.length,
-        filQD: ativos.length ? 'inline-flex' : 'none',
-        filBd: ativos.length ? 'var(--primario)' : 'var(--borda-campo)',
-        tipos: TIPOS.map(([k, n]) => ({
-          k,
-          n,
-          fw: s.tipo === k ? '800' : '600',
-          ckD: s.tipo === k ? 'block' : 'none',
-          onClick: () => set({ tipo: k }),
-        })),
+          return { k, n, q, tom, on: s.sit === k, onClick: () => set({ sit: s.sit === k && k !== 'todas' ? 'todas' : k }) };
+        }).filter((x) => x.k === 'todas' || x.q > 0 || x.on),
+        tipoRot: TIPOS.find((x) => x[0] === s.tipo)[1],
+        tipoMudou: s.tipo !== 'todos',
+        popTipo: s.popAberto === 'tipo',
+        abrirTipo: pop('tipo'),
+        tipos: TIPOS.map(([k, n]) => ({ k, n, on: s.tipo === k, onClick: () => set({ tipo: k }) })),
         temFiliais: u.filiais.length > 1,
+        filialRot: s.filial ? TX.filial(s.filial).nome : 'Todas',
+        filialMudou: !!s.filial,
+        popFilial: s.popAberto === 'filial',
+        abrirFilial: pop('filial'),
         filiais: [[null, 'Todas as filiais']].concat(u.filiais.map((f) => [f, TX.filial(f).nome])).map(([k, n]) => ({
           k: k || 'todas',
           n,
-          fw: (s.filial || null) === k ? '800' : '600',
-          ckD: (s.filial || null) === k ? 'block' : 'none',
+          on: (s.filial || null) === k,
           onClick: () => set({ filial: k }),
         })),
-        ativos,
         filtroAtivo,
         limpar: () => this.setState(Object.assign(this.entrarVisao(vi.k), { busca: '' })),
         popSalvar: s.popAberto === 'salvar',
@@ -310,33 +423,38 @@ export default class Viagens extends Tela {
           if (e.key === 'Enter') salvar();
         },
         confirmarVisao: salvar,
-        visCta: U.cta(nomeOk),
-        contagem: lista.length === 1 ? '1 viagem' : lista.length + ' viagens',
+        visOk: nomeOk,
         temDica: !!vi.dica,
         dica: vi.dica || '',
-        dicaCor: tm,
-        temDicaAcao: !!vi.acao,
+        temDicaAcao: !!vi.acao && pode('conciliarCTe'),
         dicaAcaoRot: vi.acao || '',
         dicaAcao: () => this.setState({ modal: 'conciliar', lote: null }),
         temDicaLink: !!vi.link,
         dicaLinkRot: vi.link ? vi.link[0] : '',
         dicaHref: vi.link ? vi.link[1] : '#',
-        cols: '108px 150px minmax(0,1.4fr) minmax(0,1fr) 140px 190px',
-        skel: [1, 2, 3, 4, 5, 6],
+        colOrdem,
+        ordenar,
+        // seleção (U23)
+        selQ: selecionadas.length,
+        todasPagina,
+        algumaPagina: idsPagina.some((id) => sel[id]),
+        alternarPagina: () => {
+          const n = Object.assign({}, sel);
+          idsPagina.forEach((id) => (todasPagina ? delete n[id] : (n[id] = true)));
+          this.setState({ sel: n });
+        },
+        limparSel: () => this.setState({ sel: {} }),
+        exportarSel: () => this.exportarCsv(selecionadas),
         linhas: s.loading
           ? []
           : pg.itens.map((x) => {
               const v = x.v;
               const sit = this.sitDe(x);
+              const alertas = x.dec.alertas || (x.dec.checagens || []).filter((c) => c.aviso).map((c) => ({ motivo: c.nome }));
               const tom =
-                sit === 'concluida'
-                  ? U.tom('ok')
-                  : sit === 'sem_cte'
-                    ? U.tom('autoridade')
-                    : sit === 'transito'
-                      ? U.tom('info')
-                      : U.tomResultado(x.dec);
+                sit === 'concluida' ? 'ok' : sit === 'sem_cte' ? 'autoridade' : sit === 'transito' ? 'info' : U.tomResultado(x.dec).k;
               const fl = x.dec.falta;
+              const motivo = fl.length ? (sit === 'falta' ? fl[0].o : motivoFalha(fl[0], x.dec)) : '';
               const sub = v.cancelada
                 ? v.cancelada.motivo || 'cancelada'
                 : sit === 'concluida' || sit === 'transito'
@@ -344,20 +462,22 @@ export default class Viagens extends Tela {
                   : sit === 'sem_cte'
                     ? 'conciliar com o TMS'
                     : fl.length
-                      ? fl[0].o + (fl.length > 1 ? ' e mais ' + (fl.length - 1) : '')
+                      ? motivo + (fl.length > 1 ? ' e mais ' + (fl.length - 1) : '')
                       : x.dec.porAutoridade
                         ? 'regra liberada: ' + ((x.dec.checagens.find((c) => c.liberadaPor) || {}).nome || '')
-                        : '';
+                        : alertas.length
+                          ? 'Alerta: ' + alertas.map((c) => c.motivo).join(', ')
+                          : '';
+              const id = v.id;
               return {
-                id: v.id,
-                href: '/viagem?id=' + v.id,
+                id,
+                href: '/viagem?id=' + id,
                 data: F.curta(v.data) + ' ' + v.janela,
                 filial: TX.filial(v.filial).nome,
                 ordem: v.ordem,
-                ordemSub: v.cte ? 'CT-e ' + v.cte.numero + ', NF ' + v.cte.nf : v.id,
-                subC: v.cte ? 'var(--texto-2)' : 'var(--texto-apagado)',
+                cte: v.cte ? 'CT-e ' + v.cte.numero : '',
                 produto: TX.produto(v.produto).nome,
-                assegTxt: v.assegurada ? '' : '(sem GMP+)',
+                semGmp: !v.assegurada,
                 rota:
                   TX.embarcador(v.embarcador).nome +
                   ' → ' +
@@ -370,7 +490,7 @@ export default class Viagens extends Tela {
                     ? 'TAC, RNTRC ' + (x.t.rntrc ? x.t.rntrc.numero : 'pendente')
                     : 'motorista ' + x.mot.nome
                   : 'motorista ' + x.mot.nome,
-                placas: TX.placasDoConjunto(x.conj).join(' '),
+                placas: TX.placasDoConjunto(x.conj),
                 res:
                   sit === 'concluida'
                     ? 'Concluída'
@@ -378,11 +498,21 @@ export default class Viagens extends Tela {
                       ? 'Aguardando CT-e'
                       : sit === 'transito'
                         ? 'Em trânsito'
-                        : x.dec.rotulo,
-                c: tom.c,
-                dot: tom.dot,
-                ring: tom.ring,
+                        : x.dec.rotulo +
+                          (sit === 'pronta' && alertas.length
+                            ? alertas.length === 1
+                              ? ', 1 alerta'
+                              : ', ' + alertas.length + ' alertas'
+                            : ''),
+                tom,
                 sub,
+                on: !!sel[id],
+                alternar: () => {
+                  const n = Object.assign({}, sel);
+                  if (n[id]) delete n[id];
+                  else n[id] = true;
+                  this.setState({ sel: n });
+                },
               };
             }),
         vazio: !s.loading && lista.length === 0,
@@ -391,6 +521,7 @@ export default class Viagens extends Tela {
           filtroAtivo || !vi.vazio
             ? 'Amplie o período ou limpe os filtros. A busca aceita placa, CT-e, NF, ordem, nome e RNTRC.'
             : vi.vazio[1],
+        exportarRot: 'Exportar ' + (lista.length === 1 ? '1 viagem' : lista.length + ' viagens'),
         exportar: () => this.exportarCsv(lista),
       },
       pg.vals,
@@ -464,14 +595,12 @@ export default class Viagens extends Tela {
     const aberta = s.modal === 'conciliar';
     const lote = s.lote;
     const casadas = lote ? lote.linhas.filter((l) => l.casou) : [];
-    const c = U.cta(casadas.length > 0);
     return {
       concAberta: aberta,
       fecharModal: () => this.setState({ modal: null, lote: null }),
       pararClique: (e) => e.stopPropagation(),
       abrirConciliar: () => this.setState({ modal: 'conciliar', lote: null }),
-      arqBd: lote ? 'var(--primario)' : 'var(--borda-forte)',
-      arqBg: lote ? 'var(--primario-fraco)' : '#fff',
+      arqOk: !!lote,
       arqTitulo: lote ? 'Arquivo: ' + lote.arquivo : 'Escolher arquivo do TMS',
       arqErro: s.arqErro,
       onArquivo: (e) => {
@@ -491,18 +620,32 @@ export default class Viagens extends Tela {
         this.setState({ lote: TX.loteCTe() });
       },
       temLote: !!lote,
+      // M10: a situação da viagem no carregamento aparece ao lado do CT-e; o que não estava pronto se destaca.
       lote: lote
-        ? lote.linhas.map((l) => ({
-            cte: l.cte,
-            nf: l.nf,
-            placa: l.placa,
-            data: F.curta(l.data),
-            viagem: l.casou
-              ? TX.viagem(l.viagem).ordem + ', ' + TX.pessoa(TX.viagem(l.viagem).motorista).nome
-              : 'sem correspondência: ' + l.motivo.toLowerCase(),
-            c: l.casou ? 'var(--ok)' : 'var(--aviso)',
-          }))
+        ? lote.linhas.map((l) => {
+            const vg = l.casou ? TX.viagem(l.viagem) : null;
+            const dec = vg ? TX.decidir(vg) : null;
+            const pronta = !!dec && dec.resultado === 'pronta';
+            return {
+              k: l.cte,
+              cte: l.cte,
+              nf: l.nf,
+              placa: l.placa,
+              data: F.curta(l.data),
+              casou: !!l.casou,
+              viagem: vg ? vg.ordem + ', ' + TX.pessoa(vg.motorista).nome : 'sem correspondência: ' + l.motivo.toLowerCase(),
+              sitTom: dec ? (dec.porAutoridade && pronta ? 'autoridade' : U.tomResultado(dec).k) : 'na',
+              sitRot: dec ? dec.rotulo : 'fica fora',
+              alerta: !!dec && !pronta && dec.resultado !== 'nao_assegurada',
+            };
+          })
         : [],
+      loteAlertas: lote
+        ? casadas.filter((l) => {
+            const d = TX.decidir(TX.viagem(l.viagem));
+            return d.resultado !== 'pronta' && d.resultado !== 'nao_assegurada';
+          }).length
+        : 0,
       loteResumo: lote
         ? casadas.length +
           ' CT-e casados com viagens; ' +
@@ -511,1131 +654,445 @@ export default class Viagens extends Tela {
         : '',
       concRot: casadas.length ? 'Conciliar ' + casadas.length + ' viagens' : 'Conciliar',
       confirmarConciliar: () => {
-        if (!casadas.length) return;
+        if (!casadas.length) {
+          const el = document.querySelector('[data-tx-modal="conciliar"] input[type="file"]');
+          if (el) el.focus();
+          return;
+        }
         TX.fazer('conciliarCTe', { arquivo: lote.arquivo, linhas: casadas });
         this.setState({ modal: null, lote: null });
         this.avisar(casadas.length + ' viagens conciliadas. As de descarga passada já aparecem como concluídas.');
       },
-      ctaBg: c.bg,
-      ctaC: c.c,
-      ctaSh: c.sh,
-      ctaCur: c.cur,
+      ctaOk: casadas.length > 0,
+      podeConciliar: pode('conciliarCTe'),
     };
+  }
+
+  // Botão de filtro com menu: mostra o valor escolhido e fica marcado quando sai do padrão.
+  filtroMenu({ k, rotulo, valor, mudou, aberto, abrir, itens, attr }) {
+    return (
+      <div data-tx-pop="" className="tx-viagens-pop">
+        <button
+          type="button"
+          onClick={abrir}
+          data-tx-dd={k}
+          aria-expanded={aberto}
+          aria-haspopup="menu"
+          className={'tx-viagens-filtro' + (mudou ? ' tx-viagens-filtro--on' : '')}
+        >
+          <span className="tx-viagens-filtro__rot">{rotulo}</span>
+          <span className="tx-viagens-filtro__val">{valor}</span>
+          {Chevron}
+        </button>
+        {aberto ? (
+          <div role="menu" aria-label={rotulo} className="tx-viagens-menu">
+            {itens.map((it) => (
+              <button
+                key={it.k}
+                type="button"
+                role="menuitemradio"
+                aria-checked={it.on}
+                onClick={it.onClick}
+                className="tx-viagens-menu__op"
+                {...{ [attr]: it.k }}
+              >
+                {it.n}
+              </button>
+            ))}
+          </div>
+        ) : null}
+      </div>
+    );
+  }
+
+  cabCol(v, c, rot) {
+    const o = v.colOrdem(c);
+    return (
+      <span role="columnheader" aria-sort={o}>
+        <button type="button" onClick={v.ordenar(c)} className="tx-viagens-ordenar" data-tx-ordenar={c}>
+          {rot}
+          <span className="tx-viagens-ordenar__seta" aria-hidden>
+            {o === 'ascending' ? '↑' : o === 'descending' ? '↓' : '↕'}
+          </span>
+        </button>
+      </span>
+    );
   }
 
   render() {
     const v = this.renderVals();
     return (
       <div style={{ minHeight: '100%' }} data-screen-label="Viagens" data-tela="Viagens">
-        <div style={{ flex: '1', display: 'flex', flexDirection: 'column', padding: '24px 32px 48px', gap: '16px', minWidth: '0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <div>
-              <div style={{ fontSize: '24px', fontWeight: '800' }}>Viagens</div>
-              <div style={{ fontSize: '14px', color: 'var(--texto-sec)', marginTop: '2px' }}>{v.subtitulo}</div>
-            </div>
-            <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div
-                role="button"
-                tabIndex={0}
-                onClick={v.exportar}
-                data-tx-exportar=""
-                title="Baixa a lista com os filtros da tela"
-                style={{
-                  background: 'var(--painel)',
-                  border: '1px solid var(--borda-campo)',
-                  borderRadius: '11px',
-                  padding: '9px 15px',
-                  fontSize: '14px',
-                  fontWeight: '700',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                }}
-                className="tx-h30bbaa9"
-              >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.7"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M8 2.5v8"></path>
-                  <path d="M4.8 7.5 8 10.7l3.2-3.2"></path>
-                  <path d="M3 13.2h10"></path>
-                </svg>
-                Exportar planilha
-              </div>
-            </div>
-          </div>
-          <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px' }}>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'flex-end',
-                gap: '4px',
-                padding: '0 20px',
-                borderBottom: '1px solid var(--borda-suave)',
-                overflowX: 'auto',
-              }}
-            >
-              {(Array.isArray(v.abas) ? v.abas : []).map((ab, $index) => (
-                <Fragment key={$index}>
-                  <div
-                    role="button"
-                    tabIndex={0}
-                    onClick={ab?.onClick}
-                    data-tx-visao={ab?.k}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '7px',
-                      padding: '16px 12px 12px',
-                      fontSize: '14px',
-                      fontWeight: ab?.fw,
-                      color: ab?.c,
-                      borderBottom: `2.5px solid ${ab?.bd ?? ''}`,
-                      marginBottom: '-1px',
-                      cursor: 'pointer',
-                      whiteSpace: 'nowrap',
-                    }}
-                    className="tx-hec6a165"
-                  >
-                    {ab?.n}
-                    <span
-                      style={{
-                        display: ab?.qD,
-                        fontFamily: "'Spline Sans Mono',monospace",
-                        fontSize: '11px',
-                        fontWeight: '600',
-                        color: ab?.qC,
-                        border: `1px solid ${ab?.qBd ?? ''}`,
-                        borderRadius: '99px',
-                        padding: '0 7px',
-                      }}
-                    >
-                      {ab?.q}
-                    </span>
-                    <span
-                      role="button"
-                      tabIndex={0}
-                      onClick={ab?.remover}
-                      data-tx-apagar-visao={ab?.k}
-                      title="Apagar esta visão"
-                      style={{
-                        display: ab?.xD,
-                        width: '18px',
-                        height: '18px',
-                        borderRadius: '99px',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '12px',
-                        color: 'var(--texto-apagado)',
-                      }}
-                      className="tx-alvo tx-ha5daa28"
-                    >
-                      ×
-                    </span>
-                  </div>
-                </Fragment>
-              ))}
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '16px 20px', flexWrap: 'wrap' }}>
-              <div
-                style={{
-                  background: 'var(--superficie)',
-                  border: '1px solid var(--borda-campo)',
-                  borderRadius: '11px',
-                  padding: '0 12px',
-                  display: 'flex',
-                  gap: '8px',
-                  alignItems: 'center',
-                  flex: '1',
-                  minWidth: '240px',
-                  maxWidth: '400px',
-                  height: '38px',
-                }}
-              >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  stroke="#7c8f8d"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                  style={{ flex: 'none' }}
-                >
-                  <circle cx="7" cy="7" r="4.6"></circle>
-                  <line x1="10.5" y1="10.5" x2="13.5" y2="13.5"></line>
-                </svg>
-                <input
-                  aria-label="Filtrar a lista: placa, CT-e, NF, ordem ou motorista"
+        <div className="tx-pagina tx-viagens">
+          <CabecalhoPagina
+            titulo={
+              <span className="tx-viagens-titulo">
+                Viagens <span className="tx-viagens-titulo__q num">{v.contagem}</span>
+              </span>
+            }
+            acoes={
+              <>
+                <EntradaCaixa
+                  className="tx-viagens-busca"
+                  icone={IconeBusca}
+                  aria-label="Buscar placa, CT-e, NF, ordem, motorista ou RNTRC"
                   value={v.busca ?? ''}
                   onChange={v.onBusca}
                   data-tx-busca=""
-                  placeholder="Filtrar a lista: placa, CT-e, NF, ordem ou motorista"
-                  style={{ border: 'none', outline: 'none', background: 'transparent', fontSize: '14px', flex: '1', minWidth: '0' }}
+                  placeholder="Buscar placa, CT-e, NF, ordem..."
                 />
-              </div>
-              <div data-tx-pop="" style={{ position: 'relative' }}>
-                <div
-                  role="button"
-                  tabIndex={0}
-                  onClick={v.abrirPeriodo}
-                  data-tx-dd="periodo"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '7px',
-                    height: '38px',
-                    padding: '0 12px 0 12px',
-                    borderRadius: '11px',
-                    border: `1px solid ${v.perBd ?? ''}`,
-                    background: 'var(--painel)',
-                    fontSize: '13px',
-                    cursor: 'pointer',
-                    whiteSpace: 'nowrap',
-                  }}
-                  className="tx-h30bbaa9"
+                <Botao
+                  variante="contorno"
+                  icone={IconeBaixar}
+                  onClick={v.exportar}
+                  data-tx-exportar=""
+                  title="Baixa a lista com os filtros da tela, em CSV"
                 >
-                  <span style={{ color: 'var(--texto-apagado)', fontWeight: '600' }}>Período</span>
-                  <span style={{ fontWeight: '700' }}>{v.perRot}</span>
-                  <svg
-                    width="11"
-                    height="11"
-                    viewBox="0 0 12 12"
-                    fill="none"
-                    stroke="#7c8f8d"
-                    strokeWidth="1.7"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M3 4.5 6 7.5l3-3"></path>
-                  </svg>
-                </div>
-                {v.popPeriodo ? (
-                  <>
-                    <div
-                      style={{
-                        position: 'absolute',
-                        left: '0',
-                        top: '44px',
-                        background: 'var(--painel)',
-                        border: '1px solid var(--borda)',
-                        borderRadius: '14px',
-                        boxShadow: '0 16px 40px rgba(9,61,68,.16)',
-                        padding: '6px',
-                        minWidth: '210px',
-                        zIndex: '60',
-                      }}
-                    >
-                      {(Array.isArray(v.periodos) ? v.periodos : []).map((pd, $index) => (
-                        <Fragment key={$index}>
-                          <div
-                            role="button"
-                            tabIndex={0}
-                            onClick={pd?.onClick}
-                            data-tx-periodo={pd?.k}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '10px',
-                              padding: '8px 11px',
-                              borderRadius: '9px',
-                              fontSize: '13px',
-                              fontWeight: pd?.fw,
-                              cursor: 'pointer',
-                            }}
-                            className="tx-h894fca3"
-                          >
-                            {pd?.n}
-                            <svg
-                              width="13"
-                              height="13"
-                              viewBox="0 0 16 16"
-                              fill="none"
-                              stroke="#127670"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              style={{ marginLeft: 'auto', display: pd?.ckD }}
-                            >
-                              <path d="M3.5 8.5 6.5 11.5 12.5 4.5"></path>
-                            </svg>
-                          </div>
-                        </Fragment>
-                      ))}
-                    </div>
-                  </>
-                ) : null}
-              </div>
-              {v.temSituacao ? (
-                <>
-                  <div data-tx-pop="" style={{ position: 'relative' }}>
-                    <div
-                      role="button"
-                      tabIndex={0}
-                      onClick={v.abrirSituacao}
-                      data-tx-dd="situacao"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '7px',
-                        height: '38px',
-                        padding: '0 12px 0 12px',
-                        borderRadius: '11px',
-                        border: `1px solid ${v.sitBd ?? ''}`,
-                        background: 'var(--painel)',
-                        fontSize: '13px',
-                        cursor: 'pointer',
-                        whiteSpace: 'nowrap',
-                      }}
-                      className="tx-h30bbaa9"
-                    >
-                      <span style={{ color: 'var(--texto-apagado)', fontWeight: '600' }}>Situação</span>
-                      <span style={{ display: v.sitDotD, width: '7px', height: '7px', borderRadius: '99px', background: v.sitDot }}></span>
-                      <span style={{ fontWeight: '700' }}>{v.sitRot}</span>
-                      <svg
-                        width="11"
-                        height="11"
-                        viewBox="0 0 12 12"
-                        fill="none"
-                        stroke="#7c8f8d"
-                        strokeWidth="1.7"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M3 4.5 6 7.5l3-3"></path>
-                      </svg>
-                    </div>
-                    {v.popSituacao ? (
-                      <>
-                        <div
-                          style={{
-                            position: 'absolute',
-                            left: '0',
-                            top: '44px',
-                            background: 'var(--painel)',
-                            border: '1px solid var(--borda)',
-                            borderRadius: '14px',
-                            boxShadow: '0 16px 40px rgba(9,61,68,.16)',
-                            padding: '6px',
-                            minWidth: '230px',
-                            zIndex: '60',
-                          }}
-                        >
-                          {(Array.isArray(v.situacoes) ? v.situacoes : []).map((st, $index) => (
-                            <Fragment key={$index}>
-                              <div
-                                role="button"
-                                tabIndex={0}
-                                onClick={st?.onClick}
-                                data-tx-situacao={st?.k}
-                                style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '10px',
-                                  padding: '8px 11px',
-                                  borderRadius: '9px',
-                                  fontSize: '13px',
-                                  fontWeight: st?.fw,
-                                  color: st?.cor,
-                                  cursor: 'pointer',
-                                }}
-                                className="tx-h894fca3"
-                              >
-                                <span
-                                  style={{ width: '8px', height: '8px', borderRadius: '99px', background: st?.dot, flex: 'none' }}
-                                ></span>
-                                {st?.n}
-                                <span
-                                  style={{
-                                    marginLeft: 'auto',
-                                    fontFamily: "'Spline Sans Mono',monospace",
-                                    fontSize: '12px',
-                                    color: 'var(--texto-apagado)',
-                                  }}
-                                >
-                                  {st?.q}
-                                </span>
-                                <svg
-                                  width="13"
-                                  height="13"
-                                  viewBox="0 0 16 16"
-                                  fill="none"
-                                  stroke="#127670"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  style={{ flex: 'none', opacity: st?.ckOp }}
-                                >
-                                  <path d="M3.5 8.5 6.5 11.5 12.5 4.5"></path>
-                                </svg>
-                              </div>
-                            </Fragment>
-                          ))}
-                        </div>
-                      </>
-                    ) : null}
-                  </div>
-                </>
-              ) : null}
-              <div data-tx-pop="" style={{ position: 'relative' }}>
-                <div
-                  role="button"
-                  tabIndex={0}
-                  onClick={v.abrirFiltros}
-                  data-tx-dd="filtros"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '7px',
-                    height: '38px',
-                    padding: '0 12px',
-                    borderRadius: '11px',
-                    border: `1px solid ${v.filBd ?? ''}`,
-                    background: 'var(--painel)',
-                    fontSize: '13px',
-                    fontWeight: '700',
-                    cursor: 'pointer',
-                    whiteSpace: 'nowrap',
-                  }}
-                  className="tx-h30bbaa9"
-                >
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
-                    <line x1="2.5" y1="4.5" x2="13.5" y2="4.5"></line>
-                    <line x1="4.5" y1="8" x2="11.5" y2="8"></line>
-                    <line x1="6.5" y1="11.5" x2="9.5" y2="11.5"></line>
-                  </svg>
-                  Filtros
-                  <span
-                    style={{
-                      display: v.filQD,
-                      minWidth: '18px',
-                      height: '18px',
-                      borderRadius: '6px',
-                      background: 'var(--primario)',
-                      color: '#fff',
-                      fontSize: '11px',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      padding: '0 5px',
-                    }}
-                  >
-                    {v.filQ}
-                  </span>
-                </div>
-                {v.popFiltros ? (
-                  <>
-                    <div
-                      style={{
-                        position: 'absolute',
-                        left: '0',
-                        top: '44px',
-                        background: 'var(--painel)',
-                        border: '1px solid var(--borda)',
-                        borderRadius: '14px',
-                        boxShadow: '0 16px 40px rgba(9,61,68,.16)',
-                        padding: '6px',
-                        width: '250px',
-                        zIndex: '60',
-                      }}
-                    >
-                      <div
-                        style={{
-                          fontSize: '11px',
-                          fontWeight: '800',
-                          letterSpacing: '.8px',
-                          color: 'var(--texto-apagado)',
-                          padding: '8px 11px 4px',
-                        }}
-                      >
-                        TIPO
-                      </div>
-                      {(Array.isArray(v.tipos) ? v.tipos : []).map((tp, $index) => (
-                        <Fragment key={$index}>
-                          <div
-                            role="button"
-                            tabIndex={0}
-                            onClick={tp?.onClick}
-                            data-tx-tipo={tp?.k}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '10px',
-                              padding: '8px 11px',
-                              borderRadius: '9px',
-                              fontSize: '13px',
-                              fontWeight: tp?.fw,
-                              cursor: 'pointer',
-                            }}
-                            className="tx-h894fca3"
-                          >
-                            {tp?.n}
-                            <svg
-                              width="13"
-                              height="13"
-                              viewBox="0 0 16 16"
-                              fill="none"
-                              stroke="#127670"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              style={{ marginLeft: 'auto', display: tp?.ckD }}
-                            >
-                              <path d="M3.5 8.5 6.5 11.5 12.5 4.5"></path>
-                            </svg>
-                          </div>
-                        </Fragment>
-                      ))}
-                      {v.temFiliais ? (
-                        <>
-                          <div
-                            style={{
-                              fontSize: '11px',
-                              fontWeight: '800',
-                              letterSpacing: '.8px',
-                              color: 'var(--texto-apagado)',
-                              padding: '10px 11px 4px',
-                              marginTop: '4px',
-                              borderTop: '1px solid var(--superficie-2)',
-                            }}
-                          >
-                            FILIAL
-                          </div>
-                          {(Array.isArray(v.filiais) ? v.filiais : []).map((fl, $index) => (
-                            <Fragment key={$index}>
-                              <div
-                                role="button"
-                                tabIndex={0}
-                                onClick={fl?.onClick}
-                                data-tx-filial-chip={fl?.k}
-                                style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '10px',
-                                  padding: '8px 11px',
-                                  borderRadius: '9px',
-                                  fontSize: '13px',
-                                  fontWeight: fl?.fw,
-                                  cursor: 'pointer',
-                                }}
-                                className="tx-h894fca3"
-                              >
-                                {fl?.n}
-                                <svg
-                                  width="13"
-                                  height="13"
-                                  viewBox="0 0 16 16"
-                                  fill="none"
-                                  stroke="#127670"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  style={{ marginLeft: 'auto', display: fl?.ckD }}
-                                >
-                                  <path d="M3.5 8.5 6.5 11.5 12.5 4.5"></path>
-                                </svg>
-                              </div>
-                            </Fragment>
-                          ))}
-                        </>
-                      ) : null}
-                    </div>
-                  </>
-                ) : null}
-              </div>
-              {(Array.isArray(v.ativos) ? v.ativos : []).map((at, $index) => (
-                <Fragment key={$index}>
+                  {v.exportarRot}
+                </Botao>
+              </>
+            }
+          />
+          <div className="tx-viagens-folha">
+            <Abas
+              rotulo="Visões de viagens"
+              className="tx-viagens-abas"
+              itens={v.abas.map((ab) => ({
+                k: ab.k,
+                n: <span data-tx-visao={ab.k}>{ab.n}</span>,
+                q: ab.q,
+                ativa: ab.on,
+                onClick: ab.onClick,
+                depois: ab.usuario ? (
                   <span
                     role="button"
                     tabIndex={0}
-                    onClick={at?.onClick}
-                    title="Tirar este filtro"
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      fontSize: '12px',
-                      fontWeight: '700',
-                      color: 'var(--primario-2)',
-                      border: '1px solid #cfe3e1',
-                      borderRadius: '8px',
-                      padding: '5px 9px',
-                      cursor: 'pointer',
-                      whiteSpace: 'nowrap',
+                    aria-label={'Apagar a visão ' + ab.n}
+                    title="Apagar esta visão"
+                    data-tx-apagar-visao={ab.k}
+                    className="tx-viagens-apagar"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      ab.remover();
                     }}
-                    className="tx-alvo tx-h30bbaa9"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        ab.remover();
+                      }
+                    }}
                   >
-                    {at?.n}
-                    <span style={{ color: 'var(--texto-apagado)' }}>×</span>
+                    ×
                   </span>
-                </Fragment>
-              ))}
-              <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '16px' }}>
-                {v.filtroAtivo ? (
-                  <>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                      <span
-                        role="button"
-                        tabIndex={0}
-                        onClick={v.limpar}
-                        data-tx-limpar=""
-                        style={{ fontSize: '13px', fontWeight: '700', color: 'var(--texto-sec)', cursor: 'pointer', whiteSpace: 'nowrap' }}
-                        className="tx-alvo tx-h39963fb"
-                      >
-                        Limpar
-                      </span>
-                      <div data-tx-pop="" style={{ position: 'relative' }}>
-                        {' '}
-                        <span
-                          role="button"
-                          tabIndex={0}
-                          onClick={v.abrirSalvar}
-                          data-tx-salvar-visao=""
-                          style={{
-                            fontSize: '13px',
-                            fontWeight: '800',
-                            color: 'var(--primario-2)',
-                            cursor: 'pointer',
-                            whiteSpace: 'nowrap',
-                          }}
-                          className="tx-alvo tx-h76d8d79"
-                        >
-                          Salvar como visão
-                        </span>{' '}
-                        {v.popSalvar ? (
-                          <>
-                            <div
-                              style={{
-                                position: 'absolute',
-                                right: '0',
-                                top: '30px',
-                                background: 'var(--painel)',
-                                border: '1px solid var(--borda)',
-                                borderRadius: '14px',
-                                boxShadow: '0 16px 40px rgba(9,61,68,.16)',
-                                padding: '16px',
-                                width: '300px',
-                                zIndex: '60',
-                              }}
-                            >
-                              <div style={{ fontSize: '14px', fontWeight: '800' }}>Salvar como visão</div>
-                              <div style={{ fontSize: '12px', color: 'var(--texto-sec)', marginTop: '2px', lineHeight: '1.5' }}>
-                                Vira uma aba acima da lista, com estes filtros. Fica salva neste navegador.
-                              </div>
-                              <input
-                                aria-label="Nome da visão"
-                                value={v.nomeVisao ?? ''}
-                                onChange={v.onNomeVisao}
-                                onKeyDown={v.teclaVisao}
-                                data-tx-nome-visao=""
-                                placeholder="Nome da visão"
-                                style={{
-                                  marginTop: '10px',
-                                  width: '100%',
-                                  border: '1px solid var(--borda-campo)',
-                                  borderRadius: '10px',
-                                  padding: '9px 11px',
-                                  fontSize: '13px',
-                                  outline: 'none',
-                                }}
-                              />
-                              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-                                <span
-                                  role="button"
-                                  tabIndex={0}
-                                  onClick={v.confirmarVisao}
-                                  data-tx-confirmar-visao=""
-                                  style={{
-                                    background: v.visCta?.bg,
-                                    color: v.visCta?.c,
-                                    boxShadow: v.visCta?.sh,
-                                    cursor: v.visCta?.cur,
-                                    fontSize: '13px',
-                                    fontWeight: '800',
-                                    borderRadius: '99px',
-                                    padding: '8px 18px',
-                                  }}
-                                >
-                                  Salvar
-                                </span>
-                              </div>
-                            </div>
-                          </>
-                        ) : null}
-                      </div>
-                    </div>
-                  </>
-                ) : null}
-                <span
-                  style={{
-                    fontSize: '13px',
-                    color: 'var(--texto-apagado)',
-                    whiteSpace: 'nowrap',
-                    fontFamily: "'Spline Sans Mono',monospace",
-                  }}
-                >
-                  {v.contagem}
-                </span>
+                ) : null,
+              }))}
+            />
+            {v.apagadaNome ? (
+              <div className="tx-viagens-desfazer" role="status">
+                Visão "{v.apagadaNome}" apagada.
+                <Botao variante="texto" onClick={v.desfazerApagar} data-tx-desfazer="">
+                  Desfazer
+                </Botao>
               </div>
-            </div>
-            {v.temDica ? (
-              <>
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    margin: '0 20px 14px',
-                    padding: '11px 14px',
-                    borderRadius: '13px',
-                    border: '1px solid var(--borda)',
-                    borderLeft: `3px solid ${v.dicaCor ?? ''}`,
-                  }}
-                >
-                  <div style={{ fontSize: '13px', color: 'var(--texto-2)', lineHeight: '1.5', flex: '1' }}>{v.dica}</div>
-                  {v.temDicaAcao ? (
-                    <>
-                      <span
-                        role="button"
-                        tabIndex={0}
-                        onClick={v.dicaAcao}
-                        data-tx-conciliar=""
-                        style={{
-                          background: 'linear-gradient(135deg,var(--primario),var(--azul))',
-                          color: '#fff',
-                          borderRadius: '99px',
-                          padding: '8px 16px',
-                          fontSize: '13px',
-                          fontWeight: '800',
-                          cursor: 'pointer',
-                          whiteSpace: 'nowrap',
-                          boxShadow: '0 6px 14px rgba(18,118,112,.25)',
-                        }}
-                        className="tx-h0882f37"
-                      >
-                        {v.dicaAcaoRot}
-                      </span>
-                    </>
-                  ) : null}
-                  {v.temDicaLink ? (
-                    <>
-                      <A className="tx-alvo" href={v.dicaHref} style={{ fontSize: '13px', fontWeight: '800', whiteSpace: 'nowrap' }}>
-                        {v.dicaLinkRot}
-                        {' →'}
-                      </A>
-                    </>
-                  ) : null}
+            ) : null}
+            <div className="tx-viagens-barra">
+              {this.filtroMenu({
+                k: 'periodo',
+                rotulo: 'Período',
+                valor: v.perRot,
+                mudou: v.perMudou,
+                aberto: v.popPeriodo,
+                abrir: v.abrirPeriodo,
+                itens: v.periodos,
+                attr: 'data-tx-periodo',
+              })}
+              {v.temFiliais
+                ? this.filtroMenu({
+                    k: 'filtros',
+                    rotulo: 'Filial',
+                    valor: v.filialRot,
+                    mudou: v.filialMudou,
+                    aberto: v.popFilial,
+                    abrir: v.abrirFilial,
+                    itens: v.filiais,
+                    attr: 'data-tx-filial-chip',
+                  })
+                : null}
+              {this.filtroMenu({
+                k: 'tipo',
+                rotulo: 'Tipo',
+                valor: v.tipoRot,
+                mudou: v.tipoMudou,
+                aberto: v.popTipo,
+                abrir: v.abrirTipo,
+                itens: v.tipos,
+                attr: 'data-tx-tipo',
+              })}
+              {v.filtroAtivo ? (
+                <div className="tx-viagens-barra__fim">
+                  <Botao variante="texto" onClick={v.limpar} data-tx-limpar="">
+                    Limpar filtros
+                  </Botao>
+                  <div data-tx-pop="" className="tx-viagens-pop">
+                    <Botao variante="contorno" tamanho="p" onClick={v.abrirSalvar} data-tx-salvar-visao="" aria-expanded={v.popSalvar}>
+                      Salvar como visão
+                    </Botao>
+                    {v.popSalvar ? (
+                      <div className="tx-viagens-menu tx-viagens-menu--salvar" role="dialog" aria-label="Salvar como visão">
+                        <div className="tx-tipo-corpo tx-peso-800">Salvar como visão</div>
+                        <div className="tx-tipo-legenda tx-peso-400 tx-sec" style={{ marginTop: 'var(--esp-0-5)' }}>
+                          Vira uma aba acima da lista, com estes filtros. Fica salva neste navegador.
+                        </div>
+                        <input
+                          aria-label="Nome da visão"
+                          className="tx-entrada"
+                          value={v.nomeVisao ?? ''}
+                          onChange={v.onNomeVisao}
+                          onKeyDown={v.teclaVisao}
+                          data-tx-nome-visao=""
+                          placeholder="Nome da visão"
+                        />
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 'var(--esp-2-5)' }}>
+                          <Botao variante="primario" tamanho="p" inativo={!v.visOk} onClick={v.confirmarVisao} data-tx-confirmar-visao="">
+                            Salvar
+                          </Botao>
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
                 </div>
-              </>
-            ) : null}
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: v.cols,
-                gap: '16px',
-                padding: '11px 20px',
-                background: 'var(--superficie)',
-                borderTop: '1px solid var(--borda-suave)',
-                borderBottom: '1px solid var(--borda-suave)',
-                fontSize: '11px',
-                fontWeight: '800',
-                letterSpacing: '.7px',
-                color: 'var(--texto-apagado)',
-              }}
-            >
-              <span>CARREGAMENTO</span>
-              <span>ORDEM E CT-E</span>
-              <span>PRODUTO E ROTA</span>
-              <span>TRANSPORTADOR</span>
-              <span>PLACAS</span>
-              <span>SITUAÇÃO</span>
-            </div>
-            {v.loading ? (
-              <>
-                {(Array.isArray(v.skel) ? v.skel : []).map((sk, $index) => (
-                  <Fragment key={$index}>
-                    <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--superficie-2)' }}>
-                      <div
-                        style={{
-                          height: '16px',
-                          borderRadius: '99px',
-                          background: 'linear-gradient(90deg,var(--borda-suave) 25%,var(--superficie) 40%,var(--borda-suave) 55%)',
-                          backgroundSize: '600px 100%',
-                          animation: 'txsh 1.3s linear infinite',
-                        }}
-                      ></div>
-                    </div>
-                  </Fragment>
-                ))}
-              </>
-            ) : null}
-            {(Array.isArray(v.linhas) ? v.linhas : []).map((r, $index) => (
-              <Fragment key={$index}>
-                {' '}
-                <A
-                  href={r?.href}
-                  data-tx-linha={r?.id}
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: v.cols,
-                    gap: '16px',
-                    padding: '12px 20px',
-                    borderBottom: '1px solid var(--superficie-2)',
-                    alignItems: 'center',
-                    color: 'inherit',
-                  }}
-                  className="tx-hc05ca3a"
-                >
-                  <div>
-                    <div style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '13px', fontWeight: '600' }}>{r?.data}</div>
-                    <div style={{ fontSize: '12px', color: 'var(--texto-apagado)' }}>{r?.filial}</div>
-                  </div>
-                  <div style={{ minWidth: '0' }}>
-                    <div style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '13px', fontWeight: '600' }}>{r?.ordem}</div>
-                    <div
-                      style={{
-                        fontFamily: "'Spline Sans Mono',monospace",
-                        fontSize: '12px',
-                        color: r?.subC,
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      {r?.ordemSub}
-                    </div>
-                  </div>
-                  <div style={{ minWidth: '0' }}>
-                    <div
-                      style={{ fontSize: '14px', fontWeight: '700', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-                    >
-                      {r?.produto}
-                      <span style={{ fontWeight: '600', color: 'var(--texto-apagado)', fontSize: '12px' }}> {r?.assegTxt}</span>
-                    </div>
-                    <div
-                      style={{
-                        fontSize: '12px',
-                        color: 'var(--texto-sec)',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      {r?.rota}
-                    </div>
-                  </div>
-                  <div style={{ minWidth: '0' }}>
-                    <div
-                      style={{ fontSize: '13px', fontWeight: '700', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-                    >
-                      {r?.transp}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: '12px',
-                        color: 'var(--texto-apagado)',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      {r?.transpSub}
-                    </div>
-                  </div>
-                  <div style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '12px', color: 'var(--texto-2)', lineHeight: '1.5' }}>
-                    {r?.placas}
-                  </div>
-                  <div style={{ minWidth: '0' }}>
-                    <div
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '7px',
-                        fontSize: '13px',
-                        fontWeight: '700',
-                        color: r?.c,
-                      }}
-                    >
-                      <span
-                        style={{
-                          width: '8px',
-                          height: '8px',
-                          borderRadius: '99px',
-                          background: r?.dot,
-                          boxShadow: `0 0 0 3px ${r?.ring ?? ''}`,
-                          flex: 'none',
-                        }}
-                      ></span>
-                      {r?.res}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: '12px',
-                        color: 'var(--texto-apagado)',
-                        marginTop: '2px',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      {r?.sub}
-                    </div>
-                  </div>
-                </A>{' '}
-              </Fragment>
-            ))}
-            {v.vazio ? (
-              <>
-                <div style={{ padding: '48px 20px', textAlign: 'center' }}>
-                  <div style={{ fontSize: '16px', fontWeight: '800' }}>{v.vazioT}</div>
-                  <div style={{ fontSize: '13px', color: 'var(--texto-sec)', marginTop: '4px' }}>{v.vazioSub}</div>
-                </div>
-              </>
-            ) : null}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 20px' }}>
-              <span style={{ fontSize: '13px', color: 'var(--texto-sec)' }}>{v.pagInfo}</span>
-              {v.temPaginacao ? (
-                <>
-                  <div style={{ marginLeft: 'auto', display: 'flex', gap: '5px', alignItems: 'center' }}>
-                    <span
-                      className="tx-alvo"
-                      role="button"
-                      tabIndex={0}
-                      onClick={v.pagAnt}
-                      style={{ fontSize: '13px', fontWeight: '700', color: v.pagAntC, cursor: v.pagAntCur, padding: '4px 8px' }}
-                    >
-                      ‹
-                    </span>
-                    {(Array.isArray(v.paginas) ? v.paginas : []).map((pg, $index) => (
-                      <Fragment key={$index}>
-                        <span
-                          className="tx-alvo"
-                          role="button"
-                          tabIndex={0}
-                          onClick={pg?.onClick}
-                          style={{
-                            fontFamily: "'Spline Sans Mono',monospace",
-                            fontSize: '13px',
-                            fontWeight: '600',
-                            width: '30px',
-                            height: '30px',
-                            borderRadius: '9px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                            border: `1px solid ${pg?.bd ?? ''}`,
-                            background: pg?.bg,
-                            color: pg?.c,
-                          }}
-                        >
-                          {pg?.n}
-                        </span>
-                      </Fragment>
-                    ))}
-                    <span
-                      className="tx-alvo"
-                      role="button"
-                      tabIndex={0}
-                      onClick={v.pagProx}
-                      style={{ fontSize: '13px', fontWeight: '700', color: v.pagProxC, cursor: v.pagProxCur, padding: '4px 8px' }}
-                    >
-                      ›
-                    </span>
-                  </div>
-                </>
               ) : null}
+            </div>
+            {v.temSituacao ? (
+              <div className="tx-viagens-chips">
+                <span className="tx-viagens-chips__rot" id="tx-viagens-sit" data-tx-dd="situacao">
+                  Situação
+                </span>
+                <div role="group" aria-labelledby="tx-viagens-sit" className="tx-viagens-chips__lista">
+                  {v.situacoes.map((st) => (
+                    <Chip key={st.k} tipo="filtro" selecionado={st.on} onClick={st.onClick} data-tx-situacao={st.k}>
+                      {st.k !== 'todas' ? (
+                        <span className={'tx-situacao tx-situacao--' + st.tom}>
+                          <span className="tx-situacao__ponto" aria-hidden />
+                        </span>
+                      ) : null}
+                      {st.n}
+                      <span className="tx-viagens-chips__q num">{st.q}</span>
+                    </Chip>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+            {v.temDica ? (
+              <div className="tx-viagens-dica">
+                <Aviso
+                  tom="info"
+                  acao={
+                    v.temDicaAcao ? (
+                      <Botao variante="primario" tamanho="p" onClick={v.dicaAcao} data-tx-conciliar="">
+                        {v.dicaAcaoRot}
+                      </Botao>
+                    ) : v.temDicaLink ? (
+                      <Botao variante="texto" href={v.dicaHref}>
+                        {v.dicaLinkRot}
+                      </Botao>
+                    ) : null
+                  }
+                >
+                  {v.dica}
+                </Aviso>
+              </div>
+            ) : null}
+            {v.selQ ? (
+              <div className="tx-viagens-selecao" role="region" aria-label="Seleção">
+                <span className="tx-peso-700">
+                  <span className="num">{v.selQ}</span> {v.selQ === 1 ? 'selecionada' : 'selecionadas'}
+                </span>
+                <Botao variante="contorno" tamanho="p" icone={IconeBaixar} onClick={v.exportarSel} data-tx-exportar-sel="">
+                  Exportar selecionadas
+                </Botao>
+                <Botao variante="texto" onClick={v.limparSel}>
+                  Limpar seleção
+                </Botao>
+              </div>
+            ) : null}
+            <div role="table" aria-label="Viagens" aria-rowcount={v.linhas.length} className="tx-viagens-tabela">
+              <div role="row" className="tx-viagens-linha tx-viagens-cab">
+                <span role="columnheader" className="tx-viagens-sel">
+                  <Checkbox
+                    rotulo={<span className="tx-so-leitor">Selecionar as viagens desta página</span>}
+                    checked={v.todasPagina}
+                    ref={(el) => {
+                      if (el) el.indeterminate = v.algumaPagina && !v.todasPagina;
+                    }}
+                    onChange={v.alternarPagina}
+                  />
+                </span>
+                {this.cabCol(v, 'carga', 'Carregamento')}
+                {this.cabCol(v, 'ordem', 'Ordem')}
+                <span role="columnheader">Produto e rota</span>
+                {this.cabCol(v, 'transp', 'Transportador')}
+                <span role="columnheader">Placas</span>
+                {this.cabCol(v, 'sit', 'Situação')}
+              </div>
+              {v.loading ? <TabelaEsqueleto linhas={6} /> : null}
+              {v.linhas.map((r) => (
+                <div key={r.id} role="row" className="tx-viagens-linha" aria-selected={r.on || undefined}>
+                  <span role="cell" className="tx-viagens-sel">
+                    <Checkbox rotulo={<span className="tx-so-leitor">Selecionar a {r.ordem}</span>} checked={r.on} onChange={r.alternar} />
+                  </span>
+                  <span role="cell">
+                    <span className="tx-viagens-mono tx-peso-600" style={{ display: 'block' }}>
+                      {r.data}
+                    </span>
+                    <span className="tx-viagens-sub">{r.filial}</span>
+                  </span>
+                  <span role="cell" style={{ minWidth: '0' }}>
+                    <A href={r.href} data-tx-linha={r.id} className="tx-viagens-abrir">
+                      {r.ordem}
+                    </A>
+                    <span className="tx-viagens-sub tx-viagens-mono">{r.cte}</span>
+                  </span>
+                  <span role="cell" className="tx-viagens-rota">
+                    <span className="tx-viagens-forte">
+                      {r.produto}
+                      {r.semGmp ? <span className="tx-viagens-semgmp"> sem GMP+</span> : null}
+                    </span>
+                    <span className="tx-viagens-sub tx-viagens-corta">{r.rota}</span>
+                  </span>
+                  <span role="cell" style={{ minWidth: '0' }}>
+                    <span className="tx-viagens-forte tx-viagens-corta">{r.transp}</span>
+                    <span className="tx-viagens-sub tx-viagens-corta">{r.transpSub}</span>
+                  </span>
+                  <span role="cell" className="tx-viagens-placas">
+                    {r.placas.map((pl) => (
+                      <span key={pl} className="tx-viagens-placa">
+                        {pl}
+                      </span>
+                    ))}
+                  </span>
+                  <span role="cell" style={{ minWidth: '0' }}>
+                    <Situacao tom={r.tom}>{r.res}</Situacao>
+                    {r.sub ? (
+                      <span className="tx-viagens-motivo" title={r.sub}>
+                        {r.sub}
+                      </span>
+                    ) : null}
+                  </span>
+                </div>
+              ))}
+              {v.vazio ? (
+                <EstadoVazio
+                  titulo={v.vazioT}
+                  acao={
+                    v.filtroAtivo ? (
+                      <Botao tamanho="p" onClick={v.limpar}>
+                        Limpar filtros
+                      </Botao>
+                    ) : null
+                  }
+                >
+                  {v.vazioSub}
+                </EstadoVazio>
+              ) : null}
+              <div className="tx-viagens-rodape">
+                <Paginacao pagina={v.pagina} total={v.total} info={v.pagInfo} aoIr={v.irPara} />
+              </div>
             </div>
           </div>
         </div>
         {v.concAberta ? (
-          <>
-            <div
-              onClick={v.fecharModal}
-              style={{
-                position: 'fixed',
-                inset: '0',
-                background: 'rgba(9,34,36,.45)',
-                backdropFilter: 'blur(3px)',
-                zIndex: '1000',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '32px',
-              }}
-            >
-              <div
-                role="dialog"
-                aria-modal="true"
-                onClick={v.pararClique}
-                data-tx-modal="conciliar"
-                style={{
-                  background: 'var(--painel)',
-                  borderRadius: '24px',
-                  width: '760px',
-                  maxHeight: '90vh',
-                  overflow: 'auto',
-                  boxShadow: '0 40px 100px rgba(9,34,36,.4)',
-                  padding: '28px 28px',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <div style={{ fontSize: '16px', fontWeight: '800' }}>Conciliar CT-e e NF em lote</div>
-                  <span
-                    role="button"
-                    aria-label="Fechar"
-                    title="Fechar"
-                    tabIndex={0}
-                    onClick={v.fecharModal}
-                    style={{
-                      marginLeft: 'auto',
-                      width: '32px',
-                      height: '32px',
-                      borderRadius: '99px',
-                      background: 'var(--superficie-2)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                      fontSize: '13px',
-                    }}
-                  >
-                    ✕
-                  </span>
-                </div>
-                <div style={{ fontSize: '13px', color: 'var(--texto-sec)', marginTop: '4px', lineHeight: '1.55' }}>
-                  Importe a planilha ou os XML de CT-e do período exportados do TMS. O Traxium casa cada CT-e com a viagem pela placa do
-                  cavalo e pela data. Viagem conciliada com descarga passada se conclui sozinha.
-                </div>
-                <label
-                  style={{
-                    marginTop: '16px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    border: `1.5px dashed ${v.arqBd ?? ''}`,
-                    background: v.arqBg,
-                    borderRadius: '15px',
-                    padding: '12px 16px',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <input type="file" accept=".xml,.csv,.xlsx,.zip" onChange={v.onArquivo} className="tx-so-leitor" />
-                  <div style={{ flex: '1' }}>
-                    <div style={{ fontSize: '14px', fontWeight: '800' }}>{v.arqTitulo}</div>
-                    <div style={{ fontSize: '12px', color: 'var(--texto-sec)' }}>planilha (.xlsx, .csv) ou XML de CT-e (.xml, .zip)</div>
-                  </div>
-                  <span
-                    className="tx-alvo"
-                    role="button"
-                    tabIndex={0}
-                    onClick={v.usarExemplo}
-                    data-tx-lote-exemplo=""
-                    style={{ fontSize: '12px', fontWeight: '800', color: 'var(--primario-2)' }}
-                  >
-                    usar o lote de exemplo
-                  </span>
-                </label>
-                {v.arqErro ? (
-                  <div className="tx-erro" role="alert" data-tx-arquivo-erro="">
-                    {v.arqErro}
-                  </div>
-                ) : null}
-                {v.temLote ? (
-                  <>
-                    <div style={{ marginTop: '16px', border: '1px solid var(--borda-suave)', borderRadius: '14px', overflow: 'hidden' }}>
-                      <div
-                        style={{
-                          display: 'grid',
-                          gridTemplateColumns: '80px 80px 100px 70px 1fr',
-                          gap: '10px',
-                          padding: '9px 14px',
-                          background: 'var(--superficie)',
-                          fontSize: '11px',
-                          fontWeight: '800',
-                          letterSpacing: '.7px',
-                          color: 'var(--texto-apagado)',
-                        }}
-                      >
-                        <span>CT-E</span>
-                        <span>NF</span>
-                        <span>PLACA</span>
-                        <span>DATA</span>
-                        <span>VIAGEM</span>
-                      </div>
-                      {(Array.isArray(v.lote) ? v.lote : []).map((lt, $index) => (
-                        <Fragment key={$index}>
-                          <div
-                            style={{
-                              display: 'grid',
-                              gridTemplateColumns: '80px 80px 100px 70px 1fr',
-                              gap: '10px',
-                              padding: '9px 14px',
-                              borderTop: '1px solid var(--superficie-2)',
-                              fontSize: '13px',
-                              alignItems: 'center',
-                            }}
-                          >
-                            <span style={{ fontFamily: "'Spline Sans Mono',monospace" }}>{lt?.cte}</span>
-                            <span style={{ fontFamily: "'Spline Sans Mono',monospace" }}>{lt?.nf}</span>
-                            <span style={{ fontFamily: "'Spline Sans Mono',monospace" }}>{lt?.placa}</span>
-                            <span style={{ fontFamily: "'Spline Sans Mono',monospace" }}>{lt?.data}</span>
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '7px', color: lt?.c, fontWeight: '700' }}>
-                              <span style={{ width: '7px', height: '7px', borderRadius: '99px', background: lt?.c }}></span>
-                              {lt?.viagem}
-                            </span>
-                          </div>
-                        </Fragment>
-                      ))}
-                    </div>
-                    <div style={{ fontSize: '13px', color: 'var(--texto-2)', marginTop: '10px' }}>{v.loteResumo}</div>
-                  </>
-                ) : null}
-                <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
-                  <span
-                    role="button"
-                    tabIndex={0}
-                    onClick={v.fecharModal}
-                    style={{
-                      background: 'var(--superficie-2)',
-                      fontSize: '14px',
-                      fontWeight: '700',
-                      borderRadius: '99px',
-                      padding: '10px 20px',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    Cancelar
-                  </span>
-                  <span
-                    role="button"
-                    tabIndex={0}
-                    onClick={v.confirmarConciliar}
-                    data-tx-confirmar=""
-                    style={{
-                      background: v.ctaBg,
-                      color: v.ctaC,
-                      boxShadow: v.ctaSh,
-                      cursor: v.ctaCur,
-                      fontSize: '14px',
-                      fontWeight: '800',
-                      borderRadius: '99px',
-                      padding: '10px 22px',
-                    }}
-                  >
+          <Modal
+            id="conciliar"
+            data-tx-modal="conciliar"
+            tamanho="xg"
+            titulo="Conciliar CT-e e NF em lote"
+            sub="Importe a planilha ou os XML de CT-e do período exportados do TMS. O Traxium casa cada CT-e com a viagem pela placa do cavalo e pela data. Viagem conciliada com descarga passada se conclui sozinha."
+            aoFechar={v.fecharModal}
+            falta={v.temLote ? '' : 'Falta: o arquivo do TMS.'}
+            acoes={
+              <>
+                <Botao onClick={v.fecharModal}>Cancelar</Botao>
+                {v.podeConciliar ? (
+                  <Botao variante="primario" inativo={!v.ctaOk} onClick={v.confirmarConciliar} data-tx-confirmar="">
                     {v.concRot}
+                  </Botao>
+                ) : null}
+              </>
+            }
+          >
+            <div>
+              <label className={'tx-viagens-arquivo' + (v.arqOk ? ' tx-viagens-arquivo--ok' : '')}>
+                <input type="file" accept=".xml,.csv,.xlsx,.zip" onChange={v.onArquivo} className="tx-so-leitor" />
+                <span style={{ flex: '1', minWidth: '0' }}>
+                  <span className="tx-tipo-corpo tx-peso-800" style={{ display: 'block' }}>
+                    {v.arqTitulo}
                   </span>
+                  <span className="tx-tipo-legenda tx-peso-400 tx-sec" style={{ display: 'block' }}>
+                    planilha (.xlsx, .csv) ou XML de CT-e (.xml, .zip)
+                  </span>
+                </span>
+                <Botao variante="texto" onClick={v.usarExemplo} data-tx-lote-exemplo="" className="tx-acao-texto">
+                  Usar o lote de exemplo
+                </Botao>
+              </label>
+              {v.arqErro ? (
+                <div className="tx-erro" role="alert" data-tx-arquivo-erro="">
+                  {v.arqErro}
                 </div>
-              </div>
+              ) : null}
             </div>
-          </>
+            {v.temLote ? (
+              <>
+                <div role="table" aria-label="CT-e do lote" className="tx-viagens-lote">
+                  <div role="row" className="tx-viagens-lote__linha tx-viagens-lote__cab">
+                    <span role="columnheader">CT-e</span>
+                    <span role="columnheader">NF</span>
+                    <span role="columnheader">Placa</span>
+                    <span role="columnheader">Data</span>
+                    <span role="columnheader">Viagem</span>
+                    <span role="columnheader">Ao carregar</span>
+                  </div>
+                  {v.lote.map((lt) => (
+                    <div key={lt.k} role="row" className={'tx-viagens-lote__linha' + (lt.alerta ? ' tx-viagens-lote__linha--alerta' : '')}>
+                      <span role="cell" className="tx-mono">
+                        {lt.cte}
+                      </span>
+                      <span role="cell" className="tx-mono">
+                        {lt.nf}
+                      </span>
+                      <span role="cell" className="tx-mono">
+                        {lt.placa}
+                      </span>
+                      <span role="cell" className="tx-mono">
+                        {lt.data}
+                      </span>
+                      <span role="cell" className={lt.casou ? 'tx-peso-700' : 'tx-viagens-lote__sem'}>
+                        {lt.viagem}
+                      </span>
+                      <span role="cell">
+                        {lt.casou ? <Situacao tom={lt.sitTom}>{lt.sitRot}</Situacao> : <span className="tx-apagado">fica fora</span>}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div className="tx-tipo-denso tx-sec">{v.loteResumo}</div>
+                {v.loteAlertas ? (
+                  <Aviso
+                    tom="aviso"
+                    titulo={
+                      v.loteAlertas === 1
+                        ? '1 viagem não estava pronta ao carregar.'
+                        : v.loteAlertas + ' viagens não estavam prontas ao carregar.'
+                    }
+                  >
+                    Confira se o DACTE saiu sem a declaração GMP+. Elas aparecem destacadas na lista.
+                  </Aviso>
+                ) : null}
+              </>
+            ) : null}
+          </Modal>
         ) : null}
       </div>
     );
