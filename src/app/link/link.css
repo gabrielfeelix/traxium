@@ -199,3 +199,7 @@ textarea.lk-campo { padding: 12px 14px; min-height: 88px; resize: vertical; line
   background: var(--texto); color: #fff; font-size: 14px; font-weight: 600; border-radius: 14px; padding: 12px 14px; line-height: 1.4;
   box-shadow: 0 10px 30px rgba(9, 34, 36, .3); animation: subir .2s ease;
 }
+
+/* No celular a barra de rolagem não aparece: some também dentro da moldura do protótipo. */
+html:has(.lk-pagina) { scrollbar-width: none; }
+html:has(.lk-pagina)::-webkit-scrollbar { display: none; }
