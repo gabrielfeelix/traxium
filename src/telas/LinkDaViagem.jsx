@@ -67,6 +67,12 @@ const DESENHO = {
     </>
   ),
   seta: <path d="M6 3.5 10.5 8 6 12.5" />,
+  editar: (
+    <>
+      <path d="M10.4 2.4l3.2 3.2L6.2 13H3v-3.2z" />
+      <path d="M8.8 4l3.2 3.2" />
+    </>
+  ),
   calendario: (
     <>
       <rect x="2.5" y="3.2" width="11" height="10.3" rx="2.4" />
@@ -216,6 +222,7 @@ export default class LinkDaViagem extends Tela {
     fila: [],
     camera: null,
     seletor: null,
+    dataFolha: null,
     aberto: null,
     realce: null,
     toast: null,
@@ -285,7 +292,10 @@ export default class LinkDaViagem extends Tela {
       this.setState({ fila });
       return;
     }
-    TX.fazer(tipo, d);
+    const r = TX.tentar(tipo, d);
+    // Recusa do servidor: o motorista vê o motivo em vez de a etapa sumir sem aviso.
+    if (!r.ok && tipo !== 'linkAberto') this.avisar('Não foi possível enviar: ' + r.motivo);
+    return r.ok;
   }
   setOffline(off) {
     if (!off && this.state.fila.length) {
@@ -785,12 +795,6 @@ export default class LinkDaViagem extends Tela {
     const linhaOk = (linhas, i) => !!(linhas[i].data && (linhas[i].texto || '').trim() && !erroData(linhas, i));
     const ontem = TX.addDias(v.data, -1);
     const ROT = ['Última carga', 'Penúltima', 'Antepenúltima'];
-    const RAPIDAS = [
-      ['Ontem', 1],
-      ['Há 3 dias', 3],
-      ['Há 1 semana', 7],
-      ['Há 2 semanas', 14],
-    ];
     const corpo = (
       <>
         {jaEnviado ? (
@@ -838,7 +842,6 @@ export default class LinkDaViagem extends Tela {
                   const ed = erroData(linhas, i);
                   const cima = linhas[i - 1];
                   const limite = cima && cima.data && cima.data < ontem ? TX.addDias(cima.data, -1) : ontem;
-                  const rapidas = RAPIDAS.map(([n, d]) => [n, TX.addDias(TX.HOJE, -d)]).filter(([, d]) => d <= limite);
                   let msg = null;
                   if (ed) msg = <div className="lk-erro">{ed}</div>;
                   else if (pr && pr.regime === 'X') msg = <div className="lk-erro">Carga proibida para quem leva ração. O afretador vai falar com você.</div>;
@@ -860,22 +863,27 @@ export default class LinkDaViagem extends Tela {
                       >
                         <span className="lk-escolha-ic">{icone(l.texto ? 'ok' : 'busca', 18)}</span>
                         <span className="lk-escolha-t">{l.texto || 'Escolher o que carregou'}</span>
-                        <span className="lk-escolha-seta">{icone('seta', 18)}</span>
+                        <span className="lk-escolha-acao" data-k={l.texto ? 'editar' : 'abrir'}>
+                          {l.texto ? icone('editar', 18) : icone('seta', 18)}
+                        </span>
+                        {l.texto ? <span className="tx-so-leitor">, tocar para trocar</span> : null}
                       </button>
                       {msg}
-                      <div className="lk-datas" role="group" aria-label={'Quando foi a ' + ROT[i].toLowerCase()}>
-                        {(l.data ? [] : rapidas).map(([n, d]) => (
-                          <button type="button" key={n} className="lk-sug" aria-pressed={l.data === d} onClick={() => this.setT3(c.key, i, { data: d })} data-tx-t3-rapida={key}>
-                            {n}
-                          </button>
-                        ))}
-                        <label className="lk-data">
-                          <span className="lk-data-ic">{icone('calendario', 18)}</span>
-                          <span className="tx-so-leitor">Data da {ROT[i].toLowerCase()}</span>
-                          <input type="date" value={l.data || ''} max={limite} onChange={(e) => this.setT3(c.key, i, { data: e.target.value })} data-tx-t3-data={key} />
-                          <span className="lk-data-t">{l.data ? F.data(l.data).slice(0, 5) + ', ' + F.relativo(l.data) + ' (trocar)' : 'Outra data'}</span>
-                        </label>
-                      </div>
+                      <button
+                        type="button"
+                        className="lk-escolha lk-escolha-data"
+                        data-vazio={l.data ? undefined : '1'}
+                        aria-haspopup="dialog"
+                        aria-label={'Data da ' + ROT[i].toLowerCase() + ': ' + (l.data ? F.data(l.data) + ', tocar para trocar' : 'escolher')}
+                        onClick={() => this.setState({ dataFolha: { key, k: c.key, i, rot: ROT[i].toLowerCase(), limite, sel: l.data || null, mes: (l.data || limite).slice(0, 7) } })}
+                        data-tx-t3-data={key}
+                      >
+                        <span className="lk-escolha-ic">{icone('calendario', 18)}</span>
+                        <span className="lk-escolha-t">{l.data ? F.data(l.data).slice(0, 5) + ', ' + F.relativo(l.data) : 'Quando foi?'}</span>
+                        <span className="lk-escolha-acao" data-k={l.data ? 'editar' : 'abrir'}>
+                          {l.data ? icone('editar', 18) : icone('seta', 18)}
+                        </span>
+                      </button>
                     </li>
                   );
                 })}
@@ -906,6 +914,134 @@ export default class LinkDaViagem extends Tela {
         prox();
       },
     };
+  }
+
+  // Folha de baixo para a data: atalhos com a data escrita, calendário do mês e confirmar.
+  folhaData() {
+    const fd = this.state.dataFolha;
+    if (!fd) return null;
+    const F = TX.fmt;
+    const set = (o) => this.setState({ dataFolha: Object.assign({}, fd, o) });
+    const fechar = () => this.setState({ dataFolha: null });
+    const RAPIDAS = [
+      ['Ontem', 1],
+      ['Há 3 dias', 3],
+      ['Há 1 semana', 7],
+      ['Há 2 semanas', 14],
+    ];
+    const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+    const [ano, mes] = fd.mes.split('-').map(Number);
+    const primeiro = new Date(Date.UTC(ano, mes - 1, 1));
+    const diasNoMes = new Date(Date.UTC(ano, mes, 0)).getUTCDate();
+    const vazios = primeiro.getUTCDay();
+    const iso = (d) => fd.mes + '-' + String(d).padStart(2, '0');
+    const mesAnt = new Date(Date.UTC(ano, mes - 2, 1)).toISOString().slice(0, 7);
+    const mesProx = new Date(Date.UTC(ano, mes, 1)).toISOString().slice(0, 7);
+    const podeProx = mesProx <= fd.limite.slice(0, 7);
+    const celulas = [];
+    for (let j = 0; j < vazios; j++) celulas.push(null);
+    for (let d = 1; d <= diasNoMes; d++) celulas.push(iso(d));
+    return (
+      <div className="lk-veu" onClick={fechar}>
+        <div className="lk-folha" role="dialog" aria-modal="true" aria-label="Quando foi essa carga?" onClick={(e) => e.stopPropagation()} data-tx-folha-data="">
+          <span className="lk-folha-alca" aria-hidden />
+          <div className="lk-folha-cab">
+            <div style={{ flex: 1 }}>
+              <div className="lk-tit-p">Quando foi essa carga?</div>
+              <div className="lk-dica">{fd.rot.charAt(0).toUpperCase() + fd.rot.slice(1)}, antes de {F.data(TX.addDias(fd.limite, 1))}</div>
+            </div>
+            <button type="button" className="lk-bt lk-bt-txt" onClick={fechar}>
+              Fechar
+            </button>
+          </div>
+          <div className="lk-folha-corpo">
+            <ul className="lk-lista">
+              {RAPIDAS.map(([n, d]) => {
+                const dt = TX.addDias(TX.HOJE, -d);
+                const ok = dt <= fd.limite;
+                return (
+                  <li key={n}>
+                    <button
+                      type="button"
+                      className="lk-lista-i"
+                      aria-pressed={fd.sel === dt}
+                      disabled={!ok}
+                      onClick={() => set({ sel: dt, mes: dt.slice(0, 7) })}
+                      data-tx-data-rapida={d}
+                    >
+                      <span className="lk-lista-t" style={{ flex: 1 }}>
+                        {n}
+                      </span>
+                      <span className="lk-lista-sub" style={{ marginTop: 0 }}>
+                        {F.extenso(dt)}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+            <div className="lk-cal" data-tx-calendario="">
+              <div className="lk-cal-cab">
+                <button type="button" className="lk-cal-nav" aria-label="Mês anterior" onClick={() => set({ mes: mesAnt })} data-tx-mes-ant="">
+                  <span style={{ display: 'flex', transform: 'rotate(180deg)' }}>{icone('seta', 18)}</span>
+                </button>
+                <div className="lk-cal-mes">
+                  {MESES[mes - 1]} {ano}
+                </div>
+                <button type="button" className="lk-cal-nav" aria-label="Próximo mês" disabled={!podeProx} onClick={() => set({ mes: mesProx })} data-tx-mes-prox="">
+                  {icone('seta', 18)}
+                </button>
+              </div>
+              <div className="lk-cal-grade" aria-hidden>
+                {['D', 'S', 'T', 'Q', 'Q', 'S', 'S'].map((d, j) => (
+                  <span key={j} className="lk-cal-sem">
+                    {d}
+                  </span>
+                ))}
+              </div>
+              <div className="lk-cal-grade" role="grid">
+                {celulas.map((d, j) =>
+                  d ? (
+                    <button
+                      type="button"
+                      key={d}
+                      className="lk-cal-dia"
+                      disabled={d > fd.limite}
+                      aria-pressed={fd.sel === d}
+                      data-hoje={d === TX.HOJE ? '1' : undefined}
+                      aria-label={F.extenso(d) + (d === TX.HOJE ? ', hoje' : '') + (d > fd.limite ? ', não pode' : '')}
+                      onClick={() => set({ sel: d })}
+                      data-tx-dia={d}
+                    >
+                      {+d.slice(8)}
+                    </button>
+                  ) : (
+                    <span key={'v' + j} />
+                  ),
+                )}
+              </div>
+              <div className="lk-dica" style={{ marginTop: 8 }}>
+                <span className="lk-cal-legenda" aria-hidden /> hoje. Dias apagados não podem: a carga tem que ser antes da de cima.
+              </div>
+            </div>
+          </div>
+          <button
+            type="button"
+            className="lk-bt lk-bt-pri lk-bt-bloco"
+            style={{ marginTop: 12 }}
+            data-pronto={fd.sel ? undefined : 'nao'}
+            onClick={() => {
+              if (!fd.sel) return;
+              this.setT3(fd.k, fd.i, { data: fd.sel });
+              this.setState({ dataFolha: null });
+            }}
+            data-tx-data-confirmar=""
+          >
+            {fd.sel ? 'Usar ' + F.extenso(fd.sel) : 'Escolha um dia'}
+          </button>
+        </div>
+      </div>
+    );
   }
 
   // Folha de baixo para escolher o produto: comuns em atalho, busca por nome e apelido, e "não achei".
@@ -1602,8 +1738,9 @@ export default class LinkDaViagem extends Tela {
                   className="lk-bt lk-bt-pri lk-bt-bloco"
                   style={{ marginTop: 16 }}
                   onClick={() => {
-                    TX.fazer('enviarLink', { id: v.id, canal: 'copiado' });
-                    TX.fazer('linkAberto', { id: v.id, porMotorista: true });
+                    const r = TX.tentar('enviarLink', { id: v.id, canal: 'copiado' });
+                    if (!r.ok) return this.avisar('Demonstração: o usuário do escritório não pode enviar o link (' + r.motivo + ') Entre como afretador.');
+                    TX.tentar('linkAberto', { id: v.id, porMotorista: true });
                   }}
                   data-tx-simular-envio=""
                 >
@@ -1641,6 +1778,7 @@ export default class LinkDaViagem extends Tela {
           ) : null}
 
           {this.folhaProduto()}
+          {this.folhaData()}
 
           {cam ? (
             <div className="lk-camera" role="dialog" aria-modal="true" aria-label={'Câmera: ' + cam.titulo} data-tx-camera={cam.fase}>

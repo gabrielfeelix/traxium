@@ -75,8 +75,8 @@ A etapa de documentos continua na lista depois de enviada, para a contagem "Etap
 
 - **Objetivo:** as três últimas cargas de cada compartimento, da mais recente para a mais antiga.
 - **Linha do tempo:** três pontos ligados ("Última carga", "Penúltima", "Antepenúltima"), cada um verde quando completo.
-- **O que carregou:** campo com aspecto de seleção (lupa e seta). Tocar abre uma folha de baixo com busca por nome e apelido da base IDTF ("casquinha" acha casca de soja peletizada), atalhos das cargas mais comuns e, em cada resultado, a categoria de limpeza. "Não achei o produto" guarda o texto como escrito e marca para classificação ("Fora da lista: vai como você escreveu e a transportadora confere").
-- **Quando:** atalhos "Ontem", "Há 3 dias", "Há 1 semana", "Há 2 semanas" (só os que cabem antes da carga de cima) e "Outra data", que abre o calendário do celular. Com data escolhida, mostra "26/09, há 12 dias (trocar)".
+- **O que carregou:** campo com aspecto de seleção: vazio, lupa e seta; preenchido, um lápis de editar. Tocar abre uma folha de baixo com busca por nome e apelido da base IDTF ("casquinha" acha casca de soja peletizada), atalhos das cargas mais comuns e, em cada resultado, a categoria de limpeza. "Não achei o produto" guarda o texto como escrito e marca para classificação ("Fora da lista: vai como você escreveu e a transportadora confere").
+- **Quando:** campo "Quando foi?" que abre uma folha de baixo "Quando foi essa carga?": atalhos grandes (Ontem, Há 3 dias, Há 1 semana, Há 2 semanas, cada um com a data escrita), calendário do mês com dias de 44 px, hoje marcado e dias não permitidos apagados (a data tem que ser antes desta carga e antes da carga de cima), e "Usar <data>" para confirmar. Campo preenchido mostra "26/09, há 12 dias" com um lápis; vazio, mostra a seta.
 - Carga proibida rola até a mensagem de erro, que nunca fica atrás do rodapé.
 - **Pré-preenchimento:** quando o sistema conhece o histórico do compartimento, as linhas vêm preenchidas para conferir.
 - **Atalho:** a partir da segunda carreta, "Carregou o mesmo que a <placa>".

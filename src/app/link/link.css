@@ -319,3 +319,30 @@ html:has(.lk-pagina)::-webkit-scrollbar { display: none; }
 /* O erro nunca fica atrás do rodapé fixo */
 .lk-tl-i, .lk-item, .lk-feito { scroll-margin-bottom: 96px; }
 .lk-corpo { padding-bottom: 32px; }
+
+/* Campo de escolha: seta quando vazio (abre), lápis quando preenchido (editar) */
+.lk-escolha-acao { display: flex; flex: none; color: var(--texto-apagado); }
+.lk-escolha-acao[data-k="abrir"] { transform: rotate(90deg); }
+.lk-escolha-acao[data-k="editar"] { color: var(--primario); }
+.lk-escolha-data { min-height: 48px; font-size: 14px; }
+.lk-escolha-data .lk-escolha-ic { color: var(--primario); }
+
+/* Folha da data */
+.lk-lista-i[aria-pressed="true"] { border-color: var(--primario); background: var(--primario-fraco); }
+.lk-lista-i:disabled { opacity: .45; cursor: not-allowed; }
+.lk-cal { margin-top: 16px; }
+.lk-cal-cab { display: flex; align-items: center; gap: 8px; }
+.lk-cal-mes { flex: 1; text-align: center; font-size: 16px; font-weight: 800; text-transform: capitalize; }
+.lk-cal-nav { width: 44px; height: 44px; border-radius: 12px; border: 1.5px solid var(--borda-campo); background: #fff; color: var(--texto); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.lk-cal-nav:disabled { opacity: .35; cursor: not-allowed; }
+.lk-cal-grade { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-top: 6px; }
+.lk-cal-sem { text-align: center; font-size: 12px; font-weight: 800; color: var(--texto-apagado); }
+.lk-cal-dia {
+  height: 44px; border-radius: 12px; border: 0; background: none; font: inherit; font-size: 16px; font-weight: 700; color: var(--texto);
+  cursor: pointer; font-variant-numeric: tabular-nums;
+}
+.lk-cal-dia:disabled { color: var(--texto-desab); font-weight: 500; cursor: not-allowed; }
+.lk-cal-dia[data-hoje="1"] { box-shadow: inset 0 0 0 2px var(--aviso-2); }
+.lk-cal-dia[aria-pressed="true"] { background: var(--primario); color: #fff; }
+.lk-cal-dia:focus-visible, .lk-cal-nav:focus-visible { outline: none; box-shadow: var(--foco); }
+.lk-cal-legenda { display: inline-block; width: 12px; height: 12px; border-radius: 4px; box-shadow: inset 0 0 0 2px var(--aviso-2); vertical-align: -2px; }

@@ -103,11 +103,33 @@ const OPS_DO_LINK = ['enviarLink', 'linkAberto', 'linkCpf', 'linkDocs', 'linkT3'
 function lerLS(k: string) { try { return localStorage.getItem(k); } catch { return null; } }
 function gravarLS(k: string, v: string | null) { try { if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch { /* sem armazenamento */ } }
 
-function preparar(c: (typeof CENARIOS)[number]) {
-  if (!c.preparo) return;
+// Prepara o exemplo sem depender de quem está logado: a montagem é da demonstração, não de uma pessoa.
+// O motor não tem caminho de sistema (pedido em docs/ds/pendencias.md, "mobile:"), então:
+// 1) tenta como a sessão; 2) recusado, grava no log como "sistema", do mesmo jeito que "Reiniciar"
+// apaga; 3) sem log para gravar, devolve o motivo para a página explicar.
+function preparar(c: (typeof CENARIOS)[number]): string | null {
+  if (!c.preparo) return null;
   const ja = TX.ops.some((o: Op) => o.dados && o.dados.cenario === c.id);
-  if (ja) return;
-  c.preparo.forEach(o => TX.fazer(o.tipo, Object.assign({ cenario: c.id }, o.dados)));
+  if (ja) return null;
+  const pendentes: Op[] = [];
+  let motivo: string | null = null;
+  c.preparo.forEach(o => {
+    const dados = Object.assign({ cenario: c.id }, o.dados);
+    const r = TX.tentar(o.tipo, dados);
+    if (!r.ok) { pendentes.push({ tipo: o.tipo, dados }); motivo = r.motivo; }
+  });
+  if (!pendentes.length) return null;
+  try {
+    const raw = JSON.parse(lerLS('tx-v2') || 'null');
+    if (!raw || !Array.isArray(raw.ops)) throw new Error('sem log');
+    const em = TX.HOJE + 'T' + TX.agoraHM();
+    pendentes.forEach(o => raw.ops.push({ tipo: o.tipo, dados: o.dados, em, por: 'sistema' }));
+    gravarLS('tx-v2', JSON.stringify(raw));
+    TX.recarregar();
+    return null;
+  } catch {
+    return motivo;
+  }
 }
 
 // Tira do log tudo o que o link e a conferência gravaram nesta viagem e o que o cenário preparou.
@@ -126,7 +148,7 @@ function reiniciar(c: (typeof CENARIOS)[number]) {
   gravarLS('tx-v2-fila-' + c.id, null);
   gravarLS('tx-v2-rascunho-' + c.id, null);
   TX.recarregar();
-  preparar(c);
+  return preparar(c);
 }
 
 const ALTURA_TELA = 844;
@@ -149,8 +171,9 @@ export function PrototipoMobile() {
   const avisar = (m: string) => window.dispatchEvent(new CustomEvent('tx-aviso', { detail: m }));
 
   // Prepara os cenários (só o que a semente não tem, uma vez) antes de o celular abrir a viagem.
-  useEffect(() => { CENARIOS.forEach(preparar); }, []);
-  useEffect(() => { preparar(cen); gravarLS('tx-mobile-cenario', cen.k); }, [cen]);
+  const [recusa, setRecusa] = useState<string | null>(null);
+  useEffect(() => { CENARIOS.forEach(c => preparar(c)); }, []);
+  useEffect(() => { setRecusa(preparar(cen)); gravarLS('tx-mobile-cenario', cen.k); }, [cen]);
 
   useEffect(() => {
     const off = TX.ouvir((v: number) => setVersao(v));
@@ -185,7 +208,7 @@ export function PrototipoMobile() {
     setCen(c);
   };
   const reiniciarLink = () => {
-    reiniciar(cen);
+    setRecusa(reiniciar(cen));
     setEstado(null);
     setRecarga(x => x + 1);
     avisar('Link de ' + cen.id + ' voltou ao começo do exemplo. A mesa da filial já mostra.');
@@ -266,6 +289,11 @@ export function PrototipoMobile() {
               <h2 id="mb-cen-t" className="mb-h2">Viagem de exemplo</h2>
               <span className="mb-dica">cada uma em uma situação</span>
             </div>
+            {recusa ? (
+              <div className="mb-nota" role="status" data-tx-mb-recusa="" style={{ marginTop: 0, marginBottom: 12 }}>
+                Não deu para montar o exemplo &quot;{cen.t}&quot; com o usuário atual ({recusa}). Entre como afretador ou qualidade pelo menu do avatar, em &quot;Entrar como&quot;, e escolha o exemplo de novo.
+              </div>
+            ) : null}
             <div className="mb-cenarios" role="radiogroup" aria-labelledby="mb-cen-t">
               {CENARIOS.map(c => {
                 const on = c.k === cen.k;

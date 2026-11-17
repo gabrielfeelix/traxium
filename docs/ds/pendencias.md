@@ -107,3 +107,4 @@ API nova descrita no topo de `src/lib/tx/tx-dados.js`. O motor já recusa; as te
 - ds2: `Combobox` (seleção múltipla com busca, pedida em Cadastros para participantes de treinamento) ainda não existe. Saída provisória: `CampoBusca` + lista de `Checkbox` com "Selecionar todos da frota própria".
 - ds2: `Tabela` não virtualiza; para a base IDTF acima de 500 linhas, paginar com `Paginacao` (50 por página).
 - ds2: `TabelaCabecalho` com filhos `<span>` simples continua sem `role="columnheader"`; trocar por `TabelaColuna` ao mexer na tela.
+- viagem: e2e (scripts/e2e-ui.cjs linha 23 e linha 71): `pg.click` num `Botao inativo` (aria-disabled="true") espera o botão ficar habilitado e estoura o tempo; o padrão "Falta:" pede o clique. Os scripts precisam de `{ force: true }` nesses cliques.
