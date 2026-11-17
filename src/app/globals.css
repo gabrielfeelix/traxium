@@ -16,9 +16,12 @@
   --painel: #ffffff;
   --superficie: #f7faf9;          /* recebe #fafcfb, #fbfdfc e #f7f9f8 (quase iguais) */
   --superficie-2: #f0f4f3;
-  --superficie-3: #e4eae8;        /* hover do botão secundário e do fechar; recebe #e4ebe9 */
+  --superficie-3: #e4eae8;        /* hover do botão secundário e do fechar; recebe #e4ebe9. Mesmo valor de --borda
+                                     por decisão (17/11/2026): são tokens independentes, um é superfície e o outro
+                                     borda; podem divergir sem mexer no outro. Não use um no lugar do outro. */
   --superficie-hover: #f6f9f8;    /* hover de linha e de item de menu */
   --veu: rgba(9, 34, 36, 0.45);   /* fundo atrás de modal e drawer */
+  --veu-leve: rgba(9, 34, 36, 0.24); /* atrás do drawer e do Confirmar: só escurece, sem desfoque (ds2) */
 
   /* ------------------------------------------------------------ bordas */
   --borda-suave: #eef2f1;
@@ -48,6 +51,12 @@
   --azul: #0e78b5;
   --primario-fraco: #eef7f6;      /* recebe #f3faf8 (linha selecionada) */
   --primario-borda: #cfe3e1;      /* borda do código em pílula e do papel */
+  /* Avatar de pessoa (ds2): quatro tons neutros da família da marca, escolhidos pelo nome. Nenhum é cor
+     de situação; texto 4,5:1 ou mais sobre o fundo. */
+  --avatar-1-fundo: #e3efee; --avatar-1-texto: #093d44;
+  --avatar-2-fundo: #e6ebef; --avatar-2-texto: #2f4250;
+  --avatar-3-fundo: #ebeee6; --avatar-3-texto: #3d4a2f;
+  --avatar-4-fundo: #eeeaea; --avatar-4-texto: #4a3d3d;
   --degrade-primario: linear-gradient(135deg, #127670, #0e78b5);
   --degrade-escuro: linear-gradient(130deg, var(--primario-3), var(--primario-2) 55%, var(--azul) 130%);
 
@@ -179,6 +188,7 @@
   --z-drawer: 900;
   --z-modal: 1000;
   --z-toast: 1200;
+  --z-flutuante: 1100;  /* menu de linha e dica (Termo): acima de drawer e modal, abaixo do toast (ds2) */
 
   /* ------------------------------------------------------------ movimento */
   --dur-rapida: 0.15s;  /* hover, cor, borda */

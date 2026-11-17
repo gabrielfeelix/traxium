@@ -1,0 +1,46 @@
+/*
+ * Configurações: abas verticais, uma seção por vez. Classes tx-cfg-*, valores só por token.
+ */
+.tx-cfg-grade { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: var(--esp-5); align-items: start; }
+.tx-cfg-nav { position: sticky; top: var(--esp-6); display: flex; flex-direction: column; gap: var(--esp-0-5); }
+.tx-cfg-nav__item {
+  display: flex; align-items: center; min-height: var(--controle-m); padding: 0 var(--esp-3); border: none; border-radius: var(--raio-m);
+  background: transparent; font: var(--tipo-corpo); font-weight: 700; color: var(--texto-2); text-align: left; cursor: pointer;
+}
+.tx-cfg-nav__item:hover { color: var(--texto); background: var(--superficie-2); }
+.tx-cfg-nav__item[aria-current='true'] { background: var(--painel); color: var(--primario-2); box-shadow: var(--sombra-xs), inset 3px 0 0 var(--primario); }
+
+.tx-cfg-pessoa { display: flex; align-items: center; gap: var(--esp-2-5); min-width: 0; }
+/* Iniciais neutras: pessoa não tem cor própria (cor é estado). */
+.tx-cfg-ini {
+  flex: none; width: 28px; height: 28px; border-radius: var(--raio-pilula); display: inline-flex; align-items: center; justify-content: center;
+  background: var(--primario-fraco); color: var(--primario-3); font: var(--tipo-legenda); font-weight: 800;
+}
+.tx-cfg-ini--convite { background: var(--painel); border: 1px dashed var(--borda-controle); color: var(--texto-apagado); }
+.tx-cfg-fim { display: flex; justify-content: flex-end; align-items: center; }
+.tx-cfg-seta { color: var(--texto-apagado); }
+.tx-tabela__linha[role='button']:hover .tx-cfg-seta, .tx-tabela__linha--clicavel:hover .tx-cfg-seta { color: var(--primario); }
+
+/* Controle segmentado: Bloqueia ou Só alerta */
+.tx-cfg-seg { display: inline-flex; padding: var(--esp-0-5); gap: var(--esp-0-5); background: var(--superficie-2); border-radius: var(--raio-m); }
+.tx-cfg-seg__op {
+  height: var(--controle-p); padding: 0 var(--esp-3); border: none; border-radius: var(--raio-p); background: none; cursor: pointer;
+  font: var(--tipo-denso); font-weight: 700; color: var(--texto-sec);
+}
+.tx-cfg-seg__op:hover { color: var(--texto); }
+.tx-cfg-seg__op[aria-checked='true'] { background: var(--painel); color: var(--texto); box-shadow: var(--sombra-xs); cursor: default; }
+.tx-cfg-seg__op[aria-checked='true'][data-tx-classe='bloqueio'] { color: var(--perigo); }
+.tx-cfg-seg__op[aria-checked='true'][data-tx-classe='alerta'] { color: var(--aviso); }
+.tx-cfg-seg__op[aria-disabled='true'] { color: var(--texto-desab); cursor: not-allowed; }
+.tx-cfg-trava { display: inline-flex; align-items: center; gap: var(--esp-1-5); font: var(--tipo-legenda); color: var(--texto-sec); }
+
+.tx-cfg-abrir { padding: 0; border: none; background: none; cursor: pointer; font: var(--tipo-denso); font-weight: 700; color: var(--texto); text-align: left; }
+.tx-cfg-abrir:hover { color: var(--primario-2); text-decoration: underline; text-underline-offset: 3px; }
+.tx-cfg-previa { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.tx-cfg-modelo { font: var(--tipo-corpo); line-height: var(--lh-paragrafo); color: var(--texto-2); background: var(--painel); border: 1px solid var(--borda); border-radius: var(--raio-m); padding: var(--esp-4); white-space: pre-wrap; }
+.tx-cfg-texto { margin: 0; font: var(--tipo-denso); line-height: var(--lh-paragrafo); color: var(--texto-sec); max-width: 640px; }
+.tx-cfg-zona { margin-top: var(--esp-4); padding-top: var(--esp-4); border-top: 1px solid var(--borda); }
+/* Ação destrutiva leve: contorno com texto de perigo (proposta: Botao variante "perigo-contorno"). */
+.tx-botao--contorno.tx-cfg-perigo { color: var(--perigo); border-color: var(--perigo-borda); }
+.tx-botao--contorno.tx-cfg-perigo:hover { background: var(--perigo-fundo); border-color: var(--perigo); }
+.tx-cfg-secoes { display: flex; flex-direction: column; gap: var(--esp-4); min-width: 0; }

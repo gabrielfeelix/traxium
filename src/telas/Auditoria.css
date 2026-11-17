@@ -1,0 +1,55 @@
+/*
+ * Auditoria: área de pesquisa e relatório. Barra de busca clara, tabela de largura total,
+ * listas de apoio em faixa e barra fixa da amostra. Classes tx-aud-*, valores só por token.
+ */
+.tx-aud-busca {
+  display: flex; align-items: center; gap: var(--esp-2-5); flex-wrap: wrap; padding: var(--esp-3);
+  background: var(--painel); border: 1px solid var(--borda); border-radius: var(--raio-xg);
+}
+.tx-aud-campo { flex: 1; min-width: 260px; height: 48px; border-color: transparent; background: var(--superficie); }
+.tx-aud-campo > input { font-family: var(--fonte-mono); font-size: var(--fs-titulo); }
+
+.tx-aud-pop-ancora { position: relative; display: inline-flex; }
+.tx-aud-pop {
+  position: absolute; left: 0; top: calc(100% + var(--esp-1-5)); width: 300px; padding: var(--esp-1-5); z-index: var(--z-pop);
+  background: var(--painel); border: 1px solid var(--borda); border-radius: var(--raio-g); box-shadow: var(--sombra-m);
+  display: flex; flex-direction: column; gap: var(--esp-0-5);
+}
+.tx-aud-pop--dir { left: auto; right: 0; width: 380px; }
+.tx-aud-pop__op {
+  display: flex; align-items: center; gap: var(--esp-2-5); min-height: var(--controle-p); padding: var(--esp-1-5) var(--esp-2-5); width: 100%;
+  border: none; background: none; border-radius: var(--raio-p); font: var(--tipo-denso); font-weight: 600; color: var(--texto); text-align: left; cursor: pointer;
+}
+.tx-aud-pop__op:hover { background: var(--superficie-hover); }
+.tx-aud-pop__op[aria-pressed='true'] { font-weight: 800; background: var(--primario-fraco); }
+.tx-aud-pop__sub { margin-left: auto; font: var(--tipo-legenda); font-family: var(--fonte-mono); font-weight: 400; color: var(--texto-apagado); }
+.tx-aud-pop__datas { margin-top: var(--esp-1); padding: var(--esp-2-5); border-top: 1px solid var(--superficie-2); }
+.tx-aud-pop__datas .tx-entrada { width: 124px; }
+
+.tx-aud-faixa { display: flex; align-items: center; gap: var(--esp-3); flex-wrap: wrap; padding: 0 var(--esp-1); }
+.tx-aud-faixa__fim { margin-left: auto; display: flex; align-items: center; gap: var(--esp-2); }
+.tx-aud-sims { display: flex; align-items: center; gap: var(--esp-2) var(--esp-4); flex-wrap: wrap; padding: 0 var(--esp-1); }
+.tx-aud-sim { display: inline-flex; align-items: center; gap: var(--esp-2); font: var(--tipo-legenda); font-weight: 400; }
+
+/* Listas de apoio: o que o auditor pede na mesma visita, em faixa de quatro. */
+.tx-aud-apoio { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--esp-2-5); }
+.tx-aud-apoio__item {
+  display: flex; align-items: center; gap: var(--esp-2); flex-wrap: wrap; padding: var(--esp-3) var(--esp-4); scroll-margin-top: var(--esp-6);
+  background: var(--painel); border: 1px solid var(--borda); border-radius: var(--raio-g);
+}
+.tx-aud-apoio__texto { flex: 1 0 100%; min-width: 0; }
+.tx-aud-apoio__item--destaque { border-color: var(--primario); box-shadow: 0 0 0 3px var(--primario-fraco); }
+
+.tx-aud-tabela .tx-tabela__cab, .tx-aud-tabela .tx-tabela__linha { gap: var(--esp-3); }
+.tx-aud-tabela .tx-tabela__cab { position: sticky; top: 0; z-index: var(--z-fixo); }
+.tx-aud-abrir {
+  padding: 0; border: none; background: none; cursor: pointer; font: var(--tipo-denso); font-family: var(--fonte-mono); font-weight: 700; color: var(--texto);
+}
+.tx-aud-abrir:hover { color: var(--primario-2); text-decoration: underline; text-underline-offset: 3px; }
+.tx-aud-falta { color: var(--perigo); font-weight: 700; }
+.tx-aud-aviso { color: var(--aviso); }
+.tx-aud-secao { margin: var(--esp-3) 0 0; font: var(--tipo-rotulo); letter-spacing: var(--ls-rotulo); text-transform: uppercase; color: var(--texto-apagado); }
+
+@media (max-width: 1280px) {
+  .tx-aud-apoio { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

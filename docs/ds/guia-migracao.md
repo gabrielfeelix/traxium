@@ -569,3 +569,182 @@ TX_BASE=http://localhost:3000 node scripts/capturar.cjs /tmp/claude-1000/<tela>-
 ```
 
 Os quatro números devem cair a zero (ou ao que está em pendências). As capturas de antes e depois devem diferir só pelo que está na seção 9.
+
+## 11. Peças da revisão de UX (ds2, 17/11/2026)
+
+Pedidas em `docs/revisao-telas/12-revisao-ux.md` (Top 1, 3, 5, 8, 9, 10; U115 a U118). Todas saem de `@/components/ui` e estão vivas em `/design-system`, seção 06. Mudanças que valem para quem já usava:
+
+- `Toast` mudou de arquivo (`toast.tsx`); o import por `@/components/ui` continua igual.
+- `CabecalhoPagina` mudou de arquivo (`cabecalho.tsx`); sem `variante`, desenha como antes.
+- `Drawer` não desfoca mais o fundo: o véu é `--veu-leve` (24 %). Abre igual.
+- `Cartao lista` usa `overflow: clip` (antes `hidden`), para o cabeçalho fixo da Tabela grudar dentro dele. O recorte do canto continua.
+- `Entrada` e `AreaTexto` aceitam `ref`.
+
+### 11.1 Toast com Desfazer e `avisar`
+
+Antes (Transportadores, "Revogar"): executa no clique e só avisa.
+
+```jsx
+TX.fazer('revogarAcesso', { id }); TX.ui.avisar(this, 'Acesso de ' + t.nome + ' revogado. O histórico continua.');
+```
+
+Depois, ação reversível e barata: executa e dá Desfazer por 8 s.
+
+```jsx
+import { avisar } from '@/components/ui';
+TX.fazer('tirarDoEscopo', { placa, motivo });
+avisar({
+  texto: 'QBD 3E90 saiu do escopo GMP+.',
+  acao: { rotulo: 'Desfazer', aoClicar: () => TX.fazer('incluirNoEscopo', { placa }) },
+});
+```
+
+`avisar(o)` aceita `{ texto, tom?: 'ok' | 'erro' | 'info', acao?: { rotulo, aoClicar }, duracao? }` ou só a string, e devolve a função que fecha. Um toast por vez. Padrão: 4,2 s; 8 s com ação; o tempo para com ponteiro ou foco em cima; Esc fecha. `TX.ui.avisar(this, texto)` continua valendo para texto sem ação. Declarativo, para tela fora da moldura: `<Toast acao={...} aoFechar={...}>Texto</Toast>`.
+
+### 11.2 MenuLinha e Confirmar
+
+Antes (Frota): `<span role="button" style={{ color: '#c43d3d' }} onClick={...}>Tirar do escopo</span>` na linha.
+Depois: a ação vai para o menu da linha, depois de um separador, e confirma com motivo.
+
+```jsx
+import { MenuLinha, Confirmar } from '@/components/ui';
+<MenuLinha
+  rotulo={'Ações de ' + placa}
+  itens={[
+    { rotulo: 'Ver histórico de cargas', icone: <IcHist />, aoSelecionar: () => v.irHistorico(placa) },
+    { rotulo: 'Editar conjunto', inativo: !TX.pode('editarConjunto', id), motivo: TX.porque('editarConjunto', id) },
+    'separador',
+    { rotulo: 'Tirar do escopo...', perigo: true, aoSelecionar: () => v.abrir('tirar', placa) },
+  ]}
+/>
+<Confirmar
+  aberto={s.modal === 'tirar'} aoFechar={v.fechar}
+  titulo={'Tirar ' + placa + ' do escopo GMP+?'} rotuloConfirmar="Tirar do escopo"
+  motivo={{ rotulo: 'Motivo', obrigatorio: true, dica: 'Vai para o registro de auditoria.' }}
+  aoConfirmar={(motivo) => v.tirar(placa, motivo)}
+>
+  Fora do escopo, o conjunto não faz viagem assegurada. Dá para incluir de novo depois.
+</Confirmar>
+```
+
+Regras: MenuLinha dentro de `TabelaLinha` com `onClick` (o clique no menu não abre a linha); nunca dentro de `TabelaLinha href`. Item que a pessoa não pode usar fica `inativo` com `motivo` (use `TX.porque`). Confirmar só para o irreversível ou o que avisa terceiros; o resto é Desfazer. O foco volta ao botão [...] quando o Confirmar fecha.
+
+### 11.3 Termo, SeloRegime e Dica
+
+Antes: `<span title="As três últimas cargas...">T-3</span>`, ou frase de subtítulo explicando o conceito.
+Depois:
+
+```jsx
+import { Termo, SeloRegime, Dica } from '@/components/ui';
+<Termo termo="T-3">três últimas cargas</Termo>   // só a primeira ocorrência na tela
+<SeloRegime regime="A" />                          // A, B, C, D, X ou '?'; palavra para "A seco"
+<Dica conteudo="Viagem completa: T-3, ..."><button className="tx-botao tx-botao--icone" aria-label="Como é calculado">i</button></Dica>
+```
+
+O texto vem só de `GLOSSARIO` (`src/components/ui/glossario.ts`). Chaves: `T-3`, `T-1`, `IDTF`, `regime`, `regime-A` a `regime-D`, `regime-X`, `regime-?`, `GMP+ FSA`, `TAC`, `ETC`, `RNTRC`, `CT-e`, `OC`, `certificadora`, `alcada`, `conjunto`, `compartimento`, `gatekeeper`, `escopo`, `bloqueio-tecnico`, `liberada-autoridade`. Faltou termo: acrescente lá, nunca na tela. "comunicado ao OC" vira "comunicado à certificadora".
+
+### 11.4 Tabela: ordenação, seleção, cabeçalho fixo, seta
+
+Antes: `<TabelaCabecalho><span>Transportador</span>...</TabelaCabecalho>` sem ordem; checkbox de `span`.
+Depois:
+
+```jsx
+import { TabelaCabecalho, TabelaColuna, CelulaSelecao, SetaLinha, BarraSelecao, proximaOrdem } from '@/components/ui';
+const col = (k) => ({ ordenavel: true, ordem: s.ordem.k === k ? s.ordem.o : null,
+  aoOrdenar: () => v.ordenar({ k, o: s.ordem.k === k ? proximaOrdem(s.ordem.o) : 'asc' }) });
+
+<TabelaCabecalho fixo>
+  <TabelaColuna><CelulaSelecao marcada={todas} misto={algumas} rotulo="Selecionar todas" aoMudar={v.marcarTodas} /></TabelaColuna>
+  <TabelaColuna {...col('carregamento')}>Carregamento</TabelaColuna>
+  <TabelaColuna>Placas</TabelaColuna>
+  <TabelaColuna rotuloLeitor="Ações" />
+</TabelaCabecalho>
+<TabelaLinha onClick={() => v.abrir(id)}>
+  <CelulaSelecao marcada={sel.has(id)} rotulo={'Pôr ' + ordem + ' na amostra'} aoMudar={(m) => v.marcar(id, m)} />
+  ...
+  <MenuLinha rotulo={'Ações de ' + ordem} itens={...} />
+  <SetaLinha />
+</TabelaLinha>
+<BarraSelecao quantidade={sel.size} texto={sel.size + ' viagens na amostra'} acoes={<Botao tamanho="p" variante="contorno">Exportar amostra</Botao>} aoLimpar={v.limpar} />
+```
+
+`aria-sort` sai sozinho. `TabelaCabecalho colunas={[{ k, rotulo, ordenavel, ordem, aoOrdenar }]}` é a forma por dados. Colunas de checkbox, menu e seta: 40px, 32px e 16px em `colunas`.
+
+### 11.5 BarraFiltros, Filtros, CampoBusca
+
+Antes: abas de visão + popover "Filtros" + chips soltos, cada um com estilo próprio.
+Depois, uma faixa:
+
+```jsx
+<BarraFiltros
+  busca={{ valor: s.q, aoMudar: v.buscar, placeholder: 'Buscar nome, CNPJ ou cidade' }}
+  filtros={[
+    { k: 'todos', rotulo: 'Todos', contagem: 4, ativo: s.f === 'todos', aoClicar: () => v.filtrar('todos') },
+    { k: 'vencer', rotulo: 'Documento a vencer', contagem: 2, alerta: true, ativo: s.f === 'vencer', aoClicar: () => v.filtrar('vencer') },
+  ]}
+  depois={<Segmentado rotulo="Tipo" valor={s.tipo} aoMudar={v.tipo} tamanho="p" opcoes={[{ k: 'tac', rotulo: 'TAC' }, { k: 'etc', rotulo: 'ETC' }]} />}
+  resultado={n + ' fornecedores'}
+  aoLimpar={algumFiltro ? v.limparFiltros : undefined}
+/>
+```
+
+Sem estado dentro: debounce de 150 ms e URL ficam na tela. Esc na busca limpa.
+
+### 11.6 CabecalhoPagina em três formas
+
+```jsx
+// mesa (Hoje do gestor e do afretador)
+<CabecalhoPagina variante="mesa" titulo="Bom dia, Rafael" data="quinta, 08/10/2026" filtro={<SeletorFilial />} acoes={<Botao variante="primario">Nova viagem</Botao>} />
+// lista (Viagens, Transportadores, Frota, Fornecedores): sem subtítulo
+<CabecalhoPagina variante="lista" titulo="Frota própria" contagem={6} busca={<CampoBusca ... />} acoes={...} filtros={<Filtros ... />} />
+// detalhe (Viagem, Compartimento): direto dentro de .tx-pagina
+<CabecalhoPagina variante="detalhe" fixo trilha={[{ rotulo: 'Viagens', href: '/viagens' }, { rotulo: 'OC 48130' }]}
+  titulo="OC 48130" estado={<Situacao tom="falta" forma="selo" />} meta="Farelo de soja, 37 t. Hoje 17:00." passos={<Passos />} acoes={...} />
+```
+
+Com `fixo`, o detalhe gruda no topo de `.mo-conteudo` e, passados ~120 px, encolhe para 56 px com objeto, estado e ações (trilha, meta e passos somem); a página não pula. Substitui `.tx-viagem-fixa` (pendências da Viagem).
+
+### 11.7 Drawer de detalhe de linha
+
+Antes: drawer de 560 px com desfoque, lista travada atrás, ações no rodapé.
+Depois:
+
+```jsx
+<Drawer id="conjunto" tamanho="p" semVeu titulo="QBD 3E90" extra={<Placa placa="SQT6B77" clara />} sub="Graneleira, base Rondonópolis"
+  aoFechar={v.fechar} aoAnterior={v.anterior} aoProximo={v.proximo}
+  acoes={<><Botao tamanho="p" variante="contorno">Ver histórico do C1</Botao><MenuLinha rotulo="Mais ações de QBD 3E90" itens={...} /></>}
+  abas={[{ k: 'comp', n: 'Compartimentos', ativa: s.aba === 'comp', onClick: () => v.aba('comp') }, ...]}
+  falta={textoFalta(faltam)} rodape={...}>
+  ...
+</Drawer>
+```
+
+`tamanho`: p 480, m 560, g 720. `semVeu`: a lista atrás segue rolável e clicável, sem aria-modal; Esc fecha. ↑ ↓ (e K J) trocam o registro fora de campo. `falta` põe o "Falta:" no rodapé (painel de Liberar por autoridade, Top 8).
+
+### 11.8 Avatar, IconeTipo, Placa (política de identidade)
+
+Antes: `<span style={{ background: 'linear-gradient(135deg,' + p.g1 + ',' + p.g2 + ')' }}>GS</span>`, cada pessoa de uma cor forte; placa em texto corrido.
+Depois:
+
+```jsx
+<Avatar nome={t.nome} />                                   // pessoa: iniciais, tom neutro pelo nome (4 tons)
+<IconeTipo tipo={tipoDoServico(f.servico)} />              // empresa: ícone cinza 16 px, sem avatar, sem logo
+<Placa placa={c.cavalo} /> <Placa placa={c.carreta} clara /> <Placa placa="SQT6B77" compartimento="C1" />
+```
+
+Os campos `g1`/`g2` de usuário deixam de ser usados na lista. Cor forte é só de situação.
+
+### 11.9 Trilha, Segmentado, PeriodoAtalhos
+
+```jsx
+<Trilha passos={[{ rotulo: 'Frota própria', href: '/frota' }, { rotulo: 'QBD 3E90', href: ... }, { rotulo: 'SQT 6B77 C1' }]} />
+<Segmentado rotulo="Quando falhar" valor={r.classe} aoMudar={(k) => v.classe(r.k, k)} opcoes={[{ k: 'bloqueio', rotulo: 'Bloqueia' }, { k: 'alerta', rotulo: 'Só alerta', inativo: r.norma }]} />
+<PeriodoAtalhos valor={s.per} aoMudar={v.per} de={s.de} ate={s.ate} aoMudarDe={v.de} aoMudarAte={v.ate}
+  atalhos={[...ATALHOS_PERIODO.slice(0, 2), { k: 'aud', rotulo: 'Desde a última auditoria (14/07/2026)' }, ATALHOS_PERIODO[2]]} />
+```
+
+Antes, "Bloqueia / Só alerta" eram dois botões soltos e o "Só alerta" da norma parecia desabilitado mas clicava (Top 10).
+
+### 11.10 Tokens novos
+
+`--veu-leve` (drawer e Confirmar), `--z-flutuante` (menu e dica, acima de modal e drawer), `--avatar-1-fundo` a `--avatar-4-texto`. Nenhum token antigo mudou.

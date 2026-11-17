@@ -177,10 +177,31 @@ Status de viagem combina ponto, rótulo e cor. Sempre os três sinais, nunca só
 
 ## 9. Iconografia
 
-Biblioteca: `lucide-react`. Stroke 1.75.
+Ícones próprios em SVG inline, não uma biblioteca. Fonte: `src/components/moldura/icones.tsx` (sidebar e logo, função `Icone({ k })`) e os SVG dos componentes de `src/components/ui` (fechar, visto, alerta, menu de linha, tipo de empresa). `lucide-react` está instalado mas não é usado nas telas; não misture.
 
-| Conceito | Ícone |
+Regras do desenho:
+
+- Grade de 16 x 16 (`viewBox="0 0 16 16"`), `fill="none"`, `stroke="currentColor"`, pontas e junções arredondadas.
+- Traço de 1,6 na sidebar e nos ícones de 16 px. Ícones de 12 a 14 px dentro de componente (fechar, visto do toast, alerta do aviso) usam 1,8 a 2, para não sumir no tamanho menor.
+- Cor sempre herdada (`currentColor`); o ícone nunca carrega cor de situação sozinho.
+- Decorativo leva `aria-hidden`; ícone que é o único conteúdo de um botão leva `aria-label` no botão.
+
+| Conceito | Chave em `Icone` |
 | --- | --- |
+| Hoje | `hoje` |
+| Viagens | `viagens` |
+| Transportadores | `transportadores` |
+| Frota própria | `frota` |
+| Auditoria | `auditoria` |
+| Cadastros | `cadastros` |
+| Configurações | `config` |
+| Link do motorista / protótipo mobile | `link` |
+| Voltar | `anterior` |
+| Marca | `logo` |
+
+Tipo de empresa (fornecedor, transportadora) em listas: componente `IconeTipo` de `src/components/ui/identidade.tsx`, 16 px, cinza.
+
+--- | --- |
 | Dashboard | `LayoutDashboard` |
 | Viagens | `Truck` |
 | Frota | `Container` |

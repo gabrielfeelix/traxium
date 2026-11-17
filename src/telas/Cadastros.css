@@ -1,0 +1,69 @@
+/*
+ * Cadastros: o que o design system ainda não tem como componente.
+ * Classes tx-cad-*, valores só por token. Propostas de promoção em docs/ds/pendencias.md.
+ */
+
+/* Folha com cabeçalho de tabela fixo: overflow clip (não hidden) deixa o sticky funcionar. */
+.tx-cartao--lista.tx-cad-folha { overflow: clip; }
+
+/* Barra de ferramentas dentro do cartão: busca, filtro e contagem. */
+.tx-cad-barra { display: flex; align-items: center; gap: var(--esp-2-5); flex-wrap: wrap; padding: var(--esp-4) var(--esp-5); border-bottom: 1px solid var(--borda-suave); }
+.tx-cad-barra .tx-entrada-caixa { flex: 1; min-width: 220px; max-width: 400px; margin-top: 0; }
+.tx-cad-barra__fim { margin-left: auto; display: flex; align-items: center; gap: var(--esp-2-5); }
+.tx-cad-contagem { font: var(--tipo-denso); color: var(--texto-apagado); white-space: nowrap; }
+
+/* Seletor de regime em lista suspensa */
+.tx-cad-pop-ancora { position: relative; }
+.tx-cad-pop {
+  position: absolute; left: 0; top: calc(100% + var(--esp-1-5)); min-width: 270px; padding: var(--esp-1-5); z-index: var(--z-pop);
+  background: var(--painel); border: 1px solid var(--borda); border-radius: var(--raio-g); box-shadow: var(--sombra-m);
+  display: flex; flex-direction: column; gap: var(--esp-0-5);
+}
+.tx-cad-pop__op {
+  display: flex; align-items: center; gap: var(--esp-2-5); min-height: var(--controle-p); padding: var(--esp-1-5) var(--esp-2-5); width: 100%;
+  border: none; background: none; border-radius: var(--raio-p); font: var(--tipo-denso); color: var(--texto); text-align: left; cursor: pointer;
+}
+.tx-cad-pop__op:hover { background: var(--superficie-hover); }
+.tx-cad-pop__op[aria-checked='true'] { font-weight: 800; background: var(--primario-fraco); }
+.tx-cad-pop__op[aria-disabled='true'] { color: var(--texto-desab); cursor: not-allowed; background: none; }
+.tx-cad-pop__letra {
+  flex: none; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--raio-xs);
+  background: var(--superficie-2); border: 1px solid var(--borda-campo); font-size: var(--fs-rotulo); font-weight: 600;
+}
+.tx-cad-pop__q { margin-left: auto; font: var(--tipo-legenda); font-family: var(--fonte-mono); color: var(--texto-apagado); }
+.tx-cad-pop__visto { width: 13px; display: inline-flex; color: var(--primario); }
+.tx-cad-dd-rot { color: var(--texto-apagado); font-weight: 600; }
+.tx-botao--contorno.tx-cad-dd--on { border-color: var(--primario); }
+
+/* Nome que abre o registro: o alvo de teclado da linha clicável. */
+.tx-cad-nome { display: flex; align-items: center; gap: var(--esp-2-5); min-width: 0; }
+.tx-cad-nome > svg { flex: none; }
+.tx-cad-abrir {
+  display: block; max-width: 100%; padding: 0; border: none; background: none; text-align: left; cursor: pointer;
+  font: var(--tipo-denso); font-weight: 700; color: var(--texto); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.tx-cad-abrir:hover { color: var(--primario-2); text-decoration: underline; text-underline-offset: 3px; }
+.tx-cad-dica { cursor: help; }
+
+/* Próximo vencimento: documento, prazo e a ação na mesma célula. */
+.tx-cad-venc { display: flex; align-items: center; justify-content: space-between; gap: var(--esp-2); min-width: 0; }
+.tx-cad-prazo--falta { color: var(--aviso); font-weight: 700; }
+.tx-cad-prazo--bloqueio { color: var(--perigo); font-weight: 700; }
+
+/* Cartões do manual (o que o motorista lê) */
+.tx-cad-manual { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--esp-2); padding: 0 var(--esp-5) var(--esp-5); }
+.tx-cad-manual__item { padding: var(--esp-3); border-radius: var(--raio-m); background: var(--superficie); }
+.tx-cad-manual__t { font: var(--tipo-denso); font-weight: 800; color: var(--texto); }
+.tx-cad-manual__txt { margin-top: var(--esp-1); font: var(--tipo-legenda); font-weight: 400; line-height: var(--lh-paragrafo); color: var(--texto-sec); }
+.tx-cad-alternar { display: flex; align-items: center; gap: var(--esp-3); padding: var(--esp-3) var(--esp-5); border-top: 1px solid var(--borda-suave); }
+
+/* Participantes do treinamento: busca, atalho da frota e a lista. */
+.tx-cad-part-barra { display: flex; align-items: center; gap: var(--esp-2); flex-wrap: wrap; margin-top: var(--esp-1-5); }
+.tx-cad-part-barra .tx-entrada-caixa { flex: 1; min-width: 200px; margin-top: 0; }
+.tx-cad-part { display: flex; flex-wrap: wrap; gap: var(--esp-1-5); margin-top: var(--esp-2); max-height: 200px; overflow: auto; padding: var(--esp-0-5); }
+.tx-cad-arquivo { padding-top: var(--esp-1-5); }
+
+/* Seção dentro do drawer */
+.tx-cad-secao { margin: var(--esp-3) 0 0; font: var(--tipo-rotulo); letter-spacing: var(--ls-rotulo); text-transform: uppercase; color: var(--texto-apagado); }
+.tx-cad-pessoas { display: flex; flex-wrap: wrap; gap: var(--esp-1-5); }
+.tx-cad-texto { margin: 0; font: var(--tipo-denso); line-height: var(--lh-paragrafo); color: var(--texto-sec); }

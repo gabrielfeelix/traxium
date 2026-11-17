@@ -1,4 +1,6 @@
-import type { HTMLAttributes, MouseEvent, ReactNode } from 'react';
+'use client';
+import { useEffect, useRef, type HTMLAttributes, type MouseEvent, type ReactNode } from 'react';
+import { Abas, type Aba } from './abas';
 import { Botao } from './botao';
 import { cx } from './util';
 
@@ -67,51 +69,88 @@ export type DrawerProps = {
   id: string;
   titulo: ReactNode;
   sub?: ReactNode;
-  /** Iniciais ou ícone no círculo do cabeçalho. */
+  /** Iniciais ou ícone no círculo do cabeçalho. Para placa, passe <Placa> em `extra`. */
   avatar?: ReactNode;
+  /** Ao lado do título, no cabeçalho escuro: Placa, Situacao em selo, código. */
+  extra?: ReactNode;
   aoFechar?: () => void;
+  /** p 480 px (detalhe de linha), m 560 px (padrão), g 720 px (detalhe com tabela dentro). */
+  tamanho?: 'p' | 'm' | 'g';
+  /** Faixa clara logo abaixo do cabeçalho: ações do registro (Ver histórico, Exportar, MenuLinha). */
+  acoes?: ReactNode;
+  /** Abas do detalhe (mesma forma de Abas). A tela guarda a ativa e troca o children. */
+  abas?: Aba[];
+  /** Sem véu: a lista atrás continua visível, rolável e clicável (detalhe de linha). Sem aria-modal. */
+  semVeu?: boolean;
+  /** Troca o registro sem fechar: setas no cabeçalho e teclas ↑ ↓ (ou K J) fora de campo. */
+  aoAnterior?: () => void;
+  aoProximo?: () => void;
   rodape?: ReactNode;
+  /** Texto "Falta: ..." à esquerda do rodapé (painel de decisão), como no Modal. Vazio quando nada falta. */
+  falta?: string;
   estatico?: boolean;
   children?: ReactNode;
 } & Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'children' | 'id'>;
 
-export function Drawer({ id, titulo, sub, avatar, aoFechar, rodape, estatico, children, className, ...p }: DrawerProps) {
+const SETA = (cima: boolean) => (
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <path d={cima ? 'M3.5 8.5 7 5l3.5 3.5' : 'M3.5 5.5 7 9l3.5-3.5'} />
+  </svg>
+);
+
+export function Drawer({ id, titulo, sub, avatar, extra, aoFechar, tamanho = 'm', acoes, abas, semVeu, aoAnterior, aoProximo, rodape, falta, estatico, children, className, ...p }: DrawerProps) {
   const tit = id + '-titulo';
+  const nav = useRef({ aoAnterior, aoProximo, aoFechar });
+  nav.current = { aoAnterior, aoProximo, aoFechar };
+  const navega = !!(aoAnterior || aoProximo);
+  useEffect(() => {
+    if (estatico) return;
+    const tecla = (e: KeyboardEvent) => {
+      if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
+      const t = e.target as HTMLElement | null;
+      if (t && (t.closest('input, textarea, select, [contenteditable="true"], [role="menu"], [role="listbox"]'))) return;
+      const n = nav.current;
+      if (semVeu && e.key === 'Escape' && n.aoFechar) { n.aoFechar(); return; }
+      if (!navega) return;
+      if ((e.key === 'ArrowUp' || e.key === 'k') && n.aoAnterior) { e.preventDefault(); n.aoAnterior(); }
+      else if ((e.key === 'ArrowDown' || e.key === 'j') && n.aoProximo) { e.preventDefault(); n.aoProximo(); }
+    };
+    window.addEventListener('keydown', tecla);
+    return () => window.removeEventListener('keydown', tecla);
+  }, [estatico, navega, semVeu]);
   return (
-    <div className={cx('tx-veu', 'tx-veu--lateral', estatico && 'tx-veu--estatico')} onClick={fecharNoVeu(aoFechar)}>
-      <div role="dialog" aria-modal={estatico ? undefined : true} aria-labelledby={tit} className={cx('tx-drawer', className)} {...p}>
+    <div className={cx('tx-veu', 'tx-veu--lateral', semVeu && 'tx-veu--sem', estatico && 'tx-veu--estatico')} onClick={semVeu ? undefined : fecharNoVeu(aoFechar)}>
+      <div role="dialog" aria-modal={estatico || semVeu ? undefined : true} aria-labelledby={tit} className={cx('tx-drawer', tamanho !== 'm' && 'tx-drawer--' + tamanho, className)} {...p}>
         <div className="tx-drawer__cab">
           {avatar ? <span className="tx-drawer__avatar" aria-hidden>{avatar}</span> : null}
           <div className="tx-drawer__titulos">
-            <h2 id={tit} className="tx-drawer__titulo">{titulo}</h2>
+            <div className="tx-drawer__titulo-linha">
+              <h2 id={tit} className="tx-drawer__titulo">{titulo}</h2>
+              {extra}
+            </div>
             {sub ? <div className="tx-drawer__sub">{sub}</div> : null}
           </div>
+          {navega ? (
+            <span className="tx-drawer__nav">
+              <Botao variante="icone" aria-label="Registro anterior (seta para cima)" onClick={aoAnterior} desabilitado={!aoAnterior} icone={SETA(true)} />
+              <Botao variante="icone" aria-label="Próximo registro (seta para baixo)" onClick={aoProximo} desabilitado={!aoProximo} icone={SETA(false)} />
+            </span>
+          ) : null}
           {aoFechar ? <Botao variante="icone" aria-label="Fechar" onClick={aoFechar} icone={IconeFechar} /> : null}
         </div>
+        {acoes ? <div className="tx-drawer__acoes">{acoes}</div> : null}
+        {abas && abas.length ? <Abas itens={abas} rotulo={'Seções de ' + (typeof titulo === 'string' ? titulo : 'detalhe')} className="tx-drawer__abas" /> : null}
         <div className="tx-drawer__corpo">{children}</div>
-        {rodape ? <div className="tx-drawer__rodape">{rodape}</div> : null}
+        {rodape || falta ? (
+          <div className="tx-drawer__rodape">
+            {falta ? <span className="tx-falta" aria-live="polite">{falta}</span> : null}
+            {rodape}
+          </div>
+        ) : null}
       </div>
     </div>
   );
 }
 
-const VISTO = (
-  <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-    <path d="M2.5 6.2 5 8.6l4.5-5" />
-  </svg>
-);
-const EXCL = (
-  <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
-    <path d="M6 2.5v4.2M6 9.2v.1" />
-  </svg>
-);
-
-/* Toast: confirma uma ação que deu certo. Uma frase. Erro de validação não vai aqui: vai no campo. */
-export function Toast({ children, tom = 'ok', estatico }: { children: ReactNode; tom?: 'ok' | 'erro'; estatico?: boolean }) {
-  return (
-    <div role="status" aria-live="polite" className={cx('tx-toast', tom === 'erro' && 'tx-toast--erro', estatico && 'tx-toast--estatico')}>
-      <span className="tx-toast__icone" aria-hidden>{tom === 'erro' ? EXCL : VISTO}</span>
-      {children}
-    </div>
-  );
-}
+/* Toast mora em toast.tsx (com ação, duração e avisar). Reexportado para quem importa daqui. */
+export { Toast, avisar, PostoAvisos, type ToastProps, type AcaoToast, type AvisoOpcoes, type TomToast } from './toast';

@@ -4,13 +4,15 @@
  * topo e toast. Mora no layout de (painel), então é desenhada uma vez: trocar de tela
  * troca só o conteúdo, sem piscar e sem perder o estado da sidebar.
  *
- * No protótipo .dc.html esta marcação era copiada em cada tela por
- * scripts/gerar-sidebar.mjs, e cada clique recarregava a página inteira.
+ * A sidebar mostra só o que o papel usa (M39). O toast aceita uma ação (Desfazer): as telas
+ * mandam o evento tx-aviso com { texto, acao, onAcao } em vez do texto puro.
  */
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import TXmod from '@/lib/tx/tx-ui';
+import { Badge, Botao, IconeFechar, Linha, Switch } from '@/components/ui';
+import { avisar as avisarToast, PostoAvisos } from '@/components/ui/toast';
 import { Icone } from './icones';
 import './moldura.css';
 
@@ -25,7 +27,7 @@ const GRUPOS: { n: string; itens: Item[] }[] = [
     { k: 'viagens', n: 'Viagens', href: '/viagens' }
   ] },
   { n: 'Quem transporta', itens: [
-    { k: 'transportadores', n: 'Transportadores', href: '/transportadores', badge: 'transportadores', badgeTip: 'documentos vencidos ou vencendo em 15 dias' },
+    { k: 'transportadores', n: 'Transportadores', href: '/transportadores', badge: 'transportadores', badgeTip: 'transportadores com documento vencido ou vencendo em 15 dias' },
     { k: 'frota', n: 'Frota própria', href: '/frota' }
   ] },
   { n: 'Qualidade', itens: [
@@ -39,10 +41,42 @@ const CADASTROS = [
   { k: 'filiais', n: 'Filiais' }
 ];
 const RODAPE: Item[] = [
-  { k: 'config', n: 'Configurações', href: '/configuracoes' },
+  { k: 'config', n: 'Configurações', href: '/configuracoes' }
+];
+// Demonstração: some quando houver cliente usando (12-revisao-ux, U101).
+const DEMO: Item[] = [
   { k: 'link', n: 'Protótipo mobile', tag: 'demo', href: '/mobile', tip: 'O link que o motorista recebe pelo WhatsApp, num celular, com as viagens de exemplo' },
   // O protótipo .dc.html (v1 e v2) é copiado para public/prototipo no build: scripts/copiar-prototipo.mjs.
-  { k: 'anterior', n: 'Versão anterior', href: '/prototipo/versao-anterior.html', externo: true }
+  { k: 'anterior', n: 'Versão anterior', tag: 'demo', href: '/prototipo/versao-anterior.html', externo: true }
+];
+
+// Telas por papel (premissa da 11-revisao-mvp, M39). Com TX.podeVer no motor, ele decide.
+const TELAS_PAPEL: Record<string, string[]> = {
+  afretador: ['hoje', 'viagens', 'transportadores'],
+  frota: ['hoje', 'viagens', 'frota'],
+  consultoria: ['viagens', 'auditoria', 'cadastros'],
+};
+function veTela(papel: string, k: string) {
+  if (k === 'link' || k === 'anterior') return true;
+  if (typeof TX.podeVer === 'function') {
+    try { const r = TX.podeVer('tela', k); if (typeof r === 'boolean') return r; } catch { /* API em construção */ }
+  }
+  const lista = TELAS_PAPEL[papel];
+  return !lista || lista.includes(k);
+}
+
+// "Ir para" da busca global: telas pelo nome.
+const TELAS_BUSCA = [
+  { k: 'hoje', n: 'Hoje', href: '/hoje' },
+  { k: 'viagens', n: 'Viagens', href: '/viagens' },
+  { k: 'transportadores', n: 'Transportadores', href: '/transportadores' },
+  { k: 'frota', n: 'Frota própria', href: '/frota' },
+  { k: 'auditoria', n: 'Auditoria', href: '/auditoria' },
+  { k: 'cadastros', n: 'Produtos e regimes', href: '/cadastros?aba=produtos' },
+  { k: 'cadastros', n: 'Manual e treinamentos', href: '/cadastros?aba=manual' },
+  { k: 'cadastros', n: 'Fornecedores', href: '/cadastros?aba=fornecedores' },
+  { k: 'cadastros', n: 'Filiais', href: '/cadastros?aba=filiais' },
+  { k: 'config', n: 'Configurações', href: '/configuracoes' },
 ];
 
 // Item aceso pela rota. Compartimento é de frota própria ou de transportador: decide o dado.
@@ -51,7 +85,7 @@ function itemAtivo(rota: string, busca: URLSearchParams): string | null {
   if (r === 'viagem') return 'viagens';
   if (r === 'compartimento') {
     const p = TX.placa(busca.get('placa'));
-    return p && p.dono === 'propria' ? 'frota' : 'transportadores';
+    return !p || p.dono === 'propria' ? 'frota' : 'transportadores';
   }
   if (r === 'configuracoes') return 'config';
   if (r === 'mobile') return 'link';
@@ -66,11 +100,17 @@ function lerLS(k: string, padrao: string) { try { const v = localStorage.getItem
 function gravarLS(k: string, v: string) { try { localStorage.setItem(k, v); } catch { /* sem armazenamento */ } }
 
 const PREFS = [
-  { k: 'bloq', t: 'Bloqueio técnico na minha filial', sub: 'sempre ativo: requisito da certificação', lock: true },
-  { k: 'link', t: 'Motorista terminou o link', sub: 'aviso na tela e no celular' },
-  { k: 'venc', t: 'Documento de transportador a vencer', sub: 'aos 60, 30 e 15 dias' },
-  { k: 'idtf', t: 'Nova versão da base IDTF', sub: 'quando a Traxium publicar' }
+  { k: 'bloq', t: 'Bloqueio técnico na minha filial', sub: 'Sempre ligado: requisito da certificação.', lock: true },
+  { k: 'link', t: 'Motorista terminou o link', sub: 'Na tela e no celular.' },
+  { k: 'venc', t: 'Documento de transportador a vencer', sub: 'Aos 60, 30 e 15 dias.' },
+  { k: 'idtf', t: 'Nova versão da base IDTF', sub: 'Quando a Traxium publicar.' }
 ];
+
+const LUPA = <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" style={{ flex: 'none' }} aria-hidden><circle cx="7" cy="7" r="4.6" /><line x1="10.5" y1="10.5" x2="13.5" y2="13.5" /></svg>;
+const IR = <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="mo-gb-ir" aria-hidden><path d="M3 8h9.5M8.5 4l4 4-4 4" /></svg>;
+
+type GbItem = { t: string; sub: string; href: string; dot?: string; tag?: string; tagC?: string; ir?: boolean };
+type AvisoDetalhe = string | { texto: string; acao?: string; onAcao?: () => void };
 
 export function Moldura({ children }: { children: ReactNode }) {
   const rota = usePathname();
@@ -87,16 +127,15 @@ export function Moldura({ children }: { children: ReactNode }) {
   const [modal, setModal] = useState<null | 'perfil' | 'prefs' | 'entrar' | 'saiu' | 'sair'>(null);
   const [gbQ, setGbQ] = useState('');
   const [gbAberta, setGbAberta] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
+  const [gbAtivo, setGbAtivo] = useState(-1);
   const [prefsOn, setPrefsOn] = useState<Record<string, boolean>>({ venc: true, link: true, idtf: false });
-  const toastT = useRef<ReturnType<typeof setTimeout> | null>(null);
   const campoBusca = useRef<HTMLInputElement>(null);
   const abriuModal = useRef<HTMLElement | null>(null);
 
-  const avisar = useCallback((msg: string) => {
-    setToast(msg);
-    if (toastT.current) clearTimeout(toastT.current);
-    toastT.current = setTimeout(() => setToast(null), 4200);
+  const avisar = useCallback((d: AvisoDetalhe) => {
+    if (typeof d === 'string') { avisarToast({ texto: d }); return; }
+    const onAcao = d.onAcao;
+    avisarToast({ texto: d.texto, acao: d.acao && onAcao ? { rotulo: d.acao, aoClicar: onAcao } : undefined });
   }, []);
 
   useEffect(() => {
@@ -104,7 +143,7 @@ export function Moldura({ children }: { children: ReactNode }) {
     TX.ui.moldura = true;
     setRecolhida(lerLS('tx-nav', '0') === '1');
     setCadAberto(lerLS('tx-nav-cad', '1') === '1');
-    const altura = () => setBaixa(window.innerHeight < 730);
+    const altura = () => setBaixa(window.innerHeight < 820);
     altura();
     setPronto(true);
     const off = TX.ouvir((v: number) => setVersao(v));
@@ -184,29 +223,41 @@ export function Moldura({ children }: { children: ReactNode }) {
   const naCadastros = ativo === 'cadastros';
   const aba = naCadastros ? abaCadastros(busca) : null;
   const cadVisivel = (naCadastros || cadAberto) && !recolhida;
-  const sbPad = baixa ? '6px 12px' : '8px 12px';
-  const sbSubPad = baixa ? '3px 12px 3px 39px' : '5px 12px 5px 39px';
-  const sbGrupoPad = baixa ? '6px 12px 2px' : '10px 12px 3px';
+  const sbPad = baixa ? 'var(--esp-1-5) var(--esp-3)' : 'var(--esp-2) var(--esp-3)';
+  const sbSubPad = '0 var(--esp-3) 0 39px';
+  const sbGrupoPad = baixa ? 'var(--esp-1-5) var(--esp-3) var(--esp-0-5)' : 'var(--esp-2-5) var(--esp-3) var(--esp-1)';
   const largura = recolhida ? 84 : 264;
   const alc = u.alcada ? TX.db.alcadas.find((a: { k: string }) => a.k === u.alcada) : null;
   const filiaisTxt = u.filiais.length === 4 ? 'Todas as filiais' : u.filiais.map((f: string) => TX.filial(f).nome).join(', ');
   const assinadas = TX.db.viagens.reduce((n: number, v: { liberacoes?: { assinante: string }[] }) => n + (v.liberacoes || []).filter(l => l.assinante === u.id).length, 0);
-  const grupos = gbAberta && TX.norm(gbQ).length >= 2 ? TX.ui.buscaGlobal(gbQ) : [];
   const todasHref = '/viagens?periodo=tudo&q=' + encodeURIComponent(gbQ);
   const iniciais = TX.fmt.iniciais(u.nome);
+
+  // Busca global: registros do motor, depois "Ir para" com as telas que o papel vê.
+  const qn = TX.norm(gbQ);
+  const grupos: { n: string; itens: GbItem[] }[] = gbAberta && qn.length >= 2 ? TX.ui.buscaGlobal(gbQ).map((g: { n: string; itens: GbItem[] }) => ({ n: g.n, itens: g.itens })) : [];
+  const telasAchadas = gbAberta && qn.length >= 2 ? TELAS_BUSCA.filter(t => veTela(u.papel, t.k) && TX.norm(t.n).includes(qn)) : [];
+  if (telasAchadas.length) grupos.push({ n: 'IR PARA', itens: telasAchadas.map(t => ({ t: t.n, sub: 'Tela', href: t.href, ir: true })) });
+  const planos = grupos.flatMap(g => g.itens);
+  const vaiPara = (href: string) => { setGbAberta(false); router.push(href); };
+
+  const visiveis = (lista: Item[]) => lista.filter(d => veTela(u.papel, d.k));
+  const gruposVis = GRUPOS.map(g => ({ ...g, itens: visiveis(g.itens) })).filter(g => g.itens.length || (g.n === 'Qualidade' && veTela(u.papel, 'cadastros')));
 
   function item(d: Item) {
     const on = d.k === ativo;
     const qtd = d.badge ? b[d.badge] : 0;
+    const frase = qtd > 0 && d.badgeTip ? qtd + ' ' + d.badgeTip : '';
     const miolo = (
       <>
         <Icone k={d.k} />
         {!recolhida && <span data-tx-item={d.k} className="mo-item-rot">{d.n}</span>}
-        {!recolhida && qtd > 0 && <span title={d.badgeTip} data-tx-badge={d.k} className="mo-badge">{qtd}</span>}
+        {!recolhida && qtd > 0 && <span title={frase} data-tx-badge={d.k} className="mo-badge num" aria-hidden>{qtd}</span>}
         {!recolhida && d.tag && <span className="mo-tag">{d.tag}</span>}
       </>
     );
-    const props = { title: d.tip || d.n, className: 'mo-item', style: { padding: sbPad }, 'aria-label': recolhida ? d.n : undefined };
+    const rotulo = recolhida || frase ? d.n + (frase ? ', ' + frase : '') : undefined;
+    const props = { title: d.tip || d.n, className: 'mo-item', style: { padding: sbPad }, 'aria-label': rotulo };
     if (d.novaAba) return <a key={d.k} href={d.href} target="_blank" rel="noopener" {...props}>{miolo}</a>;
     if (d.externo) return <a key={d.k} href={d.href} {...props}>{miolo}</a>;
     return <Link key={d.k} href={d.href} aria-current={on ? 'page' : undefined} {...props}>{miolo}</Link>;
@@ -215,17 +266,17 @@ export function Moldura({ children }: { children: ReactNode }) {
   return (
     <div className="mo">
       <nav data-tx-sidebar aria-label="Menu principal" className="mo-sb" style={{ width: largura }}>
-        <div className="mo-sb-cartao" style={{ padding: '18px ' + (recolhida ? '14px' : '16px') }}>
+        <div className="mo-sb-cartao" style={{ padding: 'var(--esp-5) ' + (recolhida ? 'var(--esp-3)' : 'var(--esp-4)') }}>
           <Link href="/hoje" title="Traxium: ir para Hoje" className="mo-marca">
             <Icone k="logo" />
             {!recolhida && <div><div className="mo-marca-nome">Traxium</div><div className="mo-marca-tenant">{TX.db.tenant.nome.replace(' Ltda', '')}</div></div>}
           </Link>
-          {GRUPOS.map(g => (
+          {gruposVis.map(g => (
             <div key={g.n}>
               {recolhida ? <div className="mo-sep" /> : <div className="mo-grupo" style={{ padding: sbGrupoPad }}>{g.n}</div>}
               <div className="mo-lista">
                 {g.itens.map(item)}
-                {g.n === 'Qualidade' && (
+                {g.n === 'Qualidade' && veTela(u.papel, 'cadastros') && (
                   <>
                     <button type="button" className="mo-item" style={{ padding: sbPad }} title="Cadastros" aria-expanded={cadVisivel}
                       aria-current={naCadastros && recolhida ? 'page' : undefined}
@@ -236,7 +287,7 @@ export function Moldura({ children }: { children: ReactNode }) {
                       }}>
                       <Icone k="cadastros" />
                       {!recolhida && <span data-tx-item="cadastros" className="mo-item-rot">Cadastros</span>}
-                      {!recolhida && <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="mo-chev" style={{ transform: cadVisivel ? 'rotate(90deg)' : 'none' }}><path d="M4.5 2.5 8 6l-3.5 3.5" /></svg>}
+                      {!recolhida && <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="mo-chev" aria-hidden><path d="M4.5 2.5 8 6l-3.5 3.5" /></svg>}
                     </button>
                     {cadVisivel && (
                       <div className="mo-sub">
@@ -253,10 +304,12 @@ export function Moldura({ children }: { children: ReactNode }) {
             </div>
           ))}
           <div className="mo-rodape">
-            {RODAPE.map(item)}
+            {visiveis(RODAPE).map(item)}
+            {recolhida ? <div className="mo-sep" /> : <div className="mo-grupo" style={{ padding: sbGrupoPad }}>Demonstração</div>}
+            {DEMO.map(item)}
             {!recolhida && !baixa && <div title="Base IDTF mantida pela Traxium" className="mo-base"><span className="mo-base-dot" />Base IDTF {TX.db.baseIDTF.versao} vigente</div>}
             <button type="button" onClick={alternarNav} title="Recolher ou expandir o menu" aria-label={recolhida ? 'Expandir menu' : 'Recolher menu'} className="mo-item mo-recolher" style={{ padding: sbPad }}>
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{ transform: recolhida ? 'rotate(180deg)' : 'none', transition: 'transform .25s' }}><path d="M9.5 3 4.5 8l5 5" /><line x1="12" y1="3" x2="12" y2="13" /></svg>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M9.5 3 4.5 8l5 5" /><line x1="12" y1="3" x2="12" y2="13" /></svg>
               {!recolhida && <span className="mo-item-rot">Recolher menu</span>}
             </button>
           </div>
@@ -267,54 +320,72 @@ export function Moldura({ children }: { children: ReactNode }) {
         <header data-tx-header className="mo-hd">
           <div data-tx-mo-pop className="mo-busca" role="search">
             <div className="mo-busca-campo">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#7c8f8d" strokeWidth="1.6" strokeLinecap="round" style={{ flex: 'none' }} aria-hidden><circle cx="7" cy="7" r="4.6" /><line x1="10.5" y1="10.5" x2="13.5" y2="13.5" /></svg>
+              {LUPA}
               <input ref={campoBusca} value={gbQ} data-tx-gbusca aria-label="Busca global"
-                placeholder="Buscar viagem, placa, CT-e, NF, transportador ou produto"
-                onChange={e => { setGbQ(e.target.value); setGbAberta(true); }}
+                role="combobox" aria-expanded={gbAberta && qn.length >= 2} aria-controls="mo-gb" aria-autocomplete="list"
+                aria-activedescendant={gbAtivo >= 0 && planos[gbAtivo] ? 'mo-gb-' + gbAtivo : undefined}
+                placeholder="Buscar viagem, placa, CT-e, NF, transportador ou tela"
+                onChange={e => { setGbQ(e.target.value); setGbAberta(true); setGbAtivo(-1); }}
                 onFocus={() => { if (gbQ) setGbAberta(true); }}
                 onKeyDown={e => {
+                  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                    if (!planos.length) return;
+                    e.preventDefault();
+                    const d = e.key === 'ArrowDown' ? 1 : -1;
+                    setGbAtivo(i => (i + d + planos.length) % planos.length);
+                    return;
+                  }
                   if (e.key !== 'Enter') return;
+                  if (gbAtivo >= 0 && planos[gbAtivo]) { vaiPara(planos[gbAtivo].href); return; }
                   const g = TX.ui.buscaGlobal(gbQ);
                   const prim = g[0] && g[0].itens[0];
                   router.push(prim ? prim.href : todasHref);
                 }} />
               <span title="Atalho: tecla barra" className="mo-tecla" aria-hidden>/</span>
             </div>
-            {gbAberta && TX.norm(gbQ).length >= 2 && (
-              <div data-tx-gb-resultados className="mo-gb">
-                {grupos.map((gg: { n: string; itens: { t: string; sub: string; href: string; dot: string; tag: string; tagC: string }[] }) => (
-                  <div key={gg.n}>
-                    <div className="mo-gb-grupo">{gg.n}</div>
-                    {gg.itens.map(gi => (
-                      <Link key={gi.href} href={gi.href} data-tx-gb-item className="mo-gb-item" onClick={() => setGbAberta(false)}>
-                        <span className="mo-gb-dot" style={{ background: gi.dot }} />
-                        <div style={{ minWidth: 0, flex: 1 }}><div className="mo-gb-t">{gi.t}</div><div className="mo-gb-sub">{gi.sub}</div></div>
-                        <span className="mo-gb-tag" style={{ color: gi.tagC }}>{gi.tag}</span>
-                      </Link>
-                    ))}
-                  </div>
-                ))}
-                {grupos.length === 0 && <div className="mo-gb-vazio">Nada encontrado para &quot;{gbQ}&quot;. A busca aceita ordem, CT-e, NF, placa, nome, CPF, RNTRC e produto.</div>}
-                <Link href={todasHref} className="mo-gb-todas" onClick={() => setGbAberta(false)}>Buscar &quot;{gbQ}&quot; em todas as viagens →</Link>
+            {gbAberta && qn.length >= 2 && (
+              <div id="mo-gb" data-tx-gb-resultados className="mo-gb" role="listbox" aria-label="Resultados da busca">
+                {(() => {
+                  let i = -1;
+                  return grupos.map(gg => (
+                    <div key={gg.n} role="group" aria-label={gg.n}>
+                      <div className="mo-gb-grupo" aria-hidden>{gg.n}</div>
+                      {gg.itens.map(gi => {
+                        i++;
+                        const meu = i;
+                        return (
+                          <Link key={gi.href} id={'mo-gb-' + meu} role="option" aria-selected={meu === gbAtivo} href={gi.href} data-tx-gb-item className="mo-gb-item"
+                            data-ativo={meu === gbAtivo ? '' : undefined} onClick={() => setGbAberta(false)} onMouseEnter={() => setGbAtivo(meu)}>
+                            {gi.ir ? IR : <span className="mo-gb-dot" style={{ background: gi.dot }} />}
+                            <div className="mo-gb-texto"><div className="mo-gb-t">{gi.t}</div><div className="mo-gb-sub">{gi.sub}</div></div>
+                            {gi.tag ? <span className="mo-gb-tag" style={{ color: gi.tagC }}>{gi.tag}</span> : null}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  ));
+                })()}
+                {grupos.length === 0 && <div className="mo-gb-vazio">Nada encontrado para &quot;{gbQ}&quot;. A busca aceita ordem, CT-e, NF, placa, nome, CPF, RNTRC, produto e nome de tela.</div>}
+                <Link href={todasHref} className="mo-gb-todas" onClick={() => setGbAberta(false)}>Buscar &quot;{gbQ}&quot; em todas as viagens</Link>
               </div>
             )}
           </div>
           <div className="mo-pessoa">
-            <div className="mo-pessoa-nome"><div style={{ fontSize: 13, fontWeight: 800 }}>{u.nome}</div><div style={{ fontSize: 11.5, color: 'var(--texto-sec)' }}>{u.cargo}</div></div>
-            <div data-tx-mo-pop style={{ position: 'relative' }}>
+            <div className="mo-pessoa-nome"><div className="mo-pessoa-n">{u.nome}</div><div className="mo-pessoa-c">{u.cargo}</div></div>
+            <div data-tx-mo-pop className="mo-pop">
               <button type="button" onClick={() => setPerfilAberto(x => !x)} title={u.nome} aria-label={'Menu de ' + u.nome} aria-expanded={perfilAberto} aria-haspopup="menu"
-                data-tx-avatar className="mo-avatar" style={{ background: 'linear-gradient(135deg,' + u.g1 + ',' + u.g2 + ')' }}>{iniciais}</button>
+                data-tx-avatar className="mo-avatar">{iniciais}</button>
               {perfilAberto && (
                 <div className="mo-menu" role="menu">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '11px 12px', borderBottom: '1px solid var(--superficie-2)', marginBottom: 4 }}>
-                    <span style={{ width: 38, height: 38, borderRadius: 99, background: 'linear-gradient(135deg,' + u.g1 + ',' + u.g2 + ')', color: '#fff', fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>{iniciais}</span>
-                    <div style={{ minWidth: 0 }}><div style={{ fontSize: 13.5, fontWeight: 800 }}>{u.nome}</div><div style={{ fontSize: 11.5, color: 'var(--texto-sec)' }}>{u.cargo}</div></div>
+                  <div className="mo-menu-cab">
+                    <span className="mo-avatar mo-avatar--m" aria-hidden>{iniciais}</span>
+                    <div style={{ minWidth: 0 }}><div className="mo-pessoa-n">{u.nome}</div><div className="mo-pessoa-c">{u.cargo}</div></div>
                   </div>
                   <button type="button" role="menuitem" className="mo-menu-op" onClick={() => abrirModal('perfil')}>Meu perfil</button>
                   <button type="button" role="menuitem" className="mo-menu-op" onClick={() => abrirModal('prefs')}>Avisos</button>
-                  <button type="button" role="menuitem" className="mo-menu-op" onClick={() => abrirModal('entrar')}>Entrar como<span className="mo-papel">{TX.ui.ROTULO_PAPEL[u.papel] || u.papel}</span></button>
-                  <div style={{ height: 1, background: 'var(--superficie-2)', margin: '5px 8px' }} />
-                  <button type="button" role="menuitem" className="mo-menu-op" style={{ color: 'var(--perigo)' }} onClick={() => abrirModal('sair')}>Sair</button>
+                  <button type="button" role="menuitem" className="mo-menu-op" onClick={() => abrirModal('entrar')}>Entrar como<Badge cheio>demo</Badge></button>
+                  <div className="mo-menu-sep" />
+                  <button type="button" role="menuitem" className="mo-menu-op mo-menu-op--perigo" onClick={() => abrirModal('sair')}>Sair...</button>
                 </div>
               )}
             </div>
@@ -332,44 +403,38 @@ export function Moldura({ children }: { children: ReactNode }) {
             titulo={modal === 'perfil' ? 'Meu perfil' : modal === 'prefs' ? 'Avisos' : modal === 'sair' ? 'Sair da conta' : modal === 'saiu' ? 'Sessão encerrada' : 'Entrar como'}>
             {modal === 'perfil' && (
               <>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, marginTop: 14 }}>
-                  <span style={{ width: 72, height: 72, borderRadius: 99, background: 'linear-gradient(135deg,' + u.g1 + ',' + u.g2 + ')', color: '#fff', fontSize: 24, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 0 3px #fff,0 0 0 6px #e4eae8' }}>{iniciais}</span>
-                  <div style={{ fontSize: 17, fontWeight: 800, marginTop: 4 }}>{u.nome}</div>
-                  <div style={{ fontSize: 12.5, color: 'var(--texto-sec)' }}>{u.email}</div>
+                <div className="mo-perfil">
+                  <span className="mo-avatar mo-avatar--g" aria-hidden>{iniciais}</span>
+                  <div className="mo-perfil-n">{u.nome}</div>
+                  <div className="mo-perfil-e">{u.email}</div>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginTop: 18 }}>
-                  <div className="mo-linha"><span style={{ color: 'var(--texto-sec)' }}>Papel</span><span style={{ fontWeight: 700, textAlign: 'right' }}>{u.cargo}</span></div>
-                  <div className="mo-linha"><span style={{ color: 'var(--texto-sec)' }}>Escopo</span><span style={{ fontWeight: 700, textAlign: 'right' }}>{filiaisTxt}</span></div>
-                  <div className="mo-linha"><span style={{ color: 'var(--texto-sec)' }}>Alçada de liberação</span><span style={{ fontWeight: 700, textAlign: 'right' }}>{alc ? alc.n : 'Sem alçada de liberação'}</span></div>
-                  <div className="mo-linha"><span style={{ color: 'var(--texto-sec)' }}>Liberações assinadas</span><span style={{ fontFamily: 'var(--fonte-mono)', fontWeight: 600 }}>{assinadas}</span></div>
+                <div className="mo-modal-corpo">
+                  <Linha rotulo="Papel"><span className="tx-peso-700">{u.cargo}</span></Linha>
+                  <Linha rotulo="Filiais"><span className="tx-peso-700">{filiaisTxt}</span></Linha>
+                  <Linha rotulo="Alçada de liberação"><span className="tx-peso-700">{alc ? alc.n : 'Sem alçada de liberação'}</span></Linha>
+                  <Linha rotulo="Liberações assinadas"><span className="tx-mono num tx-peso-600">{assinadas}</span></Linha>
                 </div>
-                <div style={{ fontSize: 12, color: 'var(--texto-sec)', marginTop: 12, lineHeight: 1.55 }}>{alc ? alc.libera : 'Pode conferir, registrar e pedir; liberação por autoridade fica com a Qualidade ou a Direção.'}</div>
+                <div className="mo-nota">{alc ? alc.libera : 'Pode conferir, registrar e pedir; liberação por autoridade fica com a Qualidade ou a Direção.'}</div>
               </>
             )}
             {modal === 'prefs' && (
               <>
                 <div className="mo-modal-sub">O que chega para você, na tela e no celular.</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 14 }}>
-                  {PREFS.map(p => {
-                    const on = !!(p.lock || prefsOn[p.k]);
-                    return (
-                      <button key={p.k} type="button" role="switch" aria-checked={on} className="mo-op" style={{ borderWidth: 1, borderColor: 'var(--borda-suave)', background: 'var(--painel)', borderRadius: 14, padding: '12px 14px' }}
-                        onClick={() => { if (p.lock) { avisar('O aviso de bloqueio técnico não desliga: é requisito da certificação.'); return; } setPrefsOn({ ...prefsOn, [p.k]: !prefsOn[p.k] }); }}>
-                        <div style={{ flex: 1 }}><div style={{ fontSize: 13.5, fontWeight: 700 }}>{p.t}</div><div style={{ fontSize: 11.5, color: 'var(--texto-sec)' }}>{p.sub}</div></div>
-                        <span style={{ width: 40, height: 23, borderRadius: 99, background: on ? 'var(--degrade-primario)' : '#dde5e3', position: 'relative', flex: 'none', transition: 'background .2s' }}>
-                          <span style={{ position: 'absolute', top: 2.5, left: on ? 19.5 : 2.5, width: 18, height: 18, borderRadius: 99, background: '#fff', boxShadow: '0 1px 4px rgba(9,34,36,.25)', transition: 'left .2s' }} />
-                        </span>
-                      </button>
-                    );
-                  })}
+                <div className="mo-modal-corpo">
+                  {PREFS.map(p => (
+                    <div key={p.k} className="mo-pref">
+                      <Switch rotulo={<span className="tx-peso-700">{p.t}</span>} dica={p.sub} checked={!!(p.lock || prefsOn[p.k])} disabled={p.lock}
+                        onChange={() => setPrefsOn({ ...prefsOn, [p.k]: !prefsOn[p.k] })} data-tx-pref={p.k} />
+                    </div>
+                  ))}
                 </div>
               </>
             )}
             {(modal === 'entrar' || modal === 'saiu') && (
               <>
-                <div className="mo-modal-sub">{modal === 'saiu' ? 'Nada foi perdido: o que você registrou continua na viagem com seu nome e a hora. Escolha quem entra agora.' : 'Demonstração: troque de usuário para ver a tela como cada papel vê. Filial, badges e alçada mudam junto.'}</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginTop: 14 }} role="radiogroup" aria-label="Usuário">
-                  {TX.db.usuarios.map((x: { id: string; nome: string; cargo: string; g1: string; g2: string; filiais: string[] }) => {
+                <div className="mo-modal-sub">{modal === 'saiu' ? 'O que você registrou continua na viagem com seu nome e a hora. Escolha quem entra agora.' : 'Demonstração: veja a tela como cada papel vê. Filiais, menu e alçada mudam junto.'}</div>
+                <div className="mo-modal-corpo" role="radiogroup" aria-label="Usuário">
+                  {TX.db.usuarios.map((x: { id: string; nome: string; cargo: string; filiais: string[] }) => {
                     const on = x.id === u.id;
                     return (
                       <button key={x.id} type="button" role="radio" aria-checked={on} data-tx-usuario={x.id} className="mo-op"
@@ -379,9 +444,9 @@ export function Moldura({ children }: { children: ReactNode }) {
                           window.dispatchEvent(new CustomEvent('tx-usuario', { detail: x }));
                           avisar('Agora você está como ' + x.nome + ' (' + x.cargo.toLowerCase() + ').');
                         }}>
-                        <span style={{ width: 18, height: 18, borderRadius: 99, border: '2.5px solid ' + (on ? 'var(--primario)' : 'var(--borda-forte)'), background: on ? 'var(--degrade-primario)' : '#fff', flex: 'none' }} />
-                        <span style={{ width: 34, height: 34, borderRadius: 99, flex: 'none', background: 'linear-gradient(135deg,' + x.g1 + ',' + x.g2 + ')', color: '#fff', fontSize: 12, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{TX.fmt.iniciais(x.nome)}</span>
-                        <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontSize: 13.5, fontWeight: 800 }}>{x.nome}</div><div style={{ fontSize: 11.5, color: 'var(--texto-sec)', marginTop: 1 }}>{x.cargo}, {x.filiais.length === 4 ? 'todas as filiais' : 'filial ' + x.filiais.map(f => TX.filial(f).nome).join(', ')}</div></div>
+                        <span className="mo-op-ponto" aria-hidden />
+                        <span className="mo-avatar mo-avatar--m" aria-hidden>{TX.fmt.iniciais(x.nome)}</span>
+                        <div style={{ flex: 1, minWidth: 0 }}><div className="mo-op-t">{x.nome}</div><div className="mo-op-s">{x.cargo}, {x.filiais.length === 4 ? 'todas as filiais' : 'filial ' + x.filiais.map(f => TX.filial(f).nome).join(', ')}</div></div>
                       </button>
                     );
                   })}
@@ -390,14 +455,14 @@ export function Moldura({ children }: { children: ReactNode }) {
             )}
             {modal === 'sair' && (
               <>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--superficie)', borderRadius: 15, padding: '13px 15px', marginTop: 16 }}>
-                  <span style={{ width: 40, height: 40, borderRadius: 99, flex: 'none', background: 'linear-gradient(135deg,' + u.g1 + ',' + u.g2 + ')', color: '#fff', fontSize: 13, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{iniciais}</span>
-                  <div><div style={{ fontSize: 13.5, fontWeight: 800 }}>{u.nome}</div><div style={{ fontSize: 11.5, color: 'var(--texto-sec)' }}>{u.cargo}</div></div>
+                <div className="mo-quem">
+                  <span className="mo-avatar mo-avatar--m" aria-hidden>{iniciais}</span>
+                  <div><div className="mo-pessoa-n">{u.nome}</div><div className="mo-pessoa-c">{u.cargo}</div></div>
                 </div>
-                <div style={{ fontSize: 12.5, color: 'var(--texto-sec)', marginTop: 14, lineHeight: 1.6 }}>O que você registrou continua na viagem, com seu nome e a hora. O que estava aberto num formulário sem confirmar não foi gravado.</div>
-                <div style={{ display: 'flex', gap: 8, marginTop: 18, justifyContent: 'flex-end' }}>
-                  <button type="button" className="mo-botao" onClick={fecharModal}>Cancelar</button>
-                  <button type="button" className="mo-botao mo-botao-perigo" onClick={() => setModal('saiu')}>Sair</button>
+                <div className="mo-nota">O que você registrou continua na viagem, com seu nome e a hora. Formulário aberto sem confirmar não foi gravado.</div>
+                <div className="mo-acoes">
+                  <Botao onClick={fecharModal}>Cancelar</Botao>
+                  <Botao variante="perigo" onClick={() => setModal('saiu')}>Sair</Botao>
                 </div>
               </>
             )}
@@ -405,9 +470,7 @@ export function Moldura({ children }: { children: ReactNode }) {
         </div>
       )}
 
-      {toast && (
-        <div data-tx-toast className="mo-toast" role="status" aria-live="polite"><span className="mo-toast-ok" aria-hidden>✓</span>{toast}</div>
-      )}
+      <PostoAvisos />
     </div>
   );
 }
@@ -433,9 +496,9 @@ function Dialogo({ titulo, largura, onFechar, children }: { titulo: string; larg
   }, [titulo]);
   return (
     <div ref={ref} role="dialog" aria-modal="true" data-foco-proprio aria-label={titulo} className="mo-modal" style={{ width: largura }} onClick={e => e.stopPropagation()}>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <div className="mo-modal-tit">{titulo}</div>
-        <button type="button" title="Fechar" aria-label="Fechar" className="mo-fechar" onClick={onFechar}>✕</button>
+      <div className="mo-modal-cab">
+        <h2 className="mo-modal-tit">{titulo}</h2>
+        <Botao variante="icone" aria-label="Fechar" title="Fechar" onClick={onFechar} icone={IconeFechar} />
       </div>
       {children}
     </div>

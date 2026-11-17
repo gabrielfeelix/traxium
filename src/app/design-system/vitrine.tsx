@@ -11,6 +11,7 @@ import {
   Escolhas, EstadoVazio, Linha, Modal, OpcaoCartao, Paginacao, ROTULO_TOM, Selecao, Situacao, Switch, Tabela, TabelaCabecalho,
   TabelaEsqueleto, TabelaLinha, TabelaRodape, Toast, TONS, textoFalta, type Tom,
 } from '@/components/ui';
+import { DrawerConjunto, NovasPecas, NAV_NOVAS, REGRAS_NOVAS, TOTAL_COMPONENTES } from './vitrine-ds2';
 
 // ---------------------------------------------------------------- tokens
 type T = { t: string; uso: string };
@@ -184,78 +185,7 @@ function useTokens(): Record<string, string> {
   return v;
 }
 
-// ---------------------------------------------------------------- moldura da página
-function Cod({ children }: { children: ReactNode }) {
-  return <code className="ds-cod">{children}</code>;
-}
-function Secao({ id, n, titulo, intro, children }: { id: string; n: string; titulo: string; intro?: ReactNode; children: ReactNode }) {
-  return (
-    <section className="ds-sec" id={id}>
-      <div className="ds-sec-cab">
-        <span className="ds-sec-num">{n}</span>
-        <h2 className="ds-h2">{titulo}</h2>
-      </div>
-      {intro ? <p className="ds-intro">{intro}</p> : null}
-      {children}
-    </section>
-  );
-}
-type Prop = [string, string, string, string];
-function Componente({ id, nome, arquivo, resumo, props, classes, sim, nao, fundo, children }: {
-  id: string; nome: string; arquivo: string; resumo: ReactNode; props: Prop[]; classes: ReactNode; sim: string[]; nao: string[]; fundo?: 'liso' | 'fundo'; children: ReactNode;
-}) {
-  const [aba, setAba] = useState<'props' | 'classes' | 'regras'>('props');
-  return (
-    <article className="ds-comp" id={id}>
-      <div className="ds-comp-cab">
-        <h3 className="ds-comp-nome">{nome}</h3>
-        <span className="ds-comp-arquivo">{arquivo}</span>
-      </div>
-      <p className="ds-quando" style={{ marginTop: 'var(--esp-1)' }}>{resumo}</p>
-      <div className="ds-palco">
-        <div className={'ds-palco-corpo' + (fundo ? ' ds-palco-corpo--' + fundo : '')}>{children}</div>
-        <div className="ds-abas-doc">
-          <Abas
-            rotulo={'Documentação de ' + nome}
-            className="ds-abas-doc-lista"
-            itens={[
-              { k: 'props', n: 'Props', ativa: aba === 'props', onClick: () => setAba('props') },
-              { k: 'classes', n: 'Classes', ativa: aba === 'classes', onClick: () => setAba('classes') },
-              { k: 'regras', n: 'Fazer e não fazer', ativa: aba === 'regras', onClick: () => setAba('regras') },
-            ]}
-          />
-        </div>
-        <div className="ds-detalhe">
-          {aba === 'props' ? (
-            <table className="ds-tab">
-              <thead><tr><th>Prop</th><th>Tipo</th><th>Padrão</th><th>Para quê</th></tr></thead>
-              <tbody>
-                {props.map((p) => (
-                  <tr key={p[0]}><td><Cod>{p[0]}</Cod></td><td className="tx-mono" style={{ fontSize: 'var(--fs-legenda)' }}>{p[1]}</td><td className="tx-mono" style={{ fontSize: 'var(--fs-legenda)' }}>{p[2]}</td><td>{p[3]}</td></tr>
-                ))}
-              </tbody>
-            </table>
-          ) : aba === 'classes' ? (
-            <div className="ds-quando" style={{ margin: 0, maxWidth: 'none' }}>{classes}</div>
-          ) : (
-            <div className="ds-regras" style={{ marginTop: 0 }}>
-              <div className="ds-regra ds-regra--sim"><h4>Fazer</h4><ul>{sim.map((s) => <li key={s}>{s}</li>)}</ul></div>
-              <div className="ds-regra ds-regra--nao"><h4>Não fazer</h4><ul>{nao.map((s) => <li key={s}>{s}</li>)}</ul></div>
-            </div>
-          )}
-        </div>
-      </div>
-    </article>
-  );
-}
-function Estado({ rot, children }: { rot: string; children: ReactNode }) {
-  return (
-    <div className="ds-estado">
-      <span className="ds-rot">{rot}</span>
-      {children}
-    </div>
-  );
-}
+import { Cod, Componente, Estado, Secao } from './vitrine-base';
 
 const NAV: [string, [string, string][]][] = [
   ['Fundamentos', [['cores', 'Cores'], ['tipografia', 'Tipografia'], ['espaco', 'Espaço e forma'], ['outros', 'Alturas, camadas e movimento']]],
@@ -264,6 +194,7 @@ const NAV: [string, [string, string][]][] = [
   ['Situação', [['situacao', 'Situacao'], ['badge', 'Badge'], ['aviso', 'Aviso']]],
   ['Estrutura', [['cartao', 'Cartao e página'], ['abas', 'Abas'], ['tabela', 'Tabela'], ['paginacao', 'Paginacao'], ['vazio', 'EstadoVazio']]],
   ['Sobreposição', [['modal', 'Modal'], ['drawer', 'Drawer'], ['toast', 'Toast']]],
+  ...NAV_NOVAS,
   ['Regras', [['regras', 'Regras gerais']]],
 ];
 
@@ -287,13 +218,12 @@ export default function Vitrine() {
   const [motivo, setMotivo] = useState('Resíduo de');
   const [toast, setToast] = useState(false);
   const [linhaSel, setLinhaSel] = useState('OC-24822');
+  // U117: o exemplo de Modal (textarea controlada) só monta no cliente; o HTML do servidor e o da
+  // primeira pintura ficam iguais e o aviso de hidratação some.
+  const [montado, setMontado] = useState(false);
+  useEffect(() => setMontado(true), []);
 
   const faltaModal = textoFalta([!tipo ? 'tipo' : '', motivo.trim().length < 20 ? 'motivo (faltam ' + (20 - motivo.trim().length) + ' caracteres)' : '']);
-  useEffect(() => {
-    if (!toast) return;
-    const t = setTimeout(() => setToast(false), 4200);
-    return () => clearTimeout(t);
-  }, [toast]);
 
   return (
     <div className="ds">
@@ -320,7 +250,7 @@ export default function Vitrine() {
             <div><b>{CORES.reduce((s, g) => s + g.itens.length, 0)}</b><span>tokens de cor</span></div>
             <div><b>7</b><span>passos de texto</span></div>
             <div><b>{ESPACOS.length}</b><span>passos de espaço</span></div>
-            <div><b>17</b><span>componentes</span></div>
+            <div><b>{TOTAL_COMPONENTES}</b><span>componentes</span></div>
             <div><b>4,5:1</b><span>contraste mínimo de texto</span></div>
           </div>
         </header>
@@ -809,7 +739,7 @@ export default function Vitrine() {
               <Botao variante="primario" onClick={() => setModal(true)}>Abrir modal de verdade</Botao>
               <span className="ds-nota" style={{ marginTop: 0 }}>Escolha o tipo e escreva 20 caracteres: o rodapé acompanha.</span>
             </div>
-            <Modal
+            {montado ? <Modal
               id="ds-m1" estatico titulo="Registrar ocorrência" extra={<Badge tom="marca" mono>OC-24822</Badge>}
               sub="A ocorrência fica no histórico da viagem e conta no transportador." aoFechar={() => undefined}
               falta={faltaModal}
@@ -817,7 +747,7 @@ export default function Vitrine() {
             >
               <Escolhas id="ds-m1-tipo" rotulo="Tipo" itens={['Resíduo', 'Lona rasgada', 'Reclamação no destino'].map((n) => ({ n, k: n, on: tipo === n, onClick: () => setTipo(n) }))} />
               <Campo id="ds-m1-motivo" rotulo="Motivo" campo="motivo"><AreaTexto value={motivo} onChange={(e) => setMotivo(e.target.value)} /></Campo>
-            </Modal>
+            </Modal> : <div className="tx-modal" style={{ minHeight: 320 }} aria-hidden />}
             {modal ? (
               <Modal
                 id="ds-m2" titulo="Enviar link ao motorista" sub="Ele recebe por SMS e responde pelo celular." aoFechar={() => setModal(false)} tamanho="p"
@@ -830,47 +760,66 @@ export default function Vitrine() {
 
           <Componente
             id="drawer" nome="Drawer" arquivo="src/components/ui/sobreposicao.tsx" fundo="liso"
-            resumo="Detalhe de um cadastro sem sair da lista (Transportadores, Frota). Entra pela direita, 560 px, cabeçalho no degradê escuro."
+            resumo="Detalhe de um registro sem sair da lista (Transportadores, Frota, Fornecedores) e painel de decisão (Liberar por autoridade). Entra pela direita, cabeçalho no degradê escuro. O fundo só escurece, sem desfoque; com semVeu a lista atrás continua rolável e clicável. ↑ ↓ (ou K J) trocam o registro sem fechar."
             props={[
               ['id / titulo / sub', 'string / ReactNode', '', 'Título de 20 px e subtítulo.'],
+              ['tamanho', "'p' | 'm' | 'g'", "'m'", '480, 560 ou 720 px. p para detalhe de linha, g com tabela dentro.'],
+              ['extra', 'ReactNode', '', 'Ao lado do título: Placa, Situacao em selo.'],
+              ['acoes', 'ReactNode', '', 'Faixa clara abaixo do cabeçalho: Ver histórico, Exportar, MenuLinha (vai para a direita).'],
+              ['abas', 'Aba[]', '', 'Abas do detalhe; a tela guarda a ativa e troca o children.'],
+              ['semVeu', 'boolean', 'false', 'Sem véu e sem aria-modal: a lista segue usável. Esc fecha.'],
+              ['aoAnterior / aoProximo', '() => void', '', 'Setas no cabeçalho e teclas ↑ ↓ / K J fora de campo.'],
+              ['falta', 'string', '', 'Texto "Falta: ..." à esquerda do rodapé (painel de decisão), como no Modal.'],
               ['avatar', 'ReactNode', '', 'Iniciais no círculo.'],
               ['aoFechar', '() => void', '', 'Botão fechar e clique fora.'],
               ['rodape', 'ReactNode', '', 'Ações fixas embaixo.'],
               ['estatico', 'boolean', 'false', 'Desenha no fluxo (documentação).'],
             ]}
-            classes={<><Cod>.tx-veu.tx-veu--lateral</Cod>, <Cod>.tx-drawer</Cod>, <Cod>__cab</Cod>, <Cod>__avatar</Cod>, <Cod>__titulos</Cod>, <Cod>__titulo</Cod>, <Cod>__sub</Cod>, <Cod>__corpo</Cod>, <Cod>__rodape</Cod>.</>}
-            sim={['Linhas de par rótulo e valor (Linha) no corpo.']}
-            nao={['Formulário de criação em drawer (é modal ou tela).']}
+            classes={<><Cod>.tx-veu.tx-veu--lateral</Cod> (<Cod>--sem</Cod> sem véu), <Cod>.tx-drawer</Cod> (<Cod>--p</Cod> | <Cod>--g</Cod>), <Cod>__cab</Cod>, <Cod>__avatar</Cod>, <Cod>__titulos</Cod>, <Cod>__titulo-linha</Cod>, <Cod>__titulo</Cod>, <Cod>__sub</Cod>, <Cod>__nav</Cod>, <Cod>__acoes</Cod>, <Cod>__abas</Cod>, <Cod>__corpo</Cod>, <Cod>__rodape</Cod>.</>}
+            sim={['Linhas de par rótulo e valor (Linha) no corpo.', 'Detalhe de linha com semVeu e ↑ ↓: comparar sem fechar.', 'Destrutiva no MenuLinha da faixa de ações, não no rodapé.']}
+            nao={['Formulário de criação em drawer (é modal ou tela).', 'Desfoque no fundo.', 'Mais de 4 abas no drawer.']}
           >
             <Drawer id="ds-d1" estatico titulo="Transportes Araguaia" sub="TAC, RNTRC 048213977" avatar="TA" aoFechar={() => undefined} rodape={<><Botao>Revogar acesso</Botao><Botao variante="primario">Abrir cadastro</Botao></>}>
               <Linha rotulo="Certificação GMP+"><Situacao tom="ok" forma="selo">Válida até 03/2027</Situacao></Linha>
               <Linha rotulo="Ocorrências (90 dias)"><b className="num">2</b></Linha>
               <Linha rotulo="Convite"><Badge tom="info">enviado em 12/11</Badge></Linha>
             </Drawer>
+            <div className="ds-nota" style={{ margin: 'var(--esp-5) 0 var(--esp-2)' }}>Detalhe de linha: tamanho p, semVeu, extra com Placa, faixa de ações com MenuLinha, abas e navegação ↑ ↓.</div>
+            <DrawerConjunto />
           </Componente>
 
           <Componente
-            id="toast" nome="Toast" arquivo="src/components/ui/sobreposicao.tsx"
-            resumo="Confirma uma ação que deu certo e some em 4,2 s. Uma frase com o que foi feito. Na tela, use TX.ui.avisar(c, texto): a moldura desenha."
+            id="toast" nome="Toast"
+            resumo="Confirma uma ação que deu certo, numa frase. Pode ter uma ação (Desfazer, Ver registro). Some em 4,2 s, ou 8 s com ação; o tempo para com o ponteiro ou o foco em cima; Esc fecha. Na tela: avisar({ texto, tom, acao }) de @/components/ui (TX.ui.avisar continua valendo para texto simples)."
+            arquivo="src/components/ui/toast.tsx"
             props={[
               ['children', 'ReactNode', '', 'A frase.'],
-              ['tom', "'ok' | 'erro'", "'ok'", 'erro só para falha de sistema (não de validação).'],
+              ['tom', "'ok' | 'erro' | 'info'", "'ok'", 'erro só para falha de sistema (não de validação).'],
+              ['acao', '{ rotulo, aoClicar }', '', 'Um botão de texto. Clicar executa e fecha.'],
+              ['duracao', 'number (ms)', '8000 com ação, 4200 sem', 'Só vale com aoFechar.'],
+              ['aoFechar', '() => void', '', 'Fim do tempo, Esc, botão fechar ou depois da ação.'],
               ['estatico', 'boolean', 'false', 'Desenha no fluxo (documentação).'],
+              ['avisar(o)', '({ texto, tom?, acao?, duracao? } | string) => fechar', '', 'Imperativo. Um toast por vez; o novo substitui. Desenha no PostoAvisos da página ou num posto próprio no <body>.'],
+              ['PostoAvisos', 'componente', '', 'Onde avisar() desenha. A moldura monta um (pendência ds2).'],
             ]}
-            classes={<><Cod>.tx-toast</Cod>, <Cod>.tx-toast--erro</Cod>, <Cod>.tx-toast--estatico</Cod>, <Cod>.tx-toast__icone</Cod>. A moldura usa hoje <Cod>.mo-toast</Cod>, com o mesmo desenho.</>}
-            sim={['"Ocorrência registrada na viagem OC-24822."']}
-            nao={['Erro de validação em toast.', 'Dois toasts ao mesmo tempo.']}
+            classes={<><Cod>.tx-toast</Cod>, <Cod>.tx-toast--erro</Cod>, <Cod>--info</Cod>, <Cod>--estatico</Cod>, <Cod>__icone</Cod>, <Cod>__texto</Cod>, <Cod>__acao</Cod>, <Cod>__fechar</Cod>. A moldura usa hoje <Cod>.mo-toast</Cod>, sem ação.</>}
+            sim={['"Ocorrência registrada na viagem OC-24822."', 'Ação reversível e barata: executa na hora e dá Desfazer por 8 s.', '"Liberação assinada. A viagem pode carregar." com Ver registro.']}
+            nao={['Erro de validação em toast.', 'Dois toasts ao mesmo tempo.', 'Duas ações no mesmo toast.', 'Desfazer para ação irreversível (essa pede Confirmar antes).']}
           >
             <div className="ds-pilha" style={{ justifyItems: 'start' }}>
               <Toast estatico>Ocorrência registrada na viagem OC-24822.</Toast>
+              <Toast estatico acao={{ rotulo: 'Desfazer', aoClicar: () => undefined }} aoFechar={() => undefined}>QBD 3E90 saiu do escopo GMP+.</Toast>
+              <Toast estatico tom="info" acao={{ rotulo: 'Ver registro', aoClicar: () => undefined }}>Liberação assinada. A viagem pode carregar.</Toast>
               <Toast estatico tom="erro">Não foi possível falar com o TMS. Tente de novo em 1 minuto.</Toast>
               <Botao onClick={() => setToast(true)}>Mostrar toast de verdade</Botao>
             </div>
-            {toast ? <Toast>Link enviado ao motorista da OC-24822.</Toast> : null}
+            {toast ? <Toast aoFechar={() => setToast(false)}>Link enviado ao motorista da OC-24822.</Toast> : null}
           </Componente>
         </Secao>
 
-        <Secao id="regras" n="06" titulo="Regras gerais" intro="Resumo de DESIGN.md e das decisões da revisão de telas.">
+ <NovasPecas />
+
+        <Secao id="regras" n="07" titulo="Regras gerais" intro="Resumo de DESIGN.md e das decisões da revisão de telas.">
           <div className="ds-regras">
             <div className="ds-regra ds-regra--sim">
               <h4>Fazer</h4>
@@ -901,6 +850,7 @@ export default function Vitrine() {
               </ul>
             </div>
           </div>
+          {REGRAS_NOVAS}
         </Secao>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { cloneElement, isValidElement, type CSSProperties, type InputHTMLAttributes, type ReactElement, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
+import { cloneElement, isValidElement, type CSSProperties, type InputHTMLAttributes, type ReactElement, type ReactNode, type Ref, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
 import { cx } from './util';
 
 /*
@@ -49,10 +49,10 @@ export function Campo({ id, rotulo, dica, erro, opcional, campo, className, styl
 }
 
 type Mono = { mono?: boolean };
-export function Entrada({ mono, className, ...p }: InputHTMLAttributes<HTMLInputElement> & Mono) {
+export function Entrada({ mono, className, ...p }: InputHTMLAttributes<HTMLInputElement> & Mono & { ref?: Ref<HTMLInputElement> }) {
   return <input className={cx('tx-entrada', mono && 'tx-entrada--mono', className)} {...p} />;
 }
-export function AreaTexto({ className, rows = 3, ...p }: TextareaHTMLAttributes<HTMLTextAreaElement>) {
+export function AreaTexto({ className, rows = 3, ...p }: TextareaHTMLAttributes<HTMLTextAreaElement> & { ref?: Ref<HTMLTextAreaElement> }) {
   return <textarea className={cx('tx-entrada', className)} rows={rows} {...p} />;
 }
 export function Selecao({ className, children, ...p }: SelectHTMLAttributes<HTMLSelectElement>) {

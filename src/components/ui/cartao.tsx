@@ -54,18 +54,8 @@ export function Linha({ rotulo, children, className }: { rotulo: ReactNode; chil
   );
 }
 
-/* Cabeçalho de página: título de 24 px, subtítulo e ações à direita. */
-export function CabecalhoPagina({ titulo, sub, acoes }: { titulo: ReactNode; sub?: ReactNode; acoes?: ReactNode }) {
-  return (
-    <div className="tx-pagina-cab">
-      <div className="tx-pagina-cab__titulos">
-        <h1 className="tx-pagina-cab__titulo">{titulo}</h1>
-        {sub ? <div className="tx-pagina-cab__sub">{sub}</div> : null}
-      </div>
-      {acoes ? <div className="tx-pagina-cab__acoes">{acoes}</div> : null}
-    </div>
-  );
-}
+/* CabecalhoPagina mora em cabecalho.tsx (três variantes). Reexportado para quem importa daqui. */
+export { CabecalhoPagina, type CabecalhoPaginaProps } from './cabecalho';
 
 /* Lista sem resultado: o título diz o que não há; o texto diz o que fazer. Sem ilustração. */
 export function EstadoVazio({ titulo, children, acao }: { titulo: ReactNode; children?: ReactNode; acao?: ReactNode }) {

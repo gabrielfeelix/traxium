@@ -1,7 +1,66 @@
 // Gerado de "SaaS moderno estilo Dribbble/Auditoria.dc.html" por scripts/converter-dc.mjs.
 'use client';
-import { Fragment } from 'react';
-import { TX, Tela, A, css } from '@/lib/tx/tela';
+import { TX, Tela } from '@/lib/tx/tela';
+import {
+  Botao,
+  Checkbox,
+  CelulaSelecao,
+  BarraSelecao,
+  Chip,
+  Situacao,
+  Badge,
+  Tabela,
+  TabelaCabecalho,
+  TabelaEsqueleto,
+  TabelaRodape,
+  Paginacao,
+  Cartao,
+  Linha,
+  CabecalhoPagina,
+  EstadoVazio,
+  Drawer,
+  EntradaCaixa,
+  Entrada,
+} from '@/components/ui';
+import './Auditoria.css';
+
+const LUPA = (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.6"
+    strokeLinecap="round"
+    className="tx-apagado"
+    aria-hidden
+  >
+    <circle cx="7" cy="7" r="4.6" />
+    <line x1="10.5" y1="10.5" x2="13.5" y2="13.5" />
+  </svg>
+);
+const SETA_BAIXO = (
+  <svg
+    width="11"
+    height="11"
+    viewBox="0 0 12 12"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.7"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden
+  >
+    <path d="M3 4.5 6 7.5l3-3" />
+  </svg>
+);
+const CALENDARIO = (
+  <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden>
+    <rect x="2.5" y="3.5" width="11" height="10" rx="2" />
+    <path d="M2.5 6.5h11M5.5 2v3M10.5 2v3" />
+  </svg>
+);
 
 export default class Auditoria extends Tela {
   state = { loading: true, q: '', de: '2026-09-01', ate: '2026-10-08', tipo: 'todos', sel: [], simIni: null };
@@ -25,7 +84,10 @@ export default class Auditoria extends Tela {
     const s = this.state,
       q = TX.norm(s.q),
       qd = TX.soDigitos(s.q);
+    // Escopo de filial: só as filiais que o usuário vê (API nova do motor; sem ela, as da sessão).
+    const vis = TX.filiaisVisiveis ? TX.filiaisVisiveis() : (TX.sessao() || {}).filiais || null;
     return TX.db.viagens
+      .filter((v) => !vis || vis.includes(v.filial))
       .filter(
         (v) =>
           v.assegurada &&
@@ -54,7 +116,6 @@ export default class Auditoria extends Tela {
     const res = this.resultados();
     const pg = U.paginar(this, res, 'viagens');
     const sel = s.sel.filter((id) => res.some((v) => v.id === id));
-    const am = U.cta(sel.length > 0);
     const elapsed = s.simIni ? Math.floor((Date.now() - s.simIni) / 1000) : 0;
     const pedido =
       (s.q ? (/\d{5,}/.test(s.q) ? 'Documento ' : 'Placa ') + s.q.toUpperCase() + ', ' : 'Todas as viagens, ') +
@@ -105,7 +166,48 @@ export default class Auditoria extends Tela {
               ? F.data(v.verificacao.em.slice(0, 10)) + ' por ' + TX.usuario(v.verificacao.por).nome
               : 'ausente',
           ],
+          ['Resultado da decisão', d.rotulo],
+          [
+            'Limpeza do compartimento',
+            (v.limpezas || []).length
+              ? v.limpezas
+                  .map(
+                    (l) =>
+                      l.comp.replace('#', ' ') +
+                      ': regime ' +
+                      l.regime +
+                      ', ' +
+                      ((TX.fornecedor(l.lavador) || {}).nome || l.lavador) +
+                      ', comprovante ' +
+                      l.comprovante +
+                      ', ' +
+                      F.data(l.em.slice(0, 10)),
+                  )
+                  .join(' | ')
+              : 'não exigida ou não registrada',
+          ],
+          ['Ciência do manual', v.manual ? 'versão ' + v.manual.versao + ' em ' + F.data(v.manual.em.slice(0, 10)) : 'ausente'],
         ]
+          .concat(
+            (v.liberacoes || []).map((l) => [
+              'Liberação por autoridade',
+              [
+                (TX.db.alcadas.find((a) => a.k === l.alcada) || {}).n +
+                  ' por ' +
+                  ((TX.usuario(l.assinante) || {}).nome || '') +
+                  ' em ' +
+                  F.data(l.em.slice(0, 10)),
+                'item: ' + l.checagem,
+                'motivo: ' + l.motivo,
+                'justificativa: ' + l.justificativa,
+                'risco: ' + l.risco,
+                'validade: ' + l.validade,
+                'evidência: ' + l.evidencia,
+                'escopo: ' + l.escopo,
+                'ciência do risco: ' + (l.ciencia ? 'sim' : 'não'),
+              ].join('; '),
+            ]),
+          )
           .map(
             (l) =>
               '<tr><th style="width:230px">' +
@@ -140,6 +242,8 @@ export default class Auditoria extends Tela {
       ['365', 'Últimos 12 meses', TX.addDias(TX.HOJE, -365)],
       ['ano', 'Este ano', TX.HOJE.slice(0, 4) + '-01-01'],
     ];
+    const ultSim = TX.db.simulacoes.length ? TX.db.simulacoes[TX.db.simulacoes.length - 1] : null;
+    if (ultSim) ATALHOS.push(['sim', 'Desde a última simulação', ultSim.em.slice(0, 10)]);
     const ocs = TX.db.ocorrencias
       .filter((o) => o.em.slice(0, 10) >= s.de && o.em.slice(0, 10) <= s.ate)
       .sort((a, b) => b.em.localeCompare(a.em));
@@ -176,14 +280,14 @@ export default class Auditoria extends Tela {
         atalhos: ATALHOS.map(([k, n, de]) => ({
           k,
           n,
-          sub: F.curta(de) + ' a ' + F.curta(TX.HOJE),
-          fw: s.de === de && s.ate === TX.HOJE ? '800' : '600',
+          sub: de.slice(0, 4) !== TX.HOJE.slice(0, 4) ? F.data(de) + ' a ' + F.data(TX.HOJE) : F.curta(de) + ' a ' + F.curta(TX.HOJE),
+          on: s.de === de && s.ate === TX.HOJE,
           onClick: () => this.setState({ de, ate: TX.HOJE, pag: 1, popAberto: null, deTxt: null, ateTxt: null }),
         })),
         deTxt,
         ateTxt,
-        deBd: deOk ? 'var(--borda-campo)' : 'var(--aviso-2)',
-        ateBd: ateOk ? 'var(--borda-campo)' : 'var(--aviso-2)',
+        deOk,
+        ateOk,
         onDeTxt: (ev) => {
           const t = mascara(ev.target.value);
           const d = iso(t);
@@ -200,25 +304,19 @@ export default class Auditoria extends Tela {
               ? 'A data inicial é depois da final.'
               : 'A lista atualiza enquanto você digita.'
             : 'Digite dia, mês e ano: 01/09/2026.',
-        dataMsgC: deOk && ateOk && s.de <= s.ate ? 'var(--texto-apagado)' : 'var(--aviso)',
+        dataErro: !(deOk && ateOk && s.de <= s.ate),
         tipos: [
           ['todos', 'Todas'],
           ['afretamento', 'Afretamento'],
           ['propria', 'Frota própria'],
         ].map(([k, n]) => ({
           n,
+          k,
+          on: s.tipo === k,
           onClick: () => this.setState({ tipo: k, pag: 1 }),
-          bg: s.tipo === k ? '#fff' : 'transparent',
-          c: s.tipo === k ? 'var(--primario-3)' : '#fff',
         })),
         resumoBusca:
-          res.length +
-          ' viagens asseguradas de ' +
-          F.data(s.de) +
-          ' a ' +
-          F.data(s.ate) +
-          (s.q ? ' para "' + s.q + '"' : '') +
-          '. Colunas na ordem em que o auditor anota.',
+          res.length + ' viagens asseguradas de ' + F.data(s.de) + ' a ' + F.data(s.ate) + (s.q ? ' para "' + s.q + '"' : '') + '.',
         simAtiva: !!s.simIni,
         simTempo: Math.floor(elapsed / 60) + ' min ' + String(elapsed % 60).padStart(2, '0') + ' s',
         simRot: s.simIni ? 'Registrar simulação' : 'Iniciar simulação de rastreabilidade',
@@ -234,29 +332,41 @@ export default class Auditoria extends Tela {
           this.avisar('Simulação registrada: ' + pedido + ', ' + res.length + ' viagens em ' + min + ' min.');
         },
         nRes: res.length,
-        cols: '22px 82px 70px minmax(0,1.4fr) minmax(0,1fr) 124px 50px 74px',
+        cols: '28px 120px minmax(0,1.2fr) minmax(0,1.2fr) minmax(0,1fr) 92px',
         linhas: s.loading
           ? []
           : pg.itens.map((v) => {
               const on = s.sel.includes(v.id);
+              const dec = TX.decidir(v),
+                tr = TX.transportador(v.transportador),
+                mot = TX.pessoa(v.motorista);
+              const termoOk = !!v.termo || TX.coberturaDe(v) !== 'gatekeeper',
+                verOk = !!(v.verificacao && v.verificacao.estado === 'aprovada');
               return {
+                ordem: v.ordem,
+                res: dec.rotulo,
+                tom:
+                  dec.porAutoridade && dec.resultado === 'pronta'
+                    ? 'autoridade'
+                    : { pronta: 'ok', falta: 'falta', bloqueada: 'bloqueio', tecnico: 'tecnico' }[dec.resultado] || 'na',
+                transp: tr ? TX.nomeTransportador(tr) : 'Frota própria',
+                mot: mot ? mot.nome : '',
+                on,
+                termoOk,
+                verOk,
                 id: v.id,
                 href: '/viagem?id=' + v.id,
                 data: F.data(v.data),
                 cte: v.cte ? v.cte.numero : 'pendente',
                 nf: v.cte ? v.cte.nf : '',
-                cteC: v.cte ? 'var(--texto)' : 'var(--aviso)',
+                temCte: !!v.cte,
                 rota: TX.embarcador(v.embarcador).nome + ' para ' + TX.destinatario(v.destinatario).nome,
                 produto: TX.produto(v.produto).nome,
                 placas: TX.placasDoConjunto(v.conjunto).join(' '),
                 termo: v.termo ? F.curta(v.termo.em.slice(0, 10)) : TX.coberturaDe(v) === 'gatekeeper' ? 'falta' : 'n/a',
-                termoC: v.termo || TX.coberturaDe(v) !== 'gatekeeper' ? 'var(--texto-2)' : 'var(--perigo)',
+
                 ver: v.verificacao && v.verificacao.estado === 'aprovada' ? F.curta(v.verificacao.em.slice(0, 10)) : 'falta',
-                verC: v.verificacao && v.verificacao.estado === 'aprovada' ? 'var(--texto-2)' : 'var(--perigo)',
-                bg: on ? '#f3faf8' : '#fff',
-                ck: on ? 'linear-gradient(135deg,var(--primario),var(--azul))' : '#fff',
-                ckBd: on ? 'var(--primario)' : 'var(--borda-forte)',
-                ckI: on ? '✓' : '',
+
                 toggle: () => this.setState({ sel: on ? s.sel.filter((x) => x !== v.id) : s.sel.concat(v.id) }),
               };
             }),
@@ -265,16 +375,14 @@ export default class Auditoria extends Tela {
         selTodas: () => this.setState({ sel: sel.length === res.length ? [] : res.map((v) => v.id) }),
         amostraTxt: sel.length
           ? sel.length +
-            ' viagens selecionadas (' +
+            (sel.length === 1 ? ' viagem na amostra (' : ' viagens na amostra (') +
             sel.filter((id) => TX.viagem(id).tipo === 'propria').length +
             ' de frota própria, ' +
             sel.filter((id) => TX.viagem(id).tipo !== 'propria').length +
             ' de afretamento).'
-          : 'Marque as viagens que o auditor pediu na lista ao lado.',
-        amBg: am.bg,
-        amC: am.c,
-        amSh: am.sh,
-        amCur: am.cur,
+          : 'Marque na lista as viagens que o auditor pediu.',
+        nSel: sel.length,
+        amOk: sel.length > 0,
         exportarAmostra: () => {
           if (!sel.length) return;
           exp(
@@ -298,8 +406,7 @@ export default class Auditoria extends Tela {
                 ' registradas, ' +
                 ocs.filter((o) => o.gravidade === 'grave').length +
                 ' grave' +
-                (ocs.filter((o) => o.gravidade === 'grave').length === 1 ? '' : 's') +
-                ', com descrição e revisão'
+                (ocs.filter((o) => o.gravidade === 'grave').length === 1 ? '' : 's')
               : 'nenhuma ocorrência no período',
             rot: 'Documento',
             csvD: 'inline',
@@ -349,9 +456,7 @@ export default class Auditoria extends Tela {
           {
             k: 'frota',
             n: 'Frota no escopo GMP+',
-            sub:
-              TX.db.conjuntos.filter((c) => c.dono === 'propria' && c.escopo && c.escopo.no).length +
-              ' conjuntos com placa de cada compartimento',
+            sub: TX.db.conjuntos.filter((c) => c.dono === 'propria' && c.escopo && c.escopo.no).length + ' conjuntos com as placas',
             onClick: () =>
               exp(
                 'Frota no escopo',
@@ -380,7 +485,7 @@ export default class Auditoria extends Tela {
           {
             k: 'treinos',
             n: 'Treinamentos registrados',
-            sub: TX.db.treinamentos.length + ' registros com data, tema, instrutor e participantes',
+            sub: TX.db.treinamentos.length + ' registros com participantes',
             onClick: () =>
               exp(
                 'Treinamentos',
@@ -406,7 +511,7 @@ export default class Auditoria extends Tela {
           {
             k: 'gatekeeper',
             n: 'Protocolos gatekeeper do período',
-            sub: periodoGK.length + ' viagens e a data de comunicação ao OC por filial',
+            sub: periodoGK.length + ' viagens e a comunicação ao organismo certificador',
             onClick: () =>
               exp(
                 'Protocolos gatekeeper',
@@ -451,10 +556,27 @@ export default class Auditoria extends Tela {
               ),
           },
         ].map((ap) =>
-          Object.assign({ ancora: 'apoio-' + ap.k, rot: 'Exportar', csvD: 'none', onCsv: () => {} }, ap, {
-            bd: ap.ancora && location.hash === '#' + ap.ancora ? 'var(--primario)' : 'var(--borda-suave)',
+          Object.assign({ ancora: 'apoio-' + ap.k, temCsv: ap.k === 'ocorrencias', onCsv: () => {} }, ap, {
+            destaque: !!ap.ancora && typeof location !== 'undefined' && location.hash === '#' + ap.ancora,
           }),
         ),
+        ultimaSim: ultSim
+          ? 'Última simulação de rastreabilidade: ' +
+            F.data(ultSim.em.slice(0, 10)) +
+            ', ' +
+            ultSim.pedido +
+            ', ' +
+            Math.floor(ultSim.duracaoMin / 60) +
+            'h' +
+            String(ultSim.duracaoMin % 60).padStart(2, '0') +
+            ' de 4h.'
+          : 'Nenhuma simulação de rastreabilidade registrada.',
+        drawerId: s.drawer && s.drawer.viagem,
+        abrirViagem: (id) => this.setState({ drawer: { viagem: id } }),
+        fecharDrawer: () => this.setState({ drawer: null }),
+        limparAmostra: () => this.setState({ sel: [] }),
+        todasMarcadas: sel.length > 0 && sel.length === res.length,
+        algumasMarcadas: sel.length > 0 && sel.length < res.length,
         sims: TX.db.simulacoes
           .slice()
           .reverse()
@@ -470,551 +592,343 @@ export default class Auditoria extends Tela {
     );
   }
 
+  renderDrawer(v) {
+    const id = v.drawerId;
+    const vg = id ? TX.viagem(id) : null;
+    if (!vg) return null;
+    const F = TX.fmt,
+      d = TX.decidir(vg),
+      tr = TX.transportador(vg.transportador),
+      mot = TX.pessoa(vg.motorista);
+    const tom =
+      d.porAutoridade && d.resultado === 'pronta'
+        ? 'autoridade'
+        : { pronta: 'ok', falta: 'falta', bloqueada: 'bloqueio', tecnico: 'tecnico' }[d.resultado] || 'na';
+    const on = this.state.sel.includes(vg.id);
+    const alternar = () => this.setState((st) => ({ sel: on ? st.sel.filter((x) => x !== vg.id) : st.sel.concat(vg.id) }));
+    return (
+      <Drawer
+        id="aud-viagem"
+        data-tx-drawer="viagem"
+        titulo={vg.ordem}
+        sub={F.data(vg.data) + ', ' + TX.produto(vg.produto).nome}
+        aoFechar={v.fecharDrawer}
+        rodape={
+          <>
+            <Botao onClick={alternar}>{on ? 'Tirar da amostra' : 'Pôr na amostra'}</Botao>
+            <Botao variante="primario" href={'/viagem?id=' + vg.id}>
+              Abrir viagem completa
+            </Botao>
+          </>
+        }
+      >
+        <Linha rotulo="Resultado">
+          <Situacao tom={tom} forma="selo">
+            {d.rotulo}
+          </Situacao>
+        </Linha>
+        <Linha rotulo="CT-e e NF">
+          <span className="tx-mono">{vg.cte ? vg.cte.numero + ' e ' + vg.cte.nf : 'CT-e pendente'}</span>
+        </Linha>
+        <Linha rotulo="Embarcador e destinatário">
+          <span className="tx-peso-700" style={{ textAlign: 'right' }}>
+            {TX.embarcador(vg.embarcador).nome + ' para ' + TX.destinatario(vg.destinatario).nome}
+          </span>
+        </Linha>
+        <Linha rotulo="Filial">
+          <span className="tx-peso-700">{TX.filial(vg.filial).nome}</span>
+        </Linha>
+        <Linha rotulo="Transportador">
+          <span className="tx-peso-700" style={{ textAlign: 'right' }}>
+            {tr ? TX.nomeTransportador(tr) + (tr.rntrc ? ', RNTRC ' + tr.rntrc.numero : '') : 'Frota própria'}
+          </span>
+        </Linha>
+        <Linha rotulo="Motorista">
+          <span className="tx-peso-700">{mot ? mot.nome : ''}</span>
+        </Linha>
+        <Linha rotulo="Placas">
+          <span className="tx-mono">{TX.placasDoConjunto(vg.conjunto).join(' ')}</span>
+        </Linha>
+        <Linha rotulo="Termo de compromisso">
+          <span className="tx-peso-700">
+            {vg.termo ? F.data(vg.termo.em.slice(0, 10)) : TX.coberturaDe(vg) === 'gatekeeper' ? 'Falta' : 'Não se aplica'}
+          </span>
+        </Linha>
+        <Linha rotulo="Verificação">
+          <span className="tx-peso-700">
+            {vg.verificacao && vg.verificacao.estado === 'aprovada'
+              ? F.data(vg.verificacao.em.slice(0, 10)) + ', ' + TX.usuario(vg.verificacao.por).nome
+              : 'Falta'}
+          </span>
+        </Linha>
+        <Linha rotulo="Ciência do manual">
+          <span className="tx-peso-700">{vg.manual ? 'v' + vg.manual.versao + ' em ' + F.data(vg.manual.em.slice(0, 10)) : 'Falta'}</span>
+        </Linha>
+        {(vg.liberacoes || []).map((l, i) => (
+          <Linha key={i} rotulo="Liberação por autoridade">
+            <span className="tx-peso-700" style={{ textAlign: 'right' }}>
+              {(TX.usuario(l.assinante) || {}).nome + ', ' + F.data(l.em.slice(0, 10)) + ': ' + l.motivo}
+            </span>
+          </Linha>
+        ))}
+        <h3 className="tx-aud-secao">Três últimas cargas</h3>
+        {d.t3.map((c) => (
+          <Linha key={c.placa + c.pos} rotulo={<span className="tx-mono">{c.placa + ' ' + c.pos}</span>}>
+            <span className="tx-sec" style={{ textAlign: 'right' }}>
+              {c.cargas.map((x) => (x.produto ? x.produto.nome : x.texto)).join(', ') || 'sem registro'}
+            </span>
+          </Linha>
+        ))}
+      </Drawer>
+    );
+  }
+
   render() {
     const v = this.renderVals();
     return (
       <div style={{ minHeight: '100%' }} data-screen-label="Auditoria" data-tela="Auditoria">
-        <div style={{ flex: '1', display: 'flex', flexDirection: 'column', padding: '24px 32px 48px', gap: '16px', minWidth: '0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <div>
-              <div style={{ fontSize: '24px', fontWeight: '800' }}>Auditoria</div>
-              <div style={{ fontSize: '14px', color: 'var(--texto-sec)', marginTop: '2px' }}>
-                Rastrear por placa, CT-e, NF ou período e montar a amostra. O auditor não opera: a qualidade opera ao lado dele.
-              </div>
-            </div>
-            <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}></div>
-          </div>
-          <div
-            style={{
-              position: 'relative',
-              zIndex: '5',
-              borderRadius: '22px',
-              background: 'linear-gradient(115deg,var(--primario-3),var(--primario-2) 60%,var(--azul) 140%)',
-              color: '#fff',
-              padding: '20px 24px',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-              <div
-                style={{
-                  background: 'rgba(255,255,255,.1)',
-                  border: '1px solid rgba(255,255,255,.2)',
-                  borderRadius: '13px',
-                  padding: '0 16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '9px',
-                  flex: '1',
-                  minWidth: '260px',
-                  maxWidth: '440px',
-                }}
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  stroke="rgba(255,255,255,.7)"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                >
-                  <circle cx="7" cy="7" r="4.6"></circle>
-                  <line x1="10.5" y1="10.5" x2="13.5" y2="13.5"></line>
-                </svg>
-                <input
-                  aria-label="Placa, CT-e, NF ou ordem. QWM 4H57"
-                  value={v.q ?? ''}
-                  onChange={v.onQ}
-                  data-tx-rastrear=""
-                  placeholder="Placa, CT-e, NF ou ordem. Ex.: QWM 4H57"
-                  style={{
-                    border: 'none',
-                    outline: 'none',
-                    background: 'transparent',
-                    fontSize: '16px',
-                    padding: '12px 0',
-                    flex: '1',
-                    color: '#fff',
-                    fontFamily: "'Spline Sans Mono',monospace",
-                  }}
-                />
-              </div>
-              <div data-tx-pop="" style={{ position: 'relative' }}>
-                <div
-                  role="button"
-                  tabIndex={0}
-                  onClick={v.abrirPeriodo}
-                  data-tx-dd="periodo"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    height: '44px',
-                    padding: '0 16px',
-                    borderRadius: '12px',
-                    border: '1px solid rgba(255,255,255,.25)',
-                    background: 'rgba(255,255,255,.08)',
-                    fontSize: '13px',
-                    cursor: 'pointer',
-                    whiteSpace: 'nowrap',
-                  }}
-                  className="tx-hd5eb93c"
-                >
-                  <span style={{ color: 'rgba(255,255,255,.7)', fontWeight: '600' }}>Período</span>
-                  <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontWeight: '600' }}>{v.perRot}</span>
-                  <svg
-                    width="11"
-                    height="11"
-                    viewBox="0 0 12 12"
-                    fill="none"
-                    stroke="rgba(255,255,255,.7)"
-                    strokeWidth="1.7"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M3 4.5 6 7.5l3-3"></path>
-                  </svg>
-                </div>
-                {v.popPeriodo ? (
-                  <>
-                    <div
-                      style={{
-                        position: 'absolute',
-                        left: '0',
-                        top: '50px',
-                        background: 'var(--painel)',
-                        color: 'var(--texto)',
-                        border: '1px solid var(--borda)',
-                        borderRadius: '14px',
-                        boxShadow: '0 16px 40px rgba(9,61,68,.22)',
-                        padding: '6px',
-                        width: '280px',
-                        zIndex: '60',
-                      }}
-                    >
-                      {(Array.isArray(v.atalhos) ? v.atalhos : []).map((at, $index) => (
-                        <Fragment key={$index}>
-                          <div
-                            role="button"
-                            tabIndex={0}
-                            onClick={at?.onClick}
-                            data-tx-atalho={at?.k}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '10px',
-                              padding: '8px 11px',
-                              borderRadius: '9px',
-                              fontSize: '13px',
-                              fontWeight: at?.fw,
-                              cursor: 'pointer',
-                            }}
-                            className="tx-h894fca3"
-                          >
-                            {at?.n}
-                            <span
-                              style={{
-                                marginLeft: 'auto',
-                                fontFamily: "'Spline Sans Mono',monospace",
-                                fontSize: '11px',
-                                color: 'var(--texto-apagado)',
-                              }}
-                            >
-                              {at?.sub}
-                            </span>
-                          </div>
-                        </Fragment>
-                      ))}
-                      <div style={{ borderTop: '1px solid var(--superficie-2)', marginTop: '4px', padding: '10px 11px 6px' }}>
-                        <div style={{ fontSize: '11px', fontWeight: '800', letterSpacing: '.8px', color: 'var(--texto-apagado)' }}>
-                          DATAS EXATAS
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '7px' }}>
-                          <input
-                            aria-label="DD/MM/AAAA"
-                            value={v.deTxt ?? ''}
-                            onChange={v.onDeTxt}
-                            data-tx-de=""
-                            placeholder="DD/MM/AAAA"
-                            maxLength="10"
-                            style={{
-                              width: '108px',
-                              border: `1px solid ${v.deBd ?? ''}`,
-                              borderRadius: '9px',
-                              padding: '8px 9px',
-                              fontSize: '13px',
-                              fontFamily: "'Spline Sans Mono',monospace",
-                              outline: 'none',
-                            }}
-                          />
-                          <span style={{ fontSize: '12px', color: 'var(--texto-apagado)' }}>a</span>
-                          <input
-                            aria-label="DD/MM/AAAA"
-                            value={v.ateTxt ?? ''}
-                            onChange={v.onAteTxt}
-                            data-tx-ate=""
-                            placeholder="DD/MM/AAAA"
-                            maxLength="10"
-                            style={{
-                              width: '108px',
-                              border: `1px solid ${v.ateBd ?? ''}`,
-                              borderRadius: '9px',
-                              padding: '8px 9px',
-                              fontSize: '13px',
-                              fontFamily: "'Spline Sans Mono',monospace",
-                              outline: 'none',
-                            }}
-                          />
-                        </div>
-                        <div style={{ fontSize: '12px', color: v.dataMsgC, marginTop: '6px' }}>{v.dataMsg}</div>
-                      </div>
-                    </div>
-                  </>
-                ) : null}
-              </div>
-              {(Array.isArray(v.tipos) ? v.tipos : []).map((tp, $index) => (
-                <Fragment key={$index}>
-                  <span
-                    role="button"
-                    tabIndex={0}
-                    onClick={tp?.onClick}
-                    style={{
-                      fontSize: '13px',
-                      fontWeight: '700',
-                      borderRadius: '99px',
-                      padding: '7px 13px',
-                      cursor: 'pointer',
-                      background: tp?.bg,
-                      color: tp?.c,
-                      border: '1px solid rgba(255,255,255,.22)',
-                    }}
-                  >
-                    {tp?.n}
-                  </span>
-                </Fragment>
-              ))}
-              <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div className="tx-pagina">
+          <CabecalhoPagina
+            titulo="Auditoria"
+            sub="Rastrear por placa, CT-e, NF ou período e montar a amostra do auditor."
+            acoes={
+              <>
                 {v.simAtiva ? (
-                  <>
-                    <span
-                      style={{
-                        fontFamily: "'Spline Sans Mono',monospace",
-                        fontSize: '13px',
-                        background: 'rgba(232,163,61,.25)',
-                        border: '1px solid rgba(232,163,61,.5)',
-                        borderRadius: '99px',
-                        padding: '6px 12px',
-                      }}
-                    >
-                      {'simulação '}
-                      {v.simTempo}
-                    </span>
-                  </>
+                  <Badge tom="aviso" mono aria-live="polite">
+                    {'simulação ' + v.simTempo}
+                  </Badge>
                 ) : null}
-                <span
-                  role="button"
-                  tabIndex={0}
-                  onClick={v.onSim}
-                  data-tx-simulacao=""
-                  style={{
-                    background: 'var(--painel)',
-                    color: 'var(--primario-3)',
-                    fontSize: '13px',
-                    fontWeight: '800',
-                    borderRadius: '99px',
-                    padding: '9px 16px',
-                    cursor: 'pointer',
-                  }}
-                >
+                <Botao variante={v.simAtiva ? 'primario' : 'contorno'} onClick={v.onSim} data-tx-simulacao="">
                   {v.simRot}
-                </span>
-              </div>
-            </div>
-            <div style={{ fontSize: '12px', color: 'rgba(255,255,255,.65)', marginTop: '10px' }}>{v.resumoBusca}</div>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(280px,340px)', gap: '20px', alignItems: 'start' }}>
-            <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', overflow: 'hidden' }}>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  padding: '16px 20px',
-                  borderBottom: '1px solid var(--borda-suave)',
-                }}
+                </Botao>
+              </>
+            }
+          />
+          <div className="tx-aud-busca" role="search">
+            <EntradaCaixa
+              icone={LUPA}
+              className="tx-aud-campo"
+              aria-label="Rastrear por placa, CT-e, NF ou ordem"
+              value={v.q ?? ''}
+              onChange={v.onQ}
+              data-tx-rastrear=""
+              placeholder="Placa, CT-e, NF ou ordem"
+            />
+            <div data-tx-pop="" className="tx-aud-pop-ancora">
+              <Botao
+                variante="contorno"
+                icone={CALENDARIO}
+                onClick={v.abrirPeriodo}
+                data-tx-dd="periodo"
+                aria-expanded={!!v.popPeriodo}
+                aria-haspopup="dialog"
               >
-                <div style={{ fontSize: '16px', fontWeight: '800' }}>Viagens encontradas</div>
-                <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '13px', color: 'var(--texto-sec)' }}>{v.nRes}</span>
-                <span
-                  className="tx-alvo"
-                  role="button"
-                  tabIndex={0}
-                  onClick={v.selTodas}
-                  style={{ marginLeft: 'auto', fontSize: '13px', fontWeight: '800', color: 'var(--primario-2)', cursor: 'pointer' }}
-                >
-                  {v.selTodasRot}
-                </span>
-              </div>
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: v.cols,
-                  gap: '10px',
-                  padding: '10px 18px',
-                  background: 'var(--superficie)',
-                  fontSize: '11px',
-                  fontWeight: '800',
-                  letterSpacing: '.7px',
-                  color: 'var(--texto-apagado)',
-                }}
-              >
-                <span></span>
-                <span>DATA</span>
-                <span>CT-E E NF</span>
-                <span>EMBARCADOR E DESTINATÁRIO</span>
-                <span>PRODUTO</span>
-                <span>PLACAS</span>
-                <span>TERMO</span>
-                <span>VERIFICAÇÃO</span>
-              </div>
-              {(Array.isArray(v.linhas) ? v.linhas : []).map((r, $index) => (
-                <Fragment key={$index}>
-                  <div
-                    data-tx-res={r?.id}
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: v.cols,
-                      gap: '10px',
-                      padding: '10px 18px',
-                      borderTop: '1px solid var(--superficie-2)',
-                      alignItems: 'center',
-                      fontSize: '13px',
-                      background: r?.bg,
-                    }}
-                  >
-                    <span
-                      className="tx-alvo"
-                      role="button"
-                      tabIndex={0}
-                      onClick={r?.toggle}
-                      data-tx-sel={r?.id}
-                      style={{
-                        width: '19px',
-                        height: '19px',
-                        borderRadius: '6px',
-                        border: `2px solid ${r?.ckBd ?? ''}`,
-                        background: r?.ck,
-                        color: '#fff',
-                        fontSize: '11px',
-                        fontWeight: '800',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer',
-                      }}
+                <span className="tx-mono num">{v.perRot}</span> {SETA_BAIXO}
+              </Botao>
+              {v.popPeriodo ? (
+                <div className="tx-aud-pop" role="dialog" aria-label="Período">
+                  {v.atalhos.map((at) => (
+                    <button
+                      key={at.k}
+                      type="button"
+                      className="tx-aud-pop__op"
+                      aria-pressed={at.on}
+                      onClick={at.onClick}
+                      data-tx-atalho={at.k}
                     >
-                      {r?.ckI}
-                    </span>
-                    <A
-                      className="tx-alvo"
-                      href={r?.href}
-                      style={{ fontFamily: "'Spline Sans Mono',monospace", fontWeight: '600', color: 'var(--texto)' }}
-                    >
-                      {r?.data}
-                    </A>
-                    <span style={{ fontFamily: "'Spline Sans Mono',monospace", color: r?.cteC, lineHeight: '1.45' }}>
-                      {r?.cte}
-                      <br />
-                      {r?.nf}
-                    </span>
-                    <span style={{ minWidth: '0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r?.rota}</span>
-                    <span style={{ minWidth: '0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r?.produto}</span>
-                    <span style={{ fontFamily: "'Spline Sans Mono',monospace", fontSize: '12px' }}>{r?.placas}</span>
-                    <span style={{ fontFamily: "'Spline Sans Mono',monospace", color: r?.termoC }}>{r?.termo}</span>
-                    <span style={{ fontFamily: "'Spline Sans Mono',monospace", color: r?.verC }}>{r?.ver}</span>
-                  </div>
-                </Fragment>
-              ))}
-              {v.vazio ? (
-                <>
-                  <div style={{ padding: '40px 20px', textAlign: 'center', fontSize: '13px', color: 'var(--texto-sec)' }}>
-                    Nenhuma viagem assegurada com esta placa, documento ou período.
-                  </div>
-                </>
-              ) : null}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '12px 20px',
-                  borderTop: '1px solid var(--borda-suave)',
-                }}
-              >
-                <span style={{ fontSize: '13px', color: 'var(--texto-sec)' }}>{v.pagInfo}</span>
-                {v.temPaginacao ? (
-                  <>
-                    <div style={{ marginLeft: 'auto', display: 'flex', gap: '5px' }}>
-                      {(Array.isArray(v.paginas) ? v.paginas : []).map((pg, $index) => (
-                        <Fragment key={$index}>
-                          <span
-                            className="tx-alvo"
-                            role="button"
-                            tabIndex={0}
-                            onClick={pg?.onClick}
-                            style={{
-                              fontFamily: "'Spline Sans Mono',monospace",
-                              fontSize: '13px',
-                              width: '30px',
-                              height: '30px',
-                              borderRadius: '9px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              cursor: 'pointer',
-                              border: `1px solid ${pg?.bd ?? ''}`,
-                              background: pg?.bg,
-                              color: pg?.c,
-                            }}
-                          >
-                            {pg?.n}
-                          </span>
-                        </Fragment>
-                      ))}
+                      {at.n}
+                      <span className="tx-aud-pop__sub num">{at.sub}</span>
+                    </button>
+                  ))}
+                  <div className="tx-aud-pop__datas">
+                    <div className="tx-tipo-rotulo">Datas exatas</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--esp-2)', marginTop: 'var(--esp-2)' }}>
+                      <Entrada
+                        mono
+                        aria-label="Data inicial, DD/MM/AAAA"
+                        aria-invalid={!v.deOk || undefined}
+                        value={v.deTxt ?? ''}
+                        onChange={v.onDeTxt}
+                        data-tx-de=""
+                        placeholder="DD/MM/AAAA"
+                        maxLength={10}
+                        inputMode="numeric"
+                      />
+                      <span className="tx-apagado tx-tipo-legenda">a</span>
+                      <Entrada
+                        mono
+                        aria-label="Data final, DD/MM/AAAA"
+                        aria-invalid={!v.ateOk || undefined}
+                        value={v.ateTxt ?? ''}
+                        onChange={v.onAteTxt}
+                        data-tx-ate=""
+                        placeholder="DD/MM/AAAA"
+                        maxLength={10}
+                        inputMode="numeric"
+                      />
                     </div>
-                  </>
+                    <div
+                      className={'tx-tipo-legenda ' + (v.dataErro ? 'tx-aud-aviso' : 'tx-apagado')}
+                      style={{ marginTop: 'var(--esp-1-5)' }}
+                    >
+                      {v.dataMsg}
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+            <div style={{ display: 'flex', gap: 'var(--esp-1-5)' }} role="group" aria-label="Tipo de viagem">
+              {v.tipos.map((tp) => (
+                <Chip key={tp.k} tipo="filtro" selecionado={tp.on} onClick={tp.onClick} data-tx-tipo={tp.k}>
+                  {tp.n}
+                </Chip>
+              ))}
+            </div>
+          </div>
+          <div className="tx-aud-faixa">
+            <span className="tx-tipo-denso">
+              <b className="num">{v.nRes}</b> {v.resumoBusca.replace(/^\d+ /, '')}
+            </span>
+            <span className="tx-aud-faixa__fim">
+              {v.nRes ? (
+                <Botao variante="texto" tamanho="p" onClick={v.selTodas}>
+                  {v.selTodasRot}
+                </Botao>
+              ) : null}
+            </span>
+          </div>
+          <div className="tx-aud-sims" aria-label="Simulações de rastreabilidade" role="list">
+            <span className="tx-tipo-legenda tx-apagado">Simulações de rastreabilidade (limite: 4 horas)</span>
+            {v.sims.length ? (
+              v.sims.map((sm, i) => (
+                <span key={i} role="listitem" data-tx-sim-item="" className="tx-aud-sim" title={sm.quem + ', ' + sm.n + ' viagens'}>
+                  <span className="num tx-peso-700">{sm.data}</span>
+                  <span className="tx-sec">{sm.pedido}</span>
+                  <Badge tom="ok" mono>
+                    {sm.dur}
+                  </Badge>
+                </span>
+              ))
+            ) : (
+              <span className="tx-tipo-legenda tx-apagado">nenhuma registrada</span>
+            )}
+          </div>
+          <div className="tx-aud-apoio" role="group" aria-label="Listas de apoio">
+            {v.apoio.map((ap) => (
+              <div
+                key={ap.k}
+                id={ap.ancora}
+                data-tx-apoio={ap.k}
+                className={'tx-aud-apoio__item' + (ap.destaque ? ' tx-aud-apoio__item--destaque' : '')}
+              >
+                <div className="tx-aud-apoio__texto">
+                  <div className="tx-tipo-denso tx-peso-700">{ap.n}</div>
+                  <div className="tx-tabela__sub">{ap.sub}</div>
+                </div>
+                <Botao variante="contorno" tamanho="p" onClick={ap.onClick} data-tx-apoio-doc={ap.k}>
+                  Documento
+                </Botao>
+                {ap.temCsv ? (
+                  <Botao variante="contorno" tamanho="p" onClick={ap.onCsv} data-tx-apoio-csv={ap.k}>
+                    Planilha
+                  </Botao>
                 ) : null}
               </div>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 20px' }}>
-                <div style={{ fontSize: '16px', fontWeight: '800' }}>Amostra</div>
-                <div style={{ fontSize: '13px', color: 'var(--texto-sec)', marginTop: '3px' }}>{v.amostraTxt}</div>{' '}
-                <span
-                  role="button"
-                  tabIndex={0}
-                  onClick={v.exportarAmostra}
-                  data-tx-exportar-amostra=""
-                  style={{
-                    display: 'block',
-                    textAlign: 'center',
-                    marginTop: '12px',
-                    background: v.amBg,
-                    color: v.amC,
-                    boxShadow: v.amSh,
-                    cursor: v.amCur,
-                    fontSize: '13px',
-                    fontWeight: '800',
-                    borderRadius: '99px',
-                    padding: '10px',
-                  }}
-                >
-                  Exportar amostra em documento único
-                </span>{' '}
-              </div>
-              <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 20px' }}>
-                <div style={{ fontSize: '16px', fontWeight: '800' }}>Listas de apoio</div>
-                <div style={{ fontSize: '13px', color: 'var(--texto-sec)', marginTop: '3px' }}>o que o auditor pede na mesma visita</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '10px' }}>
-                  {(Array.isArray(v.apoio) ? v.apoio : []).map((ap, $index) => (
-                    <Fragment key={$index}>
-                      <div
-                        id={ap?.ancora}
-                        data-tx-apoio={ap?.k}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '10px',
-                          border: `1px solid ${ap?.bd ?? ''}`,
-                          borderRadius: '12px',
-                          padding: '10px 12px',
-                          scrollMarginTop: '24px',
-                        }}
-                      >
-                        <div style={{ flex: '1', minWidth: '0' }}>
-                          <div style={{ fontSize: '13px', fontWeight: '700' }}>{ap?.n}</div>
-                          <div style={{ fontSize: '12px', color: 'var(--texto-apagado)' }}>{ap?.sub}</div>
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '3px' }}>
-                          <span
-                            role="button"
-                            tabIndex={0}
-                            onClick={ap?.onClick}
-                            data-tx-apoio-doc={ap?.k}
-                            style={{
-                              fontSize: '12px',
-                              fontWeight: '800',
-                              color: 'var(--primario-2)',
-                              cursor: 'pointer',
-                              whiteSpace: 'nowrap',
-                            }}
-                            className="tx-alvo tx-h76d8d79"
-                          >
-                            {ap?.rot}
-                          </span>
-                          <span
-                            role="button"
-                            tabIndex={0}
-                            onClick={ap?.onCsv}
-                            data-tx-apoio-csv={ap?.k}
-                            style={{
-                              display: ap?.csvD,
-                              fontSize: '12px',
-                              fontWeight: '700',
-                              color: 'var(--texto-sec)',
-                              cursor: 'pointer',
-                              whiteSpace: 'nowrap',
-                            }}
-                            className="tx-alvo tx-h76d8d79"
-                          >
-                            Planilha
-                          </span>
-                        </div>
-                      </div>
-                    </Fragment>
-                  ))}
-                </div>
-              </div>
-              <div style={{ background: 'var(--painel)', border: '1px solid var(--borda)', borderRadius: '20px', padding: '20px 20px' }}>
-                <div style={{ fontSize: '16px', fontWeight: '800' }}>Simulações de rastreabilidade</div>
-                <div style={{ fontSize: '13px', color: 'var(--texto-sec)', marginTop: '3px' }}>
-                  limite da auditoria: 4 horas do carregamento à descarga
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '10px' }}>
-                  {(Array.isArray(v.sims) ? v.sims : []).map((sm, $index) => (
-                    <Fragment key={$index}>
-                      <div
-                        data-tx-sim-item=""
-                        style={{ background: 'var(--superficie)', borderRadius: '12px', padding: '9px 12px', fontSize: '13px' }}
-                      >
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                          <b>{sm?.data}</b>
-                          <span
-                            style={{
-                              marginLeft: 'auto',
-                              fontFamily: "'Spline Sans Mono',monospace",
-                              color: 'var(--ok)',
-                              fontWeight: '600',
-                            }}
-                          >
-                            {sm?.dur}
-                          </span>
-                        </div>
-                        <div style={{ color: 'var(--texto-2)', marginTop: '2px' }}>{sm?.pedido}</div>
-                        <div style={{ color: 'var(--texto-apagado)', fontSize: '12px' }}>
-                          {sm?.quem}
-                          {', '}
-                          {sm?.n}
-                          {' viagens'}
-                        </div>
-                      </div>
-                    </Fragment>
-                  ))}
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
+          <Cartao lista>
+            <Tabela colunas={v.cols} rotulo="Viagens encontradas" className="tx-aud-tabela">
+              <TabelaCabecalho>
+                <span>
+                  {v.nRes ? (
+                    <CelulaSelecao
+                      marcada={v.todasMarcadas}
+                      misto={v.algumasMarcadas}
+                      aoMudar={v.selTodas}
+                      rotulo="Marcar todas as viagens do período"
+                    />
+                  ) : null}
+                </span>
+                <span>Data e CT-e</span>
+                <span>Produto e rota</span>
+                <span>Transportador e motorista</span>
+                <span>Resultado</span>
+                <span>Termo, verificação</span>
+              </TabelaCabecalho>
+              {v.loading ? (
+                <TabelaEsqueleto linhas={6} />
+              ) : (
+                v.linhas.map((r) => (
+                  <div
+                    key={r.id}
+                    role="row"
+                    data-tx-res={r.id}
+                    aria-selected={r.on || undefined}
+                    className="tx-tabela__linha tx-tabela__linha--clicavel"
+                    onClick={() => v.abrirViagem(r.id)}
+                  >
+                    <span onClick={(e) => e.stopPropagation()}>
+                      <Checkbox
+                        rotulo={<span className="tx-so-leitor">{'Pôr ' + r.ordem + ' na amostra'}</span>}
+                        checked={r.on}
+                        onChange={r.toggle}
+                        data-tx-sel={r.id}
+                      />
+                    </span>
+                    <span style={{ minWidth: '0' }}>
+                      <button
+                        type="button"
+                        className="tx-aud-abrir tx-mono num"
+                        onClick={(e) => (e.stopPropagation(), v.abrirViagem(r.id))}
+                      >
+                        {r.data}
+                      </button>
+                      <span className={'tx-tabela__sub tx-mono' + (r.temCte ? '' : ' tx-aud-aviso')}>
+                        {r.temCte ? r.cte + ', NF ' + r.nf : 'CT-e pendente'}
+                      </span>
+                    </span>
+                    <span style={{ minWidth: '0' }}>
+                      <span className="tx-tabela__forte">{r.produto}</span>
+                      <span className="tx-tabela__sub">{r.rota}</span>
+                    </span>
+                    <span style={{ minWidth: '0' }}>
+                      <span className="tx-tabela__forte">{r.transp}</span>
+                      <span className="tx-tabela__sub">{r.mot}</span>
+                      <span className="tx-tabela__sub tx-mono">{r.placas}</span>
+                    </span>
+                    <Situacao tom={r.tom}>{r.res}</Situacao>
+                    <span className="tx-tipo-legenda">
+                      <span className={'tx-mono ' + (r.termoOk ? 'tx-sec' : 'tx-aud-falta')} style={{ display: 'block' }}>
+                        {'termo ' + r.termo}
+                      </span>
+                      <span className={'tx-mono ' + (r.verOk ? 'tx-sec' : 'tx-aud-falta')} style={{ display: 'block' }}>
+                        {'verif. ' + r.ver}
+                      </span>
+                    </span>
+                  </div>
+                ))
+              )}
+            </Tabela>
+            {v.vazio ? (
+              <EstadoVazio titulo="Nenhuma viagem assegurada encontrada">Mude a placa, o documento ou o período.</EstadoVazio>
+            ) : null}
+            <TabelaRodape>
+              <Paginacao pagina={v.pagina} total={v.total} info={v.pagInfo} aoIr={v.irPara} />
+            </TabelaRodape>
+          </Cartao>
         </div>
+        <BarraSelecao
+          quantidade={v.nSel}
+          texto={v.amostraTxt}
+          aoLimpar={v.limparAmostra}
+          rotuloLimpar="Limpar amostra"
+          acoes={
+            <Botao variante="primario" inativo={!v.amOk} onClick={v.exportarAmostra} data-tx-exportar-amostra="">
+              Exportar amostra em documento único
+            </Botao>
+          }
+        />
+        {this.renderDrawer(v)}
       </div>
     );
   }
