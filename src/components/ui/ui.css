@@ -203,7 +203,8 @@ input[aria-invalid='true'], textarea[aria-invalid='true'] { border-color: var(--
 .tx-badge--contador { padding: 0 var(--esp-2); font-family: var(--fonte-mono); font-size: var(--fs-rotulo); font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.6; }
 
 /* ================================================================ Abas */
-.tx-abas { display: flex; align-items: flex-end; gap: var(--esp-1); padding: 0 var(--esp-5); border-bottom: 1px solid var(--borda-suave); overflow-x: auto; }
+.tx-abas { display: flex; align-items: flex-end; gap: var(--esp-1); padding: 0 var(--esp-5); border-bottom: 1px solid var(--borda-suave); overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+.tx-abas::-webkit-scrollbar { display: none; }
 .tx-aba {
   display: inline-flex; align-items: center; gap: var(--esp-2); min-height: 44px; padding: var(--esp-4) var(--esp-3) var(--esp-3); margin-bottom: -1px;
   border: none; border-bottom: 2.5px solid transparent; background: none; border-radius: 0;
