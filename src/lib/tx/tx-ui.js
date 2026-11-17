@@ -145,10 +145,15 @@ import TX from './tx-dados';
 
   // Pedido de liberação de quem não tem a alçada: grava e avisa quem assina (Hoje e Viagem).
   function nomeAlcada(k) { return (TX.db.alcadas.find(a => a.k === k) || {}).n || k; }
-  function pedirLiberacao(c, v, lib) {
-    TX.fazer('pedirLiberacao', { id: v.id, checagem: lib.item.k, alcada: lib.alcada });
+  // extra (opcional, M15): { nota, anexo } do afretador, que o modal de liberação mostra a quem assina.
+  // Se o motor recusar (bloqueio mantido, pedido em aberto, outra filial), avisa o motivo em vez de lançar.
+  function pedirLiberacao(c, v, lib, extra) {
+    const x = extra || {};
+    const r = TX.tentar('pedirLiberacao', { id: v.id, checagem: lib.item.k, alcada: lib.alcada, nota: x.nota || '', anexo: x.anexo || null });
+    if (!r.ok) { avisar(c, r.motivo); return false; }
     const quem = TX.db.usuarios.filter(x => x.filiais.includes(v.filial) && TX.podeAssinar(x, lib.alcada)).sort((a, b) => (a.alcada === lib.alcada ? 0 : 1) - (b.alcada === lib.alcada ? 0 : 1))[0];
     avisar(c, 'Pedido enviado' + (quem ? ' a ' + quem.nome + ' (' + nomeAlcada(lib.alcada) + ')' : '') + '. A ' + v.ordem + ' entra na fila de assinatura com o prazo das ' + v.janela + '.');
+    return true;
   }
   // Valores comuns que o conteúdo das telas usa (o resto da antiga base() é da moldura).
   function base(c) {

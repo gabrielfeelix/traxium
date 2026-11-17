@@ -3,6 +3,35 @@
  * O estado da viagem nunca é campo: TX.decidir(viagem) deriva tudo dos fatos.
  * No app Next é importado por src/lib/tx/tela.js. Também roda em Node (scripts/testar-tx-dados.mjs).
  * Cópia viva do arquivo de mesmo nome do protótipo .dc.html, que fica congelado.
+ *
+ * API de permissão e escopo (revisão do MVP, docs/revisao-telas/11-revisao-mvp.md, M40 e M41).
+ * Uma matriz só, a mesma que o back-end vai precisar; as telas escondem ou apagam, o motor recusa.
+ *   TX.pode(op, alvo)       -> boolean. A sessão pode fazer a operação `op` (os mesmos nomes de
+ *                              `aplicar`: 'criarViagem', 'liberar', 'classeRegra', 'convidarUsuario',
+ *                              'escopoFrota'...) sobre `alvo` (id de viagem, transportador, conjunto,
+ *                              placa, pessoa, fornecedor ou filial; opcional). Junta papel, alçada,
+ *                              escopo de filial e o estado da viagem (pedido em aberto, bloqueio
+ *                              mantido, viagem cancelada...). Também aceita 'reset' (voltar à semente).
+ *   TX.porque(op, alvo)     -> string curta em pt-BR com o motivo da recusa, ou null se pode.
+ *                              Serve de dica no botão apagado.
+ *   TX.filiaisVisiveis()    -> ids das filiais que a sessão enxerga (usuario.filiais).
+ *   TX.podeVer(tipo, id)    -> boolean. tipo: 'viagem' | 'filial' | 'conjunto' | 'transportador' |
+ *                              'placa' | 'pessoa' | 'compartimento'. A base de transportadores é
+ *                              compartilhada (premissa da seção 3, item 4); viagem e frota própria
+ *                              seguem a filial.
+ *   TX.viagensVisiveis()    -> viagens das filiais da sessão (o mesmo que viagensDaFilial('todas')).
+ *   TX.fazer(op, dados)     -> lança Error com .recusada = true e .motivo quando a sessão não pode
+ *                              (mesmo que a tela ofereça) ou quando o dado é inválido.
+ *   TX.tentar(op, dados)    -> { ok: true, resultado } | { ok: false, motivo }: o mesmo, sem lançar.
+ *   TX.rotuloFalha(k, item) -> rótulo do motivo em forma de falha ("CRLV vencido no conjunto",
+ *                              "filial sem comunicação ao organismo certificador"). Cada item de
+ *                              decidir().falta já traz esse rótulo em `motivo`.
+ * Papéis (premissa da revisão, M40): afretador cria, envia, confere, registra limpeza, pede
+ * liberação, troca conjunto, registra ocorrência, retifica, cancela, concilia e registra "carregou
+ * sem declaração" na própria filial; qualidade faz isso em todas as filiais dela e ainda libera e
+ * mantém bloqueio pela alçada, regulariza, atualiza documentos, cadastros e regras; direção faz tudo,
+ * inclusive reabilitar transportador; frota cuida do escopo e dos documentos da frota própria;
+ * consultoria só lê e exporta. As etapas do link (link*) só valem com porMotorista e link enviado.
  */
 (function (root) {
   'use strict';
@@ -33,6 +62,12 @@
   const addDias = (iso, n) => { const d = new Date(iso + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
   const difDias = (a, b) => Math.round((new Date(a + 'T12:00:00Z') - new Date(b + 'T12:00:00Z')) / 86400000);
   const clone = o => JSON.parse(JSON.stringify(o));
+  // Validações de entrada. CPF: 11 dígitos, não todos iguais (os CPFs fictícios da semente não
+  // passam no dígito verificador; a conferência do DV fica para o back-end, ver docs/ds/pendencias.md).
+  const cpfValido = c => { const d = soDigitos(c); return d.length === 11 && !/^(\d)\1{10}$/.test(d); };
+  const horaValida = h => /^([01]\d|2[0-3]):[0-5]\d$/.test(String(h || ''));
+  const dataValida = iso => { if (!/^\d{4}-\d{2}-\d{2}$/.test(String(iso || ''))) return false; const d = new Date(iso + 'T12:00:00Z'); return !isNaN(d) && d.toISOString().slice(0, 10) === iso; };
+  function recusa(motivo) { const e = new Error(motivo); e.recusada = true; e.motivo = motivo; return e; }
   const DIAS = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
   const MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
   const fmt = {
@@ -314,8 +349,9 @@
       integracoes: [
         { k: 'tms', n: 'TMS (planilha ou XML de CT-e)', estado: 'manual', sub: 'conciliação em lote por placa e data' },
         { k: 'whatsapp', n: 'WhatsApp do afretador', estado: 'ativo', sub: 'mensagem pronta copiada para o WhatsApp de quem envia' },
-        { k: 'antt', n: 'Consulta RNTRC (ANTT)', estado: 'ativo', sub: 'confere situação do RNTRC no cadastro' },
-        { k: 'gmp', n: 'Base pública de certificados GMP+', estado: 'ativo', sub: 'confere certificado de ETC certificada toda semana' }
+        // M38: ainda não consultam nada; "planejado" até existir a integração.
+        { k: 'antt', n: 'Consulta RNTRC (ANTT)', estado: 'planejado', sub: 'vai conferir a situação do RNTRC no cadastro' },
+        { k: 'gmp', n: 'Base pública de certificados GMP+', estado: 'planejado', sub: 'vai conferir o certificado de ETC certificada toda semana' }
       ]
     };
 
@@ -576,38 +612,58 @@
         evento(db, op, v.id, 'Limpeza regime ' + d.regime + ' registrada em ' + d.comp.replace('#', ' ') + ' com comprovante ' + d.comprovante);
         return;
       case 'liberar':
-        v.liberacoes.push(Object.assign({}, d.registro, { em: op.em, assinante: op.por }));
+        v.liberacoes.push(Object.assign({}, d.registro, { em: op.em, assinante: op.por, conjunto: v.conjunto, ord: db.eventos.length }));
         evento(db, op, v.id, 'Liberada por autoridade (' + d.registro.alcadaNome + '): ' + d.registro.motivo);
         return;
       case 'pedirLiberacao': {
         // O afretador não assina: pede a quem tem a alçada. O pedido entra na fila de assinatura.
         if (!v) return;
-        v.pedidosLib = (v.pedidosLib || []).concat([{ checagem: d.checagem, alcada: d.alcada, nota: d.nota || '', em: op.em, por: op.por }]);
+        v.pedidosLib = (v.pedidosLib || []).concat([{ checagem: d.checagem, alcada: d.alcada, nota: d.nota || '', anexo: d.anexo || null, em: op.em, por: op.por, ord: db.eventos.length }]);
         const alc = db.alcadas.find(a => a.k === d.alcada);
         evento(db, op, v.id, 'Liberação pedida a ' + (alc ? alc.n : d.alcada) + ' por ' + nome(op.por));
         return;
       }
       case 'manterBloqueio':
-        v.manutencoes.push({ checagem: d.checagem, motivo: d.motivo, acao: d.acao, em: op.em, por: op.por });
-        evento(db, op, v.id, 'Bloqueio mantido por ' + nome(op.por) + ': ' + d.motivo);
+        // detalhe: o motivo do bloqueio no momento da decisão (gravado por fazer). Enquanto o fato
+        // continuar o mesmo, o pedido fica fechado; fato novo (documento, conjunto) reabre (M43).
+        v.manutencoes.push({ checagem: d.checagem, motivo: d.motivo, acao: d.acao || '', alcada: d.alcada || null, detalhe: d.detalhe || null, em: op.em, por: op.por, ord: db.eventos.length });
+        evento(db, op, v.id, 'Bloqueio mantido por ' + nome(op.por) + ': ' + d.motivo + (d.acao ? '. Ação indicada: ' + d.acao : ''));
+        return;
+      case 'revogarLiberacao':
+        // A liberação continua no registro; a revogação é evento novo e a viagem volta a bloqueada.
+        v.revogacoes = (v.revogacoes || []).concat([{ checagem: d.checagem, motivo: d.motivo, em: op.em, por: op.por, ord: db.eventos.length }]);
+        evento(db, op, v.id, 'Liberação por autoridade revogada por ' + nome(op.por) + ': ' + d.motivo);
+        return;
+      case 'carregarSemDeclaracao':
+        // Desfecho terminal da viagem que não ficou pronta e carregou mesmo assim (M12): o CT-e sai
+        // sem a frase GMP+. O que faltava fica gravado como fato, não como campo editável.
+        v.semDeclaracao = { em: op.em, por: op.por, motivo: d.motivo, resultadoAntes: d.resultadoAntes || null, faltava: d.faltava || [] };
+        evento(db, op, v.id, 'Carregou sem declaração GMP+ (registrado por ' + nome(op.por) + '): ' + d.motivo);
         return;
       case 'regularizar':
-        v.regularizacoes.push({ comp: d.comp, opcao: d.opcao, inspetor: d.inspetor, entidade: d.entidade, laudo: d.laudo, em: op.em, por: op.por });
+        v.regularizacoes.push({ comp: d.comp, opcao: d.opcao, inspetor: d.inspetor, entidade: d.entidade, laudo: d.laudo, em: op.em, por: op.por, ord: db.eventos.length });
         evento(db, op, v.id, 'Regularização TS1.9 opção ' + d.opcao + ' registrada para ' + d.comp.replace('#', ' ') + ' (inspetor ' + d.inspetor + ')');
         return;
       case 'trocarConjunto': {
-        const antes = v.conjunto;
+        const antes = v.conjunto, motAntes = v.motorista;
         const novo = db.conjuntos.find(x => x.id === d.conjunto);
         if (!novo) throw new Error('conjunto inexistente');
-        v.conjunto = d.conjunto; v.t3 = {}; v.checklist = null; v.verificacao = null; v.termo = null; v.manual = null; v.liberacoes = []; v.regularizacoes = [];
+        // Liberações e regularizações ficam no registro; o motor só considera as posteriores à troca.
+        v.conjunto = d.conjunto; v.t3 = {}; v.checklist = null; v.verificacao = null; v.termo = null; v.manual = null;
         if (novo.dono === 'propria') { v.tipo = 'propria'; v.transportador = 'propria'; v.motorista = novo.motorista; }
         else {
           const tn = db.transportadores.find(x => x.id === novo.dono);
           v.tipo = 'afretamento'; v.transportador = tn.id; v.motorista = tn.tipo === 'TAC' ? tn.pessoa : (d.motorista || tn.motoristas[0]);
         }
-        v.link = v.link.enviadoEm ? { enviadoEm: v.link.enviadoEm } : {};
-        evento(db, op, v.id, 'Conjunto trocado (' + d.motivo + '). T-3, checklist e termo voltam a ser pedidos.');
-        v.retificacoes.push({ campo: 'conjunto', de: antes, para: d.conjunto, motivo: d.motivo || 'troca de conjunto', em: op.em, por: op.por });
+        // M45: motorista novo não recebeu link nenhum. O envio anterior fica no registro, em nome do
+        // motorista antigo; a viagem volta a "link não enviado". Mesmo motorista: o link continua
+        // enviado, mas as etapas recomeçam.
+        if (motAntes !== v.motorista) {
+          if (v.link && v.link.enviadoEm) v.linksAnteriores = (v.linksAnteriores || []).concat([{ motorista: motAntes, link: clone(v.link), ate: op.em }]);
+          v.link = {};
+        } else v.link = v.link.enviadoEm ? { enviadoEm: v.link.enviadoEm, canal: v.link.canal } : {};
+        evento(db, op, v.id, 'Conjunto trocado (' + d.motivo + '). T-3, checklist e termo voltam a ser pedidos' + (motAntes !== v.motorista ? '; o link precisa ser enviado ao motorista novo.' : '.'));
+        v.retificacoes.push({ campo: 'conjunto', de: antes, para: d.conjunto, motivo: d.motivo || 'troca de conjunto', em: op.em, por: op.por, ord: db.eventos.length });
         return;
       }
       case 'registrarOcorrencia': {
@@ -663,7 +719,11 @@
       case 'conciliarCTe':
         (d.linhas || []).forEach(l => {
           const via = db.viagens.find(x => x.id === l.viagem);
-          if (via && !via.cte) { via.cte = { numero: l.cte, nf: l.nf, conciliadoEm: HOJE, lote: d.arquivo }; evento(db, op, via.id, 'CT-e ' + l.cte + ' e NF ' + l.nf + ' conciliados pelo lote ' + d.arquivo); }
+          if (via && !via.cte) {
+            // decisao: a situação da viagem no momento da conciliação, gravada por fazer (M44).
+            via.cte = { numero: l.cte, nf: l.nf, conciliadoEm: HOJE, lote: d.arquivo, decisao: l.decisao || null, alerta: (l.decisao && l.decisao.alerta) || null };
+            evento(db, op, via.id, 'CT-e ' + l.cte + ' e NF ' + l.nf + ' conciliados pelo lote ' + d.arquivo + (via.cte.alerta ? '. ' + via.cte.alerta : ''));
+          }
         });
         return;
       case 'cancelarViagem':
@@ -676,7 +736,14 @@
         if (d.campo === 'janela') v.janela = d.para;
         if (d.campo === 'ordem') v.ordem = d.para;
         if (d.campo === 'destinatario') v.destinatario = d.para;
-        evento(db, op, v.id, 'Retificação de ' + d.campo + ': ' + d.deTxt + ' para ' + d.paraTxt + '. Motivo: ' + d.motivo);
+        if (d.campo === 'produto') v.produto = d.para;
+        if (d.campo === 'data') v.data = d.para;
+        if (d.campo === 'destinatario' || d.campo === 'produto') {
+          // M48: assegurada deriva do produto e do destinatário; muda com eles.
+          const pr = db.produtos.find(p => p.id === v.produto), de = db.destinatarios.find(x => x.id === v.destinatario);
+          v.assegurada = !!(pr && pr.racao && de && de.certificado);
+        }
+        evento(db, op, v.id, 'Retificação de ' + d.campo + ': ' + (d.deTxt != null ? d.deTxt : d.de) + ' para ' + (d.paraTxt != null ? d.paraTxt : d.para) + '. Motivo: ' + d.motivo);
         return;
       case 'comunicarOC': {
         const f = db.filiais.find(x => x.id === d.filial);
@@ -734,6 +801,9 @@
       }
       case 'classeRegra': {
         const r = db.config.regras.find(x => x.k === d.regra);
+        // M47: a classe vigente muda daqui para frente; o histórico guarda desde quando cada uma vale.
+        if (!r.historico) r.historico = [{ classe: r.classe, desde: null }];
+        r.historico.push({ classe: d.classe, desde: op.em, por: op.por, motivo: d.motivo });
         r.classe = d.classe; r.alteradaEm = op.em; r.alteradaPor = op.por; r.motivo = d.motivo;
         evento(db, op, null, 'Regra "' + r.n + '" passou a ' + d.classe + ': ' + d.motivo);
         return;
@@ -885,6 +955,67 @@
   }
 
   // ------------------------------------------------------------------ motor de decisão
+  // Checagem -> regra configurável (Configurações, Regras).
+  const REGRA_DA_CHECAGEM = { 'docs-transp': 'docs', 'docs-mot': 'docs', 'docs-conj': 'docs', manual: 'manual', fotos: 'fotos' };
+  // Classe de uma regra num momento (null = agora). O histórico nasce na primeira mudança.
+  function classeRegra(k, momento) {
+    const r = db().config.regras.find(x => x.k === k);
+    if (!r) return null;
+    if (!momento || !r.historico) return r.classe;
+    let classe = r.historico[0].classe;
+    r.historico.forEach(h => { if (!h.desde || h.desde <= momento) classe = h.classe; });
+    return classe;
+  }
+  // Momento em que a decisão da viagem é tomada para fins de regra: viagem já carregada, o fim do dia
+  // do carregamento; hoje ou adiante, agora.
+  function momentoDaRegra(v) { return v.data < HOJE ? v.data + 'T23:59' : null; }
+  // a veio depois de b: pela ordem no log quando os dois têm (mesmo minuto), senão pela hora.
+  const posterior = (a, b) => (a.ord != null && b.ord != null ? a.ord > b.ord : (a.em || '') >= (b.em || ''));
+  function ultimaTroca(v) {
+    const t = (v.retificacoes || []).filter(r => r.campo === 'conjunto');
+    return t.length ? t[t.length - 1] : null;
+  }
+  function liberacoesValidas(v) {
+    const troca = ultimaTroca(v);
+    const rev = v.revogacoes || [];
+    return (v.liberacoes || []).filter(l => (!troca || posterior(l, troca)) && (!l.conjunto || l.conjunto === v.conjunto) &&
+      !rev.some(r => r.checagem === l.checagem && posterior(r, l)));
+  }
+
+  // M42: um rótulo de falha por checagem. Com o item da checagem, o rótulo distingue vencido de
+  // ausente, proibida de não classificada e assim por diante; sem ele, sai o rótulo geral.
+  function rotuloFalha(k, item) {
+    const c = item || {};
+    const est = c.estadoRegra || c.estado;
+    const det = c.detalhe || '';
+    switch (k) {
+      case 'cobertura':
+        if (/^Conjunto no escopo/.test(c.nome || '')) return 'conjunto fora do escopo GMP+';
+        if (/^Certificado GMP\+/.test(c.nome || '')) return 'certificado GMP+ do transportador vencido ou ausente';
+        return 'filial sem comunicação ao organismo certificador';
+      case 'ocorrencia': return 'transportador em revisão após ocorrência grave';
+      case 'docs-transp': return est === 'falta' ? 'falta o RNTRC' : 'RNTRC vencido';
+      case 'docs-mot': return est === 'falta' ? 'falta a CNH do motorista' : 'CNH vencida';
+      case 'docs-conj': return est === 'falta' ? 'falta o CRLV do conjunto' : 'CRLV vencido no conjunto';
+      case 'produto': return c.tecnico ? 'produto fora da base IDTF' : 'produto não é ração';
+      case 't3': return 'faltam as três últimas cargas';
+      case 'regime':
+        if (c.tecnico) return /não está na base/.test(det) ? 'carga anterior não classificada' : 'carga anterior proibida';
+        if (est === 'falta') return 'falta o comprovante de limpeza';
+        return 'carga anterior proibida';
+      case 'verificacao':
+        if (c.tecnico) return 'resto de carga no compartimento';
+        if (c.devolvida) return 'checklist devolvido ao motorista';
+        if (c.conferir) return 'fotos esperando conferência';
+        if (item) return 'falta o checklist com fotos';
+        return 'verificação do compartimento pendente';
+      case 'fotos': return 'falta foto em item do checklist';
+      case 'termo': return 'falta o termo de compromisso assinado';
+      case 'manual': return 'falta a ciência do manual vigente';
+      default: return c.nome ? 'pendente: ' + c.nome.toLowerCase() : 'pendente';
+    }
+  }
+
   // Deriva das fatos as checagens, o resultado e o que falta, com quem resolve.
   function decidir(v) {
     if (typeof v === 'string') v = viagem(v);
@@ -946,7 +1077,8 @@
     else if (incompletos.length) add('t3', 'Três últimas cargas por compartimento', 'falta', incompletos.length === comps.length ? 'Ainda não informadas' : 'Faltam em ' + incompletos.map(c => c.placa + ' ' + c.pos).join(', '), quemT3);
     else add('t3', 'Três últimas cargas por compartimento', 'ok', comps.length + (comps.length === 1 ? ' compartimento' : ' compartimentos') + ' com T-3 completo (' + (v.tipo === 'propria' ? 'histórico da frota' : 'declarado pelo motorista') + ')', quemT3);
 
-    const regs = v.regularizacoes || [];
+    const troca = ultimaTroca(v);
+    const regs = (v.regularizacoes || []).filter(r => !troca || posterior(r, troca));
     const regimeComps = comps.filter(c => c.cargas.length).map(c => {
       const reg = regs.find(r => r.comp === c.key);
       return Object.assign({}, c, { regularizado: reg || null });
@@ -975,6 +1107,13 @@
     else if (vf && vf.estado === 'devolvida' && !(vf.reenviadoEm)) add('verificacao', 'Verificação do compartimento', 'falta', 'Devolvido ao motorista: ' + vf.motivo, 'Motorista pelo link', { devolvida: true });
     else if (vf && vf.estado === 'aprovada' && (!ck.enviadoEm || vf.em >= ck.enviadoEm)) add('verificacao', 'Verificação do compartimento', 'ok', 'Aprovada por ' + (usuario(vf.por) || {}).nome + ' em ' + fmt.quando(vf.em), 'Afretador');
     else add('verificacao', 'Verificação do compartimento', 'falta', 'Fotos enviadas ' + fmt.quando(ck.enviadoEm) + ', esperando conferência', 'Afretador confere as fotos', { conferir: true });
+    // M46: foto em todo item do checklist. Só existe depois do checklist enviado; a regra decide
+    // se a falta de foto trava (bloqueio) ou só avisa (alerta).
+    if (ck && ck.enviadoEm) {
+      const semFoto = ITENS_CHECKLIST.filter(it => ck.itens && ck.itens[it.k] && !((ck.fotos || {})[it.k] > 0));
+      if (semFoto.length) add('fotos', 'Foto em todo item do checklist', 'falta', 'Sem foto: ' + semFoto.map(it => it.n.toLowerCase()).join(', '), 'Motorista pelo link');
+      else add('fotos', 'Foto em todo item do checklist', 'ok', ITENS_CHECKLIST.length + ' itens com foto', 'Motorista pelo link');
+    }
 
     // 6. Termo e manual
     if (cob === 'gatekeeper') {
@@ -990,14 +1129,21 @@
     }
 
     // Regras configuradas como alerta não travam: viram aviso, com o motivo escrito.
-    const regraDe = { 'docs-transp': 'docs', 'docs-mot': 'docs', 'docs-conj': 'docs', manual: 'manual' };
+    // M47: vale a classe em vigor quando a viagem carregou (viagem passada: fim do dia do
+    // carregamento); mudar a regra hoje não reescreve decisão já tomada.
+    const momento = momentoDaRegra(v);
+    const alertas = [];
     ch.forEach(c => {
-      const r = db().config.regras.find(x => x.k === regraDe[c.k]);
-      if (r && r.classe === 'alerta' && (c.estado === 'bloqueio' || c.estado === 'falta') && !c.tecnico) { c.estado = 'ok'; c.aviso = true; c.detalhe = 'Alerta (regra configurada como alerta): ' + c.detalhe; }
+      const rk = REGRA_DA_CHECAGEM[c.k];
+      if (rk && classeRegra(rk, momento) === 'alerta' && (c.estado === 'bloqueio' || c.estado === 'falta') && !c.tecnico) {
+        alertas.push({ k: c.k, regra: rk, motivo: rotuloFalha(c.k, c), detalhe: c.detalhe });
+        c.estadoRegra = c.estado; c.estado = 'ok'; c.aviso = true; c.porRegraAlerta = rk; c.detalhe = 'Alerta (regra configurada como alerta): ' + c.detalhe;
+      }
     });
 
     // Liberações por autoridade cobrem bloqueios não técnicos; o motor continua reprovando.
-    const libs = v.liberacoes || [];
+    // Valem as assinadas depois da última troca de conjunto e não revogadas depois (M16).
+    const libs = liberacoesValidas(v);
     ch.forEach(c => {
       const lib = libs.find(l => l.checagem === c.k);
       if (lib && c.estado === 'bloqueio' && !c.tecnico) { c.liberadaPor = lib; }
@@ -1011,18 +1157,23 @@
     const porAutoridade = aplicaveis.some(c => c.liberadaPor);
     if (v.cancelada) resultado = 'cancelada';
     else if (!v.assegurada) resultado = 'nao_assegurada';
+    else if (v.semDeclaracao) resultado = 'nao_assegurada';
     else if (tecnico) resultado = 'tecnico';
     else if (bloq.length) resultado = 'bloqueada';
     else if (faltas.length) resultado = 'falta';
     else resultado = 'pronta';
     const ROT = {
       pronta: porAutoridade ? 'Liberada por autoridade' : 'Pronta para assegurar',
-      falta: 'Falta algo', bloqueada: 'Bloqueada', tecnico: 'Bloqueio técnico', cancelada: 'Cancelada', nao_assegurada: 'Sem declaração GMP+'
+      falta: 'Falta algo', bloqueada: 'Bloqueada', tecnico: 'Bloqueio técnico', cancelada: 'Cancelada',
+      nao_assegurada: v.assegurada && v.semDeclaracao ? 'Carregou sem declaração GMP+' : 'Sem declaração GMP+'
     };
-    const falta = [...(tecnico ? [tecnico] : []), ...bloq, ...faltas].map(c => ({ k: c.k, o: c.nome, detalhe: c.detalhe, quem: c.quem, estado: c.estado, tecnico: !!c.tecnico, alcada: c.alcada || null, resolver: c.resolver || null, href: c.href || null }));
+    ch.forEach(c => { if (c.estado === 'bloqueio' || c.estado === 'falta') c.motivo = rotuloFalha(c.k, c); });
+    // motivo: rótulo curto em forma de falha (M42), o mesmo em Hoje, Viagens, Viagem e exportações.
+    const falta = [...(tecnico ? [tecnico] : []), ...bloq, ...faltas].map(c => ({ k: c.k, o: c.nome, motivo: c.motivo, detalhe: c.detalhe, quem: c.quem, estado: c.estado, tecnico: !!c.tecnico, alcada: c.alcada || null, resolver: c.resolver || null, href: c.href || null }));
     const okN = aplicaveis.filter(c => c.estado === 'ok' || c.liberadaPor).length;
     const total = aplicaveis.filter(c => c.estado !== 'na').length;
-    return { viagem: v.id, resultado, rotulo: ROT[resultado], porAutoridade, checagens: ch, falta, t3: comps, okN, total, cobertura: cob, regime: (ch.find(c => c.k === 'regime') || {}).regime || null };
+    return { viagem: v.id, resultado, rotulo: ROT[resultado], porAutoridade, checagens: ch, falta, alertas, t3: comps, okN, total, cobertura: cob, regime: (ch.find(c => c.k === 'regime') || {}).regime || null,
+      semDeclaracao: v.assegurada && !v.cancelada && v.semDeclaracao ? v.semDeclaracao : null };
   }
 
   // Linha do tempo derivada dos fatos da viagem (nada é campo de estado).
@@ -1033,6 +1184,12 @@
     const out = [];
     const e = (em, texto, quem, tipo) => { if (em) out.push({ em, texto, quem, tipo }); };
     e(v.criadaEm, 'Viagem criada' + (v.origemOrdem === 'pdf' ? ' a partir do PDF da ordem' : '') + (v.ordem ? ', ' + v.ordem : ''), nomeU(v.criadaPor), 'equipe');
+    (v.linksAnteriores || []).forEach(x => {
+      const ant = (pessoa(x.motorista) || {}).nome || 'motorista anterior';
+      e(x.link.enviadoEm, 'Link enviado a ' + ant + ' (motorista anterior)', nomeU(v.criadaPor), 'equipe');
+      if (x.link.abertoEm) e(x.link.abertoEm, 'Abriu o link (motorista anterior)', ant, 'motorista');
+      e(x.ate, 'Link de ' + ant + ' encerrado pela troca de conjunto', 'Sistema', 'sistema');
+    });
     const l = v.link || {};
     e(l.enviadoEm, 'Link enviado ao motorista pelo WhatsApp', nomeU(v.criadaPor), 'equipe');
     e(l.abertoEm, 'Abriu o link', mot, 'motorista');
@@ -1050,18 +1207,37 @@
     (v.regularizacoes || []).forEach(x => e(x.em, 'Regularização TS1.9 opção ' + x.opcao + ' em ' + x.comp.replace('#', ' ') + ', inspetor ' + x.inspetor, nomeU(x.por), 'equipe'));
     (v.liberacoes || []).forEach(x => e(x.em, 'Liberada por autoridade: ' + x.motivo + '. O motor continua reprovando a regra.', nomeU(x.assinante), 'alerta'));
     (v.pedidosLib || []).forEach(x => e(x.em, 'Pediu liberação a ' + ((db().alcadas.find(a => a.k === x.alcada) || {}).n || x.alcada) + (x.nota ? ': ' + x.nota : ''), nomeU(x.por), 'equipe'));
-    (v.manutencoes || []).forEach(x => e(x.em, 'Bloqueio mantido: ' + x.motivo, nomeU(x.por), 'alerta'));
+    (v.manutencoes || []).forEach(x => e(x.em, 'Bloqueio mantido: ' + x.motivo + (x.acao ? '. Ação indicada: ' + x.acao : ''), nomeU(x.por), 'alerta'));
+    (v.revogacoes || []).forEach(x => e(x.em, 'Liberação revogada: ' + x.motivo, nomeU(x.por), 'alerta'));
+    if (v.semDeclaracao) e(v.semDeclaracao.em, 'Carregou sem declaração GMP+: ' + v.semDeclaracao.motivo + '. O CT-e sai sem a frase.', nomeU(v.semDeclaracao.por), 'alerta');
     (v.retificacoes || []).forEach(x => e(x.em, 'Retificação de ' + x.campo + ' (' + x.motivo + ')', nomeU(x.por), 'equipe'));
     db().ocorrencias.filter(o => o.viagem === v.id).forEach(o => e(o.em, 'Ocorrência ' + o.id + ' (' + o.gravidade + '): ' + o.tipo, nomeU(o.por), 'alerta'));
-    if (v.cte) e(v.cte.conciliadoEm + 'T23:59', 'CT-e ' + v.cte.numero + ' e NF ' + v.cte.nf + ' conciliados (lote ' + v.cte.lote + ')', 'Sistema', 'sistema');
+    if (v.cte) e(v.cte.conciliadoEm + 'T23:59', 'CT-e ' + v.cte.numero + ' e NF ' + v.cte.nf + ' conciliados (lote ' + v.cte.lote + ')' + (v.cte.alerta ? '. ' + v.cte.alerta : ''), 'Sistema', v.cte.alerta ? 'alerta' : 'sistema');
     if (v.cte && v.descarga && v.descarga < HOJE) e(v.descarga + 'T23:59', 'Concluída: CT-e conciliado e descarga passada. Cargas entram no histórico dos compartimentos.', 'Sistema', 'sistema');
     if (v.cancelada) e(v.cancelada.em, 'Cancelada: ' + v.cancelada.motivo, nomeU(v.cancelada.por), 'alerta');
     return out.sort((a, b) => a.em.localeCompare(b.em));
   }
 
   // ------------------------------------------------------------------ agregados para as telas
+  // M41: leitura de viagem segue as filiais da sessão. 'todas' quer dizer todas as que a sessão vê.
   function viagensDaFilial(filialId) {
-    return db().viagens.filter(v => !filialId || filialId === 'todas' || v.filial === filialId);
+    const vis = filiaisVisiveis();
+    return db().viagens.filter(v => vis.includes(v.filial) && (!filialId || filialId === 'todas' || v.filial === filialId));
+  }
+  function viagensVisiveis() { return viagensDaFilial('todas'); }
+  function filiaisVisiveis() { const u = sessao(); return u ? u.filiais.slice() : []; }
+  function podeVer(tipo, id) {
+    const vis = filiaisVisiveis();
+    switch (tipo) {
+      case 'viagem': { const v = typeof id === 'object' ? id : viagem(id); return !!v && vis.includes(v.filial); }
+      case 'filial': return vis.includes(id);
+      case 'conjunto': { const c = typeof id === 'object' ? id : conjunto(id); return !!c && (c.dono !== 'propria' || !c.filial || vis.includes(c.filial)); }
+      case 'placa': { const p = placa(id); if (!p) return false; if (p.dono !== 'propria') return true; const c = db().conjuntos.find(x => x.cavalo === id || x.carretas.includes(id)); return !c || !c.filial || vis.includes(c.filial); }
+      case 'compartimento': return podeVer('placa', String(id).split('#')[0]);
+      case 'transportador': return !!transportador(id);
+      case 'pessoa': return !!pessoa(id);
+      default: return true;
+    }
   }
   function viagensDoDia(filialId, dia) {
     const d = dia || HOJE;
@@ -1111,12 +1287,23 @@
     if (!bloq.length || !bloq.every(f => NIVEL_ALCADA[f.alcada])) return null;
     const alvo = bloq.reduce((m, f) => (NIVEL_ALCADA[f.alcada] > NIVEL_ALCADA[m.alcada] ? f : m), bloq[0]);
     const pedido = (v.pedidosLib || []).filter(p => p.checagem === alvo.k).slice(-1)[0] || null;
-    return { viagem: v, dec, item: alvo, alcada: alvo.alcada, nivel: NIVEL_ALCADA[alvo.alcada], pedido };
+    // M43: "Manter bloqueio" responde o pedido. Vale enquanto o fato for o mesmo (detalhe gravado na
+    // decisão igual ao de agora); documento atualizado ou conjunto trocado é fato novo e reabre.
+    const manutencao = (v.manutencoes || []).filter(m => m.checagem === alvo.k).slice(-1)[0] || null;
+    const troca = ultimaTroca(v);
+    const mesmoFato = !!manutencao && (!manutencao.detalhe || manutencao.detalhe === alvo.detalhe) && (!troca || posterior(manutencao, troca));
+    const mantido = mesmoFato && (!pedido || posterior(manutencao, pedido)) ? manutencao : null;
+    const pedidoPendente = !!pedido && !(manutencao && posterior(manutencao, pedido));
+    const quemManteve = mantido ? (usuario(mantido.por) || {}).nome || '' : '';
+    return { viagem: v, dec, item: alvo, alcada: alvo.alcada, nivel: NIVEL_ALCADA[alvo.alcada], pedido: pedidoPendente ? pedido : null, ultimoPedido: pedido,
+      manutencao, mantido, podePedir: !pedidoPendente && !mantido,
+      decisao: mantido ? 'Bloqueio mantido por ' + quemManteve + (mantido.acao ? ': ' + mantido.acao.charAt(0).toLowerCase() + mantido.acao.slice(1) : ': ' + mantido.motivo) : null };
   }
   function podeAssinar(u, alcada) { return !!(u && u.alcada && NIVEL_ALCADA[u.alcada] >= (NIVEL_ALCADA[alcada] || 99)); }
   function filaAssinatura(u) {
     const us = u || sessao();
-    const lista = db().viagens.filter(v => us.filiais.includes(v.filial) && v.data >= HOJE).map(liberacaoDe).filter(Boolean)
+    // Bloqueio mantido sai da fila (M43); volta se houver fato novo ou pedido novo.
+    const lista = db().viagens.filter(v => us.filiais.includes(v.filial) && v.data >= HOJE).map(liberacaoDe).filter(x => x && !x.mantido)
       .sort((a, b) => (!!b.pedido - !!a.pedido) || (a.viagem.data + a.viagem.janela).localeCompare(b.viagem.data + b.viagem.janela));
     return { minhas: lista.filter(x => podeAssinar(us, x.alcada)), acima: lista.filter(x => !podeAssinar(us, x.alcada)) };
   }
@@ -1124,9 +1311,11 @@
   function pendenciasRegistro(filialId, desde) {
     const ini = desde || addDias(HOJE, -45);
     const out = [];
-    viagensDaFilial(filialId).filter(v => !v.cancelada && v.assegurada && v.data >= ini && v.data <= HOJE).forEach(v => {
+    // Viagem que carregou sem declaração sai daqui (M12): o desfecho já está registrado.
+    viagensDaFilial(filialId).filter(v => !v.cancelada && v.assegurada && !v.semDeclaracao && v.data >= ini && v.data <= HOJE).forEach(v => {
       const dec = decidir(v);
       const itens = [];
+      if (v.cte && v.cte.alerta) itens.push({ k: 'cte-nao-pronta', n: 'CT-e conciliado em viagem que não estava pronta: conferir se o DACTE saiu sem a declaração' });
       if (v.data < HOJE && !v.cte) itens.push({ k: 'cte', n: 'CT-e não conciliado' });
       if (dec.cobertura === 'gatekeeper' && !v.termo && v.data < HOJE) itens.push({ k: 'termo', n: 'sem termo assinado' });
       if (v.data < HOJE && !(v.verificacao && v.verificacao.estado === 'aprovada')) itens.push({ k: 'verif', n: 'sem verificação aprovada' });
@@ -1139,7 +1328,7 @@
   // Prontidão para auditoria: viagens asseguradas concluídas no período com os itens que o auditor anota.
   function prontidao(filialId, desde) {
     const ini = desde || addDias(HOJE, -45);
-    const vs = viagensDaFilial(filialId).filter(v => !v.cancelada && v.assegurada && v.data >= ini && v.data < HOJE);
+    const vs = viagensDaFilial(filialId).filter(v => !v.cancelada && v.assegurada && !v.semDeclaracao && v.data >= ini && v.data < HOJE);
     const completas = vs.filter(v => {
       const dec = decidir(v);
       return v.cte && (dec.cobertura !== 'gatekeeper' || v.termo) && v.verificacao && v.verificacao.estado === 'aprovada' && dec.t3.every(c => c.completo);
@@ -1187,18 +1376,327 @@
   function urlLink(id) { return 'traxium.app/v/' + id.replace('VG-', '') + '-' + (('' + id.charCodeAt(4) * 7919).slice(-4)); }
 
   // Lote de CT-e simulado (planilha ou XML exportado do TMS): uma linha por viagem carregada sem CT-e, mais uma sem correspondência.
+  // M41: só casa viagem das filiais da sessão; linha de outra filial vem sem correspondência, com o motivo.
+  // M44: cada linha traz a situação da viagem ao carregar e o alerta quando ela não estava pronta.
+  function situacaoAoCarregar(v) {
+    const dec = decidir(v);
+    const sem = !!dec.semDeclaracao;
+    const pronta = dec.resultado === 'pronta';
+    let alerta = null, esperado = null;
+    if (!v.assegurada) esperado = 'CT-e sem a declaração GMP+ (viagem não assegurada)';
+    else if (sem) esperado = 'CT-e sem a declaração GMP+ (carregou sem declaração)';
+    else if (pronta) esperado = 'CT-e com a declaração GMP+';
+    else alerta = 'Viagem não estava pronta nem liberada (' + dec.rotulo.toLowerCase() + (dec.falta[0] ? ': ' + dec.falta[0].motivo : '') + '): conferir se o DACTE saiu sem a declaração GMP+.';
+    return { resultado: dec.resultado, rotulo: dec.rotulo, porAutoridade: dec.porAutoridade, pronta, semDeclaracao: sem, motivos: dec.falta.map(f => f.motivo), alerta, esperado };
+  }
   function loteCTe() {
+    const vis = filiaisVisiveis();
     const pend = db().viagens.filter(v => !v.cancelada && v.data < HOJE && !v.cte);
     let n = 18402, nf = 23510;
-    const linhas = pend.sort((a, b) => a.data.localeCompare(b.data)).map(v => ({ cte: String(n++).padStart(6, '0'), nf: String(nf++).padStart(6, '0'), placa: conjunto(v.conjunto).cavalo, data: v.data, viagem: v.id, casou: true }));
+    const linhas = pend.sort((a, b) => a.data.localeCompare(b.data)).map(v => {
+      const base = { cte: String(n++).padStart(6, '0'), nf: String(nf++).padStart(6, '0'), placa: conjunto(v.conjunto).cavalo, data: v.data };
+      if (!vis.includes(v.filial)) return Object.assign(base, { viagem: null, casou: false, outraFilial: v.filial, motivo: 'Carga de outra filial (' + (filial(v.filial) || {}).nome + '): concilia quem tem acesso a ela.' });
+      return Object.assign(base, { viagem: v.id, casou: true, situacao: situacaoAoCarregar(v) });
+    });
     linhas.push({ cte: String(n++).padStart(6, '0'), nf: String(nf++).padStart(6, '0'), placa: 'QJD 9F03', data: '2026-10-07', viagem: null, casou: false, motivo: 'Nenhuma viagem com esta placa e data. Provável carga não assegurada.' });
     return { arquivo: 'ctes-out-' + HOJE.slice(8) + '.xml', linhas };
   }
 
+  // M31: registro da viagem para a amostra de auditoria. Datas absolutas (documento exportado, M26).
+  // linhas: [rótulo, valor] na ordem em que o auditor anota; o resto vem estruturado.
+  function registroAuditoria(v) {
+    if (typeof v === 'string') v = viagem(v);
+    if (!v) return null;
+    const dec = decidir(v);
+    const t = transportador(v.transportador), mot = pessoa(v.motorista);
+    const nomeU = id => (usuario(id) || {}).nome || (id === 'motorista' ? (mot || {}).nome : id) || '';
+    const dh = ts => ts ? fmt.data(ts.slice(0, 10)) + (ts.length > 10 ? ' ' + ts.slice(11, 16) : '') : '';
+    const sit = v.cte && v.cte.decisao ? v.cte.decisao : situacaoAoCarregar(v);
+    const nomeCh = k => (dec.checagens.find(c => c.k === k) || {}).nome || k;
+    const validas = liberacoesValidas(v);
+    const liberacoes = (v.liberacoes || []).map(l => {
+      const alc = db().alcadas.find(a => a.k === l.alcada);
+      const rev = (v.revogacoes || []).find(r => r.checagem === l.checagem && posterior(r, l)) || null;
+      const campos = [
+        ['Checagem liberada', nomeCh(l.checagem)], ['Motivo', l.motivo || ''], ['Justificativa', l.justificativa || ''],
+        ['Alçada', l.alcadaNome || (alc ? alc.n : l.alcada || '')], ['Risco residual', l.risco || ''], ['Validade', l.validade || ''],
+        ['Evidência', l.evidencia || ''], ['Escopo', l.escopo || ''], ['Ciência de quem assina', l.ciencia ? 'sim' : 'não'],
+        ['Assinado por', nomeU(l.assinante) + (l.em ? ' em ' + dh(l.em) : '')]
+      ];
+      return Object.assign({}, l, { alcadaNome: l.alcadaNome || (alc ? alc.n : l.alcada), nomeChecagem: nomeCh(l.checagem), assinanteNome: nomeU(l.assinante), emTxt: dh(l.em), valida: validas.includes(l), revogada: rev, campos });
+    });
+    const limpezas = (v.limpezas || []).map(x => {
+      const f = fornecedor(x.lavador);
+      return Object.assign({}, x, { lavadorNome: f ? f.nome : x.lavador, lavadorCnpj: f ? f.cnpj : '', regimeNome: (REGIMES[x.regime] || {}).n || x.regime, emTxt: dh(x.em), porNome: nomeU(x.por) });
+    });
+    const vig = manualVigente(v.data);
+    const manual = dec.cobertura === 'certificado' ? null : { versao: v.manual ? v.manual.versao : null, em: v.manual ? v.manual.em : null, emTxt: v.manual ? dh(v.manual.em) : '', vigente: vig.v, emDia: !!(v.manual && v.manual.versao === vig.v) };
+    const regTxt = (dec.checagens.find(c => c.k === 'regime') || {}).regime;
+    let dacte;
+    if (v.cte) {
+      if (sit.pronta) dacte = v.cte.numero + ': "' + DECLARACAO_CTE + '"' + (sit.porAutoridade ? ' (liberada por autoridade)' : '');
+      else if (sit.esperado) dacte = v.cte.numero + ': ' + sit.esperado.toLowerCase();
+      else dacte = v.cte.numero + ': ' + (sit.alerta || 'viagem não estava pronta');
+    } else dacte = v.data < HOJE ? 'ausente' : 'a conciliar depois do carregamento';
+    const linhas = [
+      ['Resultado da decisão', sit.rotulo + (sit.motivos && sit.motivos.length && !sit.pronta ? ': ' + sit.motivos.join('; ') : '')],
+      ['Nota fiscal', v.cte ? v.cte.nf : 'ausente'],
+      ['DACTE', dacte],
+      ['Embarcador e destinatário', ((embarcador(v.embarcador) || {}).nome || '') + ' para ' + ((destinatario(v.destinatario) || {}).nome || '')],
+      ['Produto', (produto(v.produto) || {}).nome || v.produto],
+      ['Filial', (filial(v.filial) || {}).nome || v.filial],
+      ['Subcontratado com RNTRC', t ? nomeTransportador(t) + ', RNTRC ' + (t.rntrc ? t.rntrc.numero : 'ausente') : 'frota própria'],
+      ['Motorista', mot ? mot.nome + ', CPF ' + fmt.cpfMascara(mot.cpf) : ''],
+      ['Placas do conjunto', placasDoConjunto(v.conjunto).join(', ')],
+      ['Três últimas cargas', dec.t3.map(c => c.placa + ' ' + c.pos + ': ' + c.cargas.map(x => fmt.data(x.data) + ' ' + (x.produto ? x.produto.nome : x.texto)).join('; ')).join(' | ')],
+      ['Limpeza', limpezas.length ? limpezas.map(x => x.comp.replace('#', ' ') + ': regime ' + x.regime + ' (' + x.regimeNome.toLowerCase() + '), ' + x.lavadorNome + ', comprovante ' + x.comprovante + ', ' + x.emTxt).join(' | ')
+        : regTxt === 'A' && v.checklist && v.checklist.enviadoEm ? 'regime A (seco), declarada no checklist de ' + dh(v.checklist.enviadoEm) : 'não registrada'],
+      ['Regularização TS1.9', (v.regularizacoes || []).length ? v.regularizacoes.map(x => x.comp.replace('#', ' ') + ', opção ' + x.opcao + ', inspetor ' + x.inspetor + ' (' + x.entidade + '), laudo ' + x.laudo + ', ' + dh(x.em)).join(' | ') : 'não houve'],
+      ['Termo de compromisso', v.termo ? 'versão ' + v.termo.versao + ', assinado em ' + dh(v.termo.em) : dec.cobertura === 'gatekeeper' ? 'ausente' : 'não se aplica'],
+      ['Ciência do manual', !manual ? 'não se aplica' : manual.versao ? 'v' + manual.versao + ' em ' + manual.emTxt + (manual.emDia ? ' (vigente)' : '; vigente era a v' + manual.vigente) : 'ausente (vigente: v' + manual.vigente + ')'],
+      ['Verificação de conformidade', v.verificacao && v.verificacao.estado === 'aprovada' ? dh(v.verificacao.em) + ' por ' + nomeU(v.verificacao.por) : 'ausente'],
+      ['Liberação por autoridade', liberacoes.length ? liberacoes.map(l => l.nomeChecagem + ': ' + l.motivo + ', ' + (l.alcadaNome || l.alcada) + ', ' + l.assinanteNome + ' em ' + l.emTxt + (l.revogada ? ' (revogada em ' + dh(l.revogada.em) + ')' : '')).join(' | ') : 'não houve'],
+      ['Bloqueio mantido', (v.manutencoes || []).length ? v.manutencoes.map(m => nomeU(m.por) + ' em ' + dh(m.em) + ': ' + m.motivo + (m.acao ? ' (ação: ' + m.acao + ')' : '')).join(' | ') : 'não houve'],
+      ['Carregou sem declaração', v.semDeclaracao ? dh(v.semDeclaracao.em) + ' por ' + nomeU(v.semDeclaracao.por) + ': ' + v.semDeclaracao.motivo : 'não']
+    ];
+    return { viagem: v.id, resultado: dec.resultado, rotulo: dec.rotulo, situacao: sit, liberacoes, limpezas, manual, regularizacoes: v.regularizacoes || [], manutencoes: v.manutencoes || [], semDeclaracao: v.semDeclaracao || null, linhas };
+  }
+
+  // ------------------------------------------------------------------ permissões (M40, M37, M41, M14)
+  const P_OPERACAO = ['afretador', 'qualidade', 'direcao'];
+  const P_GESTAO = ['qualidade', 'direcao'];
+  const PAPEIS_OP = {
+    criarViagem: P_OPERACAO, enviarLink: P_OPERACAO, conferir: P_OPERACAO, registrarLimpeza: P_OPERACAO, pedirLiberacao: P_OPERACAO,
+    trocarConjunto: P_OPERACAO, registrarOcorrencia: P_OPERACAO, retificar: P_OPERACAO, cancelarViagem: P_OPERACAO, conciliarCTe: P_OPERACAO,
+    carregarSemDeclaracao: P_OPERACAO, cadastrarTransportador: P_OPERACAO, pedirClassificacao: P_OPERACAO,
+    liberar: P_GESTAO, manterBloqueio: P_GESTAO, revogarLiberacao: P_GESTAO, regularizar: P_GESTAO,
+    atualizarDocumento: ['qualidade', 'direcao', 'frota'], escopoFrota: ['qualidade', 'direcao', 'frota'],
+    convidar: P_GESTAO, cadastrarFornecedor: P_GESTAO, comunicarOC: P_GESTAO, publicarManual: P_GESTAO, registrarTreinamento: P_GESTAO,
+    registrarSimulacao: P_GESTAO, classeRegra: P_GESTAO, convidarUsuario: P_GESTAO, cancelarConviteUsuario: P_GESTAO, reset: P_GESTAO,
+    revisarTransportador: ['direcao']
+  };
+  const OPS_MOTORISTA = ['linkAberto', 'linkCpf', 'linkDocs', 'linkT3', 'linkChecklist', 'linkManual', 'linkAssinar'];
+  const OPS_VIAGEM = ['enviarLink', 'conferir', 'registrarLimpeza', 'pedirLiberacao', 'trocarConjunto', 'retificar', 'cancelarViagem', 'carregarSemDeclaracao',
+    'liberar', 'manterBloqueio', 'revogarLiberacao', 'regularizar'];
+  const NOME_PAPEL = { afretador: 'Afretador', qualidade: 'Qualidade', direcao: 'Direção', frota: 'Gestor de frota', consultoria: 'Consultoria' };
+  const listaE = xs => xs.length > 1 ? xs.slice(0, -1).join(', ') + ' e ' + xs[xs.length - 1] : xs[0];
+  const nomeAlcadaK = k => (db().alcadas.find(a => a.k === k) || {}).n || k;
+  const ehFrotaPropria = ref => { if (!ref) return false; const pl = placa(ref); if (pl) return pl.dono === 'propria'; const ps = pessoa(ref); if (ps) return ps.vinculo === 'propria'; const cj = conjunto(ref); return !!cj && cj.dono === 'propria'; };
+  // Item bloqueado que a alçada libera (ou mantém): o da checagem pedida, ou o principal da viagem.
+  function itemLiberavel(v, k) {
+    const dec = decidir(v);
+    if (!k) { const lib = liberacaoDe(v); return lib ? lib.item : null; }
+    return dec.falta.find(f => f.k === k && f.estado === 'bloqueio') || null;
+  }
+
+  // Motivo da recusa (null = pode). alvo: id ou objeto; dados: o que a operação vai gravar (de fazer).
+  function avaliar(op, alvo, dados, u) {
+    const d = dados || {};
+    if (OPS_MOTORISTA.includes(op)) {
+      if (!d.porMotorista && !(dados === undefined)) return 'Etapa do motorista: só pelo link da viagem.';
+      const v = typeof alvo === 'object' && alvo ? alvo : viagem(alvo);
+      if (!v) return 'Viagem não encontrada.';
+      if (v.cancelada) return 'Viagem cancelada: o link não vale mais.';
+      if (!(v.link && v.link.enviadoEm)) return 'Link ainda não enviado a este motorista.';
+      if (op === 'linkCpf' && !cpfValido((pessoa(v.motorista) || {}).cpf)) return 'Motorista sem CPF no cadastro: a filial completa o cadastro antes.';
+      return null;
+    }
+    if (!PAPEIS_OP[op]) return 'Operação desconhecida: ' + op + '.';
+    if (!u) return 'Entre com um usuário.';
+    if (u.papel === 'consultoria') return 'Consultoria tem acesso só de leitura e exportação.';
+    if (!PAPEIS_OP[op].includes(u.papel)) {
+      if (['liberar', 'manterBloqueio', 'revogarLiberacao'].includes(op)) return 'Sem alçada de liberação: a Qualidade ou a Direção decide. Peça a liberação.';
+      const ps = PAPEIS_OP[op].map(p => NOME_PAPEL[p]);
+      return 'Só ' + listaE(ps) + (ps.length > 1 ? ' fazem' : ' faz') + ' isto.';
+    }
+    const fil = id => (filial(id) || {}).nome || id;
+    const naFilial = fid => u.filiais.includes(fid);
+
+    if (OPS_VIAGEM.includes(op) || (op === 'registrarOcorrencia' && (alvo || d.viagem)) || (op === 'pedirClassificacao' && (alvo || d.viagem))) {
+      const v = typeof alvo === 'object' && alvo ? alvo : viagem(alvo || d.id || d.viagem);
+      if (!v) return OPS_VIAGEM.includes(op) ? 'Viagem não encontrada.' : null;
+      if (!naFilial(v.filial)) return 'Viagem de outra filial (' + fil(v.filial) + ').';
+      if (v.cancelada) return 'Viagem cancelada.';
+      const dec = decidir(v);
+      switch (op) {
+        case 'enviarLink':
+          if (!cpfValido((pessoa(v.motorista) || {}).cpf)) return 'Motorista sem CPF no cadastro: o link pede o CPF para identificar quem preenche.';
+          return null;
+        case 'conferir':
+          if (!(v.checklist && v.checklist.enviadoEm)) return 'O motorista ainda não enviou o checklist.';
+          return null;
+        case 'trocarConjunto': case 'cancelarViagem':
+          if (v.cte) return 'Viagem já tem CT-e conciliado.';
+          return null;
+        case 'carregarSemDeclaracao':
+          if (!v.assegurada) return 'A viagem não leva declaração GMP+.';
+          if (v.semDeclaracao) return 'Já registrado: carregou sem declaração.';
+          if (v.data > HOJE) return 'A viagem ainda não carregou (carregamento em ' + fmt.data(v.data) + ').';
+          if (dec.resultado === 'pronta') return 'A viagem está pronta: carrega com a declaração.';
+          return null;
+        case 'pedirLiberacao': {
+          const lib = liberacaoDe(v);
+          if (!lib) return 'Não há bloqueio que uma alçada libere.';
+          if (lib.mantido) return lib.decisao + '. Novo pedido só com fato novo (documento atualizado, conjunto trocado).';
+          if (lib.pedido) return 'Liberação já pedida às ' + fmt.hora(lib.pedido.em) + ', esperando ' + nomeAlcadaK(lib.alcada) + '.';
+          if (podeAssinar(u, lib.alcada)) return 'Você tem a alçada: libere ou mantenha o bloqueio.';
+          return null;
+        }
+        case 'liberar': case 'manterBloqueio': {
+          const k = d.checagem || (d.registro && d.registro.checagem) || null;
+          const it = itemLiberavel(v, k);
+          if (!it) {
+            const tec = dec.falta.find(f => f.tecnico);
+            return tec ? 'Bloqueio técnico: ninguém libera. ' + (tec.resolver || 'Trocar o conjunto ou regularizar.') : 'Não há bloqueio liberável por alçada nesta viagem.';
+          }
+          if (it.tecnico || !NIVEL_ALCADA[it.alcada]) return 'Este bloqueio não se libera por alçada. ' + (it.resolver || '');
+          if (!podeAssinar(u, it.alcada)) return 'Precisa da alçada ' + nomeAlcadaK(it.alcada) + '.';
+          if (op === 'manterBloqueio') { const lib = liberacaoDe(v); if (lib && lib.mantido && lib.item.k === it.k) return 'Bloqueio já mantido: ' + lib.decisao.replace(/^Bloqueio mantido por /, 'por ') + '.'; }
+          return null;
+        }
+        case 'revogarLiberacao': {
+          const ls = liberacoesValidas(v).filter(l => !d.checagem || l.checagem === d.checagem);
+          if (!ls.length) return 'Não há liberação em vigor nesta viagem.';
+          if (v.cte) return 'Viagem já tem CT-e conciliado: registre ocorrência.';
+          if (!podeAssinar(u, ls[ls.length - 1].alcada)) return 'Precisa da alçada ' + nomeAlcadaK(ls[ls.length - 1].alcada) + '.';
+          return null;
+        }
+        case 'regularizar':
+          if (!dec.checagens.some(c => c.k === 'regime' && c.tecnico && c.estado === 'bloqueio')) return 'Não há carga anterior proibida a regularizar.';
+          return null;
+        default: return null;
+      }
+    }
+    switch (op) {
+      case 'criarViagem': {
+        const fid = (typeof alvo === 'string' && alvo) || d.filial;
+        if (fid && !naFilial(fid)) return 'Filial fora do seu acesso (' + fil(fid) + ').';
+        return null;
+      }
+      case 'conciliarCTe': {
+        const fora = (d.linhas || []).map(l => viagem(l.viagem)).filter(v => v && !naFilial(v.filial));
+        if (fora.length) return 'Lote com viagem de outra filial (' + fora.map(v => v.id).join(', ') + ').';
+        return null;
+      }
+      case 'escopoFrota': {
+        const c = conjunto((typeof alvo === 'string' && alvo) || d.conjunto);
+        if (alvo || d.conjunto) {
+          if (!c || c.dono !== 'propria') return 'Só conjunto da frota própria tem escopo.';
+          if (c.filial && !naFilial(c.filial)) return 'Conjunto de outra filial (' + fil(c.filial) + ').';
+        }
+        return null;
+      }
+      case 'atualizarDocumento': {
+        if (u.papel !== 'frota') return null;
+        const ref = typeof alvo === 'object' && alvo ? (alvo.fornecedor || alvo.ref) : (alvo || d.fornecedor || d.ref);
+        if (!ref) return null;
+        return ehFrotaPropria(ref) && !d.fornecedor ? null : 'Gestor de frota atualiza só documentos da frota própria.';
+      }
+      case 'comunicarOC': {
+        const fid = (typeof alvo === 'string' && alvo) || d.filial;
+        if (fid && !naFilial(fid)) return 'Filial fora do seu acesso (' + fil(fid) + ').';
+        return null;
+      }
+      default: return null;
+    }
+  }
+
+  // Dados inválidos: recusa antes de gravar (o log só guarda fato válido). Não roda na releitura do log.
+  function validar(op) {
+    const d = op.dados || {};
+    const v = d.id ? viagem(d.id) : null;
+    const cpfNovo = (cpf, nomeP) => {
+      if (!cpfValido(cpf)) return 'CPF de ' + (nomeP || 'motorista') + ' com 11 dígitos é obrigatório: o link identifica o motorista por ele.';
+      if (db().pessoas.some(p => soDigitos(p.cpf) === soDigitos(cpf))) return 'CPF já cadastrado: escolha o transportador existente.';
+      return null;
+    };
+    switch (op.tipo) {
+      case 'criarViagem': {
+        if (!filial(d.filial)) return 'Filial inexistente.';
+        if (d.data && !dataValida(d.data)) return 'Data de carregamento inválida.';
+        if (d.janela && !horaValida(d.janela)) return 'Janela de carregamento no formato HH:MM, como 14:30.';
+        if (!produto(d.produto)) return 'Produto fora da base.';
+        if (!embarcador(d.embarcador) || !destinatario(d.destinatario)) return 'Embarcador e destinatário são obrigatórios.';
+        if (!(+d.peso > 0)) return 'Peso maior que zero é obrigatório.';
+        const ordem = norm(d.ordem);
+        if (ordem && db().viagens.some(x => x.filial === d.filial && !x.cancelada && norm(x.ordem) === ordem)) return 'Ordem ' + d.ordem + ' já tem viagem nesta filial.';
+        if (d.novoTAC) {
+          const n = d.novoTAC;
+          if (!String(n.nome || '').trim()) return 'Nome do motorista é obrigatório.';
+          const m = cpfNovo(n.cpf, n.nome); if (m) return m;
+          if (!(n.placas || []).length) return 'Informe as placas do conjunto.';
+        } else {
+          const c = conjunto(d.conjunto);
+          if (!c) return 'Conjunto inexistente.';
+          if (!pessoa(d.motorista)) return 'Motorista inexistente.';
+        }
+        return null;
+      }
+      case 'cadastrarTransportador':
+        if (d.tipo !== 'ETC') return cpfNovo(d.cpf, d.nome);
+        return null;
+      case 'retificar': {
+        if (!v) return 'Viagem não encontrada.';
+        if (!String(d.motivo || '').trim()) return 'Motivo da retificação é obrigatório.';
+        if (d.campo === 'janela' && !horaValida(d.para)) return 'Janela no formato HH:MM, como 14:30.';
+        if (d.campo === 'peso' && !(+d.para > 0)) return 'Peso só com números, maior que zero.';
+        if (d.campo === 'data') { if (!dataValida(d.para)) return 'Data inválida.'; if (v.cte) return 'Viagem já tem CT-e: a data de carregamento não muda.'; }
+        if (d.campo === 'destinatario' && !destinatario(d.para)) return 'Destinatário inexistente.';
+        if (d.campo === 'produto' && !produto(d.para)) return 'Produto fora da base.';
+        if (d.campo === 'ordem' && !String(d.para || '').trim()) return 'Número da ordem é obrigatório.';
+        if (!['peso', 'janela', 'ordem', 'destinatario', 'produto', 'data'].includes(d.campo)) return 'Campo que não se retifica: ' + d.campo + '.';
+        return null;
+      }
+      case 'carregarSemDeclaracao': case 'manterBloqueio': case 'cancelarViagem': case 'revogarLiberacao':
+        if (!String(d.motivo || '').trim()) return 'Motivo é obrigatório.';
+        return null;
+      case 'classeRegra': {
+        const r = db().config.regras.find(x => x.k === d.regra);
+        if (!r) return 'Regra inexistente.';
+        if (!['bloqueio', 'alerta'].includes(d.classe)) return 'Classe de regra inválida.';
+        if (r.travada && d.classe !== r.piso) return 'Regra de norma: fica em ' + r.piso + '.';
+        if (!String(d.motivo || '').trim()) return 'Motivo é obrigatório.';
+        return null;
+      }
+      default: return null;
+    }
+  }
+
+  // Fatos do momento da decisão, gravados junto da operação (o log é a prova).
+  function enriquecer(op) {
+    const d = op.dados;
+    const v = d.id ? viagem(d.id) : null;
+    if (op.tipo === 'manterBloqueio' && v) {
+      const it = itemLiberavel(v, d.checagem);
+      if (it) { d.checagem = d.checagem || it.k; d.detalhe = it.detalhe; d.alcada = it.alcada; }
+    }
+    if (op.tipo === 'carregarSemDeclaracao' && v) {
+      const dec = decidir(v);
+      d.resultadoAntes = dec.resultado; d.faltava = dec.falta.map(f => f.motivo);
+    }
+    if (op.tipo === 'conciliarCTe') (d.linhas || []).forEach(l => { const via = viagem(l.viagem); if (via) l.decisao = situacaoAoCarregar(via); });
+  }
+
+  function opDoAlvo(tipo, d) {
+    if (OPS_VIAGEM.includes(tipo) || OPS_MOTORISTA.includes(tipo)) return d.id;
+    if (tipo === 'registrarOcorrencia' || tipo === 'pedirClassificacao') return d.viagem || null;
+    if (tipo === 'criarViagem' || tipo === 'comunicarOC') return d.filial;
+    if (tipo === 'escopoFrota') return d.conjunto;
+    if (tipo === 'convidar' || tipo === 'revisarTransportador') return d.transportador;
+    if (tipo === 'atualizarDocumento') return d;
+    return null;
+  }
+  function pode(op, alvo) { return avaliar(op, alvo, OPS_MOTORISTA.includes(op) ? { porMotorista: true } : undefined, sessao()) === null; }
+  function porque(op, alvo) { return avaliar(op, alvo, OPS_MOTORISTA.includes(op) ? { porMotorista: true } : undefined, sessao()); }
+
   // ------------------------------------------------------------------ escrita
   function fazer(tipo, dados) {
     const op = { tipo, dados: clone(dados || {}), em: agoraTs(), por: (sessao() || {}).id || 'u-rafael' };
-    if (dados && dados.porMotorista) op.por = 'motorista';
+    if (dados && dados.porMotorista && OPS_MOTORISTA.includes(tipo)) op.por = 'motorista';
+    // Recusa o que a sessão não pode (M40) e o dado inválido, mesmo que a tela ofereça.
+    const motivo = avaliar(tipo, opDoAlvo(tipo, op.dados), op.dados, op.por === 'motorista' ? null : sessao()) || validar(op);
+    if (motivo) throw recusa(motivo);
+    enriquecer(op);
     const teste = clone(mem.db);
     teste.eventos = mem.db.eventos.slice();
     aplicar(teste, op); // valida antes de gravar; lança se a operação for inválida
@@ -1207,6 +1705,9 @@
     reconstruir();
     avisarOuvintes();
     return op.resultado || true;
+  }
+  function tentar(tipo, dados) {
+    try { return { ok: true, resultado: fazer(tipo, dados) }; } catch (e) { return { ok: false, motivo: e.motivo || e.message }; }
   }
   function ouvir(fn) {
     mem.ouvintes.push(fn);
@@ -1237,7 +1738,10 @@
     nomeTransportador, produtoPorTexto, buscarProdutos, compsDoConjunto, placasDoConjunto, docEstado, historico, t3,
     linkEstado, coberturaDe, ocorrenciaGraveAberta, liberacaoDe, podeAssinar, filaAssinatura, manualVigente, ciclo, decidir, linhaDoTempo,
     viagensDaFilial, viagensDoDia, sessao, entrarComo, vencimentos, pendenciasRegistro, prontidao, badges, qualificacao,
-    mensagemLink, urlLink, loteCTe, fazer, ouvir, reset, recarregar
+    mensagemLink, urlLink, loteCTe, fazer, ouvir, reset, recarregar,
+    // revisão do MVP (11-revisao-mvp.md)
+    pode, porque, filiaisVisiveis, podeVer, viagensVisiveis, tentar, rotuloFalha, registroAuditoria, situacaoAoCarregar,
+    classeRegra, cpfValido, horaValida, dataValida, liberacoesValidas
   };
   root.TX = TX;
   if (typeof module !== 'undefined' && module.exports) module.exports = TX;
