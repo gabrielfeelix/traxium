@@ -83,6 +83,21 @@ const ETAPAS: Record<string, { mot: string; fil: string; ev: string }> = {
   },
 };
 
+const ic = (d: React.ReactNode) => (
+  <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">{d}</svg>
+);
+// Quatro respostas rápidas: o que é, quando, o que o motorista faz, por quê.
+const INTRO: { t: string; p: string; ic: React.ReactNode }[] = [
+  { t: 'O que é', p: 'A parte do Traxium que o motorista usa: uma página no celular, sem login e sem instalar nada.',
+    ic: ic(<><rect x="4" y="1.8" width="8" height="12.4" rx="2" /><line x1="6.8" y1="4" x2="9.2" y2="4" /><circle cx="8" cy="11.8" r=".6" fill="currentColor" stroke="none" /></>) },
+  { t: 'Quando', p: 'Antes de carregar ração: o afretador cria a viagem e manda este link pelo WhatsApp.',
+    ic: ic(<><rect x="1.4" y="4" width="9.6" height="6.6" rx="1" /><path d="M11 6.4h2.3l1.3 2v2.2H11z" /><circle cx="4.4" cy="12.2" r="1.3" /><circle cx="12" cy="12.2" r="1.3" /></>) },
+  { t: 'O que o motorista faz', p: 'Confirma CPF e placas, informa as 3 últimas cargas, faz o checklist com fotos, lê o manual e assina. Uns 5 minutos.',
+    ic: ic(<><rect x="3" y="2.5" width="10" height="11.5" rx="1.8" /><path d="M6 1.8h4v1.8H6z" /><path d="M5.6 8.8 7.3 10.5 10.6 6.8" /></>) },
+  { t: 'Por quê', p: 'Prova que o veículo serve para ração (GMP+ FSA). O escritório vê tudo na hora e o sistema decide se o caminhão carrega.',
+    ic: ic(<><path d="M8 1.8 13.2 4v4c0 3-2.2 5.3-5.2 6.2C5 13.3 2.8 11 2.8 8V4z" /><path d="M5.6 8.2 7.3 9.9 10.5 6.4" /></>) },
+];
+
 const OPS_DO_LINK = ['enviarLink', 'linkAberto', 'linkCpf', 'linkDocs', 'linkT3', 'linkChecklist', 'linkManual', 'linkAssinar', 'conferir'];
 
 function lerLS(k: string) { try { return localStorage.getItem(k); } catch { return null; } }
@@ -154,8 +169,8 @@ export function PrototipoMobile() {
     const medir = () => {
       const el = palco.current;
       if (!el) return;
-      const topo = el.getBoundingClientRect().top + (el.closest('[data-tx-conteudo]')?.scrollTop || 0);
-      const livre = window.innerHeight - Math.max(topo, 96) - 24;
+      // O celular gruda no topo ao rolar: cabe na altura útil abaixo do header da moldura (72 px).
+      const livre = window.innerHeight - 72 - 32;
       setEscala(Math.max(0.62, Math.min(1, livre / (ALTURA_TELA + BORDA * 2))));
     };
     medir();
@@ -194,12 +209,27 @@ export function PrototipoMobile() {
       <div className="mb-cab">
         <div>
           <h1 className="mb-tit">Protótipo mobile</h1>
-          <div className="mb-sub">O link que o motorista recebe pelo WhatsApp, num celular. O que ele faz aqui chega na mesa da filial na hora.</div>
+          <div className="mb-sub">O lado do motorista no Traxium, num celular de verdade.</div>
         </div>
         <div className="mb-cab-acoes">
           <a className="mb-bt mb-bt-sec" href={'/link?id=' + cen.id} target="_blank" rel="noopener">Abrir em outra aba</a>
           <button type="button" className="mb-bt mb-bt-sec" onClick={reiniciarLink} data-tx-reiniciar="">Reiniciar este link</button>
         </div>
+      </div>
+
+      <ul className="mb-intro" aria-label="Sobre esta página">
+        {INTRO.map(i => (
+          <li key={i.t} className="mb-intro-i">
+            <span className="mb-intro-ic" aria-hidden>{i.ic}</span>
+            <div>
+              <div className="mb-intro-t">{i.t}</div>
+              <div className="mb-intro-p">{i.p}</div>
+            </div>
+          </li>
+        ))}
+      </ul>
+      <div className="mb-como" data-tx-como-usar="">
+        <strong>Como usar:</strong> escolha uma viagem de exemplo, toque nas etapas para levar o celular até elas, use o CPF mostrado em cada viagem e desligue o sinal para ver o modo sem cobertura.
       </div>
 
       <div className="mb-grade">

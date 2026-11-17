@@ -11,6 +11,9 @@ Código de referência: `src/telas/LinkDaViagem.jsx` (tela e regras), `src/app/l
 3. Cada etapa concluída vira um evento no back-end, com a hora. Nada se apaga: correção é um evento novo.
 4. Alvos de toque com pelo menos 44 px; campos com 48 px de altura e fonte de 16 px (o iOS não amplia a página). Escala de texto: 12, 14, 16, 20, 24.
 5. Texto em português, direto, na segunda pessoa ("você").
+6. Pista visual onde ajuda: ícone por etapa na capa, ícone por item no checklist, moldura de enquadramento com câmera, ilustração no fim. Nada decorativo além disso.
+7. Depois da capa, o cabeçalho encolhe para uma barra (etapa, produto, janela, progresso); "Carga" abre os dados completos.
+8. Nenhuma mensagem de escritório aparece no celular. O indicador "sem sinal" é só estado; a simulação de sinal fica no painel do `/mobile` (ou num botão marcado "Demonstração" na página solta).
 
 ## 2. Ordem das etapas
 
@@ -54,6 +57,7 @@ A etapa de documentos continua na lista depois de enviada, para a contagem "Etap
 
 - **Objetivo:** confirmar que é o motorista da viagem e que o conjunto é o certo.
 - **Campos:** 3 primeiros números do CPF (teclado numérico, 3 dígitos). Lista das placas (cavalo e carretas), só leitura.
+- **CPF ausente no cadastro** (TAC novo sem CPF): o link mostra "Falta o seu CPF no cadastro" e pede para avisar o afretador; o botão diz "CPF não cadastrado: fale com o afretador".
 - **Validações:** CPF confere com o cadastro da viagem. Errado: "Não confere com o CPF desta viagem. Confira os números ou fale com <afretador>, o afretador."
 - **Placa errada:** "Alguma placa está errada" abre o aviso "Não siga com placa diferente" e trava o botão ("Placa errada: fale com o afretador"). O afretador corrige a viagem e o mesmo link passa a mostrar as placas certas. "Olhei de novo: as placas estão certas" desfaz.
 - **Já feito:** mostra nome, CPF mascarado e placas, com a hora.
@@ -70,21 +74,27 @@ A etapa de documentos continua na lista depois de enviada, para a contagem "Etap
 ### 4.3 Últimas cargas (T-3)
 
 - **Objetivo:** as três últimas cargas de cada compartimento, da mais recente para a mais antiga.
-- **Campos por linha:** data (seletor de data do celular) e o que carregou (texto livre com sugestões da base de produtos).
+- **Linha do tempo:** três pontos ligados ("Última carga", "Penúltima", "Antepenúltima"), cada um verde quando completo.
+- **O que carregou:** campo com aspecto de seleção (lupa e seta). Tocar abre uma folha de baixo com busca por nome e apelido da base IDTF ("casquinha" acha casca de soja peletizada), atalhos das cargas mais comuns e, em cada resultado, a categoria de limpeza. "Não achei o produto" guarda o texto como escrito e marca para classificação ("Fora da lista: vai como você escreveu e a transportadora confere").
+- **Quando:** atalhos "Ontem", "Há 3 dias", "Há 1 semana", "Há 2 semanas" (só os que cabem antes da carga de cima) e "Outra data", que abre o calendário do celular. Com data escolhida, mostra "26/09, há 12 dias (trocar)".
+- Carga proibida rola até a mensagem de erro, que nunca fica atrás do rodapé.
 - **Pré-preenchimento:** quando o sistema conhece o histórico do compartimento, as linhas vêm preenchidas para conferir.
 - **Atalho:** a partir da segunda carreta, "Carregou o mesmo que a <placa>".
 - **Validações:**
   - data antes da data desta carga;
   - cada linha mais antiga que a de cima ("Esta carga é mais antiga: a data tem que ser antes de 03/10/2026.");
   - texto preenchido.
-- **Mensagens por linha:** produto reconhecido ("Entendido: milho"); regime que pede lavagem; carga proibida ("O afretador vai falar com você"); não reconhecido ("Vai como está e a transportadora confere"). Nenhuma delas impede o envio: o motorista declara, o sistema decide.
+- **Mensagens por linha:** regime que pede lavagem; carga proibida ("O afretador vai falar com você"); fora da lista. Nenhuma delas impede o envio: o motorista declara, o sistema decide.
 - **Evento:** `linkT3 { id, t3: { "<placa>#<comp>": [{ data, produto } | { data, texto }] x3 } }`.
 
 ### 4.4 Checklist com fotos
 
 - **Objetivo:** inspeção do conjunto antes de carregar: lona, correntes, cintas, carroceria e interior (crítico).
+- **Progresso:** "2 de 5 itens prontos" com uma barra por item.
+- **Item aberto:** ícone do item ao lado do título, pergunta, Sim e Não grandes com ✓ e ✕ (Sim escolhido em teal sólido, Não em vermelho claro), moldura de enquadramento com ícone de câmera, "Enquadre: ..." e "Tirar foto".
+- **Item pronto:** encolhe numa linha com a miniatura, a resposta e "Alterar".
 - **Campos por item:** Sim ou Não, e uma foto pela câmera. Com "Não": o que fazer naquele item e um campo opcional "O que está errado?".
-- **Validações:** todos os itens respondidos e com foto. O botão diz quantos faltam ("Faltam 3 de 5 itens", "Falta 1 item").
+- **Validações:** todos os itens respondidos e com foto. O botão separa resposta e foto ("Faltam 2 respostas e 5 fotos", "Falta 1 foto").
 - **Não no interior:** aviso em vermelho de que com resto de carga a carreta não carrega ração.
 - **Fotos salvas antes** (rascunho no servidor ou no celular) voltam como miniatura, com "Tirar de novo".
 - **Devolvida:** só os itens pedidos, com o motivo no topo; o botão vira "Reenviar à filial" e o fim diz "Foto nova enviada".
@@ -94,14 +104,14 @@ A etapa de documentos continua na lista depois de enviada, para a contagem "Etap
 ### 4.5 Manual
 
 - **Objetivo:** ciência do manual de boas práticas vigente.
-- **Tela:** um cartão por vez (5 cartões), com indicador de posição. "Próximo cartão"; no último, "Li e entendi". "Voltar" volta um cartão.
+- **Tela:** um cartão por vez (5 cartões), altura pelo conteúdo, com indicador de posição. Arrastar para o lado troca de cartão; "Próximo cartão"; no último, "Li e entendi". "Voltar" volta um cartão.
 - **Evento:** `linkManual { id, versao }`.
 
 ### 4.6 Termo
 
 - **Objetivo:** termo de compromisso do transportador, só para gatekeeper.
 - **Tela:** título, versão, texto e quadro de assinatura com o dedo (nome e data impressos no quadro). "Limpar" apaga.
-- **Validações:** um traço mínimo no quadro ("Assine no quadro para enviar").
+- **Validações:** um traço mínimo no quadro ("Assine para enviar").
 - **Evento:** `linkAssinar { id, versao }` mais a imagem da assinatura.
 
 ### 4.7 Fim
