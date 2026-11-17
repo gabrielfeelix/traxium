@@ -750,6 +750,11 @@ export default class Viagens extends Tela {
                 >
                   {v.exportarRot}
                 </Botao>
+                {(!TX.pode || TX.pode('criarViagem')) && (
+                  <Botao variante="primario" href="/hoje?nova=1" data-tx-viagens-nova="">
+                    Nova viagem
+                  </Botao>
+                )}
               </>
             }
           />

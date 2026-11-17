@@ -93,6 +93,14 @@ export default class Hoje extends Tela {
   state = { loading: true, busca: '', abertos: { falta: true, bloq: true, pronta: false }, nova: false };
   componentDidMount() {
     TX.ui.montar(this);
+    // /hoje?nova=1 (vindo do botão Nova viagem de Viagens) abre o formulário direto.
+    if (new URLSearchParams(window.location.search).get('nova') === '1') {
+      setTimeout(() => {
+        const b = document.querySelector('[data-tx-nova-viagem]') || [...document.querySelectorAll('button')].find((x) => x.textContent.trim() === 'Nova viagem');
+        if (b) b.click();
+        TX.ui.trocarUrl('/hoje');
+      }, 300);
+    }
   }
   avisar(m) {
     TX.ui.avisar(this, m);
