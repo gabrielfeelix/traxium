@@ -232,9 +232,9 @@ export default class Transportadores extends Tela {
         busca: s.busca,
         onBusca: (e) => this.setState({ busca: e.target.value, pag: 1 }),
         tipos: [
-          ['todos', 'TAC e ETC'],
-          ['TAC', 'TAC'],
-          ['ETC', 'ETC'],
+          ['todos', 'Todos os terceiros'],
+          ['TAC', 'Autônomo (TAC)'],
+          ['ETC', 'Empresa (ETC)'],
         ].map(([k, n]) => ({ k, n, on: s.tipo === k, onClick: () => this.setState({ tipo: k, pag: 1 }) })),
         dica: DICA[s.filtro] || '',
         ordenar,
@@ -1211,6 +1211,10 @@ export default class Transportadores extends Tela {
                 Transportadores
               </h1>
               <span className="tx-tipo-corpo tx-sec num">{v.contagem}</span>
+              <p className="tx-tipo-denso tx-sec" style={{ margin: 0, flexBasis: '100%' }}>
+                Terceirizados: autônomos (TAC) e empresas (ETC). Os veículos próprios ficam em{' '}
+                <a href="/frota" className="tx-acao-texto">Frota própria</a>.
+              </p>
             </div>
             {v.podeCad ? (
               <div className="tx-pagina-cab__acoes">
@@ -1252,11 +1256,13 @@ export default class Transportadores extends Tela {
                 data-tx-busca=""
               />
               <div role="group" aria-label="Tipo de transportador" style={{ display: 'flex', gap: 'var(--esp-1-5)', marginLeft: 'auto' }}>
+                <span className="tx-tipo-rotulo tx-sec" style={{ alignSelf: 'center' }}>VÍNCULO</span>
                 {v.tipos.map((tp) => (
                   <Chip key={tp.k} tipo="filtro" selecionado={tp.on} onClick={tp.onClick} data-tx-tipo={tp.k}>
                     {tp.n}
                   </Chip>
                 ))}
+                <a href="/frota" className="tx-chip tx-chip--filtro" data-tx-tipo-propria="">Frota própria ›</a>
               </div>
             </div>
             {v.dica ? <div className="tx-transp-dica">{v.dica}</div> : null}
